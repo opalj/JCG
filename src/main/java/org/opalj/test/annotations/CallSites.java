@@ -28,19 +28,21 @@
  */
 package org.opalj.test.annotations;
 
-import java.lang.annotation.*;
-import static java.lang.annotation.RetentionPolicy.*;
-import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Wrapper annotation that allows several InvokedMethod annotations on the same method.
+ * Container of the {@link CallSite} annotation.
  * 
- * @author Arne Lottmann
+ * @author Florian Kuebler
  */
 @Retention(RUNTIME)
 @Target(METHOD)
-@Deprecated
-public @interface InvokedMethods {
+public @interface CallSites {
+	
+	CallSite[] value();
 
-    InvokedMethod[] value();
 }

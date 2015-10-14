@@ -33,14 +33,20 @@ import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Wrapper annotation that allows several InvokedMethod annotations on the same method.
- * 
- * @author Arne Lottmann
+ * Describes a specific method to which a call site can resolve.
+ *
+ * @author Florian Kuebler
  */
 @Retention(RUNTIME)
-@Target(METHOD)
-@Deprecated
-public @interface InvokedMethods {
+@Target(LOCAL_VARIABLE)
+public @interface ResolvedMethod {
 
-    InvokedMethod[] value();
+	/**
+	 * The type name of the receiver using JVM notation (e.g.,
+	 * "java/lang/Object").
+	 */
+	String receiverType();
+
+	ResolvingCondition[] iff() default { @ResolvingCondition() };
+
 }

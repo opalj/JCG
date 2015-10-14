@@ -33,14 +33,15 @@ import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Wrapper annotation that allows several InvokedMethod annotations on the same method.
- * 
- * @author Arne Lottmann
+ * A concrete call must be resolved if all these conditions are true.
+ *
+ * @author Florian Kuebler
  */
 @Retention(RUNTIME)
-@Target(METHOD)
-@Deprecated
-public @interface InvokedMethods {
+@Target(LOCAL_VARIABLE)
+public @interface ResolvingCondition {
 
-    InvokedMethod[] value();
+	CallGraphAlgorithm containedInMax() default CallGraphAlgorithm.TOP;
+	
+	CallGraphAlgorithmMode mode() default CallGraphAlgorithmMode.Application;
 }

@@ -29,18 +29,34 @@
 package org.opalj.test.annotations;
 
 import java.lang.annotation.*;
+
 import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Wrapper annotation that allows several InvokedMethod annotations on the same method.
+ * Describes a method call as call site with different {@link ResolvedMethod}s.
+ * For types see the {@link TargetResolution} enum.
  * 
- * @author Arne Lottmann
+ * @author Florian Kuebler
  */
 @Retention(RUNTIME)
 @Target(METHOD)
-@Deprecated
-public @interface InvokedMethods {
+@Repeatable(CallSites.class)
+public @interface CallSite {
 
-    InvokedMethod[] value();
+	TargetResolution resolution() default TargetResolution.DEFAULT;
+	
+	String name();
+
+	Class<?> returnType() default Void.class;
+
+	Class<?>[] parameterTypes() default {};
+
+	int line() default -1;
+
+	boolean isStatic() default false;
+
+	boolean isReflective() default false;
+
+    ResolvedMethod[] resolvedMethods();
 }

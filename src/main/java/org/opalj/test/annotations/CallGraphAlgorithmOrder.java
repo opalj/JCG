@@ -28,19 +28,15 @@
  */
 package org.opalj.test.annotations;
 
-import java.lang.annotation.*;
-import static java.lang.annotation.RetentionPolicy.*;
-import static java.lang.annotation.ElementType.*;
-
 /**
- * Wrapper annotation that allows several InvokedMethod annotations on the same method.
+ * Represents the result of a comparison of two partially ordered
+ * {@link CallGraphAlgorithm} in terms of precision.
  * 
- * @author Arne Lottmann
+ * @author Florian Kuebler
+ *
  */
-@Retention(RUNTIME)
-@Target(METHOD)
-@Deprecated
-public @interface InvokedMethods {
+public enum CallGraphAlgorithmOrder {
 
-    InvokedMethod[] value();
+	EqualPrecision, SmallerPrecision, GreaterPrecision, Incomparable
+
 }
