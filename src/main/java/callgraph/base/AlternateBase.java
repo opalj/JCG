@@ -28,7 +28,8 @@
  */
 package callgraph.base;
 
-import org.opalj.test.annotations.InvokedMethod;
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -73,13 +74,13 @@ public class AlternateBase extends AbstractBase {
     }
 
     @Override
-    @InvokedMethod(receiverType = "callgraph/base/AbstractBase", name = "abstractImplementedMethod", line = 78)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "abstractImplementedMethod", line = 78)
     public void abstractMethod() {
         super.abstractImplementedMethod();
     }
 
     @Override
-    @InvokedMethod(receiverType = "callgraph/base/AbstractBase", name = "implementedMethod", line = 84)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "implementedMethod", line = 84)
     public void implementedMethod() {
         super.implementedMethod();
     }

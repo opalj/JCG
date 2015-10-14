@@ -29,8 +29,9 @@
 package simpleCallgraph;
 
 import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.InvokedMethod;
-import org.opalj.test.annotations.InvokedMethods;
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+import org.opalj.test.annotations.CallSites;
 
 /**
  * This class was used to create a class file with some well defined properties. The
@@ -65,16 +66,16 @@ public class B implements Base {
     }
 
     @Override
-    @InvokedMethod(receiverType = "simpleCallgraph/A", name = "callOnConstructor", line = 71)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/A") }, name = "callOnConstructor", line = 71)
     @InvokedConstructor(receiverType = "simpleCallgraph/A", line = 71)
     public void callOnConstructor() {
         new A().callOnConstructor();
     }
 
     @Override
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "simpleCallgraph/A", name = "callOnConstructor", line = 79),
-            @InvokedMethod(receiverType = "simpleCallgraph/B", name = "callOnConstructor", line = 79) })
+    @CallSites({
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/A") }, name = "callOnConstructor", line = 79),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/B") }, name = "callOnConstructor", line = 79) })
     public void callOnMethodParameter(@SuppressWarnings("hiding") Base b) {
         b.callOnConstructor();
     }

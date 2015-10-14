@@ -29,8 +29,9 @@
 package simpleCallgraph;
 
 import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.InvokedMethod;
-import org.opalj.test.annotations.InvokedMethods;
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+import org.opalj.test.annotations.CallSites;
 
 /**
  * This class was used to create a class file with some well defined properties. The
@@ -60,23 +61,23 @@ public class A implements Base {
     Base b = new B();
 
     @Override
-    @InvokedMethod(receiverType = "simpleCallgraph/B", name = "callOnInstanceField", line = 65)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/B") }, name = "callOnInstanceField", line = 65)
     public String callOnInstanceField() {
         return b.callOnInstanceField();
     }
 
     @Override
-    @InvokedMethod(receiverType = "simpleCallgraph/B", name = "callOnConstructor", line = 72)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/B") }, name = "callOnConstructor", line = 72)
     @InvokedConstructor(receiverType = "simpleCallgraph/B", line = 72)
     public void callOnConstructor() {
         new B().callOnConstructor();
     }
 
     @Override
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "simpleCallgraph/A", name = "callOnMethodParameter", line = 82),
-            @InvokedMethod(receiverType = "simpleCallgraph/A", name = "callOnConstructor", line = 83),
-            @InvokedMethod(receiverType = "simpleCallgraph/B", name = "callOnConstructor", line = 83) })
+    @CallSites({
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/A") }, name = "callOnMethodParameter", line = 82),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/A") }, name = "callOnConstructor", line = 83),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/B") }, name = "callOnConstructor", line = 83) })
     public void callOnMethodParameter(Base b) {
         if (b != null) {
             this.callOnMethodParameter(null);
@@ -84,9 +85,9 @@ public class A implements Base {
         }
     }
 
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "simpleCallgraph/A", name = "callOnConstructor", line = 91),
-            @InvokedMethod(receiverType = "simpleCallgraph/B", name = "callOnConstructor", line = 92) })
+    @CallSites({
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/A") }, name = "callOnConstructor", line = 91),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "simpleCallgraph/B") }, name = "callOnConstructor", line = 92) })
     public void directCallOnConstructor() {
         new A().callOnConstructor();
         new B().callOnConstructor();

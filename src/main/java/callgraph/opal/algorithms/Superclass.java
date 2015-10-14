@@ -28,33 +28,31 @@
  */
 package callgraph.opal.algorithms;
 
-import org.opalj.test.annotations.CallGraphAlgorithm;
-import org.opalj.test.annotations.InvokedMethod;
-import org.opalj.test.annotations.InvokedMethods;
+import org.opalj.test.annotations.*;
 
 /**
  * This class was used to create a class file with some well defined properties. The
  * created class is subsequently used by several tests.
- * 
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * 
+ * <p>
  * <!--
- * 
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
- * 
+ *
  * @author Michael Reif
  */
 public class Superclass {
@@ -71,37 +69,28 @@ public class Superclass {
         this.toString();
     }
 
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/Superclass", name = "implementedInEachSubclass", line = 92, isContainedIn = {
-                    CallGraphAlgorithm.CHA, CallGraphAlgorithm.BasicVTA }),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", name = "implementedInEachSubclass", line = 92, isContainedIn = {
-                    CallGraphAlgorithm.CHA, CallGraphAlgorithm.BasicVTA }),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2", name = "implementedInEachSubclass", line = 92),
+    @CallSites({
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}, name = "implementedInEachSubclass", line = 92),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}, name = "implementedInEachSubclass", line = 92),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2")}, name = "implementedInEachSubclass", line = 92),
 
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/Superclass", name = "implementedInEachSubclass", line = 93, isContainedIn = {}),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", name = "implementedInEachSubclass", line = 93, isContainedIn = {
-                    CallGraphAlgorithm.CHA, CallGraphAlgorithm.BasicVTA }),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2", name = "implementedInEachSubclass", line = 93),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}, name = "implementedInEachSubclass", line = 93),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2")}, name = "implementedInEachSubclass", line = 93),
 
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/Superclass", name = "implementedInEachSubclass", line = 94, isContainedIn = {
-                    CallGraphAlgorithm.CHA, CallGraphAlgorithm.BasicVTA }),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", name = "implementedInEachSubclass", line = 94, isContainedIn = {
-                    CallGraphAlgorithm.CHA, CallGraphAlgorithm.BasicVTA }),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2", name = "implementedInEachSubclass", line = 94), })
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}, name = "implementedInEachSubclass", line = 94),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}, name = "implementedInEachSubclass", line = 94),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2")}, name = "implementedInEachSubclass", line = 94),})
     public void callMethods() {
         getInstance().implementedInEachSubclass();
         someSubtype.implementedInEachSubclass();
         top.implementedInEachSubclass();
     }
 
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/Superclass", name = "implementedInEachSubclass", line = 111, isContainedIn = { CallGraphAlgorithm.CHA }),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", name = "implementedInEachSubclass", line = 111, isContainedIn = {
-                    CallGraphAlgorithm.CHA, CallGraphAlgorithm.BasicVTA }),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/AltSubclassLevel2", name = "implementedInEachSubclass", line = 111, isContainedIn = {
-                    CallGraphAlgorithm.CHA, CallGraphAlgorithm.BasicVTA,
-                    CallGraphAlgorithm.DefaultVTA }),
-            @InvokedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2", name = "implementedInEachSubclass", line = 111) })
+    @CallSites({
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.CHA)})}, name = "implementedInEachSubclass", line = 111),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}, name = "implementedInEachSubclass", line = 111),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/AltSubclassLevel2", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.DefaultVTA)})}, name = "implementedInEachSubclass", line = 111),
+            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2")}, name = "implementedInEachSubclass", line = 111)})
     public void testInstanceOfExtVTABranchElimination() {
         Superclass field = null;
         if (getInstance() instanceof AltSubclassLevel2)

@@ -28,8 +28,9 @@
  */
 package callgraph.virtualCalls;
 
-import org.opalj.test.annotations.InvokedMethod;
-import org.opalj.test.annotations.InvokedMethods;
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+import org.opalj.test.annotations.CallSites;
 
 import callgraph.base.AbstractBase;
 import callgraph.base.AlternateBase;
@@ -61,29 +62,29 @@ import callgraph.base.SimpleBase;
  */
 public class CallByParameter {
 
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "callgraph/base/SimpleBase", name = "interfaceMethod", line = 68),
-            @InvokedMethod(receiverType = "callgraph/base/AbstractBase", name = "interfaceMethod", line = 68) })
+    @CallSites({
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "interfaceMethod", line = 68),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 68) })
     void callByInterface(Base object) {
         object.interfaceMethod();
     }
 
-    @InvokedMethod(receiverType = "callgraph/base/AbstractBase", name = "interfaceMethod", line = 73)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 73)
     void callByInterface(AbstractBase object) {
         object.interfaceMethod();
     }
 
-    @InvokedMethod(receiverType = "callgraph/base/AbstractBase", name = "interfaceMethod", line = 78)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 78)
     void callByInterface(ConcreteBase object) {
         object.interfaceMethod();
     }
 
-    @InvokedMethod(receiverType = "callgraph/base/AbstractBase", name = "interfaceMethod", line = 83)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 83)
     void callByInterface(AlternateBase object) {
         object.interfaceMethod();
     }
 
-    @InvokedMethod(receiverType = "callgraph/base/SimpleBase", name = "interfaceMethod", line = 88)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "interfaceMethod", line = 88)
     void callByInterface(SimpleBase object) {
         object.interfaceMethod();
     }
