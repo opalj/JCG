@@ -33,7 +33,6 @@ import java.lang.reflect.Method;
 
 import org.opalj.test.annotations.CallSite;
 import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.InvokedMethod;
 
 import callgraph.base.Base;
 import callgraph.base.ConcreteBase;
@@ -65,22 +64,22 @@ import org.opalj.test.annotations.ResolvedMethod;
  */
 public class Reflections {
 
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 70)
+    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 69)
     @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/ConcreteBase")}, name = "implementedMethod", line = 69)
     void callAfterCastingToInterface() {
         ((Base) new ConcreteBase()).implementedMethod();
     }
 
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 78, isReflective = true)
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 79)
+    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 77, isReflective = true)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 78)
     void callInstantiatedByReflection() throws InstantiationException,
             IllegalAccessException, ClassNotFoundException {
         Base instance = (Base) Class.forName("fixture.SimpleBase").newInstance();
         instance.implementedMethod();
     }
 
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 86)
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 88, isReflective = true)
+    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 85)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 87, isReflective = true)
     void callMethodByReflection() throws NoSuchMethodException, SecurityException,
             IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Base base = new SimpleBase();
