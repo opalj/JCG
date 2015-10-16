@@ -66,17 +66,17 @@ public class ExecutionClass {
         }
     }
 
-    @CallSites({
-            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass")}, name = "interfaceMethod", line = 76),
-            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", iff = {@ResolvingCondition(containedInMax = BasicVTA)})}, name = "interfaceMethod", line = 76)})
+    @CallSite(name = "interfaceMethod", line = 72, resolvedMethods = {
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass"),
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", iff = {@ResolvingCondition(containedInMax = BasicVTA)})})
     public void testInnerClass() {
         innerClass.interfaceMethod();
     }
 
-    @CallSites({
-            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$1")}, name = "interfaceMethod", line = 92),
-            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", iff = {@ResolvingCondition(containedInMax = CHA)})}, name = "interfaceMethod", line = 92),
-            @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass", iff = {@ResolvingCondition(containedInMax = CHA)})}, name = "interfaceMethod", line = 92)})
+    @CallSite(name = "interfaceMethod", line = 89, resolvedMethods = {
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$1"),
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", iff = {@ResolvingCondition(containedInMax = CHA)}),
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass", iff = {@ResolvingCondition(containedInMax = CHA)})})
     public void testAnonClass() {
         IBase anon = new IBase() {
 

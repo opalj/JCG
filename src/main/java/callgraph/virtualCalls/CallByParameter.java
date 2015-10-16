@@ -41,50 +41,50 @@ import callgraph.base.SimpleBase;
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
- * 
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * 
+ * <p>
  * <!--
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY (THIS AREA CAN BE EXTENDED/REDUCED TO MAKE SURE THAT THE
  * SPECIFIED LINE NUMBERS ARE STABLE.
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
  * -->
- * 
+ *
  * @author Marco Jacobasch
  */
 public class CallByParameter {
 
-    @CallSites({
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "interfaceMethod", line = 68),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 68) })
+
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase"),
+            @ResolvedMethod(receiverType = "callgraph/base/AbstractBase")}, name = "interfaceMethod", line = 68)
     void callByInterface(Base object) {
         object.interfaceMethod();
     }
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 73)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/AbstractBase")}, name = "interfaceMethod", line = 73)
     void callByInterface(AbstractBase object) {
         object.interfaceMethod();
     }
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 78)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/AbstractBase")}, name = "interfaceMethod", line = 78)
     void callByInterface(ConcreteBase object) {
         object.interfaceMethod();
     }
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 83)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/AbstractBase")}, name = "interfaceMethod", line = 83)
     void callByInterface(AlternateBase object) {
         object.interfaceMethod();
     }
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "interfaceMethod", line = 88)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "interfaceMethod", line = 88)
     void callByInterface(SimpleBase object) {
         object.interfaceMethod();
     }

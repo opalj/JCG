@@ -65,7 +65,7 @@ import org.opalj.test.annotations.ResolvedMethod;
  */
 public class Reflections {
 
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 71)
+    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 70)
     @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/ConcreteBase")}, name = "implementedMethod", line = 69)
     void callAfterCastingToInterface() {
         ((Base) new ConcreteBase()).implementedMethod();

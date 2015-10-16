@@ -81,10 +81,10 @@ public class CallConcreteObjects {
     };
 
     @CallSites({
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "implementedMethod", line = 88),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "implementedMethod", line = 89),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AlternateBase") }, name = "implementedMethod", line = 90),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "implementedMethod", line = 91) })
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "implementedMethod", line = 89),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "implementedMethod", line = 90),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AlternateBase") }, name = "implementedMethod", line = 91),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "implementedMethod", line = 92) })
     void callImplementedMethod() {
         simpleBase.implementedMethod();
         concreteBase.implementedMethod();
@@ -93,9 +93,9 @@ public class CallConcreteObjects {
     }
 
     @CallSites({
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "abstractMethod", line = 99),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "abstractMethod", line = 100),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AlternateBase") }, name = "abstractMethod", line = 101) })
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "abstractMethod", line = 100),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "abstractMethod", line = 101),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AlternateBase") }, name = "abstractMethod", line = 102) })
     void callAbstractMethod() {
         simpleBase.abstractMethod();
         concreteBase.abstractMethod();
@@ -103,10 +103,10 @@ public class CallConcreteObjects {
     }
 
     @CallSites({
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "abstractImplementedMethod", line = 110),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "abstractImplementedMethod", line = 111),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "abstractImplementedMethod", line = 111),
             @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "abstractImplementedMethod", line = 112),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "abstractImplementedMethod", line = 113) })
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "abstractImplementedMethod", line = 113),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "abstractImplementedMethod", line = 114) })
     void callAbstractImplementedMethod() {
         simpleBase.abstractImplementedMethod();
         concreteBase.abstractImplementedMethod();
@@ -115,10 +115,10 @@ public class CallConcreteObjects {
     }
 
     @CallSites({
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "interfaceMethod", line = 122),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 123),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "interfaceMethod", line = 123),
             @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 124),
-            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 125) })
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 125),
+            @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "interfaceMethod", line = 126) })
     void callInterfaceMethod() {
         simpleBase.interfaceMethod();
         concreteBase.interfaceMethod();
