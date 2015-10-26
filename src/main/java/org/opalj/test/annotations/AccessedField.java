@@ -35,7 +35,7 @@ import static java.lang.annotation.ElementType.*;
 /**
  * Describes a field access made by an invokedynamic instruction or through use of the
  * Java reflection API.
- * 
+ * TEST
  * @author Arne Lottmann
  */
 @Retention(RUNTIME)
