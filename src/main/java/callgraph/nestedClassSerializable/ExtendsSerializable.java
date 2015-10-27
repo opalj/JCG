@@ -26,11 +26,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.nestedClassSerializable;
 
 import java.io.Serializable;
-import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.InvokedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -54,13 +52,8 @@ import org.opalj.test.annotations.InvokedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable{
+public interface ExtendsSerializable extends Serializable {
 
-	private static final long serialVersionUID = 1L;
-
-	/*Entry point via de-serialization*/
-	@InvokedConstructor(receiverType = "callgraph/simpleSerializable/Base", line = 64)
-	private Object readResolve(){
-		return new Base();
-	}
+	void someMethod();
+	
 }

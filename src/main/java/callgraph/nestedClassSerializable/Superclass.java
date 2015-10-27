@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.nestedClassSerializable;
 
 import java.io.Serializable;
 import org.opalj.test.annotations.InvokedConstructor;
@@ -54,13 +54,34 @@ import org.opalj.test.annotations.InvokedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable{
+public class Superclass implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -8714932542828113368L;
 
-	/*Entry point via de-serialization*/
-	@InvokedConstructor(receiverType = "callgraph/simpleSerializable/Base", line = 64)
-	private Object readResolve(){
-		return new Base();
+	public Superclass() {
+		nestedClassValue = new newClass(); /*only instances of newClass are created*/
 	}
+	
+	private class oldClass implements ExtendsSerializable { /*kept for backwards compatibility, no new instances can be created*/
+		private static final long serialVersionUID = 1L;
+
+		private oldClass() {} /*entry point via de-serialization*/
+		
+		@InvokedConstructor(receiverType = "callgraph/nestedClassSerializable/Superclass/newClass", line = 72)
+		private Object readResolve() { /*entry point via de-serialization*/
+			return new newClass(); //create instance of new version of the class instead of an instance of old version
+		}
+		
+		public void someMethod() {} /*dead code, no instances of oldClass escape this scope*/
+	}
+	
+	private class newClass implements ExtendsSerializable {
+		private static final long serialVersionUID = 1L;
+
+		newClass() {} /*entry point*/
+		
+		public void someMethod() {} /*living code*/
+	}
+	
+	private ExtendsSerializable nestedClassValue;
 }
