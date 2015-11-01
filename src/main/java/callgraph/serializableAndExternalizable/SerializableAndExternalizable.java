@@ -26,24 +26,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.serializableAndExternalizable;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Serializable;
-import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.InvokedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
  * 
- * A simple class using the Serializable interface. No special behavior.
+ * This class implements both Externalizable and Serializable interfaces. Apart from being redundant 
+ * (as Externalizable is a sub-interface of Serializable) this doesn't generate any strange behavior. 
+ * The readExternal defines the manner of reading the class data from the stream and afterwards the 
+ * readResolve method is called to reconstruct the class from the data read.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
  * 
  * <!--
- * 
  * 
  * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
@@ -54,13 +58,20 @@ import org.opalj.test.annotations.InvokedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable{
+public class SerializableAndExternalizable implements Serializable,
+		Externalizable {
 
-	private static final long serialVersionUID = 1L;
-
-	/*Entry point via de-serialization*/
-	@InvokedConstructor(receiverType = "callgraph/simpleSerializable/Base", line = 64)
-	private Object readResolve(){
-		return new Base();
+	@Override
+	public void readExternal(ObjectInput arg0) throws IOException,
+			ClassNotFoundException { //called during de-serialization
 	}
+	
+	private Object readResolve(){
+		return new SerializableAndExternalizable(); //living code; called during de-serialization after readExternal
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput arg0) throws IOException { //called during serialization
+	}
+
 }

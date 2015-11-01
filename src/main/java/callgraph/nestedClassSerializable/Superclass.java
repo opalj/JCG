@@ -36,19 +36,19 @@ import org.opalj.test.annotations.InvokedMethod;
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
  * 
+ * The superclass contains a nested private class not intended for use. No instances of it can be 
+ * created but it has to be kept around for legacy reasons as serialized instances of the class can be 
+ * de-serialized. The constructor and the readResolve methods are entry points due to de-serialization
+ * but other methods of the class (someMethod) are dead code. 
+ * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
  * 
  * <!--
  * 
- * 
- * 
- * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
  * 
  * -->
  * 
