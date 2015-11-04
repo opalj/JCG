@@ -35,7 +35,7 @@ import java.io.Serializable;
  * created class is subsequently used by several tests.
  * 
  * The nested class has a private method which is only called during de-serialization. However the 
- * call is gated by an check if the chooser field is 0. This is always the case immediately after 
+ * call is gated by an check if the chooser field is not 0. This is never the case immediately after 
  * de-serialization as the field is transient and thus is de-serialized to 0.
  * 
  * <b>NOTE</b><br>
@@ -62,7 +62,7 @@ public class Superclass implements Serializable {
 	private class ClassWithTransientField{ 
 		transient int chooser; //transient field; always 0 after de-serialization
 		
-		private Object readResolve(){
+		private Object readResolve(){ //entry point via de-serialization
 			if(chooser != 0){ //always false
 				someMethod();
 			}
