@@ -28,6 +28,7 @@
  */
 package callgraph.transientSerializable;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -60,16 +61,21 @@ public class Superclass implements Serializable {
 	ClassWithTransientField field = new ClassWithTransientField();
 	
 	private class ClassWithTransientField{ 
-		transient int chooser; //transient field; always 0 after de-serialization
+		transient int transientField; //transient field; value not saved during serialization
 		
-		private Object readResolve(){
-			if(chooser != 0){ //always false
-				someMethod();
+		private void readObject(java.io.ObjectInputStream in) //entry point via de-serialization 
+				throws IOException, ClassNotFoundException{
+			in.defaultReadObject(); //transientField is restored to its default value (0 for int)
+		}
+		
+		private Object readResolve(){ //entry point via de-serialization, called after readObject
+			if(transientField != 0){ //always false; transientField is always 0 after de-serialization
+				someMethod(); //dead code; branch never taken
 			}
 			return new ClassWithTransientField();
 		}
 		
-		private void someMethod(){} //dead code; only called after de-serialization if chooser is not 0
+		private void someMethod(){} //dead code; only call in dead branch of caller
 	}
 
 }

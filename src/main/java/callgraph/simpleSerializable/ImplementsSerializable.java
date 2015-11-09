@@ -28,39 +28,57 @@
  */
 package callgraph.simpleSerializable;
 
+import java.io.IOException;
 import java.io.Serializable;
+
 import org.opalj.test.annotations.InvokedConstructor;
 import org.opalj.test.annotations.InvokedMethod;
 
 /**
- * This class was used to create a class file with some well defined attributes. The
- * created class is subsequently used by several tests.
+ * This class was used to create a class file with some well defined attributes.
+ * The created class is subsequently used by several tests.
  * 
  * A simple class using the Serializable interface. No special behavior.
  * 
  * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
  * 
  * <!--
  * 
  * 
  * 
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
+ * 
+ * 
  * 
  * 
  * -->
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable{
+public class ImplementsSerializable extends Base implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	/*Entry point via de-serialization*/
-	@InvokedConstructor(receiverType = "callgraph/simpleSerializable/Base", line = 64)
-	private Object readResolve(){
-		return new Base();
+	private Object writeReplace(){ //entry point via serialization
+		return new ImplementsSerializable();
 	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) // entry point via serialization
+			throws IOException { 
+		out.defaultWriteObject();
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException,
+			ClassNotFoundException { // entry point via de-serialization
+		in.defaultReadObject();
+	}
+
+	@InvokedConstructor(receiverType = "callgraph/simpleSerializable/ImplementsSerializable", line = 81)
+	private Object readResolve() { // entry point via de-serialization
+		return new ImplementsSerializable();
+	}
+
 }
