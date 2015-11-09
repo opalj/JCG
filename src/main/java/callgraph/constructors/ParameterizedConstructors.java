@@ -59,27 +59,27 @@ import callgraph.base.ConcreteBase;
 public class ParameterizedConstructors {
 
     @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", parameterTypes = { String.class }, line = 64)
+    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", parameterTypes = { String.class }, line = 63)
     public void createConcreteBaseSingleParameter() {
         Base concreteBase = new ConcreteBase("test");
     }
 
     @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/AlternateBase", parameterTypes = { String.class }, line = 70)
+    @InvokedConstructor(receiverType = "callgraph/base/AlternateBase", parameterTypes = { String.class }, line = 69)
     public void createAlternateBaseSingleParameter() {
         Base alternerateBase = new AlternateBase("test");
     }
 
     @SuppressWarnings("unused")
     @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", parameterTypes = {
-            String.class, Integer.class }, line = 77)
+            String.class, Integer.class }, line = 76)
     public void createConcreteBaseTwoParameters() {
         Base concreteBase = new ConcreteBase("test", 42);
     }
 
     @SuppressWarnings("unused")
     @InvokedConstructor(receiverType = "callgraph/base/AlternateBase", parameterTypes = {
-            String.class, Double.class }, line = 84)
+            String.class, Double.class }, line = 83)
     public void createAlternateBaseTwoParameters() {
         Base alternerateBase = new AlternateBase("test", 42);
     }

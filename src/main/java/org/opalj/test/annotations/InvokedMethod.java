@@ -40,6 +40,7 @@ import static java.lang.annotation.ElementType.*;
  */
 @Retention(RUNTIME)
 @Target(METHOD)
+@Deprecated
 public @interface InvokedMethod {
 
 	TargetResolution resolution() default TargetResolution.DEFAULT;

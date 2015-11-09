@@ -29,30 +29,31 @@
 package simpleCallgraph;
 
 import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.InvokedMethod;
-import org.opalj.test.annotations.InvokedMethods;
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+import org.opalj.test.annotations.CallSites;
 
 /**
  * This class was used to create a class file with some well defined properties. The
  * created class is subsequently used by several tests.
- * 
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * 
+ * <p>
  * <!--
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
- * 
+ *
  * @author Marco Jacobasch
  */
 public class B implements Base {
@@ -65,16 +66,15 @@ public class B implements Base {
     }
 
     @Override
-    @InvokedMethod(receiverType = "simpleCallgraph/A", name = "callOnConstructor", line = 71)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "simpleCallgraph/A")}, name = "callOnConstructor", line = 71)
     @InvokedConstructor(receiverType = "simpleCallgraph/A", line = 71)
     public void callOnConstructor() {
         new A().callOnConstructor();
     }
 
     @Override
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "simpleCallgraph/A", name = "callOnConstructor", line = 79),
-            @InvokedMethod(receiverType = "simpleCallgraph/B", name = "callOnConstructor", line = 79) })
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "simpleCallgraph/A"),
+            @ResolvedMethod(receiverType = "simpleCallgraph/B")}, name = "callOnConstructor", line = 78)
     public void callOnMethodParameter(@SuppressWarnings("hiding") Base b) {
         b.callOnConstructor();
     }
