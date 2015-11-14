@@ -66,7 +66,7 @@ public class ImplementsSerializable extends Base implements Serializable {
 		return new ImplementsSerializable();
 	}
 	
-	private void writeObject(java.io.ObjectOutputStream out) // entry point via serialization
+	private void writeObject(java.io.ObjectOutputStream out) // entry point via serialization; called after writeReplace
 			throws IOException { 
 		out.defaultWriteObject();
 	}
@@ -77,7 +77,7 @@ public class ImplementsSerializable extends Base implements Serializable {
 	}
 
 	@InvokedConstructor(receiverType = "callgraph/simpleSerializable/ImplementsSerializable", line = 81)
-	private Object readResolve() { // entry point via de-serialization
+	private Object readResolve() { // entry point via de-serialization; called after readObject
 		return new ImplementsSerializable();
 	}
 
