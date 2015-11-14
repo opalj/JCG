@@ -1,4 +1,4 @@
-package callgraph.serializableNonSerializableField;
+package callgraph.serializableWithNonSerializableField;
 
 /**
  * This class was used to create a class file with some well defined attributes.
