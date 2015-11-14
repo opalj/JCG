@@ -26,18 +26,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.indirectReadResolve;
 
-import java.io.IOException;
 import java.io.Serializable;
-
-import org.opalj.test.annotations.InvokedConstructor;
 
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * A simple class using the Serializable interface. No special behavior.
+ * Serializable class with readResolve. The readResolve returns an instance of a replacement class
+ * indirectly through a factory method.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -57,27 +55,9 @@ import org.opalj.test.annotations.InvokedConstructor;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-
-	private Object writeReplace(){ //entry point via serialization
-		return this; //default implementation
-	}
+public class SerializableWithReadResolve implements Serializable {
 	
-	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
-			throws IOException { 
-		out.defaultWriteObject();
+	private Object readResolve(){ //entry point via de-serialization
+		return ReplacementFactory.makeReplacement(); //returns a replacement object - indirectly
 	}
-	
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException { // entry point via de-serialization
-		in.defaultReadObject();
-	}
-
-	@InvokedConstructor(receiverType = "callgraph/simpleSerializable/ImplementsSerializable", line = 81)
-	private Object readResolve() { // entry point via de-serialization; called after readObject
-		return this; //default implementation
-	}
-
 }
