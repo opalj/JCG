@@ -37,7 +37,8 @@ import java.io.Serializable;
  * 
  * Serializable class with private no-args constructor. Used as a superclass for another serializable 
  * class. Implements readResolve and writeReplace, which are only called if this class is 
- * (de-)serialized directly.
+ * (de-)serialized directly. Also contains the readObjectNoData method, which is called if a
+ * subclass which was serialized before the inheritance was added is de-serialized.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -85,5 +86,10 @@ public class ImplementsSerializable implements Serializable {
 	
 	private Object writeReplace(){ //entry point via serialization; not called if a subclass is serialized
 		return this; //default implementation
+	}
+	
+	private void readObjectNoData(){ //entry point via de-serialization of subclass; 
+									 //only called if serialization was done before the inheritance was added
+		//do nothing;
 	}
 }
