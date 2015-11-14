@@ -63,7 +63,7 @@ public class SerializableSubclass extends InvalidSuperclass implements
 	}
 	
 	private Object writeReplace(){ //entry point via serialization
-		return new SerializableSubclass(); //default implementation
+		return this; //default implementation
 	}
 	
 	private void writeObject(java.io.ObjectOutputStream out) 
@@ -72,7 +72,7 @@ public class SerializableSubclass extends InvalidSuperclass implements
 	}
 	
 	private Object readResolve(){ //no entry point; de-serialization results in java.io.InvalidClassException
-		return new SerializableSubclass(); //default implementation
+		return this; //default implementation
 	}
 	
 	private void readObject(java.io.ObjectInputStream in) 

@@ -63,7 +63,7 @@ public class ImplementsSerializable extends Base implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Object writeReplace(){ //entry point via serialization
-		return new ImplementsSerializable();
+		return this; //default implementation
 	}
 	
 	private void writeObject(java.io.ObjectOutputStream out) // entry point via serialization; called after writeReplace
@@ -78,7 +78,7 @@ public class ImplementsSerializable extends Base implements Serializable {
 
 	@InvokedConstructor(receiverType = "callgraph/simpleSerializable/ImplementsSerializable", line = 81)
 	private Object readResolve() { // entry point via de-serialization; called after readObject
-		return new ImplementsSerializable();
+		return this; //default implementation
 	}
 
 }

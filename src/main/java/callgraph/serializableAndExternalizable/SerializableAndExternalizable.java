@@ -71,11 +71,11 @@ public class SerializableAndExternalizable implements Serializable,
 	}
 	
 	private Object readResolve(){ //entry point via de-serialization
-		return new SerializableAndExternalizable(); //living code; called during de-serialization after readExternal
+		return this; //living code; called during de-serialization after readExternal
 	}
 
 	private Object writeReplace(){ //entry point via serialization
-		return new SerializableAndExternalizable(); //living code; called during serialization before writeExternal
+		return this; //living code; called during serialization before writeExternal
 	}
 	
 	@Override

@@ -63,7 +63,7 @@ public class SerializableWithNonSerializableField implements Serializable {
 	public StringBox label; //field with non-serializable type (StringBox)
 	
 	private Object writeReplace(){ //entry point via serialization
-		return new SerializableWithNonSerializableField(); //default implementation
+		return this; //default implementation
 	}
 	
 	private void writeObject(java.io.ObjectOutputStream out) 
@@ -73,7 +73,7 @@ public class SerializableWithNonSerializableField implements Serializable {
 	
 	private Object readResolve(){ //no entry point; 
 								  //de-serialization attempts result in java.io.WriteAbortedException
-		return new SerializableWithNonSerializableField(); //default implementation
+		return this; //default implementation
 	}
 	
 	private void readObject(java.io.ObjectInputStream in) 
