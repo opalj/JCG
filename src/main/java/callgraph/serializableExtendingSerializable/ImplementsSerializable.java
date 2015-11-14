@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.serializableWithNonSerializableField;
+package callgraph.serializableExtendingSerializable;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -35,8 +35,9 @@ import java.io.Serializable;
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * Serializable class with a non-serializable field. As writeObject and readObject use the default 
- * implementation, all serialization and de-serialization attempts result in an error.
+ * Serializable class with private no-args constructor. Used as a superclass for another serializable 
+ * class. Implements readResolve and writeReplace, which are only called if this class is 
+ * (de-)serialized directly.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -56,28 +57,33 @@ import java.io.Serializable;
  * 
  * @author Roberts Kolosovs
  */
-public class SerializableWithNonSerializableField implements Serializable {
+public class ImplementsSerializable implements Serializable {
 
-	private static final long serialVersionUID = -6141317929433778662L;
+	private static final long serialVersionUID = -6839681032530961303L;
 	
-	public StringBox label; //field with non-serializable type (StringBox)
+	public String label; //String field to enable sensible constructor with arguments
 	
-	private Object writeReplace(){ //entry point via serialization
-		return new SerializableWithNonSerializableField(); //default implementation
-	}
+	private ImplementsSerializable(){} //private no-args constructor; dead code
 	
-	private void writeObject(java.io.ObjectOutputStream out) 
-			throws IOException{ //entry point via serialization;
-		out.defaultWriteObject(); //default implementation; results in java.io.NotSerializableException
-	}
-	
-	private Object readResolve(){ //no entry point; 
-								  //de-serialization attempts result in java.io.WriteAbortedException
-		return new SerializableWithNonSerializableField(); //default implementation
+	public ImplementsSerializable(String arg){ //public constructor to enable valid subclasses
+		label = arg;
 	}
 	
 	private void readObject(java.io.ObjectInputStream in) 
-			throws ClassNotFoundException, IOException{ //entry point via de-serialization;
-		in.defaultReadObject(); //default implementation; results in java.io.WriteAbortedException
+			throws ClassNotFoundException, IOException{ //entry point via de-serialization
+		in.defaultReadObject(); //default implementation
+	}
+	
+	private Object readResolve(){ //entry point via de-serialization; not called if a subclass is de-serialized
+		return this; //default implementation
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) 
+			throws IOException{ //entry point via serialization
+		out.defaultWriteObject(); //default implementation
+	}
+	
+	private Object writeReplace(){ //entry point via serialization; not called if a subclass is serialized
+		return this; //default implementation
 	}
 }
