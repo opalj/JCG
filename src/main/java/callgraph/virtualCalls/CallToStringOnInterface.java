@@ -28,7 +28,8 @@
  */
 package callgraph.virtualCalls;
 
-import org.opalj.test.annotations.InvokedMethod;
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
 
 import callgraph.base.AbstractBase;
 import callgraph.base.AlternateBase;
@@ -72,22 +73,22 @@ public class CallToStringOnInterface {
         }
     };
 
-    @InvokedMethod(receiverType = "callgraph/base/SimpleBase", name = "toString", returnType = String.class, line = 77)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "toString", returnType = String.class, line = 77)
     void callToStringOnSimpleBase() {
         simpleBase.toString();
     }
 
-    @InvokedMethod(receiverType = "java/lang/Object", name = "toString", returnType = String.class, line = 82)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 82)
     void callToStringOnConcreteBase() {
         concreteBase.toString();
     }
 
-    @InvokedMethod(receiverType = "java/lang/Object", name = "toString", returnType = String.class, line = 87)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 87)
     void callToStringOnAlternateBase() {
         alternerateBase.toString();
     }
 
-    @InvokedMethod(receiverType = "java/lang/Object", name = "toString", returnType = String.class, line = 92)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 92)
     void callToStringOnAbstractBase() {
         abstractBase.toString();
     }

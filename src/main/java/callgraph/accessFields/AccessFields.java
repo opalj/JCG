@@ -35,24 +35,24 @@ import org.opalj.test.annotations.AccessedField;
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
- * 
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * 
+ * <p>
  * <!--
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
- * 
+ *
  * @author Marco Jacobasch
  */
 public class AccessFields {
@@ -60,22 +60,22 @@ public class AccessFields {
     ConcreteBase concreteBase = new ConcreteBase();
     AlternateBase alternerateBase = new AlternateBase();
 
-    @AccessedField(declaringType = ConcreteBase.class, fieldType = Integer.class, name = "integer", line = 65)
+    @AccessedField(declaringType = ConcreteBase.class, fieldType = Integer.class, name = "integer", line = 64)
     public int accessFieldInClass() {
         return concreteBase.integer;
     }
 
-    @AccessedField(declaringType = ConcreteBase.class, fieldType = String.class, name = "string", line = 70)
+    @AccessedField(declaringType = ConcreteBase.class, fieldType = String.class, name = "string", line = 69)
     public String accessFieldInSuperClass() {
         return concreteBase.string;
     }
 
-    @AccessedField(declaringType = AlternateBase.class, fieldType = String.class, name = "string", line = 75)
+    @AccessedField(declaringType = AlternateBase.class, fieldType = String.class, name = "string", line = 74)
     public String accessFieldInClassSameFieldNameInSuperClass() {
         return alternerateBase.string;
     }
 
-    @AccessedField(declaringType = ConcreteBase.class, fieldType = Double.class, name = "DOUBLE_FIELD", line = 80)
+    @AccessedField(declaringType = ConcreteBase.class, fieldType = Double.class, name = "DOUBLE_FIELD", line = 79)
     public double accessStaticField() {
         return ConcreteBase.DOUBLE_FIELD;
     }

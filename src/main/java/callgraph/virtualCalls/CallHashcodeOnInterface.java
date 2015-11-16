@@ -28,7 +28,8 @@
  */
 package callgraph.virtualCalls;
 
-import org.opalj.test.annotations.InvokedMethod;
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
 
 import callgraph.base.AbstractBase;
 import callgraph.base.AlternateBase;
@@ -71,22 +72,22 @@ public class CallHashcodeOnInterface {
         }
     };
 
-    @InvokedMethod(receiverType = "callgraph/base/SimpleBase", name = "hashCode", returnType = Integer.class, line = 76)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "hashCode", returnType = Integer.class, line = 76)
     void callHashCodeOnSimpleBase() {
         simpleBase.hashCode();
     }
 
-    @InvokedMethod(receiverType = "java/lang/Object", name = "hashCode", returnType = Integer.class, line = 81)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "hashCode", returnType = Integer.class, line = 81)
     void callHashCodeOnConcreteBase() {
         concreteBase.hashCode();
     }
 
-    @InvokedMethod(receiverType = "java/lang/Object", name = "hashCode", returnType = Integer.class, line = 86)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "hashCode", returnType = Integer.class, line = 86)
     void callHashCodeOnAlternateBase() {
         alternerateBase.hashCode();
     }
 
-    @InvokedMethod(receiverType = "java/lang/Object", name = "hashCode", returnType = Integer.class, line = 91)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "hashCode", returnType = Integer.class, line = 91)
     void callHashCodeOnAbstractBase() {
         abstractBase.hashCode();
     }
