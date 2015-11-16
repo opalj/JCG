@@ -64,6 +64,7 @@ public class SerializableAndExternalizable implements Serializable,
 	@Override
 	public void readExternal(ObjectInput arg0) throws IOException,
 			ClassNotFoundException { //entry point via de-serialization
+		//no fields to read; do nothing
 	}
 	
 	private void readObject(java.io.ObjectInputStream in) throws IOException { //dead code; superseded by readExternal
@@ -80,6 +81,7 @@ public class SerializableAndExternalizable implements Serializable,
 	
 	@Override
 	public void writeExternal(ObjectOutput arg0) throws IOException { //entry point via serialization
+		//no fields to write; do nothing
 	}
 
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException{ //dead code; superseded by writeExternal
@@ -87,7 +89,7 @@ public class SerializableAndExternalizable implements Serializable,
 	}
 	
 	private void deadMethod(){ //dead code; all callers are dead
-		
+		System.out.println("I feel dead inside.");
 	}
 
 }

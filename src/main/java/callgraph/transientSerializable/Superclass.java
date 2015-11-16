@@ -72,7 +72,7 @@ public class Superclass implements Serializable {
 			if(transientField != 0){ //always false; transientField is always 0 after de-serialization
 				someMethod(); //dead code; branch never taken
 			}
-			return new ClassWithTransientField();
+			return this; //default functionality;
 		}
 		
 		private void someMethod(){} //dead code; only call in dead branch of caller

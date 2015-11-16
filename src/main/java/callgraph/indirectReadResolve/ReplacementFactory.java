@@ -61,9 +61,9 @@ public class ReplacementFactory {
 	
 	private static class ReplacementClass{ //replacement class for SerialWithReadResolve; 
 										   //created indirectly by outer class
-		public int number;
+		public int number; //a field to truly differentiate from the class to replace
 		
-		public ReplacementClass(int arg){
+		public ReplacementClass(int arg){ //constructor setting the field
 			number = arg;
 		}
 	}

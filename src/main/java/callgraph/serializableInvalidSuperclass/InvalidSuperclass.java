@@ -54,9 +54,7 @@ public class InvalidSuperclass {
 
 	public String label; //a field to enable sensible constructor with arguments
 	
-	private InvalidSuperclass(){ //needs to be visible for a serializable subclass to de-serialize properly
-		//empty
-	}
+	private InvalidSuperclass(){} //needs to be visible for a serializable subclass to de-serialize properly
 	
 	public InvalidSuperclass(String arg){ //visible constructor to enable valid subclasses
 		label = arg;

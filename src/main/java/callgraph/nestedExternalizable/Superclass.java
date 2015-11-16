@@ -61,25 +61,31 @@ public class Superclass implements Externalizable {
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
-			ClassNotFoundException {} //called during de-serialization
+			ClassNotFoundException { //entry point via de-serialization
+		//no fields to read; do nothing
+	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {} //called during serialization
+	public void writeExternal(ObjectOutput out) throws IOException { //entry point via serialization
+		//no fields to write; do nothing
+	}
 	
 	private class DeadInternalClass implements Externalizable { //no instances are created; can still be de-serialized
 
 		@Override
-		public void readExternal(ObjectInput in) throws IOException, /*entry point via de-serialization*/
+		public void readExternal(ObjectInput in) throws IOException, //entry point via de-serialization
 				ClassNotFoundException { 
 			throw new InvalidClassException(null); //throw an exception whenever a de-serialization is attempted
 		}
 
-		private Object readResolve(){ /*called during de-serialization after readExternal*/
+		private Object readResolve(){ //entry point via de-serialization; called after readExternal
 			return new DeadInternalClass(); //dead code; every de-serialization results in an exception thrown
 		}
 		
 		@Override
-		public void writeExternal(ObjectOutput out) throws IOException {} //entry point via serialization
+		public void writeExternal(ObjectOutput out) throws IOException { //entry point via serialization
+			//no fields to write; do nothing
+		}
 		
 	}
 

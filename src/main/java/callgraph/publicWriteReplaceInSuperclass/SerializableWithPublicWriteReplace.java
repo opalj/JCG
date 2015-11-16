@@ -61,7 +61,7 @@ public class SerializableWithPublicWriteReplace implements Serializable {
 
 	private static final long serialVersionUID = 2368715977184990608L;
 	
-	public String label;
+	public String label; //field to modify during serialization
 	
 	public SerializableWithPublicWriteReplace(){} //default no-args constructor
 	

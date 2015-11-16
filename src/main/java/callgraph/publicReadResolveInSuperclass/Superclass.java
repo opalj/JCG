@@ -68,6 +68,7 @@ public class Superclass{
 
 		private void readObject(java.io.ObjectInputStream in) 
 				throws ClassNotFoundException, IOException{ //entry point via de-serialization
+															//public readResolve of superclass called immediately after
 			in.defaultReadObject(); //default implementation
 			livingCode();
 		}
@@ -83,7 +84,7 @@ public class Superclass{
 		}
 		
 		public void deadMethod(){ //dead code; no instance of this class survives de-serialization
-			//do nothing
+			System.out.println("I feel dead inside.");
 		}
 	}
 }
