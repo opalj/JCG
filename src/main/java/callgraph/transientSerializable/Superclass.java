@@ -59,7 +59,7 @@ public class Superclass implements Serializable {
 	
 	ClassWithTransientField field = new ClassWithTransientField();
 	
-	private class ClassWithTransientField{ 
+	private class ClassWithTransientField implements Serializable{ 
 		transient int chooser; //transient field; always 0 after de-serialization
 		
 		private Object readResolve(){ //entry point via de-serialization
