@@ -31,54 +31,55 @@ package callgraph.reflections;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.opalj.test.annotations.CallSite;
 import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.InvokedMethod;
 
 import callgraph.base.Base;
 import callgraph.base.ConcreteBase;
 import callgraph.base.SimpleBase;
+import org.opalj.test.annotations.ResolvedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
- * 
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * 
+ * <p>
  * <!--
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
- * 
+ *
  * @author Marco Jacobasch
  */
 public class Reflections {
 
     @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 69)
-    @InvokedMethod(receiverType = "callgraph/base/ConcreteBase", name = "implementedMethod", line = 69)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/ConcreteBase")}, name = "implementedMethod", line = 69)
     void callAfterCastingToInterface() {
         ((Base) new ConcreteBase()).implementedMethod();
     }
 
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 76, isReflective = true)
-    @InvokedMethod(receiverType = "callgraph/base/SimpleBase", name = "implementedMethod", line = 77)
+    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 77, isReflective = true)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 78)
     void callInstantiatedByReflection() throws InstantiationException,
             IllegalAccessException, ClassNotFoundException {
         Base instance = (Base) Class.forName("fixture.SimpleBase").newInstance();
         instance.implementedMethod();
     }
 
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 84)
-    @InvokedMethod(receiverType = "callgraph/base/SimpleBase", name = "implementedMethod", line = 86, isReflective = true)
+    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 85)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 87, isReflective = true)
     void callMethodByReflection() throws NoSuchMethodException, SecurityException,
             IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Base base = new SimpleBase();

@@ -26,20 +26,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.serializableExtendingSerializable;
 
 import java.io.IOException;
 import java.io.Serializable;
 
 import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.InvokedConstructor;
 import org.opalj.test.annotations.ResolvedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * A simple class using the Serializable interface. No special behavior.
+ * Serializable class with private no-args constructor. Used as a superclass for another serializable 
+ * class. Implements readResolve and writeReplace, which are only called if this class is 
+ * (de-)serialized directly. Also contains the readObjectNoData method, which is called if a
+ * subclass which was serialized before the inheritance was added is de-serialized.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -59,28 +61,40 @@ import org.opalj.test.annotations.ResolvedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable {
+public class ImplementsSerializable implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
-	private Object writeReplace(){ //entry point via serialization
-		return this; //default implementation
-	}
+	private static final long serialVersionUID = -6839681032530961303L;
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 73)
-	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
-			throws IOException { 
-		out.defaultWriteObject();
+	public String label; //String field to enable sensible constructor with arguments
+	
+	private ImplementsSerializable(){} //private no-args constructor; dead code
+	
+	public ImplementsSerializable(String arg){ //public constructor to enable valid subclasses
+		label = arg;
 	}
 	
 	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException { // entry point via de-serialization
-		in.defaultReadObject();
+	private void readObject(java.io.ObjectInputStream in) 
+			throws ClassNotFoundException, IOException{ //entry point via de-serialization
+		in.defaultReadObject(); //default implementation
 	}
-
-	private Object readResolve() { // entry point via de-serialization; called after readObject
+	
+	private Object readResolve(){ //entry point via de-serialization; not called if a subclass is de-serialized
 		return this; //default implementation
 	}
-
+	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 89)
+	private void writeObject(java.io.ObjectOutputStream out) 
+			throws IOException{ //entry point via serialization
+		out.defaultWriteObject(); //default implementation
+	}
+	
+	private Object writeReplace(){ //entry point via serialization; not called if a subclass is serialized
+		return this; //default implementation
+	}
+	
+	private void readObjectNoData(){ //entry point via de-serialization of subclass; 
+									 //only called if serialization was done before the inheritance was added
+		//do nothing;
+	}
 }

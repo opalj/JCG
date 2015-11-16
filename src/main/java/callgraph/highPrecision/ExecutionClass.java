@@ -31,29 +31,28 @@ package callgraph.highPrecision;
 import static org.opalj.test.annotations.CallGraphAlgorithm.BasicVTA;
 import static org.opalj.test.annotations.CallGraphAlgorithm.CHA;
 
-import org.opalj.test.annotations.InvokedMethod;
-import org.opalj.test.annotations.InvokedMethods;
+import org.opalj.test.annotations.*;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
- * 
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * 
+ * <p>
  * <!--
- * 
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
+ * <p>
+ * <p>
  * -->
- * 
+ *
  * @author Michael Reif
  */
 public class ExecutionClass {
@@ -67,18 +66,17 @@ public class ExecutionClass {
         }
     }
 
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass", name = "interfaceMethod", line = 76),
-            @InvokedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", name = "interfaceMethod", line = 76, isContainedIn = {
-                    CHA, BasicVTA }) })
+    @CallSite(name = "interfaceMethod", line = 72, resolvedMethods = {
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass"),
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", iff = {@ResolvingCondition(containedInMax = BasicVTA)})})
     public void testInnerClass() {
         innerClass.interfaceMethod();
     }
 
-    @InvokedMethods({
-            @InvokedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$1", name = "interfaceMethod", line = 92),
-            @InvokedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", name = "interfaceMethod", line = 92, isContainedIn = { CHA }),
-            @InvokedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass", name = "interfaceMethod", line = 92, isContainedIn = { CHA }) })
+    @CallSite(name = "interfaceMethod", line = 89, resolvedMethods = {
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$1"),
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", iff = {@ResolvingCondition(containedInMax = CHA)}),
+            @ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass", iff = {@ResolvingCondition(containedInMax = CHA)})})
     public void testAnonClass() {
         IBase anon = new IBase() {
 

@@ -34,6 +34,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
@@ -63,15 +66,35 @@ public class SerializableAndExternalizable implements Serializable,
 
 	@Override
 	public void readExternal(ObjectInput arg0) throws IOException,
-			ClassNotFoundException { //called during de-serialization
+			ClassNotFoundException { //entry point via de-serialization
+		//no fields to read; do nothing
 	}
 	
-	private Object readResolve(){
-		return new SerializableAndExternalizable(); //living code; called during de-serialization after readExternal
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, name = "deadMethod", isStatic = false, line = 75)
+	private void readObject(java.io.ObjectInputStream in) throws IOException { //dead code; superseded by readExternal
+		deadMethod();
+	}
+	
+	private Object readResolve(){ //entry point via de-serialization
+		return this; //living code; called during de-serialization after readExternal
 	}
 
+	private Object writeReplace(){ //entry point via serialization
+		return this; //living code; called during serialization before writeExternal
+	}
+	
 	@Override
-	public void writeExternal(ObjectOutput arg0) throws IOException { //called during serialization
+	public void writeExternal(ObjectOutput arg0) throws IOException { //entry point via serialization
+		//no fields to write; do nothing
+	}
+
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, name = "deadMethod", isStatic = false, line = 93)
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException{ //dead code; superseded by writeExternal
+		deadMethod();
+	}
+	
+	private void deadMethod(){ //dead code; all callers are dead
+		System.out.println("I feel dead inside.");
 	}
 
 }

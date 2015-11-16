@@ -26,34 +26,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package org.opalj.test.annotations;
+
+import java.lang.annotation.*;
+
+import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.*;
 
 /**
- * This class was used to create a class file with some well defined attributes. The
- * created class is subsequently used by several tests.
+ * Describes a method call as call site with different {@link ResolvedMethod}s.
+ * For types see the {@link TargetResolution} enum.
  * 
- * A base class for a serializable class to extend. Has a non-public no-args constructor which is 
- * still visible to the subclass. Thus (de-)serialization completes without issues.
- * 
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- * 
- * <!--
- * 
- * 
- * 
- * 
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * -->
- * 
- * @author Roberts Kolosovs
+ * @author Florian Kuebler
  */
-public class Base {
+@Retention(RUNTIME)
+@Target(METHOD)
+@Repeatable(CallSites.class)
+public @interface CallSite {
+
+	TargetResolution resolution() default TargetResolution.DEFAULT;
 	
-	protected Base(){}//empty no-args constructor
+	String name();
+
+	Class<?> returnType() default Void.class;
+
+	Class<?>[] parameterTypes() default {};
+
+	int line() default -1;
+
+	boolean isStatic() default false;
+
+	boolean isReflective() default false;
+
+    ResolvedMethod[] resolvedMethods();
 }

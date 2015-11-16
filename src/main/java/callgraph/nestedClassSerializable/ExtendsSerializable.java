@@ -54,6 +54,7 @@ import java.io.Serializable;
  */
 public interface ExtendsSerializable extends Serializable {
 
-	void someMethod();
+	void someMethod(); //some method to make the implementation of this interface meaningful
+	                   //and to have a meaningfull difference between NewClass and OldClass
 	
 }

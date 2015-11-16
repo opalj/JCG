@@ -26,20 +26,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.virtualCalls;
+package callgraph.serializableInvalidSuperclass;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 import org.opalj.test.annotations.CallSite;
 import org.opalj.test.annotations.ResolvedMethod;
 
-import callgraph.base.AbstractBase;
-import callgraph.base.AlternateBase;
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
-
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
+ * 
+ * Serializable class with subclass without visible no-args constructor. Attempts at 
+ * de-serialization result in a runtime error. Serialization completes without problems.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -48,49 +48,40 @@ import callgraph.base.SimpleBase;
  * <!--
  * 
  * 
- * 
- * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * 
  * 
- * 
- * 
  * -->
  * 
- * @author Marco Jacobasch
+ * @author Roberts Kolosovs
  */
-public class CallToStringOnInterface {
+public class SerializableSubclass extends InvalidSuperclass implements
+		Serializable {
+	
+	private static final long serialVersionUID = -3867218705647300333L;
 
-    Base simpleBase = new SimpleBase();
-    Base concreteBase = new ConcreteBase();
-    Base alternerateBase = new AlternateBase();
-    Base abstractBase = new AbstractBase() {
-
-        @Override
-        public void abstractMethod() {
-            // empty
-        }
-    };
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "toString", returnType = String.class, line = 77)
-    void callToStringOnSimpleBase() {
-        simpleBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 82)
-    void callToStringOnConcreteBase() {
-        concreteBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 87)
-    void callToStringOnAlternateBase() {
-        alternerateBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 92)
-    void callToStringOnAbstractBase() {
-        abstractBase.toString();
-    }
-
+	public SerializableSubclass(){ //explicit implementation of no-args constructor to accommodate the superclass
+		super(null);
+	}
+	
+	private Object writeReplace(){ //entry point via serialization
+		return this; //default implementation
+	}
+	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 75)
+	private void writeObject(java.io.ObjectOutputStream out) 
+			throws IOException{ //entry point via serialization; called after writeReplace
+		out.defaultWriteObject(); //default implementation
+	}
+	
+	private Object readResolve(){ //no entry point; de-serialization results in java.io.InvalidClassException
+		return this; //default implementation
+	}
+	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 85)
+	private void readObject(java.io.ObjectInputStream in) 
+			throws ClassNotFoundException, IOException{ //no entry point; de-serialization results in java.io.InvalidClassException
+		in.defaultReadObject(); //default implementation
+	}
 }

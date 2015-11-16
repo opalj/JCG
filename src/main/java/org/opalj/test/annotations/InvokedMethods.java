@@ -39,6 +39,7 @@ import static java.lang.annotation.ElementType.*;
  */
 @Retention(RUNTIME)
 @Target(METHOD)
+@Deprecated
 public @interface InvokedMethods {
 
     InvokedMethod[] value();

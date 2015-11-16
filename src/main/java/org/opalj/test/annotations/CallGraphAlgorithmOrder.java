@@ -26,34 +26,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package org.opalj.test.annotations;
 
 /**
- * This class was used to create a class file with some well defined attributes. The
- * created class is subsequently used by several tests.
+ * Represents the result of a comparison of two partially ordered
+ * {@link CallGraphAlgorithm} in terms of precision.
  * 
- * A base class for a serializable class to extend. Has a non-public no-args constructor which is 
- * still visible to the subclass. Thus (de-)serialization completes without issues.
- * 
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- * 
- * <!--
- * 
- * 
- * 
- * 
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * -->
- * 
- * @author Roberts Kolosovs
+ * @author Florian Kuebler
+ *
  */
-public class Base {
-	
-	protected Base(){}//empty no-args constructor
+public enum CallGraphAlgorithmOrder {
+
+	EqualPrecision, SmallerPrecision, GreaterPrecision, Incomparable
+
 }

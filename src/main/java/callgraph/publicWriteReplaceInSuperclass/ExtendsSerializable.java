@@ -26,20 +26,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.publicWriteReplaceInSuperclass;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.InvokedConstructor;
 import org.opalj.test.annotations.ResolvedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * A simple class using the Serializable interface. No special behavior.
+ * Serializable class extending another serializable class. The superclass implements public 
+ * writeReplace method which is called whenever this class is serialized. Thus (assuming this 
+ * state of code is the only one being run) no serialized instances of this class exist. Whenever 
+ * this happens, writeReplace of the superclass is called twice.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -59,28 +60,21 @@ import org.opalj.test.annotations.ResolvedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable {
+public class ExtendsSerializable extends SerializableWithPublicWriteReplace {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 5471170331658694098L;
 
-	private Object writeReplace(){ //entry point via serialization
-		return this; //default implementation
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 72)
+	private void readObject(java.io.ObjectInputStream in) 
+			throws ClassNotFoundException, IOException{ //dead code; 
+														//no serialized instances of this class exist 
+														//(provided the code has always been in this state)
+		in.defaultReadObject(); //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 73)
-	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
-			throws IOException { 
-		out.defaultWriteObject();
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 78)
+	private void writeObject(java.io.ObjectOutputStream out) 
+			throws IOException{ //dead code; call graph is redirected to superclass by writeReplace during serialization
+		out.defaultWriteObject(); //default implementation
 	}
-	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException { // entry point via de-serialization
-		in.defaultReadObject();
-	}
-
-	private Object readResolve() { // entry point via de-serialization; called after readObject
-		return this; //default implementation
-	}
-
 }

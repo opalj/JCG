@@ -28,7 +28,8 @@
  */
 package callgraph.staticCalls;
 
-import org.opalj.test.annotations.InvokedMethod;
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
 
 import callgraph.base.AbstractBase;
 import callgraph.base.ConcreteBase;
@@ -58,17 +59,17 @@ import callgraph.base.SimpleBase;
  */
 public class CallStaticMethods {
 
-    @InvokedMethod(receiverType = "callgraph/base/AbstractBase", name = "staticMethod", isStatic = true, line = 63)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "staticMethod", isStatic = true, line = 63)
     void callStaticAbstract() {
         AbstractBase.staticMethod();
     }
 
-    @InvokedMethod(receiverType = "callgraph/base/ConcreteBase", name = "staticMethod", isStatic = true, line = 68)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "staticMethod", isStatic = true, line = 68)
     void callStaticConcrete() {
         ConcreteBase.staticMethod();
     }
 
-    @InvokedMethod(receiverType = "callgraph/base/SimpleBase", name = "staticMethod", isStatic = true, line = 73)
+    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "staticMethod", isStatic = true, line = 73)
     void callStaticSimple() {
         SimpleBase.staticMethod();
     }

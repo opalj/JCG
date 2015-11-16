@@ -26,20 +26,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.serializableWithNonSerializableField;
 
 import java.io.IOException;
 import java.io.Serializable;
 
 import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.InvokedConstructor;
 import org.opalj.test.annotations.ResolvedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * A simple class using the Serializable interface. No special behavior.
+ * Serializable class with a non-serializable field. As writeObject and readObject use the default 
+ * implementation, all serialization and de-serialization attempts result in an error.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -59,28 +59,30 @@ import org.opalj.test.annotations.ResolvedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable {
+public class SerializableWithNonSerializableField implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = -6141317929433778662L;
+	
+	public StringBox label; //field with non-serializable type (StringBox)
+	
 	private Object writeReplace(){ //entry point via serialization
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 73)
-	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
-			throws IOException { 
-		out.defaultWriteObject();
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 75)
+	private void writeObject(java.io.ObjectOutputStream out) 
+			throws IOException{ //entry point via serialization;
+		out.defaultWriteObject(); //default implementation; results in java.io.NotSerializableException
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException { // entry point via de-serialization
-		in.defaultReadObject();
-	}
-
-	private Object readResolve() { // entry point via de-serialization; called after readObject
+	private Object readResolve(){ //no entry point; 
+								  //de-serialization attempts result in java.io.WriteAbortedException
 		return this; //default implementation
 	}
-
+	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 86)
+	private void readObject(java.io.ObjectInputStream in) 
+			throws ClassNotFoundException, IOException{ //entry point via de-serialization;
+		in.defaultReadObject(); //default implementation; results in java.io.WriteAbortedException
+	}
 }

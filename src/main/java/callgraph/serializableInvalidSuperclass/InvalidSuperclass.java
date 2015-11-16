@@ -26,16 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.virtualCalls;
-
-import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.ResolvedMethod;
-
-import callgraph.base.AbstractBase;
-import callgraph.base.AlternateBase;
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
+package callgraph.serializableInvalidSuperclass;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -55,42 +46,17 @@ import callgraph.base.SimpleBase;
  * 
  * 
  * 
- * 
  * -->
  * 
- * @author Marco Jacobasch
+ * @author Roberts Kolosovs
  */
-public class CallToStringOnInterface {
+public class InvalidSuperclass {
 
-    Base simpleBase = new SimpleBase();
-    Base concreteBase = new ConcreteBase();
-    Base alternerateBase = new AlternateBase();
-    Base abstractBase = new AbstractBase() {
-
-        @Override
-        public void abstractMethod() {
-            // empty
-        }
-    };
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "toString", returnType = String.class, line = 77)
-    void callToStringOnSimpleBase() {
-        simpleBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 82)
-    void callToStringOnConcreteBase() {
-        concreteBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 87)
-    void callToStringOnAlternateBase() {
-        alternerateBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 92)
-    void callToStringOnAbstractBase() {
-        abstractBase.toString();
-    }
-
+	public String label; //a field to enable sensible constructor with arguments
+	
+	private InvalidSuperclass(){} //needs to be visible for a serializable subclass to de-serialize properly
+	
+	public InvalidSuperclass(String arg){ //visible constructor to enable valid subclasses
+		label = arg;
+	}
 }

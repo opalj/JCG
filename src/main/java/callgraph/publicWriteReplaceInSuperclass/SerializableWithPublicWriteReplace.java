@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.publicWriteReplaceInSuperclass;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,7 +39,9 @@ import org.opalj.test.annotations.ResolvedMethod;
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * A simple class using the Serializable interface. No special behavior.
+ * Serializable class with public writeReplace method. It returns a new instance of this class with 
+ * label marked as being replaced. This method is called whenever this class or one of its subclasses 
+ * attempts a serialization. If a subclass causes the method to be called, it is called twice.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -59,28 +61,37 @@ import org.opalj.test.annotations.ResolvedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable {
+public class SerializableWithPublicWriteReplace implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2368715977184990608L;
+	
+	public String label; //field to modify during serialization
+	
+	public SerializableWithPublicWriteReplace(){} //default no-args constructor
+	
+	public SerializableWithPublicWriteReplace(String arg){ //constructor explicitly setting the label
+		label = arg;
+	}
 
-	private Object writeReplace(){ //entry point via serialization
-		return this; //default implementation
+    @InvokedConstructor(receiverType = "callgraph/publicWriteReplaceInSuperclass/SerializableWithPublicWriteReplace", line = 79)
+	public Object writeReplace(){ //entry point via serialization;
+								  //called during the serialization of ExtendsSerializable
+		return new SerializableWithPublicWriteReplace("replaced " + label); //modifies the label to trace the event of replacement object
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 73)
-	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
-			throws IOException { 
-		out.defaultWriteObject();
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 85)
+	private void readObject(java.io.ObjectInputStream in) 
+			throws ClassNotFoundException, IOException{ //entry point via de-serialization
+		in.defaultReadObject(); //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException { // entry point via de-serialization
-		in.defaultReadObject();
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 91)
+	private void writeObject(java.io.ObjectOutputStream out) 
+			throws IOException{ //entry point via serialization
+		out.defaultWriteObject(); //default implementation
 	}
-
-	private Object readResolve() { // entry point via de-serialization; called after readObject
+	
+	private Object readResolve(){ //entry point via de-serialization
 		return this; //default implementation
 	}
-
 }

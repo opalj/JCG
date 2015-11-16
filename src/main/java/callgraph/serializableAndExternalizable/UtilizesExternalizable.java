@@ -26,20 +26,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.virtualCalls;
+package callgraph.serializableAndExternalizable;
 
-import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.ResolvedMethod;
-
-import callgraph.base.AbstractBase;
-import callgraph.base.AlternateBase;
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
+ * 
+ * This class utilizes a externalizable class and performs basic (de-)externalization routine.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -48,49 +47,32 @@ import callgraph.base.SimpleBase;
  * <!--
  * 
  * 
- * 
- * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * 
  * 
- * 
- * 
  * -->
  * 
- * @author Marco Jacobasch
+ * @author Roberts Kolosovs
  */
-public class CallToStringOnInterface {
+public class UtilizesExternalizable {
 
-    Base simpleBase = new SimpleBase();
-    Base concreteBase = new ConcreteBase();
-    Base alternerateBase = new AlternateBase();
-    Base abstractBase = new AbstractBase() {
-
-        @Override
-        public void abstractMethod() {
-            // empty
-        }
-    };
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "toString", returnType = String.class, line = 77)
-    void callToStringOnSimpleBase() {
-        simpleBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 82)
-    void callToStringOnConcreteBase() {
-        concreteBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 87)
-    void callToStringOnAlternateBase() {
-        alternerateBase.toString();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/Object") }, name = "toString", returnType = String.class, line = 92)
-    void callToStringOnAbstractBase() {
-        abstractBase.toString();
-    }
-
+	public SerializableAndExternalizable externalizableField;
+	
+	public void performSerialization() throws IOException{ //basic externalization routine
+		FileOutputStream fileOut = new FileOutputStream("/tmp/serializableField.ser");
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		out.writeObject(externalizableField); //call writeReplace and writeExternal of externalizable class
+		out.close();
+		fileOut.close();
+	}
+	
+	public void performDeserialization() 
+			throws IOException, ClassNotFoundException{ //basic de-externalization routine
+		FileInputStream fileIn = new FileInputStream("/tmp/serializableField.ser");
+		ObjectInputStream in = new ObjectInputStream(fileIn);
+		externalizableField = (SerializableAndExternalizable) in.readObject(); //call readExternal and readResolve of externalizable class
+		in.close();
+		fileIn.close();
+	}
 }

@@ -26,20 +26,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.simpleSerializable;
+package callgraph.externalizablePrivateNoArgsConstructorSuperclass;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.ResolvedMethod;
+import org.opalj.test.annotations.AccessedField;
+
+import callgraph.base.ConcreteBase;
 
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * A simple class using the Serializable interface. No special behavior.
+ * This class implements externalizable and extends a class with private no-args constructor. 
+ * Unlike with plain Serializable this is not a problem. The field of the superclass is not 
+ * explicitly read or written by read/writeExternal and thus set to the default value after
+ * de-serialization.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -59,28 +64,26 @@ import org.opalj.test.annotations.ResolvedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ImplementsSerializable extends Base implements Serializable {
+public class ExternalizableSubclass extends Superclass implements
+		Externalizable {
 
-	private static final long serialVersionUID = 1L;
-
-	private Object writeReplace(){ //entry point via serialization
-		return this; //default implementation
+	public String label; //field to read and write during (de-)serialization
+	
+	public ExternalizableSubclass(){ //explicit no-args constructor to accommodate the superclass
+		super(42);
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 73)
-	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
-			throws IOException { 
-		out.defaultWriteObject();
-	}
-	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException { // entry point via de-serialization
-		in.defaultReadObject();
+	@Override
+	@AccessedField(declaringType = ExternalizableSubclass.class, fieldType = String.class, name = "label", line = 80)
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException { //called during de-serialization
+		label = in.readUTF(); //read label previously written as UTF8
 	}
 
-	private Object readResolve() { // entry point via de-serialization; called after readObject
-		return this; //default implementation
+	@Override
+	@AccessedField(declaringType = ExternalizableSubclass.class, fieldType = String.class, name = "label", line = 86)
+	public void writeExternal(ObjectOutput out) throws IOException { //called during serialization
+		out.writeUTF(label); //write label as UTF8 into file
 	}
 
 }
