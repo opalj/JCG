@@ -72,7 +72,7 @@ public class Superclass{
 
 		@CallSites({
 				@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79),
-				@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, name = "livingCOde", isStatic = false, line = 80)})
+				@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, name = "livingCode", isStatic = false, line = 80)})
 		private void readObject(java.io.ObjectInputStream in) 
 				throws ClassNotFoundException, IOException{ //entry point via de-serialization
 															//public readResolve of superclass called immediately after
