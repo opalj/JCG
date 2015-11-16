@@ -31,6 +31,9 @@ package callgraph.serializableExtendingSerializable;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
@@ -70,6 +73,7 @@ public class ImplementsSerializable implements Serializable {
 		label = arg;
 	}
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization
 		in.defaultReadObject(); //default implementation
@@ -79,6 +83,7 @@ public class ImplementsSerializable implements Serializable {
 		return this; //default implementation
 	}
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 89)
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization
 		out.defaultWriteObject(); //default implementation

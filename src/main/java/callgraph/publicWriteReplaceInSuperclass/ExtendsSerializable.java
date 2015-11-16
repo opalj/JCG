@@ -30,6 +30,9 @@ package callgraph.publicWriteReplaceInSuperclass;
 
 import java.io.IOException;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
@@ -61,6 +64,7 @@ public class ExtendsSerializable extends SerializableWithPublicWriteReplace {
 
 	private static final long serialVersionUID = 5471170331658694098L;
 
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 72)
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //dead code; 
 														//no serialized instances of this class exist 
@@ -68,6 +72,7 @@ public class ExtendsSerializable extends SerializableWithPublicWriteReplace {
 		in.defaultReadObject(); //default implementation
 	}
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 78)
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //dead code; call graph is redirected to superclass by writeReplace during serialization
 		out.defaultWriteObject(); //default implementation

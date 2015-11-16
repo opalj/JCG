@@ -34,6 +34,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
@@ -67,6 +70,7 @@ public class SerializableAndExternalizable implements Serializable,
 		//no fields to read; do nothing
 	}
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, name = "deadMethod", isStatic = false, line = 75)
 	private void readObject(java.io.ObjectInputStream in) throws IOException { //dead code; superseded by readExternal
 		deadMethod();
 	}
@@ -84,6 +88,7 @@ public class SerializableAndExternalizable implements Serializable,
 		//no fields to write; do nothing
 	}
 
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, name = "deadMethod", isStatic = false, line = 93)
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException{ //dead code; superseded by writeExternal
 		deadMethod();
 	}

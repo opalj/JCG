@@ -30,6 +30,9 @@ package callgraph.indirectReadResolve;
 
 import java.io.Serializable;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
@@ -57,6 +60,7 @@ import java.io.Serializable;
  */
 public class SerializableWithReadResolve implements Serializable {
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/indirectReadResolve/ReplacementFactory") }, name = "makeReplacement", isStatic = true, line = 65)
 	private Object readResolve(){ //entry point via de-serialization
 		return ReplacementFactory.makeReplacement(); //returns a replacement object - indirectly
 	}

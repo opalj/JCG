@@ -30,6 +30,10 @@ package callgraph.publicReadResolveInSuperclass;
 
 import java.io.IOException;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.CallSites;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
@@ -66,6 +70,9 @@ public class Superclass{
 		
 		private static final long serialVersionUID = 2320664358117848370L;
 
+		@CallSites({
+				@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79),
+				@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, name = "livingCOde", isStatic = false, line = 80)})
 		private void readObject(java.io.ObjectInputStream in) 
 				throws ClassNotFoundException, IOException{ //entry point via de-serialization
 															//public readResolve of superclass called immediately after
@@ -73,6 +80,7 @@ public class Superclass{
 			livingCode();
 		}
 		
+		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 86)
 		private void writeObject(java.io.ObjectOutputStream out) 
 				throws IOException{ //entry point via serialization
 			out.defaultWriteObject(); //default implementation

@@ -30,6 +30,9 @@ package callgraph.serializableExtendingSerializable;
 
 import java.io.IOException;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
@@ -63,12 +66,14 @@ public class ExtendsSerializable extends ImplementsSerializable {
 		super(null);
 	}
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 73)
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization; 
 														//called after readObject of superclass
 		in.defaultReadObject(); //default implementation
 	}
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 80)
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization
 								//called after writeObject of superclass

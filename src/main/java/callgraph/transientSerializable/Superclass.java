@@ -31,6 +31,9 @@ package callgraph.transientSerializable;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
@@ -63,19 +66,23 @@ public class Superclass implements Serializable {
 	private class ClassWithTransientField{ 
 		transient int transientField; //transient field; value not saved during serialization
 		
+		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 72)
 		private void readObject(java.io.ObjectInputStream in) //entry point via de-serialization 
 				throws IOException, ClassNotFoundException{
 			in.defaultReadObject(); //transientField is restored to its default value (0 for int)
 		}
 		
+		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/transientSerializable/Superclass$ClassWithTransientField") }, name = "deadMethod", isStatic = false, line = 78)
 		private Object readResolve(){ //entry point via de-serialization, called after readObject
 			if(transientField != 0){ //always false; transientField is always 0 after de-serialization
-				someMethod(); //dead code; branch never taken
+				deadMethod(); //dead code; branch never taken
 			}
 			return this; //default functionality;
 		}
 		
-		private void someMethod(){} //dead code; only call in dead branch of caller
+		private void deadMethod(){ //dead code; only call in dead branch of caller
+			System.out.println("I feel dead inside.");
+		}
 	}
 
 }

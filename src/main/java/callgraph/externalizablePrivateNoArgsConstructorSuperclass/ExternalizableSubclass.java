@@ -33,6 +33,10 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import org.opalj.test.annotations.AccessedField;
+
+import callgraph.base.ConcreteBase;
+
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
@@ -70,12 +74,14 @@ public class ExternalizableSubclass extends Superclass implements
 	}
 	
 	@Override
+	@AccessedField(declaringType = ExternalizableSubclass.class, fieldType = String.class, name = "label", line = 80)
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException { //called during de-serialization
 		label = in.readUTF(); //read label previously written as UTF8
 	}
 
 	@Override
+	@AccessedField(declaringType = ExternalizableSubclass.class, fieldType = String.class, name = "label", line = 86)
 	public void writeExternal(ObjectOutput out) throws IOException { //called during serialization
 		out.writeUTF(label); //write label as UTF8 into file
 	}

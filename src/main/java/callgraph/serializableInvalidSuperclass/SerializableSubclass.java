@@ -31,6 +31,9 @@ package callgraph.serializableInvalidSuperclass;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.opalj.test.annotations.CallSite;
+import org.opalj.test.annotations.ResolvedMethod;
+
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
@@ -66,6 +69,7 @@ public class SerializableSubclass extends InvalidSuperclass implements
 		return this; //default implementation
 	}
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 75)
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization; called after writeReplace
 		out.defaultWriteObject(); //default implementation
@@ -75,6 +79,7 @@ public class SerializableSubclass extends InvalidSuperclass implements
 		return this; //default implementation
 	}
 	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 85)
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //no entry point; de-serialization results in java.io.InvalidClassException
 		in.defaultReadObject(); //default implementation
