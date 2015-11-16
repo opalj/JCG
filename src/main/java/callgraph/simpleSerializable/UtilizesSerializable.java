@@ -28,12 +28,17 @@
  */
 package callgraph.simpleSerializable;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
  * 
- * A base class for a serializable class to extend. Has a non-public no-args constructor which is 
- * still visible to the subclass. Thus (de-)serialization completes without issues.
+ * This class utilizes a serializable class and performs basic (de-)serialization routine.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -53,7 +58,24 @@ package callgraph.simpleSerializable;
  * 
  * @author Roberts Kolosovs
  */
-public class Base {
+public class UtilizesSerializable {
+
+	public ImplementsSerializable serializableField = new ImplementsSerializable(); //serializable field to be (de-)serialized
 	
-	protected Base(){}//empty no-args constructor
+	public void performSerialization() throws IOException{ //basic serialization routine
+		FileOutputStream fileOut = new FileOutputStream("/tmp/serializableField.ser");
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		out.writeObject(serializableField); //call writeReplace and writeObject of serializable class
+		out.close();
+		fileOut.close();
+	}
+	
+	public void performDeserialization() 
+			throws IOException, ClassNotFoundException{ //basic de-serialization routine
+		FileInputStream fileIn = new FileInputStream("/tmp/serializableField.ser");
+		ObjectInputStream in = new ObjectInputStream(fileIn);
+		serializableField = (ImplementsSerializable) in.readObject(); //call readObject and readResolve of serializable class
+		in.close();
+		fileIn.close();
+	}
 }
