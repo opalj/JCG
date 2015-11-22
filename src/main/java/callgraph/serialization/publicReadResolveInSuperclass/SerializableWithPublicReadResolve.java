@@ -31,9 +31,9 @@ package callgraph.serialization.publicReadResolveInSuperclass;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.ResolvedMethod;
+import org.opalj.annotations.callgraph.CallSite;
+import org.opalj.annotations.callgraph.InvokedConstructor;
+import org.opalj.annotations.callgraph.ResolvedMethod;
 
 import callgraph.serialization.publicWriteReplaceInSuperclass.SerializableWithPublicWriteReplace;
 

@@ -28,7 +28,7 @@
  */
 package callgraph.opal.algorithms;
 
-import org.opalj.test.annotations.*;
+import org.opalj.annotations.callgraph.*;
 
 /**
  * This class was used to create a class file with some well defined properties. The

@@ -28,8 +28,8 @@
  */
 package callgraph.virtualCalls;
 
-import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.ResolvedMethod;
+import org.opalj.annotations.callgraph.CallSite;
+import org.opalj.annotations.callgraph.ResolvedMethod;
 
 import callgraph.base.AbstractBase;
 import callgraph.base.AlternateBase;

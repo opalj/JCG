@@ -29,7 +29,7 @@
  */
 package callgraph.constructors;
 
-import org.opalj.test.annotations.InvokedConstructor;
+import org.opalj.annotations.callgraph.InvokedConstructor;
 
 import callgraph.base.AlternateBase;
 import callgraph.base.Base;

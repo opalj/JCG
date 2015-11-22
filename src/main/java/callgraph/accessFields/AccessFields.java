@@ -30,7 +30,8 @@ package callgraph.accessFields;
 
 import callgraph.base.AlternateBase;
 import callgraph.base.ConcreteBase;
-import org.opalj.test.annotations.AccessedField;
+
+import org.opalj.annotations.callgraph.AccessedField;
 
 /**
  * This class was used to create a class file with some well defined attributes. The

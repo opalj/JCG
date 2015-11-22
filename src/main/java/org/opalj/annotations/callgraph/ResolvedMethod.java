@@ -26,37 +26,27 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
 
 import java.lang.annotation.*;
-
 import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Describes a method call as call site with different {@link ResolvedMethod}s.
- * For types see the {@link TargetResolution} enum.
- * 
+ * Describes a specific method to which a call site can resolve.
+ *
  * @author Florian Kuebler
  */
 @Retention(RUNTIME)
-@Target(METHOD)
-@Repeatable(CallSites.class)
-public @interface CallSite {
+@Target(LOCAL_VARIABLE)
+public @interface ResolvedMethod {
 
-	TargetResolution resolution() default TargetResolution.DEFAULT;
-	
-	String name();
+	/**
+	 * The type name of the receiver using JVM notation (e.g.,
+	 * "java/lang/Object").
+	 */
+	String receiverType();
 
-	Class<?> returnType() default Void.class;
+	ResolvingCondition[] iff() default { @ResolvingCondition() };
 
-	Class<?>[] parameterTypes() default {};
-
-	int line() default -1;
-
-	boolean isStatic() default false;
-
-	boolean isReflective() default false;
-
-    ResolvedMethod[] resolvedMethods();
 }

@@ -26,20 +26,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
 
 import java.lang.annotation.*;
 import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Wrapper annotation to allow several AccessedField annotations on the same method.
- * 
- * @author Arne Lottmann
+ * A concrete call must be resolved if all these conditions are true.
+ *
+ * @author Florian Kuebler
  */
 @Retention(RUNTIME)
-@Target(METHOD)
-public @interface AccessedFields {
+@Target(LOCAL_VARIABLE)
+public @interface ResolvingCondition {
 
-    AccessedField[] value();
+	CallGraphAlgorithm containedInMax() default CallGraphAlgorithm.TOP;
+	
+	CallGraphAlgorithmMode mode() default CallGraphAlgorithmMode.Application;
 }

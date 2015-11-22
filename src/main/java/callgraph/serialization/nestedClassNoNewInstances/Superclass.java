@@ -29,8 +29,9 @@
 package callgraph.serialization.nestedClassNoNewInstances;
 
 import java.io.Serializable;
-import org.opalj.test.annotations.InvokedConstructor;
-import org.opalj.test.annotations.InvokedMethod;
+
+import org.opalj.annotations.callgraph.InvokedConstructor;
+import org.opalj.annotations.callgraph.InvokedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes. The

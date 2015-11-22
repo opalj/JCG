@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import org.opalj.test.annotations.AccessedField;
+import org.opalj.annotations.callgraph.AccessedField;
 
 /**
  * This class was used to create a class file with some well defined attributes.

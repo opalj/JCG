@@ -26,34 +26,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
+
+import java.lang.annotation.*;
+
+import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.*;
 
 /**
- * Describes whether the method call instruction is a standard invoke instruction
- * (invokevirtual, invokestatic, invokespecial, invokeinterface), an invokedynamic, or a
- * call made through use of the Java reflection API.
+ * Describes a constructor call made by an invokedynamic instruction or through use of the
+ * Java reflection API.
  * 
  * @author Arne Lottmann
  */
-public enum TargetResolution {
+@Retention(RUNTIME)
+@Target(METHOD)
+public @interface InvokedConstructor {
 
     /**
-     * Describes a method call made using one of the following instructions:
-     * <ul>
-     * <li>invokevirtual</li>
-     * <li>invokestatic</li>
-     * <li>invokespecial</li>
-     * <li>invokeinterface</li>
-     * </ul>
-     * .
+     * The type name of the receiver using JVM notation (e.g., "java/lang/Object").
      */
-    DEFAULT,
-    /**
-     * Describes a method call based on an invokedynamic instruction.
-     */
-    DYNAMIC,
-    /**
-     * Describes a reflective method call.
-     */
-    REFLECTIVE
+    String receiverType();
+
+    Class<?>[] parameterTypes() default {};
+
+    int line() default -1;
+
+    boolean isReflective() default false;
 }

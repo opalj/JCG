@@ -34,7 +34,7 @@ import java.io.InvalidClassException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import org.opalj.test.annotations.InvokedConstructor;
+import org.opalj.annotations.callgraph.InvokedConstructor;
 
 /**
  * This class was used to create a class file with some well defined attributes. The

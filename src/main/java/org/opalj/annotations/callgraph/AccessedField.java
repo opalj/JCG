@@ -26,27 +26,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
 
 import java.lang.annotation.*;
 import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Describes a specific method to which a call site can resolve.
- *
- * @author Florian Kuebler
+ * Describes a field access made by an invokedynamic instruction or through use of the
+ * Java reflection API.
+ * 
+ * @author Arne Lottmann
  */
 @Retention(RUNTIME)
-@Target(LOCAL_VARIABLE)
-public @interface ResolvedMethod {
+@Target(METHOD)
+public @interface AccessedField {
 
-	/**
-	 * The type name of the receiver using JVM notation (e.g.,
-	 * "java/lang/Object").
-	 */
-	String receiverType();
+    Class<?> declaringType();
 
-	ResolvingCondition[] iff() default { @ResolvingCondition() };
+    String name();
 
+    Class<?> fieldType();
+
+    boolean isStatic() default false;
+
+    int line() default -1;
 }

@@ -28,8 +28,8 @@
  */
 package callgraph.base;
 
-import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.ResolvedMethod;
+import org.opalj.annotations.callgraph.CallSite;
+import org.opalj.annotations.callgraph.ResolvedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes. The

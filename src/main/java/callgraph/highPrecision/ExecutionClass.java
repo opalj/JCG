@@ -28,10 +28,10 @@
  */
 package callgraph.highPrecision;
 
-import static org.opalj.test.annotations.CallGraphAlgorithm.BasicVTA;
-import static org.opalj.test.annotations.CallGraphAlgorithm.CHA;
+import static org.opalj.annotations.callgraph.CallGraphAlgorithm.BasicVTA;
+import static org.opalj.annotations.callgraph.CallGraphAlgorithm.CHA;
 
-import org.opalj.test.annotations.*;
+import org.opalj.annotations.callgraph.*;
 
 /**
  * This class was used to create a class file with some well defined attributes. The

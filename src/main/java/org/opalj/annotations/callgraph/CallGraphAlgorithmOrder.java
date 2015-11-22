@@ -26,31 +26,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
-
-import java.lang.annotation.*;
-
-import static java.lang.annotation.RetentionPolicy.*;
-import static java.lang.annotation.ElementType.*;
+package org.opalj.annotations.callgraph;
 
 /**
- * Describes a constructor call made by an invokedynamic instruction or through use of the
- * Java reflection API.
+ * Represents the result of a comparison of two partially ordered
+ * {@link CallGraphAlgorithm} in terms of precision.
  * 
- * @author Arne Lottmann
+ * @author Florian Kuebler
+ *
  */
-@Retention(RUNTIME)
-@Target(METHOD)
-public @interface InvokedConstructor {
+public enum CallGraphAlgorithmOrder {
 
-    /**
-     * The type name of the receiver using JVM notation (e.g., "java/lang/Object").
-     */
-    String receiverType();
+	EqualPrecision, SmallerPrecision, GreaterPrecision, Incomparable
 
-    Class<?>[] parameterTypes() default {};
-
-    int line() default -1;
-
-    boolean isReflective() default false;
 }
