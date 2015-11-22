@@ -35,8 +35,6 @@ import java.io.ObjectOutput;
 
 import org.opalj.test.annotations.AccessedField;
 
-import callgraph.base.ConcreteBase;
-
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
