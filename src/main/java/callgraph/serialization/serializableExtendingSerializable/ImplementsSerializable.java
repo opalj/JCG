@@ -33,6 +33,8 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPointKeys;
+import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -73,26 +75,35 @@ public class ImplementsSerializable implements Serializable {
 		label = arg;
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
+	@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
+			name = "defaultReadObject", isStatic = false, line = 84)
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization
 		in.defaultReadObject(); //default implementation
 	}
-	
+
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private Object readResolve(){ //entry point via de-serialization; not called if a subclass is de-serialized
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 89)
+	@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
+			name = "defaultWriteObject", isStatic = false, line = 98)
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization
 		out.defaultWriteObject(); //default implementation
 	}
-	
+
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private Object writeReplace(){ //entry point via serialization; not called if a subclass is serialized
 		return this; //default implementation
 	}
-	
+
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private void readObjectNoData(){ //entry point via de-serialization of subclass; 
 									 //only called if serialization was done before the inheritance was added
 		//do nothing;

@@ -34,6 +34,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.opalj.annotations.callgraph.properties.EntryPointKeys;
+import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
@@ -61,7 +64,8 @@ import java.io.ObjectOutputStream;
 public class UtilizesSerializable {
 
 	public ImplementsSerializable serializableField = new ImplementsSerializable(); //serializable field to be (de-)serialized
-	
+
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	public void performSerialization() throws IOException{ //basic serialization routine
 		FileOutputStream fileOut = new FileOutputStream("/tmp/serializableField.ser");
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -69,7 +73,8 @@ public class UtilizesSerializable {
 		out.close();
 		fileOut.close();
 	}
-	
+
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	public void performDeserialization() 
 			throws IOException, ClassNotFoundException{ //basic de-serialization routine
 		FileInputStream fileIn = new FileInputStream("/tmp/serializableField.ser");

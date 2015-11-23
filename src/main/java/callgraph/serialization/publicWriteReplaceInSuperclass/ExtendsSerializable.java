@@ -32,6 +32,8 @@ import java.io.IOException;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPointKeys;
+import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -64,7 +66,10 @@ public class ExtendsSerializable extends SerializableWithPublicWriteReplace {
 
 	private static final long serialVersionUID = 5471170331658694098L;
 
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 72)
+	@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
+			name = "defaultReadObject", isStatic = false, line = 77)
+	@EntryPointProperty(cpa=EntryPointKeys.NoEntryPoint)
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //dead code; 
 														//no serialized instances of this class exist 
@@ -72,7 +77,10 @@ public class ExtendsSerializable extends SerializableWithPublicWriteReplace {
 		in.defaultReadObject(); //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 78)
+	@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
+			name = "defaultWriteObject", isStatic = false, line = 86)
+	@EntryPointProperty(cpa=EntryPointKeys.NoEntryPoint)
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //dead code; call graph is redirected to superclass by writeReplace during serialization
 		out.defaultWriteObject(); //default implementation
