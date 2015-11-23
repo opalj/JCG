@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.opal.algorithms;
+package callgraph.branchElimination;
 
 /**
  * This class was used to create a class file with some well defined properties. The
@@ -39,10 +39,8 @@ package callgraph.opal.algorithms;
  * <!--
  * 
  * 
- * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
  * 
  * 
  * -->
@@ -50,7 +48,7 @@ package callgraph.opal.algorithms;
  * @author Michael Reif
  */
 
-public class SubclassLevel2 extends SubclassLevel1 {
+public class SubclassLevel1 extends Superclass {
 
     @Override
     public void implementedInEachSubclass() {
