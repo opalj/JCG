@@ -26,31 +26,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
-
-import java.lang.annotation.*;
-
-import static java.lang.annotation.RetentionPolicy.*;
-import static java.lang.annotation.ElementType.*;
+package callgraph.serialization.nonSerializableField;
 
 /**
- * Describes a constructor call made by an invokedynamic instruction or through use of the
- * Java reflection API.
+ * This class was used to create a class file with some well defined attributes.
+ * The created class is subsequently used by several tests.
  * 
- * @author Arne Lottmann
+ * A simple box wrapping a String object.
+ * 
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
+ * 
+ * <!--
+ * 
+ * 
+ * 
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
+ * 
+ * 
+ * 
+ * 
+ * -->
+ * 
+ * @author Roberts Kolosovs
  */
-@Retention(RUNTIME)
-@Target(METHOD)
-public @interface InvokedConstructor {
+public class StringBox {
 
-    /**
-     * The type name of the receiver using JVM notation (e.g., "java/lang/Object").
-     */
-    String receiverType();
-
-    Class<?>[] parameterTypes() default {};
-
-    int line() default -1;
-
-    boolean isReflective() default false;
+	public String content; //String wrapped by the class
 }

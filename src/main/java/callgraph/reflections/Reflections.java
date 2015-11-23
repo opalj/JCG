@@ -31,13 +31,13 @@ package callgraph.reflections;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.opalj.test.annotations.CallSite;
-import org.opalj.test.annotations.InvokedConstructor;
+import org.opalj.annotations.callgraph.CallSite;
+import org.opalj.annotations.callgraph.InvokedConstructor;
+import org.opalj.annotations.callgraph.ResolvedMethod;
 
 import callgraph.base.Base;
 import callgraph.base.ConcreteBase;
 import callgraph.base.SimpleBase;
-import org.opalj.test.annotations.ResolvedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes. The

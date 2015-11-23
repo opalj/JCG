@@ -26,22 +26,46 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
-
-import java.lang.annotation.*;
-import static java.lang.annotation.RetentionPolicy.*;
-import static java.lang.annotation.ElementType.*;
+package callgraph.serialization.indirectReadResolve;
 
 /**
- * A concrete call must be resolved if all these conditions are true.
- *
- * @author Florian Kuebler
- */
-@Retention(RUNTIME)
-@Target(LOCAL_VARIABLE)
-public @interface ResolvingCondition {
+* This class was used to create a class file with some well defined attributes.
+* The created class is subsequently used by several tests.
+* 
+* This class contains a private nested class as a replacement class for SerializableWithReadResolve.
+* A factory method is used to indirectly create an instance of that class.
+* 
+* <b>NOTE</b><br>
+* This class is not meant to be (automatically) recompiled; it just serves
+* documentation purposes.
+* 
+* <!--
+* 
+* 
+* 
+* INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+* STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
+* 
+* 
+* 
+* 
+* -->
+* 
+* @author Roberts Kolosovs
+*/
+public class ReplacementFactory {
 
-	CallGraphAlgorithm containedInMax() default CallGraphAlgorithm.TOP;
+	protected static ReplacementClass makeReplacement(){ //called by SerializableWithReadResolve during de-serialization
+		return new ReplacementClass(42); //make new inner class instance
+	}
 	
-	CallGraphAlgorithmMode mode() default CallGraphAlgorithmMode.Application;
+	private static class ReplacementClass{ //replacement class for SerialWithReadResolve; 
+										   //created indirectly by outer class
+		public int number; //a field to truly differentiate from the class to replace
+		
+		public ReplacementClass(int arg){ //constructor setting the field
+			number = arg;
+		}
+	}
+	
 }

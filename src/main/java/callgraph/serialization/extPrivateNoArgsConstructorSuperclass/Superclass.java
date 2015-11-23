@@ -26,52 +26,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.staticCalls;
-
-import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.ResolvedMethod;
-
-import callgraph.base.AbstractBase;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
+package callgraph.serialization.extPrivateNoArgsConstructorSuperclass;
 
 /**
- * This class was used to create a class file with some well defined attributes. The
- * created class is subsequently used by several tests.
+ * This class was used to create a class file with some well defined attributes.
+ * The created class is subsequently used by several tests.
+ * 
+ * This class has a private no-args constructor and serves as a superclass for a externalizable class.
  * 
  * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
  * 
  * <!--
  * 
  * 
  * 
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
  * 
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
  * 
  * 
  * 
  * -->
  * 
- * @author Marco Jacobasch
+ * @author Roberts Kolosovs
  */
-public class CallStaticMethods {
+public class Superclass {
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "staticMethod", isStatic = true, line = 63)
-    void callStaticAbstract() {
-        AbstractBase.staticMethod();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "staticMethod", isStatic = true, line = 68)
-    void callStaticConcrete() {
-        ConcreteBase.staticMethod();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "staticMethod", isStatic = true, line = 73)
-    void callStaticSimple() {
-        SimpleBase.staticMethod();
-    }
-
+	public int number; //public field to enable sensible constructor with arguments
+	
+	private Superclass(){} //private no-args constructor; dead code
+	
+	public Superclass(int arg){ //public constructor to enable valid subclasses
+		number = arg;
+	}
 }

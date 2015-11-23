@@ -26,19 +26,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.constructors;
+package callgraph.serialization.nestedExternalizable;
+
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 import org.opalj.annotations.callgraph.InvokedConstructor;
-
-import callgraph.base.AbstractBase;
-import callgraph.base.AlternateBase;
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
+ * 
+ * Class contains a nested private class never instantiated. Similarly to example in callgraph/nestedClassSerializable 
+ * the class can still be de-serialized. However here the de-serialization always leads to an exception 
+ * thrown by readExternal before readResolve is ever called.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -47,47 +51,46 @@ import callgraph.base.SimpleBase;
  * <!--
  * 
  * 
- * 
- * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * 
  * 
- * 
  * -->
  * 
- * @author Marco Jacobasch
+ * @author Roberts Kolosovs
  */
-public class DefaultConstructor {
+public class Superclass implements Externalizable {
 
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 65)
-    public void createSimpleBase() {
-        Base simpleBase = new SimpleBase();
-    }
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException { //entry point via de-serialization
+		//no fields to read; do nothing
+	}
 
-    class MyBase extends AbstractBase {
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException { //entry point via serialization
+		//no fields to write; do nothing
+	}
+	
+	private class DeadInternalClass implements Externalizable { //no instances are created; can still be de-serialized
 
-        @Override
-        public void abstractMethod() {/* empty */
-        }
-    }
+		@Override
+	    @InvokedConstructor(receiverType = "java/io/InvalidClassException", line = 81)
+		public void readExternal(ObjectInput in) throws IOException, //entry point via de-serialization
+				ClassNotFoundException { 
+			throw new InvalidClassException(null); //throw an exception whenever a de-serialization is attempted
+		}
 
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/constructors/DefaultConstructor$MyBase", line = 78)
-    public void createAbstractBase() {
-        Base abstractBase = new MyBase();
-    }
+	    @InvokedConstructor(receiverType = "callgraph/nestedExternalizable/DeadInternalClass", line = 86)
+		private Object readResolve(){ //entry point via de-serialization; called after readExternal
+			return new DeadInternalClass(); //dead code; every de-serialization results in an exception thrown
+		}
+		
+		@Override
+		public void writeExternal(ObjectOutput out) throws IOException { //entry point via serialization
+			//no fields to write; do nothing
+		}
+		
+	}
 
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 84)
-    public void createConcreteBase() {
-        Base concreteBase = new ConcreteBase();
-    }
-
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/AlternateBase", line = 90)
-    public void createAlternateBase() {
-        Base alternerateBase = new AlternateBase();
-    }
 }

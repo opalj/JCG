@@ -26,19 +26,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.constructors;
+package callgraph.serialization.nestedClassNoNewInstances;
+
+import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.InvokedConstructor;
-
-import callgraph.base.AbstractBase;
-import callgraph.base.AlternateBase;
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
+import org.opalj.annotations.callgraph.InvokedMethod;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
+ * 
+ * The superclass contains a nested private class not intended for use. No instances of it can be 
+ * created but it has to be kept around for legacy reasons as serialized instances of the class can be 
+ * de-serialized. The constructor and the readResolve methods are entry points due to de-serialization
+ * but other methods of the class (someMethod) are dead code. 
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -46,48 +48,45 @@ import callgraph.base.SimpleBase;
  * 
  * <!--
  * 
- * 
- * 
- * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * 
- * 
- * 
  * -->
  * 
- * @author Marco Jacobasch
+ * @author Roberts Kolosovs
  */
-public class DefaultConstructor {
+public class Superclass implements Serializable {
 
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 65)
-    public void createSimpleBase() {
-        Base simpleBase = new SimpleBase();
-    }
+	private static final long serialVersionUID = -8714932542828113368L;
 
-    class MyBase extends AbstractBase {
+	public Superclass() {
+		nestedClassValue = new NewClass(); //only instances of NewClass are created
+	}
+	
+	private class OldClass implements ExtendsSerializable { //kept for backwards compatibility, no new instances can be created
+		private static final long serialVersionUID = 1L;
 
-        @Override
-        public void abstractMethod() {/* empty */
-        }
-    }
+		private OldClass() {} //entry point via de-serialization
+		
+		@InvokedConstructor(receiverType = "callgraph/nestedClassSerializable/Superclass$newClass", line = 72)
+		private Object readResolve() { //entry point via de-serialization
+			return new NewClass(); //create instance of new version of the class instead of an instance of old version
+		}
+		
+		public void someMethod() { //dead code, no instances of OldClass escape this scope
+			System.out.println("Executing someMethod of OldClass.");
+		} 
+	}
+	
+	private class NewClass implements ExtendsSerializable {
+		private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/constructors/DefaultConstructor$MyBase", line = 78)
-    public void createAbstractBase() {
-        Base abstractBase = new MyBase();
-    }
-
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 84)
-    public void createConcreteBase() {
-        Base concreteBase = new ConcreteBase();
-    }
-
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/AlternateBase", line = 90)
-    public void createAlternateBase() {
-        Base alternerateBase = new AlternateBase();
-    }
+		NewClass() {} //entry point
+		
+		public void someMethod() { //living code
+			System.out.println("Executing someMethod of NewClass.");
+		}
+	}
+	
+	private ExtendsSerializable nestedClassValue; //place where OldClass was used / NewClass is used
 }

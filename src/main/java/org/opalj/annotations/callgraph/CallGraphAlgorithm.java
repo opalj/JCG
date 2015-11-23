@@ -26,9 +26,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
 
-import static org.opalj.test.annotations.CallGraphAlgorithmOrder.*;
+import static org.opalj.annotations.callgraph.CallGraphAlgorithmOrder.*;
 
 /**
  * Represents the different call graph algorithms. The algorithms form a lattice

@@ -26,67 +26,63 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.virtualCalls;
+package callgraph.serialization.transientField;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.CallSites;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-
-import callgraph.base.AbstractBase;
-import callgraph.base.AlternateBase;
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
- * <p>
+ * 
+ * The nested class has a private method which is only called during de-serialization. However the 
+ * call is gated by an check if the chooser field is not 0. This is never the case immediately after 
+ * de-serialization as the field is transient and thus is de-serialized to 0.
+ * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * <p>
+ * 
  * <!--
- * <p>
- * <p>
- * <p>
- * <p>
- * INTENTIONALLY LEFT EMPTY (THIS AREA CAN BE EXTENDED/REDUCED TO MAKE SURE THAT THE
- * SPECIFIED LINE NUMBERS ARE STABLE.
- * <p>
- * <p>
- * <p>
+ * 
+ * 
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ * 
+ * 
  * -->
- *
- * @author Marco Jacobasch
+ * 
+ * @author Roberts Kolosovs
  */
-public class CallByParameter {
+public class Superclass implements Serializable {
 
-
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase"),
-            @ResolvedMethod(receiverType = "callgraph/base/AbstractBase")}, name = "interfaceMethod", line = 68)
-    void callByInterface(Base object) {
-        object.interfaceMethod();
-    }
-
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/AbstractBase")}, name = "interfaceMethod", line = 73)
-    void callByInterface(AbstractBase object) {
-        object.interfaceMethod();
-    }
-
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/AbstractBase")}, name = "interfaceMethod", line = 78)
-    void callByInterface(ConcreteBase object) {
-        object.interfaceMethod();
-    }
-
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/AbstractBase")}, name = "interfaceMethod", line = 83)
-    void callByInterface(AlternateBase object) {
-        object.interfaceMethod();
-    }
-
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "interfaceMethod", line = 88)
-    void callByInterface(SimpleBase object) {
-        object.interfaceMethod();
-    }
+	private static final long serialVersionUID = 3005126240428648143L;
+	
+	ClassWithTransientField field = new ClassWithTransientField();
+	
+	private class ClassWithTransientField{ 
+		transient int transientField; //transient field; value not saved during serialization
+		
+		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 72)
+		private void readObject(java.io.ObjectInputStream in) //entry point via de-serialization 
+				throws IOException, ClassNotFoundException{
+			in.defaultReadObject(); //transientField is restored to its default value (0 for int)
+		}
+		
+		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/transientSerializable/Superclass$ClassWithTransientField") }, name = "deadMethod", isStatic = false, line = 78)
+		private Object readResolve(){ //entry point via de-serialization, called after readObject
+			if(transientField != 0){ //always false; transientField is always 0 after de-serialization
+				deadMethod(); //dead code; branch never taken
+			}
+			return this; //default functionality;
+		}
+		
+		private void deadMethod(){ //dead code; only call in dead branch of caller
+			System.out.println("I feel dead inside.");
+		}
+	}
 
 }

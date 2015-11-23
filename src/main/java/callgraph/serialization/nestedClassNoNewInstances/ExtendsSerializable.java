@@ -26,23 +26,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package callgraph.serialization.nestedClassNoNewInstances;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.io.Serializable;
 
 /**
- * Container of the {@link CallSite} annotation.
+ * This class was used to create a class file with some well defined attributes. The
+ * created class is subsequently used by several tests.
  * 
- * @author Florian Kuebler
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ * 
+ * <!--
+ * 
+ * 
+ * 
+ * 
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ * 
+ * 
+ * 
+ * -->
+ * 
+ * @author Roberts Kolosovs
  */
-@Retention(RUNTIME)
-@Target(METHOD)
-public @interface CallSites {
-	
-	CallSite[] value();
+public interface ExtendsSerializable extends Serializable {
 
+	void someMethod(); //some method to make the implementation of this interface meaningful
+	                   //and to have a meaningfull difference between NewClass and OldClass
+	
 }

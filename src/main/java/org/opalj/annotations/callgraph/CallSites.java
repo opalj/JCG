@@ -26,21 +26,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
 
-import java.lang.annotation.*;
-import static java.lang.annotation.RetentionPolicy.*;
-import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Wrapper annotation that allows several InvokedConstructor annotations on the same
- * method.
+ * Container of the {@link CallSite} annotation.
  * 
- * @author Arne Lottmann
+ * @author Florian Kuebler
  */
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface InvokedConstructors {
+public @interface CallSites {
+	
+	CallSite[] value();
 
-    InvokedConstructor[] value();
 }

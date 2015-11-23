@@ -26,17 +26,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
+
+import java.lang.annotation.*;
+import static java.lang.annotation.RetentionPolicy.*;
+import static java.lang.annotation.ElementType.*;
 
 /**
- * Represents the result of a comparison of two partially ordered
- * {@link CallGraphAlgorithm} in terms of precision.
+ * Wrapper annotation that allows several InvokedConstructor annotations on the same
+ * method.
  * 
- * @author Florian Kuebler
- *
+ * @author Arne Lottmann
  */
-public enum CallGraphAlgorithmOrder {
+@Retention(RUNTIME)
+@Target(METHOD)
+public @interface InvokedConstructors {
 
-	EqualPrecision, SmallerPrecision, GreaterPrecision, Incomparable
-
+    InvokedConstructor[] value();
 }

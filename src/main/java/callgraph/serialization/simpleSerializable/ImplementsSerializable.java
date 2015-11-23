@@ -26,52 +26,61 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.staticCalls;
+package callgraph.serialization.simpleSerializable;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
+import org.opalj.annotations.callgraph.InvokedConstructor;
 import org.opalj.annotations.callgraph.ResolvedMethod;
 
-import callgraph.base.AbstractBase;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
-
 /**
- * This class was used to create a class file with some well defined attributes. The
- * created class is subsequently used by several tests.
+ * This class was used to create a class file with some well defined attributes.
+ * The created class is subsequently used by several tests.
+ * 
+ * A simple class using the Serializable interface. No special behavior.
  * 
  * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
  * 
  * <!--
  * 
  * 
  * 
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
  * 
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
  * 
  * 
  * 
  * -->
  * 
- * @author Marco Jacobasch
+ * @author Roberts Kolosovs
  */
-public class CallStaticMethods {
+public class ImplementsSerializable extends Base implements Serializable {
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "staticMethod", isStatic = true, line = 63)
-    void callStaticAbstract() {
-        AbstractBase.staticMethod();
-    }
+	private static final long serialVersionUID = 1L;
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "staticMethod", isStatic = true, line = 68)
-    void callStaticConcrete() {
-        ConcreteBase.staticMethod();
-    }
+	private Object writeReplace(){ //entry point via serialization
+		return this; //default implementation
+	}
+	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 73)
+	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
+			throws IOException { 
+		out.defaultWriteObject();
+	}
+	
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
+	private void readObject(java.io.ObjectInputStream in) throws IOException,
+			ClassNotFoundException { // entry point via de-serialization
+		in.defaultReadObject();
+	}
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "staticMethod", isStatic = true, line = 73)
-    void callStaticSimple() {
-        SimpleBase.staticMethod();
-    }
+	private Object readResolve() { // entry point via de-serialization; called after readObject
+		return this; //default implementation
+	}
 
 }

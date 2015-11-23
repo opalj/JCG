@@ -26,20 +26,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
 
 import java.lang.annotation.*;
 import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Wrapper annotation to allow several AccessedField annotations on the same method.
+ * Describes a field access made by an invokedynamic instruction or through use of the
+ * Java reflection API.
  * 
  * @author Arne Lottmann
  */
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface AccessedFields {
+public @interface AccessedField {
 
-    AccessedField[] value();
+    Class<?> declaringType();
+
+    String name();
+
+    Class<?> fieldType();
+
+    boolean isStatic() default false;
+
+    int line() default -1;
 }

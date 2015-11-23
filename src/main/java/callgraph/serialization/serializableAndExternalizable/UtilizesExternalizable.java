@@ -14,7 +14,6 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  * 
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,21 +22,23 @@
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.constructors;
+package callgraph.serialization.serializableAndExternalizable;
 
-import org.opalj.annotations.callgraph.InvokedConstructor;
-
-import callgraph.base.AlternateBase;
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
+ * 
+ * This class utilizes a externalizable class and performs basic (de-)externalization routine.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -46,41 +47,32 @@ import callgraph.base.ConcreteBase;
  * <!--
  * 
  * 
- * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * 
  * 
- * 
  * -->
  * 
- * @author Marco Jacobasch
+ * @author Roberts Kolosovs
  */
-public class ParameterizedConstructors {
+public class UtilizesExternalizable {
 
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", parameterTypes = { String.class }, line = 63)
-    public void createConcreteBaseSingleParameter() {
-        Base concreteBase = new ConcreteBase("test");
-    }
-
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/AlternateBase", parameterTypes = { String.class }, line = 69)
-    public void createAlternateBaseSingleParameter() {
-        Base alternerateBase = new AlternateBase("test");
-    }
-
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", parameterTypes = {
-            String.class, Integer.class }, line = 76)
-    public void createConcreteBaseTwoParameters() {
-        Base concreteBase = new ConcreteBase("test", 42);
-    }
-
-    @SuppressWarnings("unused")
-    @InvokedConstructor(receiverType = "callgraph/base/AlternateBase", parameterTypes = {
-            String.class, Double.class }, line = 83)
-    public void createAlternateBaseTwoParameters() {
-        Base alternerateBase = new AlternateBase("test", 42);
-    }
+	public SerializableAndExternalizable externalizableField;
+	
+	public void performSerialization() throws IOException{ //basic externalization routine
+		FileOutputStream fileOut = new FileOutputStream("/tmp/serializableField.ser");
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		out.writeObject(externalizableField); //call writeReplace and writeExternal of externalizable class
+		out.close();
+		fileOut.close();
+	}
+	
+	public void performDeserialization() 
+			throws IOException, ClassNotFoundException{ //basic de-externalization routine
+		FileInputStream fileIn = new FileInputStream("/tmp/serializableField.ser");
+		ObjectInputStream in = new ObjectInputStream(fileIn);
+		externalizableField = (SerializableAndExternalizable) in.readObject(); //call readExternal and readResolve of externalizable class
+		in.close();
+		fileIn.close();
+	}
 }

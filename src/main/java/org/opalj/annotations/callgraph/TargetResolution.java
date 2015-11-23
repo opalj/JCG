@@ -26,52 +26,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.staticCalls;
-
-import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.ResolvedMethod;
-
-import callgraph.base.AbstractBase;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
+package org.opalj.annotations.callgraph;
 
 /**
- * This class was used to create a class file with some well defined attributes. The
- * created class is subsequently used by several tests.
+ * Describes whether the method call instruction is a standard invoke instruction
+ * (invokevirtual, invokestatic, invokespecial, invokeinterface), an invokedynamic, or a
+ * call made through use of the Java reflection API.
  * 
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- * 
- * <!--
- * 
- * 
- * 
- * 
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * -->
- * 
- * @author Marco Jacobasch
+ * @author Arne Lottmann
  */
-public class CallStaticMethods {
+public enum TargetResolution {
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "staticMethod", isStatic = true, line = 63)
-    void callStaticAbstract() {
-        AbstractBase.staticMethod();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "staticMethod", isStatic = true, line = 68)
-    void callStaticConcrete() {
-        ConcreteBase.staticMethod();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "staticMethod", isStatic = true, line = 73)
-    void callStaticSimple() {
-        SimpleBase.staticMethod();
-    }
-
+    /**
+     * Describes a method call made using one of the following instructions:
+     * <ul>
+     * <li>invokevirtual</li>
+     * <li>invokestatic</li>
+     * <li>invokespecial</li>
+     * <li>invokeinterface</li>
+     * </ul>
+     * .
+     */
+    DEFAULT,
+    /**
+     * Describes a method call based on an invokedynamic instruction.
+     */
+    DYNAMIC,
+    /**
+     * Describes a reflective method call.
+     */
+    REFLECTIVE
 }

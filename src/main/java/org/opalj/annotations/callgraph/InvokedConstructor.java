@@ -26,27 +26,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.opalj.test.annotations;
+package org.opalj.annotations.callgraph;
 
 import java.lang.annotation.*;
+
 import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Describes a specific method to which a call site can resolve.
- *
- * @author Florian Kuebler
+ * Describes a constructor call made by an invokedynamic instruction or through use of the
+ * Java reflection API.
+ * 
+ * @author Arne Lottmann
  */
 @Retention(RUNTIME)
-@Target(LOCAL_VARIABLE)
-public @interface ResolvedMethod {
+@Target(METHOD)
+public @interface InvokedConstructor {
 
-	/**
-	 * The type name of the receiver using JVM notation (e.g.,
-	 * "java/lang/Object").
-	 */
-	String receiverType();
+    /**
+     * The type name of the receiver using JVM notation (e.g., "java/lang/Object").
+     */
+    String receiverType();
 
-	ResolvingCondition[] iff() default { @ResolvingCondition() };
+    Class<?>[] parameterTypes() default {};
 
+    int line() default -1;
+
+    boolean isReflective() default false;
 }
