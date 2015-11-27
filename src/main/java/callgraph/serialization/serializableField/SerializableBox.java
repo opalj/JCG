@@ -33,8 +33,7 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -66,7 +65,7 @@ public class SerializableBox implements Serializable {
 	
 	public String value; //The content of the box.
 	
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@EntryPoint
 	private Object writeReplace(){ //entry point via serialization
 								   //called after writeObject of containing class if serialized as field
 		return this; //default implementation
@@ -74,8 +73,8 @@ public class SerializableBox implements Serializable {
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 81)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultWriteObject", isStatic = false, line = 80)
+	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
 			throws IOException { 
 		out.defaultWriteObject();
@@ -83,15 +82,15 @@ public class SerializableBox implements Serializable {
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 91)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultReadObject", isStatic = false, line = 90)
+	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException { //entry point via de-serialization; 
 									 //called after readObject of containing class if serialized as field
 		in.defaultReadObject();
 	}
 
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@EntryPoint
 	private Object readResolve() { // entry point via de-serialization; called after readObject
 		return this; //default implementation
 	}

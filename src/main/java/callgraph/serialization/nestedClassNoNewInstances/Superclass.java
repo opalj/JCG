@@ -31,9 +31,7 @@ package callgraph.serialization.nestedClassNoNewInstances;
 import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.InvokedConstructor;
-import org.opalj.annotations.callgraph.InvokedMethod;
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -68,13 +66,13 @@ public class Superclass implements Serializable {
 
 		private OldClass() {} //entry point via de-serialization
 		
-		@InvokedConstructor(receiverType = "callgraph/nestedClassSerializable/Superclass$newClass", line = 74)
-		@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+		@InvokedConstructor(
+				receiverType = "callgraph/nestedClassSerializable/Superclass$newClass", line = 73)
+		@EntryPoint
 		private Object readResolve() { //entry point via de-serialization
 			return new NewClass(); //create instance of new version of the class instead of an instance of old version
 		}
 		
-		@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
 		public void someMethod() { //dead code, no instances of OldClass escape this scope
 			System.out.println("Executing someMethod of OldClass.");
 		} 
@@ -85,7 +83,7 @@ public class Superclass implements Serializable {
 
 		NewClass() {} //entry point
 
-		@EntryPointProperty(opa=EntryPointKeys.IsEntryPoint)
+		@EntryPoint
 		public void someMethod() { //living code
 			System.out.println("Executing someMethod of NewClass.");
 		}

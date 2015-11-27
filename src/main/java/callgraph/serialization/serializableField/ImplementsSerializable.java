@@ -33,8 +33,7 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -64,15 +63,15 @@ public class ImplementsSerializable implements Serializable {
 
 	public SerializableBox serializableField; //
 	
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@EntryPoint
 	private Object writeReplace(){ //entry point via serialization
 		return this; //default implementation
 	}
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 79)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultWriteObject", isStatic = false, line = 78)
+	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
 															 //writeReplace of serializableField called immediately after
 			throws IOException { 
@@ -81,15 +80,15 @@ public class ImplementsSerializable implements Serializable {
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 89)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultReadObject", isStatic = false, line = 88)
+	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException { //entry point via de-serialization; 
 									 //readObject of serializableField called immediately after
 		in.defaultReadObject();
 	}
 
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@EntryPoint
 	private Object readResolve() { // entry point via de-serialization; called after readResolve of serializableField
 		return this; //default implementation
 	}

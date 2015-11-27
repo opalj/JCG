@@ -32,8 +32,7 @@ import java.io.IOException;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -70,8 +69,8 @@ public class ExtendsSerializable extends ImplementsSerializable {
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 78)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultReadObject", isStatic = false, line = 77)
+	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization; 
 														//called after readObject of superclass
@@ -80,8 +79,8 @@ public class ExtendsSerializable extends ImplementsSerializable {
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 88)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultWriteObject", isStatic = false, line = 87)
+	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization
 								//called after writeObject of superclass

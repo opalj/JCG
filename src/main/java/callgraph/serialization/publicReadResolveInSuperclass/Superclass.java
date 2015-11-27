@@ -33,8 +33,7 @@ import java.io.IOException;
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.CallSites;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -75,11 +74,11 @@ public class Superclass{
 		@CallSites({
 				@CallSite(resolvedMethods = { 
 						@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-						name = "defaultReadObject", isStatic = false, line = 86),
+						name = "defaultReadObject", isStatic = false, line = 85),
 				@CallSite(resolvedMethods = { 
 						@ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, 
-						name = "livingCode", isStatic = false, line = 87)})
-		@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+						name = "livingCode", isStatic = false, line = 86)})
+		@EntryPoint
 		private void readObject(java.io.ObjectInputStream in) 
 				throws ClassNotFoundException, IOException{ //entry point via de-serialization
 															//public readResolve of superclass called immediately after
@@ -88,8 +87,8 @@ public class Superclass{
 		}
 		
 		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-				name = "defaultWriteObject", isStatic = false, line = 95)
-		@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+				name = "defaultWriteObject", isStatic = false, line = 94)
+		@EntryPoint
 		private void writeObject(java.io.ObjectOutputStream out) 
 				throws IOException{ //no entry point via serialization; no instances of this class are created
 			out.defaultWriteObject(); //default implementation
@@ -100,7 +99,6 @@ public class Superclass{
 			System.out.println("Still alive!");
 		}
 
-		@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
 		public void deadMethod(){ //dead code; no instance of this class survives de-serialization
 			System.out.println("I feel dead inside.");
 		}

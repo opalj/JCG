@@ -33,8 +33,7 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -67,27 +66,27 @@ public class SerializableSubclass extends InvalidSuperclass implements
 		super(null);
 	}
 
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@EntryPoint
 	private Object writeReplace(){ //entry point via serialization
 		return this; //default implementation
 	}
 	
 	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 80)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultWriteObject", isStatic = false, line = 79)
+	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization; called after writeReplace
 		out.defaultWriteObject(); //default implementation
 	}
 	
-	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint) //might become entry point if another version of this class is serialized
+	//might become entry point if another version of this class is serialized
 	private Object readResolve(){ //no entry point; de-serialization results in java.io.InvalidClassException
 		return this; //default implementation
 	}
 	
 	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 93)
-	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint) //might become entry point if another version of this class is serialized
+			name = "defaultReadObject", isStatic = false, line = 92)
+	//might become entry point if another version of this class is serialized
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //no entry point; de-serialization results in java.io.InvalidClassException
 		in.defaultReadObject(); //default implementation

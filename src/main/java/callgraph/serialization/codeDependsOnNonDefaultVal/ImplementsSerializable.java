@@ -30,19 +30,18 @@ package callgraph.serialization.codeDependsOnNonDefaultVal;
 
 import java.io.Serializable;
 
-import javax.management.RuntimeErrorException;
-
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
  * 
- * Serializable class with a method whichs execution depends on fields not having the default value
- * immediately at the start of readObject execution.
+ * Serializable class with a private method called in readObject during de-serialization. 
+ * The call is only executed if the integer field of the class is at any value other than 
+ * the default set in the field declaration. However the field is always set to the data 
+ * types default value at the point the call is made.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -67,9 +66,13 @@ public class ImplementsSerializable implements Serializable {
 		number = 42; //doesn't matter what the field starts at 42
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 25)
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serialization/ImplementsSerializable") }, name = "deadCode", isStatic = false, line = 26)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@CallSite(resolvedMethods = 
+		{ @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
+		name = "defaultReadObject", isStatic = false, line = 80)
+	@CallSite(resolvedMethods = 
+		{ @ResolvedMethod(receiverType = "callgraph/serialization/ImplementsSerializable") }, 
+		name = "deadCode", isStatic = false, line = 81)
+	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) throws Exception{ //entry point via de-serialization
 		if(number != 42){ //number always == 0 immediately after de-serialization 
 			throw new Exception();
@@ -78,7 +81,6 @@ public class ImplementsSerializable implements Serializable {
 		deadCode(); //call never executed
 	}
 	
-	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
 	private Object readResolve(){ //no entry point; readObject terminates de-serialization with an exception
 		return this; //default implementation
 	}

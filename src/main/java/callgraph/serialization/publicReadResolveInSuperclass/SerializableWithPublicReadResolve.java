@@ -34,10 +34,7 @@ import java.io.Serializable;
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.InvokedConstructor;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
-
-import callgraph.serialization.publicWriteReplaceInSuperclass.SerializableWithPublicWriteReplace;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -77,15 +74,15 @@ public class SerializableWithPublicReadResolve implements Serializable {
 		label = arg;
 	}
 
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@EntryPoint
 	private Object writeReplace(){ //entry point via serialization
 		return this; //default implementation
 	}
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 91)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultReadObject", isStatic = false, line = 88)
+	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization
 		in.defaultReadObject(); //default implementation
@@ -93,15 +90,16 @@ public class SerializableWithPublicReadResolve implements Serializable {
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 100)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+			name = "defaultWriteObject", isStatic = false, line = 97)
+	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization
 		out.defaultWriteObject(); //default implementation
 	}
 	
-    @InvokedConstructor(receiverType = "callgraph/publicReadResolveInSuperclass/SerializableWithPublicReadResolve", line = 107)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+    @InvokedConstructor(
+    		receiverType = "callgraph/publicReadResolveInSuperclass/SerializableWithPublicReadResolve", line = 105)
+	@EntryPoint
 	public Object readResolve(){ //entry point via de-serialization;
 								 //called when a subclass attempts de-serialization
 		return new SerializableWithPublicReadResolve("replaced " + label); //modifies the label to trace the event of replacement object

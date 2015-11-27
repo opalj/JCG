@@ -33,8 +33,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -71,13 +70,12 @@ public class InvalidExternalizable implements Externalizable {
 	}
 	
 	@Override
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@EntryPoint
 	public void writeExternal(ObjectOutput out) throws IOException { //entry point via externalization
 		out.writeUTF(label); //default implementation
 	}
 
 	@Override
-	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException { //no entry point; 
 									 //de-externalization results in InvalidClassException due to no valid constructor
