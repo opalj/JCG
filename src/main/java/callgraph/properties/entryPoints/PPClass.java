@@ -28,9 +28,6 @@
  */
 package callgraph.properties.entryPoints;
 
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
-
 /**
  * 
  * @author Michael Reif

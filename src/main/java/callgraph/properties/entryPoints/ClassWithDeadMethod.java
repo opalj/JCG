@@ -28,18 +28,17 @@
  */
 package callgraph.properties.entryPoints;
 
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import static org.opalj.annotations.callgraph.properties.AnalysisMode.*;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
-
+ * 
  * @author Michael Reif
  */
-class ClassWithDeadMethod implements InterfaceWithEntryPoint,
-		InterfaceWithoutEntryPoint {
+class ClassWithDeadMethod implements InterfaceWithEntryPoint, InterfaceWithoutEntryPoint {
 
-	@EntryPointProperty(
-			cpa=EntryPointKeys.NoEntryPoint)
-	public void n(){
+	@EntryPoint({ OPA })
+	public void n() {
+		// is only an entry point when the open packages assumption is applied. 
 	}
 }
