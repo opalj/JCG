@@ -33,6 +33,8 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPointKeys;
+import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -64,23 +66,27 @@ public class SerializableWithNonSerializableField implements Serializable {
 	private static final long serialVersionUID = -6141317929433778662L;
 	
 	public StringBox label; //field with non-serializable type (StringBox)
-	
+
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private Object writeReplace(){ //entry point via serialization
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 75)
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 79)
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization;
 		out.defaultWriteObject(); //default implementation; results in java.io.NotSerializableException
 	}
-	
+
+	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
 	private Object readResolve(){ //no entry point; 
 								  //de-serialization attempts result in java.io.WriteAbortedException
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 86)
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 92)
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization;
 		in.defaultReadObject(); //default implementation; results in java.io.WriteAbortedException

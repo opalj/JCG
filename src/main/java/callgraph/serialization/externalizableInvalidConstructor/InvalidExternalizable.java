@@ -26,12 +26,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.serialization.serializableExtendingSerializable;
+package callgraph.serialization.externalizableInvalidConstructor;
 
+import java.io.Externalizable;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.ResolvedMethod;
 import org.opalj.annotations.callgraph.properties.EntryPointKeys;
 import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
@@ -39,8 +40,7 @@ import org.opalj.annotations.callgraph.properties.EntryPointProperty;
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * This class extends a serializable class. The superclass does not have a visible no-args 
- * constructor. As the superclass itself is already serializable, this does not cause an error.
+ * An invalid externalizable class. Requires a public no-args constructor to perform de-externalization.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -60,31 +60,28 @@ import org.opalj.annotations.callgraph.properties.EntryPointProperty;
  * 
  * @author Roberts Kolosovs
  */
-public class ExtendsSerializable extends ImplementsSerializable {
+public class InvalidExternalizable implements Externalizable {
 
-	private static final long serialVersionUID = -1253588232410042631L;
-
-	public ExtendsSerializable(){ //explicit no-args constructor to accommodate superclass
-		super(null);
+	public String label; //a field to make a some args constructor plausible
+	
+	private InvalidExternalizable(){} //must be public for the external class to be valid
+	
+	public InvalidExternalizable(String arg){ //public constructor setting the field
+		label = arg;
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 78)
+	@Override
 	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
-	private void readObject(java.io.ObjectInputStream in) 
-			throws ClassNotFoundException, IOException{ //entry point via de-serialization; 
-														//called after readObject of superclass
-		in.defaultReadObject(); //default implementation
+	public void writeExternal(ObjectOutput out) throws IOException { //entry point via externalization
+		out.writeUTF(label); //default implementation
 	}
-	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 88)
-	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
-	private void writeObject(java.io.ObjectOutputStream out) 
-			throws IOException{ //entry point via serialization
-								//called after writeObject of superclass
-		out.defaultWriteObject(); //default implementation
+
+	@Override
+	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException { //no entry point; 
+									 //de-externalization results in InvalidClassException due to no valid constructor
+		label = in.readUTF(); //default implementation
 	}
+
 }

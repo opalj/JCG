@@ -35,6 +35,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import org.opalj.annotations.callgraph.InvokedConstructor;
+import org.opalj.annotations.callgraph.properties.EntryPointKeys;
+import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -62,12 +64,14 @@ import org.opalj.annotations.callgraph.InvokedConstructor;
 public class Superclass implements Externalizable {
 
 	@Override
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException { //entry point via de-serialization
 		//no fields to read; do nothing
 	}
 
 	@Override
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	public void writeExternal(ObjectOutput out) throws IOException { //entry point via serialization
 		//no fields to write; do nothing
 	}
@@ -75,18 +79,22 @@ public class Superclass implements Externalizable {
 	private class DeadInternalClass implements Externalizable { //no instances are created; can still be de-serialized
 
 		@Override
-	    @InvokedConstructor(receiverType = "java/io/InvalidClassException", line = 81)
+	    @InvokedConstructor(receiverType = "java/io/InvalidClassException", line = 86)
+		@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 		public void readExternal(ObjectInput in) throws IOException, //entry point via de-serialization
 				ClassNotFoundException { 
 			throw new InvalidClassException(null); //throw an exception whenever a de-serialization is attempted
 		}
 
-	    @InvokedConstructor(receiverType = "callgraph/nestedExternalizable/DeadInternalClass", line = 86)
-		private Object readResolve(){ //entry point via de-serialization; called after readExternal
+	    @InvokedConstructor(receiverType = "callgraph/nestedExternalizable/DeadInternalClass", line = 93)
+		@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
+		private Object readResolve(){ //no entry point via de-serialization; 
+	    							  //would be called after readExternal but exception is thrown
 			return new DeadInternalClass(); //dead code; every de-serialization results in an exception thrown
 		}
 		
 		@Override
+		@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 		public void writeExternal(ObjectOutput out) throws IOException { //entry point via serialization
 			//no fields to write; do nothing
 		}

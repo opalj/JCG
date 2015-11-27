@@ -33,6 +33,8 @@ import java.io.IOException;
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.CallSites;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPointKeys;
+import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -71,8 +73,13 @@ public class Superclass{
 		private static final long serialVersionUID = 2320664358117848370L;
 
 		@CallSites({
-				@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79),
-				@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, name = "livingCode", isStatic = false, line = 80)})
+				@CallSite(resolvedMethods = { 
+						@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
+						name = "defaultReadObject", isStatic = false, line = 86),
+				@CallSite(resolvedMethods = { 
+						@ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, 
+						name = "livingCode", isStatic = false, line = 87)})
+		@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 		private void readObject(java.io.ObjectInputStream in) 
 				throws ClassNotFoundException, IOException{ //entry point via de-serialization
 															//public readResolve of superclass called immediately after
@@ -80,9 +87,11 @@ public class Superclass{
 			livingCode();
 		}
 		
-		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 86)
+		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
+				name = "defaultWriteObject", isStatic = false, line = 95)
+		@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 		private void writeObject(java.io.ObjectOutputStream out) 
-				throws IOException{ //entry point via serialization
+				throws IOException{ //no entry point via serialization; no instances of this class are created
 			out.defaultWriteObject(); //default implementation
 		}
 		
@@ -90,7 +99,8 @@ public class Superclass{
 								   //shortly before the object of this class is replaced
 			System.out.println("Still alive!");
 		}
-		
+
+		@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
 		public void deadMethod(){ //dead code; no instance of this class survives de-serialization
 			System.out.println("I feel dead inside.");
 		}

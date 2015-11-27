@@ -66,26 +66,28 @@ public class SerializableSubclass extends InvalidSuperclass implements
 	public SerializableSubclass(){ //explicit implementation of no-args constructor to accommodate the superclass
 		super(null);
 	}
-	
+
 	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private Object writeReplace(){ //entry point via serialization
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 79)
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
+			name = "defaultWriteObject", isStatic = false, line = 80)
 	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization; called after writeReplace
 		out.defaultWriteObject(); //default implementation
 	}
 	
-	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
+	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint) //might become entry point if another version of this class is serialized
 	private Object readResolve(){ //no entry point; de-serialization results in java.io.InvalidClassException
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 91)
-	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
+	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
+			name = "defaultReadObject", isStatic = false, line = 93)
+	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint) //might become entry point if another version of this class is serialized
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //no entry point; de-serialization results in java.io.InvalidClassException
 		in.defaultReadObject(); //default implementation

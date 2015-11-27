@@ -36,6 +36,8 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPointKeys;
+import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -65,30 +67,40 @@ public class SerializableAndExternalizable implements Serializable,
 		Externalizable {
 
 	@Override
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	public void readExternal(ObjectInput arg0) throws IOException,
 			ClassNotFoundException { //entry point via de-serialization
 		//no fields to read; do nothing
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, name = "deadMethod", isStatic = false, line = 75)
+	@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, 
+			name = "deadMethod", isStatic = false, line = 81)
+	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
 	private void readObject(java.io.ObjectInputStream in) throws IOException { //dead code; superseded by readExternal
 		deadMethod();
 	}
-	
+
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private Object readResolve(){ //entry point via de-serialization
 		return this; //living code; called during de-serialization after readExternal
 	}
 
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	private Object writeReplace(){ //entry point via serialization
 		return this; //living code; called during serialization before writeExternal
 	}
 	
 	@Override
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
 	public void writeExternal(ObjectOutput arg0) throws IOException { //entry point via serialization
 		//no fields to write; do nothing
 	}
 
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, name = "deadMethod", isStatic = false, line = 93)
+	@EntryPointProperty(opa=EntryPointKeys.NoEntryPoint)
+	@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, 
+			name = "deadMethod", isStatic = false, line = 105)
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException{ //dead code; superseded by writeExternal
 		deadMethod();
 	}

@@ -34,6 +34,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import org.opalj.annotations.callgraph.AccessedField;
+import org.opalj.annotations.callgraph.properties.EntryPointKeys;
+import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -72,14 +74,16 @@ public class ExternalizableSubclass extends Superclass implements
 	}
 	
 	@Override
-	@AccessedField(declaringType = ExternalizableSubclass.class, fieldType = String.class, name = "label", line = 80)
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@AccessedField(declaringType = ExternalizableSubclass.class, fieldType = String.class, name = "label", line = 81)
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException { //called during de-serialization
 		label = in.readUTF(); //read label previously written as UTF8
 	}
 
 	@Override
-	@AccessedField(declaringType = ExternalizableSubclass.class, fieldType = String.class, name = "label", line = 86)
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	@AccessedField(declaringType = ExternalizableSubclass.class, fieldType = String.class, name = "label", line = 88)
 	public void writeExternal(ObjectOutput out) throws IOException { //called during serialization
 		out.writeUTF(label); //write label as UTF8 into file
 	}

@@ -26,9 +26,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.serialization.serializableExtendingSerializable;
+package callgraph.serialization.serializableField;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
@@ -36,23 +37,22 @@ import org.opalj.annotations.callgraph.properties.EntryPointKeys;
 import org.opalj.annotations.callgraph.properties.EntryPointProperty;
 
 /**
- * This class was used to create a class file with some well defined attributes.
- * The created class is subsequently used by several tests.
+ * This class was used to create a class file with some well defined attributes. The
+ * created class is subsequently used by several tests.
  * 
- * This class extends a serializable class. The superclass does not have a visible no-args 
- * constructor. As the superclass itself is already serializable, this does not cause an error.
+ * A serializable class containing a field of a custom serializable type.
  * 
  * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves
- * documentation purposes.
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
  * 
  * <!--
  * 
  * 
  * 
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
- * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
  * 
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
  * 
  * 
  * 
@@ -60,31 +60,37 @@ import org.opalj.annotations.callgraph.properties.EntryPointProperty;
  * 
  * @author Roberts Kolosovs
  */
-public class ExtendsSerializable extends ImplementsSerializable {
+public class ImplementsSerializable implements Serializable {
 
-	private static final long serialVersionUID = -1253588232410042631L;
-
-	public ExtendsSerializable(){ //explicit no-args constructor to accommodate superclass
-		super(null);
-	}
+	public SerializableBox serializableField; //
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 78)
 	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
-	private void readObject(java.io.ObjectInputStream in) 
-			throws ClassNotFoundException, IOException{ //entry point via de-serialization; 
-														//called after readObject of superclass
-		in.defaultReadObject(); //default implementation
+	private Object writeReplace(){ //entry point via serialization
+		return this; //default implementation
 	}
 	
 	@CallSite(resolvedMethods = { 
 			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 88)
+			name = "defaultWriteObject", isStatic = false, line = 79)
 	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
-	private void writeObject(java.io.ObjectOutputStream out) 
-			throws IOException{ //entry point via serialization
-								//called after writeObject of superclass
-		out.defaultWriteObject(); //default implementation
+	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
+															 //writeReplace of serializableField called immediately after
+			throws IOException { 
+		out.defaultWriteObject();
+	}
+	
+	@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
+			name = "defaultReadObject", isStatic = false, line = 89)
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	private void readObject(java.io.ObjectInputStream in) throws IOException,
+			ClassNotFoundException { //entry point via de-serialization; 
+									 //readObject of serializableField called immediately after
+		in.defaultReadObject();
+	}
+
+	@EntryPointProperty(cpa=EntryPointKeys.IsEntryPoint)
+	private Object readResolve() { // entry point via de-serialization; called after readResolve of serializableField
+		return this; //default implementation
 	}
 }
