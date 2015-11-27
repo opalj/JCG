@@ -29,8 +29,7 @@
  */
 package callgraph.properties.entryPoints;
 
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * 
@@ -43,12 +42,12 @@ import org.opalj.annotations.callgraph.properties.EntryPointProperty;
  */
 class CouldBeCallIfThisClassEscapes implements InterfaceWithEntryPoint {
 	
-	@EntryPointProperty(
-			cpa=EntryPointKeys.IsEntryPoint)
+	@EntryPoint
 	public void defaultMethodAsEntryPoint() {
 		doesNotEscape();
 	}
 	
+	@EntryPoint
 	private void doesNotEscape(){
 		new CouldBeCallIfThisClassEscapes();
 	}

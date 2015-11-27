@@ -28,9 +28,8 @@
  */
 package callgraph.properties.entryPoints;
 
-import org.opalj.annotations.callgraph.properties.EntryPointKeys;
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
-
+import org.opalj.annotations.callgraph.properties.EntryPoint;
+import static org.opalj.annotations.callgraph.properties.AnalysisMode.*;
 /**
  * This class is for test purpose only. In this case enables this superclass the
  * "publicMethod" as EntryPoint. The package private class MethodBecomeEntryPointThroughSuperclass
@@ -51,8 +50,7 @@ class MethodBecomeEntryPointThroughSuperclass extends SuperclassEnablesEntrypoin
 	/* Since no instance is created is can not escape throug the super class
 	 * This test depends stricly on the instantiability analysis.
 	 * */
-	@EntryPointProperty(
-			cpa=EntryPointKeys.NoEntryPoint)
+	@EntryPoint(OPA)
 	public void publicMethod(){
 		
 	}

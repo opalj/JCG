@@ -28,7 +28,7 @@
  */
 package callgraph.properties.entryPoints;
 
-import org.opalj.annotations.callgraph.properties.EntryPointProperty;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 
 /**
@@ -37,7 +37,7 @@ import org.opalj.annotations.callgraph.properties.EntryPointProperty;
  */
 public interface InterfaceWithEntryPoint {
 	
-	@EntryPointProperty
+	@EntryPoint
 	default void defaultMethodAsEntryPoint(){
 	}
 }
