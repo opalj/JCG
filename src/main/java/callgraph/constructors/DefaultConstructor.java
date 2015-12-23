@@ -48,7 +48,6 @@ import callgraph.base.SimpleBase;
  * 
  * 
  * 
- * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * 
