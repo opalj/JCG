@@ -61,14 +61,14 @@ public class A implements Base {
     Base b = new B();
 
     @Override
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "simpleCallgraph/B")}, name = "callOnInstanceField", line = 65)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "simpleCallgraph/B")}, name = "callOnInstanceField", line = 66)
     public String callOnInstanceField() {
         return b.callOnInstanceField();
     }
 
     @Override
     @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "simpleCallgraph/B")}, name = "callOnConstructor", line = 72)
-    @InvokedConstructor(receiverType = "simpleCallgraph/B", line = 72)
+    @InvokedConstructor(receiverType = "simpleCallgraph/B", line = 73)
     public void callOnConstructor() {
         new B().callOnConstructor();
     }
