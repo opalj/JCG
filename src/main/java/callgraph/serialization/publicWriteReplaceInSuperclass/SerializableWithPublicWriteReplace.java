@@ -75,7 +75,7 @@ public class SerializableWithPublicWriteReplace implements Serializable {
 	}
 
     @InvokedConstructor(
-    		receiverType = "callgraph/publicWriteReplaceInSuperclass/SerializableWithPublicWriteReplace", line = 82)
+    		receiverType = "callgraph/serialization/publicWriteReplaceInSuperclass/SerializableWithPublicWriteReplace", line = 82)
 	@EntryPoint
 	public Object writeReplace(){ //entry point via serialization;
 								  //called during the serialization of ExtendsSerializable
