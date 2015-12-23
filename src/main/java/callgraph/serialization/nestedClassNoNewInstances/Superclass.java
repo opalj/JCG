@@ -67,7 +67,7 @@ public class Superclass implements Serializable {
 		private OldClass() {} //entry point via de-serialization
 		
 		@InvokedConstructor(
-				receiverType = "callgraph/nestedClassSerializable/Superclass$newClass", line = 73)
+				receiverType = "callgraph/nestedClassSerializable/Superclass$NewClass", line = 73)
 		@EntryPoint
 		private Object readResolve() { //entry point via de-serialization
 			return new NewClass(); //create instance of new version of the class instead of an instance of old version
