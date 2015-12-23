@@ -64,7 +64,7 @@ import callgraph.base.SimpleBase;
  */
 public class Reflections {
 
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 69)
+    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 70)
     @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/ConcreteBase")}, name = "implementedMethod", line = 69)
     void callAfterCastingToInterface() {
         ((Base) new ConcreteBase()).implementedMethod();
