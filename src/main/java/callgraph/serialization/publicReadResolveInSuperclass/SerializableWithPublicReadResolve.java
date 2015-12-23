@@ -98,7 +98,7 @@ public class SerializableWithPublicReadResolve implements Serializable {
 	}
 	
     @InvokedConstructor(
-    		receiverType = "callgraph/publicReadResolveInSuperclass/SerializableWithPublicReadResolve", line = 105)
+    		receiverType = "callgraph/serialization/publicReadResolveInSuperclass/SerializableWithPublicReadResolve", line = 105)
 	@EntryPoint
 	public Object readResolve(){ //entry point via de-serialization;
 								 //called when a subclass attempts de-serialization
