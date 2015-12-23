@@ -45,7 +45,6 @@ import org.opalj.annotations.callgraph.ResolvedMethod;
  * <p>
  * <p>
  * <p>
- * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
