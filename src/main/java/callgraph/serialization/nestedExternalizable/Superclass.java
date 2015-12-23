@@ -87,7 +87,7 @@ public class Superclass implements Externalizable {
 		}
 
 	    @InvokedConstructor(
-	    		receiverType = "callgraph/nestedExternalizable/Superclass$DeadInternalClass", line = 93)
+	    		receiverType = "callgraph/serialization/nestedExternalizable/Superclass$DeadInternalClass", line = 93)
 		private Object readResolve(){ //no entry point via de-serialization; 
 	    							  //would be called after readExternal but exception is thrown
 			return new DeadInternalClass(); //dead code; every de-serialization results in an exception thrown
