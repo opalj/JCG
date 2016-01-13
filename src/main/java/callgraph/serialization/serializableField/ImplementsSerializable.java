@@ -68,9 +68,6 @@ public class ImplementsSerializable implements Serializable {
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 78)
 	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
 															 //writeReplace of serializableField called immediately after
@@ -78,9 +75,6 @@ public class ImplementsSerializable implements Serializable {
 		out.defaultWriteObject();
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 88)
 	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException { //entry point via de-serialization; 

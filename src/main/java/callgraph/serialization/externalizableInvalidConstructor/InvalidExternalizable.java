@@ -33,7 +33,10 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import org.opalj.annotations.callgraph.AccessedField;
 import org.opalj.annotations.callgraph.properties.EntryPoint;
+
+import callgraph.serialization.extPrivateNoArgsConstructorSuperclass.ExternalizableSubclass;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -71,6 +74,8 @@ public class InvalidExternalizable implements Externalizable {
 	
 	@Override
 	@EntryPoint
+	@AccessedField(declaringType = InvalidExternalizable.class, 
+		fieldType = String.class, name = "label", line = 80)
 	public void writeExternal(ObjectOutput out) throws IOException { //entry point via externalization
 		out.writeUTF(label); //default implementation
 	}

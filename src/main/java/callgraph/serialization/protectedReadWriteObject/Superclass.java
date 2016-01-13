@@ -71,9 +71,6 @@ public class Superclass {
 
 		private static final long serialVersionUID = -8192945638933075918L;
 
-		@CallSite(resolvedMethods = { 
-				@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-				name = "defaultReadObject", isStatic = false, line = 88)
 		@EntryPoint(OPA)
 		protected void readObject(java.io.ObjectInputStream in) //no entry point via de-serialization;
 																//this method must be private
@@ -82,9 +79,6 @@ public class Superclass {
 			in.defaultReadObject(); //default implementation
 		}
 		
-		@CallSite(resolvedMethods = { 
-				@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-				name = "defaultWriteObject", isStatic = false, line = 88)
 		@EntryPoint(OPA)
 		protected void writeObject(java.io.ObjectOutputStream out) //no entry point via serialization;
 																   //this method must be private

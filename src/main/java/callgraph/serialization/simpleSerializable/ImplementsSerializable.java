@@ -68,18 +68,12 @@ public class ImplementsSerializable extends Base implements Serializable {
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 77)
 	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
 			throws IOException { 
 		out.defaultWriteObject();
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 86)
 	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException { // entry point via de-serialization

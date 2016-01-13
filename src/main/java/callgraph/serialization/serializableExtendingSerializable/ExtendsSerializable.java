@@ -67,9 +67,6 @@ public class ExtendsSerializable extends ImplementsSerializable {
 		super(null);
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 77)
 	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization; 
@@ -77,9 +74,6 @@ public class ExtendsSerializable extends ImplementsSerializable {
 		in.defaultReadObject(); //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 87)
 	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization

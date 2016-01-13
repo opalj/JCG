@@ -71,13 +71,9 @@ public class Superclass{
 		
 		private static final long serialVersionUID = 2320664358117848370L;
 
-		@CallSites({
-				@CallSite(resolvedMethods = { 
-						@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-						name = "defaultReadObject", isStatic = false, line = 85),
-				@CallSite(resolvedMethods = { 
-						@ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, 
-						name = "livingCode", isStatic = false, line = 86)})
+		@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, 
+			name = "livingCode", isStatic = false, line = 82)
 		@EntryPoint
 		private void readObject(java.io.ObjectInputStream in) 
 				throws ClassNotFoundException, IOException{ //entry point via de-serialization
@@ -86,8 +82,6 @@ public class Superclass{
 			livingCode();
 		}
 		
-		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-				name = "defaultWriteObject", isStatic = false, line = 94)
 		@EntryPoint
 		private void writeObject(java.io.ObjectOutputStream out) 
 				throws IOException{ //no entry point via serialization; no instances of this class are created

@@ -67,9 +67,6 @@ public class Superclass implements Serializable {
 	private class ClassWithTransientField{ 
 		transient int transientField; //transient field; value not saved during serialization
 		
-		@CallSite(resolvedMethods = { 
-				@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-				name = "defaultReadObject", isStatic = false, line = 76)
 		@EntryPoint
 		private void readObject(java.io.ObjectInputStream in) //entry point via de-serialization 
 				throws IOException, ClassNotFoundException{
@@ -78,7 +75,7 @@ public class Superclass implements Serializable {
 		
 		@CallSite(resolvedMethods = { 
 				@ResolvedMethod(receiverType = "callgraph/transientSerializable/Superclass$ClassWithTransientField") }, 
-				name = "deadMethod", isStatic = false, line = 85)
+				name = "deadMethod", isStatic = false, line = 82)
 		@EntryPoint
 		private Object readResolve(){ //entry point via de-serialization, called after readObject
 			if(transientField != 0){ //always false; transientField is always 0 after de-serialization

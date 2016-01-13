@@ -67,11 +67,8 @@ public class ImplementsSerializable implements Serializable {
 	}
 	
 	@CallSite(resolvedMethods = 
-		{ @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-		name = "defaultReadObject", isStatic = false, line = 80)
-	@CallSite(resolvedMethods = 
 		{ @ResolvedMethod(receiverType = "callgraph/serialization/ImplementsSerializable") }, 
-		name = "deadCode", isStatic = false, line = 81)
+		name = "deadCode", isStatic = false, line = 78)
 	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) throws Exception{ //entry point via de-serialization
 		if(number != 42){ //number always == 0 immediately after de-serialization 

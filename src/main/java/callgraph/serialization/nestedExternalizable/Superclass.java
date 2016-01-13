@@ -78,8 +78,6 @@ public class Superclass implements Externalizable {
 	private class DeadInternalClass implements Externalizable { //no instances are created; can still be de-serialized
 
 		@Override
-	    @InvokedConstructor(
-	    		receiverType = "java/io/InvalidClassException", line = 86)
 		@EntryPoint
 		public void readExternal(ObjectInput in) throws IOException, //entry point via de-serialization
 				ClassNotFoundException { 
@@ -87,7 +85,7 @@ public class Superclass implements Externalizable {
 		}
 
 	    @InvokedConstructor(
-	    		receiverType = "callgraph/serialization/nestedExternalizable/Superclass$DeadInternalClass", line = 93)
+	    		receiverType = "callgraph/serialization/nestedExternalizable/Superclass$DeadInternalClass", line = 91)
 		private Object readResolve(){ //no entry point via de-serialization; 
 	    							  //would be called after readExternal but exception is thrown
 			return new DeadInternalClass(); //dead code; every de-serialization results in an exception thrown

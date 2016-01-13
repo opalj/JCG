@@ -71,8 +71,6 @@ public class SerializableSubclass extends InvalidSuperclass implements
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 79)
 	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization; called after writeReplace
@@ -84,8 +82,6 @@ public class SerializableSubclass extends InvalidSuperclass implements
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 92)
 	//might become entry point if another version of this class is serialized
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //no entry point; de-serialization results in java.io.InvalidClassException

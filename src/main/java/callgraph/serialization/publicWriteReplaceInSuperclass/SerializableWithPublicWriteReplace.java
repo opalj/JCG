@@ -82,18 +82,12 @@ public class SerializableWithPublicWriteReplace implements Serializable {
 		return new SerializableWithPublicWriteReplace("replaced " + label); //modifies the label to trace the event of replacement object
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, 
-			name = "defaultReadObject", isStatic = false, line = 91)
 	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization
 		in.defaultReadObject(); //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, 
-			name = "defaultWriteObject", isStatic = false, line = 100)
 	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization
