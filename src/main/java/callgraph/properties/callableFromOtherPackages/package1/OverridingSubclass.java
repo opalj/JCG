@@ -49,13 +49,13 @@ public class OverridingSubclass extends Superclass{
 			cpa=CallabilityKeys.NotCallable)
 	void packagePrivateMethod(){
 		publicFinalMethod();
-		privteMethod();
+		privateMethod();
 	}
 	
 	@CallabilityProperty(
 			opa=CallabilityKeys.NotCallable,
 			cpa=CallabilityKeys.NotCallable)
-	private void privteMethod(){
+	private void privateMethod(){
 		publicFinalMethod();
 	}
 }
