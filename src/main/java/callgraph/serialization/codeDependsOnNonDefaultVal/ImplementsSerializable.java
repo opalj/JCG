@@ -67,7 +67,7 @@ public class ImplementsSerializable implements Serializable {
 	}
 	
 	@CallSite(resolvedMethods = 
-		{ @ResolvedMethod(receiverType = "callgraph/serialization/ImplementsSerializable") }, 
+		{ @ResolvedMethod(receiverType = "callgraph/serialization/codeDependsOnNonDefaultVal/ImplementsSerializable") }, 
 		name = "deadCode", isStatic = false, line = 78)
 	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) throws Exception{ //entry point via de-serialization
