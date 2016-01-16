@@ -72,7 +72,7 @@ public class Superclass{
 		private static final long serialVersionUID = 2320664358117848370L;
 
 		@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "callgraph/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, 
+			@ResolvedMethod(receiverType = "callgraph/serialization/publicReadResolveInSuperclass/Superclass$ExtendsSerializable") }, 
 			name = "livingCode", isStatic = false, line = 82)
 		@EntryPoint
 		private void readObject(java.io.ObjectInputStream in) 
