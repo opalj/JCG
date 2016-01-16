@@ -74,7 +74,7 @@ public class Superclass implements Serializable {
 		}
 		
 		@CallSite(resolvedMethods = { 
-				@ResolvedMethod(receiverType = "callgraph/transientSerializable/Superclass$ClassWithTransientField") }, 
+				@ResolvedMethod(receiverType = "callgraph/serialization/transientField/Superclass$ClassWithTransientField") }, 
 				name = "deadMethod", isStatic = false, line = 82)
 		@EntryPoint
 		private Object readResolve(){ //entry point via de-serialization, called after readObject
