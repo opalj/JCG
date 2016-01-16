@@ -73,7 +73,7 @@ public class SerializableAndExternalizable implements Serializable,
 	}
 	
 	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, 
+			@ResolvedMethod(receiverType = "callgraph/serialization/serializableAndExternalizable/SerializableAndExternalizable") }, 
 			name = "deadMethod", isStatic = false, line = 79)
 	private void readObject(java.io.ObjectInputStream in) throws IOException { //dead code; superseded by readExternal
 		deadMethod();
@@ -96,7 +96,7 @@ public class SerializableAndExternalizable implements Serializable,
 	}
 
 	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, 
+			@ResolvedMethod(receiverType = "callgraph/serialization/serializableAndExternalizable/SerializableAndExternalizable") }, 
 			name = "deadMethod", isStatic = false, line = 102)
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException{ //dead code; superseded by writeExternal
 		deadMethod();
