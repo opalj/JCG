@@ -55,7 +55,6 @@ import callgraph.base.SimpleBase;
  * 
  * 
  * 
- * 
  * -->
  * 
  * @author Marco Jacobasch
