@@ -64,7 +64,7 @@ public class SerializableWithReadResolve implements Serializable {
 	private static final long serialVersionUID = -8605403644252230415L;
 
 	@CallSite(resolvedMethods = { 
-			@ResolvedMethod(receiverType = "callgraph/indirectReadResolve/ReplacementFactory") }, 
+			@ResolvedMethod(receiverType = "callgraph/serialization/indirectReadResolve/ReplacementFactory") }, 
 			name = "makeReplacement", isStatic = true, line = 71)
 	@EntryPoint
 	private Object readResolve(){ //entry point via de-serialization
