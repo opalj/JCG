@@ -67,7 +67,7 @@ public class A implements Base {
     }
 
     @Override
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "simpleCallgraph/B")}, name = "callOnConstructor", line = 72)
+    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "simpleCallgraph/B")}, name = "callOnConstructor", line = 73)
     @InvokedConstructor(receiverType = "simpleCallgraph/B", line = 73)
     public void callOnConstructor() {
         new B().callOnConstructor();
