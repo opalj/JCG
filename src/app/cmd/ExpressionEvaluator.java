@@ -21,6 +21,7 @@ public class ExpressionEvaluator {
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
     public static void main(final String[] args) {
 
+        @CGNote(value = "[ARR_HANLDE]", description = "") // TODO Why is this special?
         String[] expressions = args.clone();
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -36,6 +37,8 @@ public class ExpressionEvaluator {
         Runtime.getRuntime().addShutdownHook(new Thread(){
 
             // This is an entry point!
+            @CGNote(value = "[INV_CALLBACK]", description="invisible callback because no native code is involved; the call graph seems to be complete")
+            @CGNote(value = "[NOTE]", description="the related method<Thread>.run is called by the jvm")
             @Override public void run() {
                 System.out.println("It was a pleasure to evaluate your expression!");
                 super.run();
@@ -45,7 +48,10 @@ public class ExpressionEvaluator {
         synchronized (ExpressionEvaluator.class) {
             // all methods of the class object of ExpressionEvaluation may be called...
             // unless we analyze the "JVM" internal implementation
-            if (!Thread.holdsLock(ExpressionEvaluator.class)) throw new UnknownError();
+            @CGNote(value ="[POT_CALLBACK]", description = "potential callback because native code is involved; the call graph seems to be complete")
+            @CGNote(value = "[NOTE]", description = "the native code may call any of the methods declared at the class object of ExpressionEvaluation")
+            boolean holdsLock = !Thread.holdsLock(ExpressionEvaluator.class);
+            if (holdsLock) throw new UnknownError();
 
         if(args.length == 0) {
             throw new IllegalArgumentException("no expression");

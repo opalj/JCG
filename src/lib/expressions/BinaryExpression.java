@@ -1,5 +1,7 @@
 package expressions;
 
+import annotations.CGNote;
+
 import java.lang.reflect.Method;
 
 /**
@@ -43,6 +45,7 @@ public abstract class BinaryExpression implements Expression {
         };
     }
 
+    @CGNote(value = "[REFL_CALL]", description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,
