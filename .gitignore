@@ -4,3 +4,6 @@ target
 .classpath
 .cache-main
 .idea
+*.iws
+*.ipr
+*.iml
