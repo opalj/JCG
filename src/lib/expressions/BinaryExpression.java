@@ -47,8 +47,14 @@ public abstract class BinaryExpression implements Expression {
             String operator,
             final Expression left,
             final Expression right) throws Exception{
-        Class<?> operatorClass = Class.forName("expression."+operator+"Operator");
-        Method m = operatorClass.getMethod("createBinaryExpression",Expression.class,Expression.class);
+        Class<?> operatorClass = null;
+        try {
+            operatorClass = Class.forName("expressions." + operator + "Operator");
+        } catch (ClassNotFoundException cnfe) {
+            operatorClass = Class.forName(operator);
+        }
+        Method m = operatorClass.getDeclaredMethod("createBinaryExpression",Expression.class,Expression.class);
+        m.setAccessible(true);
         return (BinaryExpression) m.invoke(null,left,right);
 
     }

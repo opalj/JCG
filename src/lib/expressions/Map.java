@@ -5,8 +5,44 @@ package expressions;
  */
 public class Map<K, V> {
 
+    private class LinkedEntry {
+
+        final K key;
+        V value;
+
+        private LinkedEntry nextEntry;
+
+        LinkedEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public LinkedEntry getNextEntry() {
+            return nextEntry;
+        }
+
+        public void setNextEntry(LinkedEntry nextEntry) {
+            this.nextEntry = nextEntry;
+        }
+
+        public String toString(){
+            return key.toString() + " -> " + value.toString();
+        }
+    }
+
     LinkedEntry root;
     LinkedEntry last;
+
+    public static final Map<?,?> EMPTY = new Map<Object,Object>(){
+
+        @Override public void add(Object o, Object o2) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override public Object get(Object name) {
+            return null;
+        }
+    };
 
     public Map() {
 
@@ -65,28 +101,5 @@ public class Map<K, V> {
         return null;
     }
 
-    private class LinkedEntry {
 
-        final K key;
-        V value;
-
-        private LinkedEntry nextEntry;
-
-        LinkedEntry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public LinkedEntry getNextEntry() {
-            return nextEntry;
-        }
-
-        public void setNextEntry(LinkedEntry nextEntry) {
-            this.nextEntry = nextEntry;
-        }
-
-        public String toString(){
-            return key.toString() + " -> " + value.toString();
-        }
-    }
 }
