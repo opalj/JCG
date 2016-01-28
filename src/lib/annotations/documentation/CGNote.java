@@ -1,4 +1,4 @@
-package annotations;
+package annotations.documentation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Repeatable;
