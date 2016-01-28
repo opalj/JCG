@@ -30,6 +30,7 @@
 
 package expressions;
 
+import annotations.documentation.CGEdgeCategory;
 import annotations.documentation.CGNote;
 
 /**
@@ -42,7 +43,7 @@ public class Stack<V> {
 
     public Stack() {}
 
-    @CGNote(value ="[POT_CALLBACK]",
+    @CGNote(value = CGEdgeCategory.NATIVE_CALLBACK,
             description = "potential callback because an object type is passed to a native method;" +
                     "methods of this object could be called from native code (I.e. toString, clone etc.)")
     public void push(V v){

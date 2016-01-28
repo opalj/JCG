@@ -61,5 +61,8 @@ public enum AnalysisMode {
 	/**
 	 * The project is a pure web application developed with JavaEE 6.
 	 */
-	EJB6_APP
+	EJB6_APP,
+
+
+	OSGI_BUNDLE
 }

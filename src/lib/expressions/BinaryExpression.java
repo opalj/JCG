@@ -32,7 +32,9 @@ package expressions;
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
 import annotations.callgraph.ResolvingCondition;
+import annotations.documentation.CGEdgeCategory;
 import annotations.documentation.CGNote;
+
 import static annotations.callgraph.AnalysisMode.*;
 
 import java.lang.reflect.Method;
@@ -42,16 +44,11 @@ import java.lang.reflect.Method;
  * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
  * a given call graph implementation can handle these features.
  *
- * <p>
+ * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * <p>
- * <!--
- * <p>
- * <p>
- * <p>
- * <p>
+ *
  *
  *
  *
@@ -66,10 +63,6 @@ import java.lang.reflect.Method;
  *
  *
  *
- * <p>
- * <p>
- * <p>
- * <p>
  * -->
  *
  * @author Michael Eichberg
@@ -89,7 +82,7 @@ public abstract class BinaryExpression implements Expression {
         return visitor.visit(this);
     }
 
-    @CGNote(value = "NEW_INST", description = "a new instance is created by Java Reflection")
+    @CGNote( value = CGEdgeCategory.REFLECTION,description = "a new instance is created by Java Reflection")
     @CallSite(name = "<init>",
             resolvedMethods = {
                     @ResolvedMethod(receiverType = PlusOperator.fqn),
@@ -124,7 +117,7 @@ public abstract class BinaryExpression implements Expression {
         };
     }
 
-    @CGNote(value = "[REFL_CALL]", description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
+    @CGNote(value = CGEdgeCategory.REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,

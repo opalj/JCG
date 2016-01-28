@@ -31,7 +31,7 @@ package annotations.properties;
 /**
  * 
  * Represents all possible property variants of the [[ProjectAccessibility]] property
- * defined in the [[SchadowingAnalysis]].
+ * defined in the [[ShadowingAnalysis]].
  * 
  * @Note This enum is used for test-only purposes. It is used as parameter in
  * the [[ProjectAccessibilityProperty]] annotation. Make sure, that the names

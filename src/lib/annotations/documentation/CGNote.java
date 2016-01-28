@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 @Repeatable(CGNotes.class)
 public @interface CGNote {
 
-    String value();
+    CGCategory value();
 
     String description() default "";
 }

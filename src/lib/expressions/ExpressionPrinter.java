@@ -30,11 +30,12 @@
 
 package expressions;
 
+import static annotations.documentation.CGEdgeCategory.STATIC_INITIALIZERS;
 import annotations.documentation.CGNote;
 
 public final class ExpressionPrinter extends ExpressionVisitor<String> {
 
-    @CGNote(value = "[CINIT]",
+    @CGNote(value = STATIC_INITIALIZERS,
             description = "static initializers are called by the jvm;" +
                     " called when the class is somehow referenced the first time." +
                     "I.e. invoking a constructor of a subclass or calling a static method.")

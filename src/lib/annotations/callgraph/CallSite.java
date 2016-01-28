@@ -59,4 +59,5 @@ public @interface CallSite {
 	boolean isReflective() default false;
 
     ResolvedMethod[] resolvedMethods();
+
 }

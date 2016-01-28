@@ -30,6 +30,7 @@
 
 package expressions;
 
+import annotations.documentation.CGEdgeCategory;
 import annotations.documentation.CGNote;
 
 import java.io.ObjectStreamException;
@@ -68,7 +69,7 @@ public class BinExpression implements Expression {
     }
 
     @CGNote(
-            value = "[SER]",
+            value = CGEdgeCategory.SERIALIZABILITY,
             description = "This method is called if an old instance of this class is read from some stream.")
     private Object readResolve() throws ObjectStreamException {
         if(operator == PlusOperator.instance)
