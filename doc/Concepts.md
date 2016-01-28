@@ -57,6 +57,9 @@ in particular int[] a= ...; a.clone() bzw. a.toString()...
 Thread.UncaughtExceptionHandler
 Runtime.addShutdownHook
 
+#Threads
+
+#System.exit and Hooks???
 
 # Legal JVM Stuff that cannot be created using Java 
 ## (e.g. package visibility related)
