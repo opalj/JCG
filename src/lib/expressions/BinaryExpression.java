@@ -1,6 +1,6 @@
 package expressions;
 
-import annotations.CGNote;
+import annotations.documentation.CGNote;
 
 import java.lang.reflect.Method;
 

@@ -1,6 +1,6 @@
 package expressions;
 
-import annotations.CGNote;
+import annotations.documentation.CGNote;
 
 /**
  * Created by eichberg on 26.01.16.

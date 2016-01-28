@@ -2,7 +2,10 @@ package cmd;
 
 import static java.lang.Integer.parseInt;
 
-import annotations.CGNote;
+import annotations.callgraph.CallSite;
+import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
+import static annotations.callgraph.AnalysisMode.*;
 import expressions.*;
 
 import java.util.Arrays;
@@ -10,7 +13,42 @@ import java.util.Arrays;
 import static expressions.BinaryExpression.createBinaryExpression;
 import static expressions.PlusOperator.AddExpression;
 
-
+/**
+ * This class defines an application use case of the expression library and has some well defined properties
+ * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
+ * a given call graph implementation can handle these features.
+ *
+ * <p>
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ * <p>
+ * <!--
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
+ */
 public class ExpressionEvaluator {
 
     private static final Map<String,Constant> NO_VARIABLES = (Map<String,Constant>)Map.EMPTY;
@@ -19,6 +57,7 @@ public class ExpressionEvaluator {
     // 2 34 + 23 Plus == 59
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     public static void main(final String[] args) {
 
         @CGNote(value = "[ARR_HANLDE]", description = "") // TODO Why is this special?
