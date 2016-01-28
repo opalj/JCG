@@ -5,6 +5,8 @@ package expressions;
  */
 public class PlusOperator extends Operator {
 
+    protected PlusOperator() {}
+
     public final static Operator instance = new PlusOperator();
 
     public static class AddExpression extends BinaryExpression {
