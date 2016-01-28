@@ -1,7 +1,9 @@
 % !TEX root = ../document.tex
 
 \begin{abstract}
-	Call graphs are a fundamental data-structure used by many advanced analyses such as data-flow analyses for finding security bugs.
+	Call graphs are a fundamental data-structure used by many advanced analyses such as data-flow analyses for finding security bugs. This requires a precise understanding of the precision and soundness of the constructed call graphs to make it possible to describe and assess the capabilities of the analyses built on top of them.  Though, precision and soundness is generally  discussed in the respective papers, the discussion often only targets the standard features of object-oriented programs; i.e., static and virtual method calls. Features, such as calls via (Java) reflection or call backs made by the JVM are only treated at a superficial level -- if at all. More advanced features, such as signature polymorphic method calls, Java Serialization related methods calls, dynamic proxies or calls made by native code in 3rd party libraries (e.g., SWT), are not discussed -- though these features are used in real world programs.
 	
+In this paper, we first discuss those Java features specified in the JLS, JVMS, and JDK Doc that have a direct relevance for call graph construction algorithms. After that, we present a small application that that uses all these features and which is a testbed for call graph algorithms. In the application, relevant call sites are manually annotated w.r.t. the expected call targets to make it possible to directly analyze the soundness of the constructed call graphs. Lastly, the application is used to evaluate and compare implementations of call graph algorithms in static analysis frameworks.
+
 	\keywords{Call Graph Construction, Library, Java, Software Tests}
 \end{abstract}
