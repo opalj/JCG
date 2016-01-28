@@ -1,5 +1,7 @@
 package expressions;
 
+import annotations.CGNote;
+
 /**
  * Created by eichberg on 27.01.16.
  */
@@ -10,6 +12,9 @@ public class Stack<V> {
 
     public Stack() {}
 
+    @CGNote(value ="[POT_CALLBACK]",
+            description = "potential callback because an object type is passed to a native method;" +
+                    "methods of this object could be called from native code (I.e. toString, clone etc.)")
     public void push(V v){
         if(data.length == entries) {
             V[]  newData = (V[]) new Object[entries*2+1];
@@ -34,4 +39,5 @@ public class Stack<V> {
                         return  v;
     }
 
+    public boolean isEmpty(){ return entries == 0; }
 }
