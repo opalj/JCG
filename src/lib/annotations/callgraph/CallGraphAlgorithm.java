@@ -68,7 +68,7 @@ public enum CallGraphAlgorithm {
 	CFA(new CallGraphAlgorithm[] { ExtVTA }),
 
 	/**
-	 * Rapid-typed Analysis based Callgraph algorithm.
+	 * Rapid Type Analysis based call graph algorithm.
 	 */
 	RTA(new CallGraphAlgorithm[] { CHA }),
 	

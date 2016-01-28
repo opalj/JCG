@@ -3,6 +3,8 @@ package cmd;
 import static java.lang.Integer.parseInt;
 
 import annotations.callgraph.CallSite;
+import annotations.callgraph.InvokedConstructor;
+import annotations.callgraph.ResolvedMethod;
 import annotations.documentation.CGNote;
 import annotations.properties.EntryPoint;
 import static annotations.callgraph.AnalysisMode.*;
@@ -40,6 +42,8 @@ import static expressions.PlusOperator.AddExpression;
  *
  *
  *
+ *
+ *
  * <p>
  * <p>
  * <p>
@@ -53,11 +57,17 @@ public class ExpressionEvaluator {
 
     private static final Map<String,Constant> NO_VARIABLES = (Map<String,Constant>)Map.EMPTY;
 
-
     // 2 34 + 23 Plus == 59
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    @InvokedConstructor(receiverType = "expressions/Stack", line = 109)
+    @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java.lang.String")}, line = 74)
+    @CallSite(name = "push", resolvedMethods = {@ResolvedMethod(receiverType = "expressions.Stack")}, line = 117)
+    @CallSite(name = "createBinaryExpression",
+            resolvedMethods = {@ResolvedMethod( receiverType = BinaryExpression.fqn)},
+            parameterTypes = {String.class, Expression.class, Expression.class},
+            line = 120)
     public static void main(final String[] args) {
 
         @CGNote(value = "[ARR_HANLDE]", description = "") // TODO Why is this special?
@@ -124,5 +134,4 @@ public class ExpressionEvaluator {
         System.out.println("result "+values.pop().getValue());
         }
     }
-
 }

@@ -42,5 +42,5 @@ import static java.lang.annotation.ElementType.*;
 public @interface ResolvingCondition {
 
 	CallGraphAlgorithm containedInMax() default CallGraphAlgorithm.TOP;
-	AnalysisMode mode() default AnalysisMode.DESKTOP_APP;
+	AnalysisMode[] mode() default {AnalysisMode.DESKTOP_APP};
 }
