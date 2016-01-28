@@ -33,7 +33,10 @@
 		\rowcolor{light-gray}
 		REFL\_METHODCALL    & a method is called via Java's reflection 
 		mechanism                                                                                                                & y                 \\
-		CLASSLOADING                                &                                                                                                                                                                      & n
+		CLASSLOADING                                
+		&                                                                                                                                                                      & n\\
+				\rowcolor{light-gray}
+		NESTED\_CLASSES & local classes, anonymous classes, inner classes and nested classes can become calling targets in different scopes; resolution can require point-to and escape analysis information & partially covered
 	\end{tabularx}
 	\centering
 	\caption{Scenarios covered by the test suite}

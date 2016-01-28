@@ -1,9 +1,12 @@
 package expressions;
 
+import annotations.CGNote;
+
 /**
  * Created by eichberg on 26.01.16.
  */
 public class Map<K, V> {
+
 
     private class LinkedEntry {
 
@@ -33,6 +36,7 @@ public class Map<K, V> {
     LinkedEntry root;
     LinkedEntry last;
 
+    @CGNote(value = "[NESTED_CLASSES]", description = "an anonymous class is created; the methods of this class become potential call targets.")
     public static final Map<?,?> EMPTY = new Map<Object,Object>(){
 
         @Override public void add(Object o, Object o2) {
@@ -100,6 +104,4 @@ public class Map<K, V> {
 
         return null;
     }
-
-
 }
