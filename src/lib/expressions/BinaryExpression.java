@@ -32,6 +32,7 @@ package expressions;
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
 import annotations.callgraph.ResolvingCondition;
+import annotations.callgraph.TargetResolution;
 import annotations.documentation.CGNote;
 
 import static annotations.callgraph.AnalysisMode.*;
@@ -70,7 +71,7 @@ import java.lang.reflect.Method;
  */
 public abstract class BinaryExpression implements Expression {
 
-    public static final String fqn = "expressions.BinaryExpression";
+    public static final String FQN = "expressions.BinaryExpression";
 
     abstract protected Expression left();
 
@@ -85,10 +86,10 @@ public abstract class BinaryExpression implements Expression {
     @CGNote( value = REFLECTION,description = "a new instance is created by Java Reflection")
     @CallSite(name = "<init>",
             resolvedMethods = {
-                    @ResolvedMethod(receiverType = PlusOperator.fqn),
-                    @ResolvedMethod(receiverType = SubOperator.fqn, iff = {@ResolvingCondition(mode = {OPA, CPA})})
+                    @ResolvedMethod(receiverType = PlusOperator.FQN),
+                    @ResolvedMethod(receiverType = SubOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})
             },
-            isReflective = true,
+            resolution = TargetResolution.REFLECTIVE,
             line = 98
     )
     public static BinaryExpression createBasicBinaryExpression(
@@ -118,6 +119,16 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
+    @CallSite(name = "createBinaryExpression",
+    resolvedMethods = {
+            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
+            @ResolvedMethod(
+                    receiverType = SubOperator.SubExpression.FQN,
+                    iff = {@ResolvingCondition(mode = {OPA, CPA})})},
+    resolution = TargetResolution.REFLECTIVE,
+    returnType = BinaryExpression.class,
+    parameterTypes = {Operator.class, Expression.class, Expression.class},
+    line = 144)
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,

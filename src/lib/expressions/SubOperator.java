@@ -66,7 +66,7 @@ package expressions;
  */
 public class SubOperator extends Operator {
 
-    public static final String fqn = "expressions/SubOperator";
+    public static final String FQN = "expressions/SubOperator";
 
     protected SubOperator() {}
 

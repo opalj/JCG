@@ -65,7 +65,7 @@ public class ExpressionEvaluator {
     @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java.lang.String")}, line = 74)
     @CallSite(name = "push", resolvedMethods = {@ResolvedMethod(receiverType = "expressions.Stack")}, line = 117)
     @CallSite(name = "createBinaryExpression",
-            resolvedMethods = {@ResolvedMethod( receiverType = BinaryExpression.fqn)},
+            resolvedMethods = {@ResolvedMethod( receiverType = BinaryExpression.FQN)},
             parameterTypes = {String.class, Expression.class, Expression.class},
             line = 120)
     public static void main(final String[] args) {

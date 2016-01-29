@@ -59,7 +59,7 @@ package expressions;
  */
 public class PlusOperator extends Operator {
 
-    public static final String fqn = "expressions/PlusOperator";
+    public static final String FQN = "expressions/PlusOperator";
 
     protected PlusOperator() {}
 
