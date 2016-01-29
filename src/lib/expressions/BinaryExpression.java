@@ -32,10 +32,10 @@ package expressions;
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
 import annotations.callgraph.ResolvingCondition;
-import annotations.documentation.CGEdgeCategory;
 import annotations.documentation.CGNote;
 
 import static annotations.callgraph.AnalysisMode.*;
+import static annotations.documentation.CGCategory.*;
 
 import java.lang.reflect.Method;
 
@@ -82,7 +82,7 @@ public abstract class BinaryExpression implements Expression {
         return visitor.visit(this);
     }
 
-    @CGNote( value = CGEdgeCategory.REFLECTION,description = "a new instance is created by Java Reflection")
+    @CGNote( value = REFLECTION,description = "a new instance is created by Java Reflection")
     @CallSite(name = "<init>",
             resolvedMethods = {
                     @ResolvedMethod(receiverType = PlusOperator.fqn),
@@ -117,7 +117,7 @@ public abstract class BinaryExpression implements Expression {
         };
     }
 
-    @CGNote(value = CGEdgeCategory.REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
+    @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,

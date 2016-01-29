@@ -30,11 +30,12 @@
 
 package expressions;
 
-import annotations.documentation.CGEdgeCategory;
 import annotations.documentation.CGNote;
 
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
+
+import static annotations.documentation.CGCategory.SERIALIZABILITY;
 
 // This class is no longer used, but if we deserialize an old expression it replaces itself
 // with an instance of BinaryExpression
@@ -69,7 +70,7 @@ public class BinExpression implements Expression {
     }
 
     @CGNote(
-            value = CGEdgeCategory.SERIALIZABILITY,
+            value = SERIALIZABILITY,
             description = "This method is called if an old instance of this class is read from some stream.")
     private Object readResolve() throws ObjectStreamException {
         if(operator == PlusOperator.instance)

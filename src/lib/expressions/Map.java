@@ -33,8 +33,9 @@ package expressions;
 import annotations.callgraph.CallSite;
 import annotations.callgraph.InvokedConstructor;
 import annotations.callgraph.ResolvedMethod;
-import annotations.documentation.CGEdgeCategory;
 import annotations.documentation.CGNote;
+
+import static annotations.documentation.CGCategory.*;
 
 /**
  *
@@ -93,7 +94,7 @@ public class Map<K, V> {
     LinkedEntry root;
     LinkedEntry last;
 
-    @CGNote(value = CGEdgeCategory.POLYMORPHIC_CALL, description = "an anonymous class is created; the methods of this class become potential call targets.")
+    @CGNote(value = POLYMORPHIC_CALL, description = "an anonymous class is created; the methods of this class become potential call targets.")
     public static final Map<?,?> EMPTY = new Map<Object,Object>(){
 
         @Override public void add(Object o, Object o2) {

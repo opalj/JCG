@@ -30,7 +30,7 @@
 
 package expressions;
 
-import static annotations.documentation.CGEdgeCategory.STATIC_INITIALIZERS;
+import static annotations.documentation.CGCategory.STATIC_INITIALIZERS;
 import annotations.documentation.CGNote;
 
 public final class ExpressionPrinter extends ExpressionVisitor<String> {
