@@ -34,7 +34,31 @@ import static annotations.documentation.CGCategory.NATIVE_CALLBACK;
 import annotations.documentation.CGNote;
 
 /**
- * Created by eichberg on 27.01.16.
+ * A array-based stack implementation.
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
  */
 public class Stack<V> {
 

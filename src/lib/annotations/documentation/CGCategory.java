@@ -25,7 +25,7 @@ public enum CGCategory {
     // There is no native code ...
     // e.g., Thread.unhandledException...
     // e.g., Thread.start => Thread.run bzw. Runnable.run
-    JVM_CALLBACKS,
+    JVM_CALLBACK,
 
     /**
      * Some object
@@ -33,5 +33,12 @@ public enum CGCategory {
     NATIVE_CALLBACK,
 
 
-    STATIC_INITIALIZERS
+    ARRAY_HANDLING,
+
+    STATIC_INITIALIZERS,
+
+    /**
+     * A notice if additional information is needed.
+     */
+    NOTE
 }

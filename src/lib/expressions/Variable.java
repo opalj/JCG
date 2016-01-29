@@ -31,7 +31,31 @@
 package expressions;
 
 /**
- * Created by eichberg on 26.01.16.
+ * Wraps a String and represents a variable.
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
  */
 public class Variable implements Expression {
 

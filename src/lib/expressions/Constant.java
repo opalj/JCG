@@ -36,7 +36,31 @@ import annotations.callgraph.ResolvedMethod;
 import java.io.Serializable;
 
 /**
- * Simply wraps an integer value.
+ * This class simply wraps an integer value.
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
  */
 public class Constant implements Expression, Serializable{
 
@@ -57,7 +81,7 @@ public class Constant implements Expression, Serializable{
     @CallSite(name = "visit",
             resolvedMethods = {@ResolvedMethod(receiverType = "expressions/ExpressionPrinter")},
             returnType = Object.class,
-            line = 33
+            line = 86
     )
     public <T> T accept(ExpressionVisitor <T> visitor) {
         return visitor.visit(this);

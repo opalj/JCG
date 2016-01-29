@@ -33,7 +33,31 @@ package expressions;
 import java.io.Serializable;
 
 /**
- * Created by eichberg on 26.01.16.
+ * Common superclass of an operator.
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
  */
 public abstract class Operator implements Serializable {
 }

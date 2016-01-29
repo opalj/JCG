@@ -31,7 +31,33 @@
 package expressions;
 
 /**
- * Created by eichberg on 26.01.16.
+ * This class defines an application use case of the expression library and has some well defined properties
+ * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
+ * a given call graph implementation can handle these features.
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
  */
 public abstract class ExpressionVisitor<T> {
 

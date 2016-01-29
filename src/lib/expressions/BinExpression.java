@@ -37,8 +37,34 @@ import java.io.StreamCorruptedException;
 
 import static annotations.documentation.CGCategory.SERIALIZABILITY;
 
-// This class is no longer used, but if we deserialize an old expression it replaces itself
-// with an instance of BinaryExpression
+/**
+ * This class is no longer used, but if we deserialize an old expression it replaces itself
+ * with an instance of BinaryExpressio
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
+ */
 public class BinExpression implements Expression {
 
     private Expression left;

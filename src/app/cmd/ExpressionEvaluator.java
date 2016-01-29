@@ -1,5 +1,6 @@
 package cmd;
 
+import static annotations.documentation.CGCategory.*;
 import static java.lang.Integer.parseInt;
 
 import annotations.callgraph.CallSite;
@@ -43,7 +44,6 @@ import static expressions.PlusOperator.AddExpression;
  *
  *
  *
- *
  * <p>
  * <p>
  * <p>
@@ -70,13 +70,13 @@ public class ExpressionEvaluator {
             line = 120)
     public static void main(final String[] args) {
 
-        @CGNote(value = "[ARR_HANLDE]", description = "") // TODO Why is this special?
+        @CGNote(value = ARRAY_HANDLING, description = "") // TODO Why is this special?
         String[] expressions = args.clone();
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
-            @CGNote(value = "[INV_CALLBACK]", description="invisible callback because no native code is involved; the call graph seems to be complete")
-            @CGNote(value="[NOTE]",description="the related method <Thread>.dispatchUncaughtException is not dead")
+            @CGNote(value = JVM_CALLBACK, description="invisible callback because no native code is involved; the call graph seems to be complete")
+            @CGNote(value= NOTE,description="the related method <Thread>.dispatchUncaughtException is not dead")
             @Override public void uncaughtException(Thread t, Throwable e) {
                 String msg = "unexpected error while processing "+ Arrays.deepToString(args);
                 System.out.println(msg);
@@ -86,8 +86,8 @@ public class ExpressionEvaluator {
         Runtime.getRuntime().addShutdownHook(new Thread(){
 
             // This is an entry point!
-            @CGNote(value = "[INV_CALLBACK]", description="invisible callback because no native code is involved; the call graph seems to be complete")
-            @CGNote(value = "[NOTE]", description="the related method<Thread>.run is called by the jvm")
+            @CGNote(value = JVM_CALLBACK, description="invisible callback because no native code is involved; the call graph seems to be complete")
+            @CGNote(value = NOTE, description="the related method<Thread>.run is called by the jvm")
             @Override public void run() {
                 System.out.println("It was a pleasure to evaluate your expression!");
                 super.run();
@@ -97,8 +97,8 @@ public class ExpressionEvaluator {
         synchronized (ExpressionEvaluator.class) {
             // all methods of the class object of ExpressionEvaluation may be called...
             // unless we analyze the "JVM" internal implementation
-            @CGNote(value ="[POT_CALLBACK]", description = "potential callback because native code is involved; the call graph seems to be complete")
-            @CGNote(value = "[NOTE]", description = "the native code may call any of the methods declared at the class object of ExpressionEvaluation")
+            @CGNote(value = NATIVE_CALLBACK, description = "potential callback because native code is involved; the call graph seems to be complete")
+            @CGNote(value = NOTE, description = "the native code may call any of the methods declared at the class object of ExpressionEvaluation")
             boolean holdsLock = !Thread.holdsLock(ExpressionEvaluator.class);
             if (holdsLock) throw new UnknownError();
 

@@ -31,9 +31,38 @@
 package expressions;
 
 /**
- * Models an arithmetic subtraction. Negative values are allowed.
+ *
  *
  * @author Michael Reif
+ */
+/**
+ * Models an arithmetic subtraction. Negative values are allowed.
+ *
+ * This class is intentionally unused and not instantiated.
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
  */
 public class SubOperator extends Operator {
 
