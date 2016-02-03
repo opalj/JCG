@@ -4,3 +4,14 @@ target
 .classpath
 .cache-main
 .idea
+*.iws
+*.ipr
+*.iml
+src/lib/out
+*.soc
+*.aux
+*.out
+*.pdf
+*.gz
+out/
+doc/src/document.log
