@@ -29,6 +29,7 @@
 package callgraph.serialization.serializableExtendingSerializable;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
@@ -59,7 +60,7 @@ import org.opalj.annotations.callgraph.properties.EntryPoint;
  * 
  * @author Roberts Kolosovs
  */
-public class ExtendsSerializable extends ImplementsSerializable {
+public class ExtendsSerializable extends ImplementsSerializable implements Serializable {
 
 	private static final long serialVersionUID = -1253588232410042631L;
 
