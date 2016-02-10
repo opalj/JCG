@@ -65,7 +65,7 @@ public class Map<K, V> {
 
     public static final String linkedEntryRecieverType = "expressions/Map$LinkedEntry";
 
-
+    @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.")
     private class LinkedEntry {
 
         final K key;
@@ -162,5 +162,34 @@ public class Map<K, V> {
         }
 
         return null;
+    }
+
+    public Iterator<LinkedEntry> iterator(){
+        return new MapIterator(root);
+    }
+
+    class MapIterator implements Iterator<LinkedEntry>{
+
+        private LinkedEntry cur;
+
+        public MapIterator(LinkedEntry head){
+            cur = head;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cur.nextEntry != null;
+        }
+
+        @Override
+        public LinkedEntry next() {
+            cur = cur.getNextEntry();
+            return cur;
+        }
+
+        @Override
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException();
+        }
     }
 }

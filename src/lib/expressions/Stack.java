@@ -95,4 +95,35 @@ public class Stack<V> {
     }
 
     public boolean isEmpty(){ return entries == 0; }
+
+    public Iterator<V> iterator(){
+        return new StackIterator(data, entries);
+    }
+
+    class StackIterator implements Iterator<V>{
+
+        private V[] data;
+        private int cur = 0;
+
+
+        public StackIterator(V[] data, int top){
+            this.data = data;
+            cur = top-1;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cur >= 0;
+        }
+
+        @Override
+        public V next() {
+            return data[cur--];
+        }
+
+        @Override
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException();
+        }
+    }
 }
