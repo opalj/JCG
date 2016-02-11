@@ -1,0 +1,714 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{OPAL CallGraph Testsuite Documentation}
+\author{Roberts Kolosovs}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Old Test Suite}
+\subsection{Serialization}
+\subsubsection{Implemented Cases}
+
+\textbf{Simple Serializable Case}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.simpleSerializable
+\end{itemize}
+Redundant implementation in: 
+\begin{itemize}
+    \item serialization.serializableAndExternalizable ((de-)serialization routine)
+\end{itemize}
+A class implements the Serializable interface. The methods writeReplace and readResolve are implemented with the default behavior (return this). The methods readObject and writeObject are implemented with the default behavior (inStream.defaultReadObject, outStream.defaultWriteObject). Another class implements methods containing standard implementation of serialization and de-serialization.\\
+
+\noindent
+\textbf{Simple Externalizable Case}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.serializableAndExternalizable
+\end{itemize}
+A class implements the Externalizable interface. The methods writeReplace and readResolve are implemented with the default behavior (return this). The methods readExternal and writeExternal are implemented with the default behavior (do nothing). Another class implements methods containing standard implementation of externalization and de-externalization (identical to (de-)serialization).\\
+
+\noindent
+\textbf{Externalizable and Serializable Together}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.serializableAndExternalizable
+\end{itemize}
+A class implements the Externalizable interface and the Serializable interface. The methods writeReplace and readResolve are implemented with the default behavior (return this). The methods readExternal and writeExternal are implemented with the default behavior (do nothing). The methods readObject and writeObject are implemented but never called as they are superceded by read/writeExternal during (de-)serialization.\\
+
+\noindent
+\textbf{Superclass with no no-args Constructor (Serializable)}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.invalidSuperclass
+\end{itemize}
+A class implements the Serializable interface and extends another class. The superclass doesn't implement the Serializable interface and declares a private no-argument constructor. The subclass implements writeReplace, readResolve, readObject and writeObject with the default behavior. The de-serialization of the subclass always fails so readResolve and readObject methods of the subclass are never called.\\
+
+\noindent
+\textbf{Superclass with no no-args Constructor (Externalizable)}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.extPrivateNoArgsConstructorSuperclass
+\end{itemize}
+A class implements the Externalizable interface and extends another class. The superclass doesn't implement the Serializable or Externalizable interfaces and declares a private no-argument constructor. In contrast to the serializable case the (de-)externalization of subclass completes without errors.\\
+
+\noindent
+\textbf{Serializable Superclass with no no-args Constructor}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.serializableExtendingSerializable
+\end{itemize}
+A class implements the Serializable interface and extends another class. The superclass also implement the Serializable interface and declares a private no-argument constructor. In contrast to the serializable case with non-serializable superclass the (de-)serialization of the subclass completes without errors.\\
+
+\noindent
+\textbf{Call readObjectNoData}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.serializableExtendingSerializable
+\end{itemize}
+A class implements the Serializable interface and extends another class implementing the Serializable interface. The superclass implements the readObjectNoData method with the default behavior (do nothing). ReadObjectNoData can be called during de-serialization of the subclass if the serialization happened before the inheritance was implemented.\\
+
+\noindent
+\textbf{Non-serializable Field}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.nonSerializableField
+\end{itemize}
+A class implements the Serializable interface and declares a field. The field's type is a class not implementing the Serializable interface. Both serialization and de-serialization of the serializable class fails.\\
+
+\noindent
+\textbf{Serializable Field}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.serializableField
+\end{itemize}
+A class implements the Serializable interface and declares a field. The field's type is a class also implementing the Serializable interface. The writeReplace and writeObject methods of the field are called after the methods of the declaring class are called during serialization. During de-serialization readObject and readResolve methods of the field are called after readObject method but before readResolve method of the declaring class.\\
+
+\noindent
+\textbf{Transient Field}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.transientField
+\end{itemize}
+A class implements the Serializable interface and declares a field marked as transient. The class also implements a private method which is called by the readResolve method during de-serialization if the transient field doesn't have its default value. However the transient field always has its type's default value at that point so the method is never called.\\
+
+\noindent
+\textbf{Invalid Constructor in Externalizable}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.externalizableInvalidConstructor
+\end{itemize}
+A class implements the Externalizable interface and declares a private no-arguments constructor. The methods writeExternal and readExternal are declared. However the readExternal method is never called as every de-externalization attempt fails because the no-arguments constructor is nont public.\\
+
+\noindent
+\textbf{Field Values During De-Serialization}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.codeDependsOnNonDefaultVal
+\end{itemize}
+A class implements the Serializable interface, declares a field and a method. The method is called during de-serialization by the readObject method if the field doesn't have its default value. However during de-serialization before inStream.defaultReadObject (or equivalent code) is executed each field has its types default value and thus the method is never called.\\
+
+\noindent
+\textbf{Visibility of readResolve and writeReplace}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.serializableExtendingSerializable
+    \item serialization.publicReadResolveInSuperclass
+    \item serialization.publicWriteReplaceInSuperclass
+\end{itemize}
+The readResolve and writeReplace methods of classes implementing the Serializable should be declared as private if implemented. If declared as public or protected, they are subject to usual visibility rules for class inheritance.\\
+
+\noindent
+\textbf{Visibility of readObject and writeObject}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.protectedReadWriteObject
+\end{itemize}
+The readObject and writeObject methods which can be implemented by serializable classes have to be private. They are not called during (de-)serialization if they are declared with some other visibility.\\
+
+\noindent
+\textbf{ReadResolve and writeReplace Redirect Control Flow}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.indirectReadResolve (new class created in another class by a static method)
+    \item serialization.nestedClassNoNewInstances (de-serialized class and new class are both inner private classes of the same class)
+\end{itemize}
+The methods readResolve and writeReplace of classes implementing the Serializable interface are supposed to replace the (de-)serialized class with another class during (de-)serialization. This diverts the control flow to the newly returned class.\\
+
+\noindent
+\textbf{Interruption of the (De-)Serialization Process}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.nestedExternalizable (error in readExternal)
+\end{itemize}
+During (de-)serialization the methods relevant to (de-)serialization are called in a specific order (if implemented). If an exception is thrown during one of the steps of (de-)serialization, none of the subsequent steps gets called.\\
+
+\noindent
+\textbf{Interface Inheritance}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.nestedClassNoNewInstances
+\end{itemize}
+Each class implementing the Serializable interface or an interface extending Serializable has the same behavior in regard to (de-)serialization. A notable exception is the Externalizable interface (and its children), itself a child of the Serializable interface. Externalizable differs in behaviour from Serializable in some points and supersedes it.\\
+
+
+\subsubsection{Missing Cases}
+
+\textbf{Empty readObject}\\
+A serializable class implements the readObject method with empty body (do-nothing behavior). All class fields are set to their default values after readObject is called during de-serialization. This can influence method calls in later steps of de-serialization if they depend on specific field values.\\
+
+\noindent
+\textbf{Empty writeObject}\\
+A serializable class implements the writeObject method with empty body (do-nothing behavior). Nothing is written to stream during serialization. When de-serializing a stream written this way the inStream.defaultReadObject throws a StreamCorruptedException. This can influence method calls in later steps of de-serialization. However this behavior is only exhibited when de-serializing the current version of the code. If another versions of the class were serialized, their de-serialization doesn't necessarily always produce an error.\\
+
+
+\subsection{Field Access}
+\subsubsection{Implemented Cases}
+
+\textbf{Primitive Field Access}\\
+Implemented in: 
+\begin{itemize}
+    \item accessFields
+\end{itemize}
+A class declares a field of type T and a method accessing a public field of the class T. The type of the accessed field is a Java primitive.\\
+
+\noindent
+\textbf{Object Field Access}\\
+Implemented in: 
+\begin{itemize}
+    \item accessFields
+\end{itemize}
+A class declares a field of type T and a method accessing a public field of the class T. The type of the accessed field is a child of the Java Object class.\\
+
+\noindent
+\textbf{Shadowed Superclass Field Access}\\
+Implemented in: 
+\begin{itemize}
+    \item accessFields
+\end{itemize}
+A class declares a field of type T and a method accessing a public field of the class T. The accessed field shares his type and name with a field in the direct superclass of T shadowing it. The field's type is a child of the Java Object class.\\
+
+\noindent
+\textbf{Static Field Access}\\
+Implemented in: 
+\begin{itemize}
+    \item accessFields
+\end{itemize}
+A class declares a method accessing a static field of another class. The accessed fields type is a Java primitive.\\
+
+\subsubsection{Missing Cases}
+
+\textbf{Shadowed Static Field Access}\\
+A class declares a method accessing a static field of another class C. The accessed field shares his type and name with a field in the direct superclass of C shadowing it.\\
+
+\noindent
+\textbf{Shadowed Primitive Field}\\
+The same test case as the ''Shadowed Superclass Field Access'' case but with accessed field's type being a Java primitive type.\\
+
+\noindent
+\textbf{Static Non-Primitive Field}\\
+The same test cases as the ''Static Field Access'' and ''Shadowed Static Field Access'' but with the accessed field's type being a child of the Java Object class.\\
+
+
+\subsection{Branch Elimination Based On Dynamic Typing}
+
+\textbf{Call a Method of a Field with Value Set in Constructor}\\
+Implemented in: 
+\begin{itemize}
+    \item branchElimination
+\end{itemize}
+A class C defines a field statically typed as C and a method calling a method of the field. The field's value is set in the constructor of C and never changed afterwards. The field's dynamic type is a second generation subclass of the class C.\\
+
+\noindent
+\textbf{Call a Method of a Field fetched via a Method Call}\\
+Implemented in: 
+\begin{itemize}
+    \item branchElimination
+\end{itemize}
+The same case as ''Call a Method of a Field with Value Set in Constructor'' with the exception that the field is fetched via a method call instead of direct access.\\
+
+\noindent
+\textbf{Call a Method of a Field Statically Typed as a Mid-Level Class}\\
+Implemented in: 
+\begin{itemize}
+    \item branchElimination
+\end{itemize}
+The same case as ''Call a Method of a Field with Value Set in Constructor'' with the exception that the field is statically typed to a direct subclass of C instead of C itself. The dynamic type is a direct subclass of the static type.\\
+
+\noindent
+\textbf{Call a Method of a Variable with Value Set in an If-Clause}\\
+Implemented in: 
+\begin{itemize}
+    \item branchElimination
+\end{itemize}
+A class C defines a method defining a variable and invoking a method of the variable. The variable is statically typed as the class C. Its final value (and thus dynamic type) is set in an if-clause and depends on the dynamic type of a field of the class C. The field is statically typed as the class C, set to its value in the constructor and fetched via a method call.\\
+
+\noindent
+\textbf{Call a Method of a Field Dynamically Typed as an Inner Class}\\
+Implemented in: 
+\begin{itemize}
+    \item highPrecision
+\end{itemize}
+Redundant implementation in: 
+\begin{itemize}
+    \item simpleCallgraph (regular calss instead of an inner class)
+\end{itemize}
+A class C defines a method calling a method of a field. The field is statically typed as an interface and dynamically typed as an inner class of the class C. The field's value is set as the default value of the field and not changed afterwards.\\
+
+\noindent
+\textbf{Call a Method of a Variable Dynamically Typed as an Anonymous Class}\\
+Implemented in: 
+\begin{itemize}
+    \item highPrecision
+\end{itemize}
+A class defines a method defining a variable and calling a method of that variable. The variable is statically typed as an interface. Its dynamic type is an anonymous class. The interface has a subtype which is an inner class.\\
+
+\subsection{Constructor Calls}
+
+\textbf{Simple Constructor Call}\\
+Implemented in: 
+\begin{itemize}
+    \item constructors
+\end{itemize}
+A class defines a method declaring a variable and initializing it by calling a no-arguments constructor.\\
+
+\noindent
+\textbf{Parameterized Constructor Call}\\
+Implemented in: 
+\begin{itemize}
+    \item constructors
+\end{itemize}
+A class defines a method declaring a variable and initializing it by calling a unary constructor.\\
+
+\noindent
+\textbf{Inner Class Constructor Call}\\
+Implemented in: 
+\begin{itemize}
+    \item constructors
+\end{itemize}
+Same as ''Simple Constructor Call'' but with the constructor being called belonging to an inner class.\\
+
+\noindent
+\textbf{Call Constructor Without Assignment}\\
+Implemented in: 
+\begin{itemize}
+    \item simpleCallgraph
+\end{itemize}
+Redundant implementation in: 
+\begin{itemize}
+    \item reflections (additional cast to implemented interface)
+\end{itemize}
+A class defines a method calling a constructor and immediately calling a method of the newly created object. The object itself is then discarded instead of being assigned to a field or a variable.\\
+
+\noindent
+\textbf{Indirect Constructor Call via Reflection}\\
+Implemented in: 
+\begin{itemize}
+    \item reflections
+\end{itemize}
+A class defines a method calling a constructor indirectly via the newInstance method of of the Class class.\\
+
+\subsection{Try-Catch and Exception Handling}
+
+\textbf{Simple Call in Catch}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Static Call in Catch}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Catch Block Never Executed}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Catch Block with Static Method Never Executed}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Simple Call in Finally}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Static Call in Finally}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Try a Method Throwing Exception}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Several Catch-Statements, Only One Executed}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Several Catch-Statements, Every Can Be Executed}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Several Catch-Statements, All But One Can Be Executed}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Possible Exception Throw Followed by Guaranteed Exception Throw in Try}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Guaranteed Exception Throw Followed by Possible Exception Throw in Try}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\subsection{Loops}
+
+\textbf{Call in For-Loop After Break}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Call in For-Loop After Labeled Break}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Call in Empty For-Loop}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Infinite Loop in Catch Before Method Call}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Non-Infinite Loop in Catch Before Method Call}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\noindent
+\textbf{Method Call in a Do-While Loop in Catch}\\
+Implemented in: 
+\begin{itemize}
+    \item misc
+\end{itemize}
+\\%TODO
+
+\subsection{Method Visibility}
+%TODO
+%relevant packages:
+    %callability: properties.callableFromOtherPackages.package1, properties.callableFromOtherPackages.package2, properties.callableFromOtherPackages.package3
+    %entry point: properties.entryPoints
+    %methoc accessability: properties.methodAccessibility.instanceMethods, properties.methodAccessibility.staticMethods1, properties.methodAccessibility.staticMethods2
+    
+\subsection{Class Instantiability}
+
+\textbf{Class with Private Constructor and a Factory Method}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.FactoryAndInstantiable
+\end{itemize}
+A public class defining only private constructors and a package private factory method.\\
+
+\noindent
+\textbf{Class with Private Constructor and a Native Factory Method}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.NativeFactoryMethod
+\end{itemize}
+A public class defining only private constructors and a public native factory method.\\
+
+\noindent
+\textbf{Class with Protected Constructor and a Fake Factory Method}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.NoFactoryButInstantiable
+\end{itemize}
+A public class defining a private and a protected constructor. It also defines a method resembling a factory method but always returning null.\\
+
+\noindent
+\textbf{Class with only Private Constructors}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.OnlyPrivateConstructors
+\end{itemize}
+A public class defining only private constructors and no factory methods. Can't be instantiated.\\
+
+\noindent
+\textbf{Abstract Class without Explicit Constructors}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.PackagePrivateAbstractClass
+\end{itemize}
+A package private abstract class without explicit constructor definitions. Can't be instantiated.\\
+
+\noindent
+\textbf{Class with Protected Constructor and Private Factory Method}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.PackageVisibleFactoryMethod, properties.instantiability.TransFacoryMethod
+\end{itemize}
+A class defines only protected constructors and a private factory method. Another class in the package defines a protected factory method for the class.\\
+
+\noindent
+\textbf{Class with a Real and a Fake Factory Method}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.PublicFactoryMethod
+\end{itemize}
+A class defines only private constructors and a public factory method. It also defines another method similar to a factory method but with void return value.\\
+
+\noindent
+\textbf{Public Interface}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.PublicInterface
+\end{itemize}
+An empty public interface. Can't be instantiated.\\
+
+\noindent
+\textbf{Public Serializable Class}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.SerializableClass
+\end{itemize}
+An empty public class implementing the Serializable interface. The Serializable interface doesn't prevent the class from being instantiated.\\
+
+\noindent
+\textbf{Class with Private Constructor and a Factory Method for other Class}\\
+Implemented in: 
+\begin{itemize}
+    \item properties.instantiability.TransFacoryMethod
+\end{itemize}
+A class defines only private constructors and a protected factory method. However the factory method builds another class in the package.\\
+
+\subsection{Reflection}
+
+\textbf{Calling a Method of a Class Instantiated via Reflection}\\
+Implemented in: 
+\begin{itemize}
+    \item reflections
+\end{itemize}
+A class defines a method instantiating a class via it's Class object's newInstance method. It then calls a method of the instantiated class.\\
+
+\noindent
+\textbf{Invoking a Method via Reflection}\\
+Implemented in: 
+\begin{itemize}
+    \item reflections
+\end{itemize}
+A class defines a method instantiating a class and fetching the Method object of a method of the instantiated class. It then invokes the method via the invoke method of the Method class.\\
+
+\subsection{Static Calls}
+
+\textbf{Call a Static Method of a Concrete Class}\\
+Implemented in: 
+\begin{itemize}
+    \item staticCalls
+\end{itemize}
+A class declares a method calling a static method of another concrete class.\\
+
+\noindent
+\textbf{Call a Static Method of an Abstract Class}\\
+Implemented in: 
+\begin{itemize}
+    \item staticCalls
+\end{itemize}
+A class declares a method calling a static method of an abstract class. The called method is concrete.\\
+
+\noindent
+\textbf{Static Initializer Calling Methods of a Concrete Class}\\
+Implemented in: 
+\begin{itemize}
+    \item staticCalls
+\end{itemize}
+A class defines a static initializer instantiating a concrete class and calls a method of that class.\\
+
+\noindent
+\textbf{Static Initializer Calling Methods of an Abstract Class}\\
+Implemented in: 
+\begin{itemize}
+    \item staticCalls
+\end{itemize}
+A class defines a static initializer instantiating an abstract class and calls a concrete method of that class.\\
+
+\noindent
+\textbf{Static Initializer Calling Methods of a Concrete Class Typed as Interface}\\
+Implemented in: 
+\begin{itemize}
+    \item staticCalls
+\end{itemize}
+A class defines a static initializer instantiating a concrete class statically typed as an interface and calls a method of that class.\\
+
+\noindent
+\textbf{Static Initializer Calling Methods of an Abstract Class Typed as Interface}\\
+Implemented in: 
+\begin{itemize}
+    \item staticCalls
+\end{itemize}
+A class defines a static initializer instantiating an abstract class statically typed as an interface and calls a method of that class.\\
+
+\noindent
+\textbf{Static Initializer Calling Static Methods of a Concrete Class}\\
+Implemented in: 
+\begin{itemize}
+    \item staticCalls
+\end{itemize}
+A class defines a static initializer calling a static method of a concrete class.\\
+
+\noindent
+\textbf{Static Initializer Calling Static Methods of an Abstract Class}\\
+Implemented in: 
+\begin{itemize}
+    \item staticCalls
+\end{itemize}
+A class defines a static initializer calling a concrete static method of an abstract class.\\
+
+\subsection{Virtual Calls}
+
+\textbf{Calling Method Defined in Abstract Superclass}\\
+Implemented in: 
+\begin{itemize}
+    \item base.AlternateBase
+\end{itemize}
+A concrete class extending an abstract class declares a method calling another method of the class. The called method is defined in the abstract superclass and declared in an interface implemented by the abstract superclass.\\
+
+\noindent
+\textbf{Call Own Private Method}\\
+Implemented in: 
+\begin{itemize}
+    \item serialization.publicReadResolveInSuperclass
+\end{itemize}
+A class declares two methods. One of them is private and is called by the other method, which is an entry point.\\
+
+\noindent
+\textbf{Calling the toString or hashCode methods of a Concrete Class}\\
+Implemented in: 
+\begin{itemize}
+    \item virtualCalls
+\end{itemize}
+A class calls the toString or hashCode method of an object statically typed as an interface and dynamically typed as a concrete class implementing the interface.\\
+
+\noindent
+\textbf{Calling the toString or hashCode methods of an Abstract Class}\\
+Implemented in: 
+\begin{itemize}
+    \item virtualCalls
+\end{itemize}
+A class calls the toString or hashCode method of an object statically typed as an interface and dynamically typed as an abstract class implementing the interface.\\
+
+\noindent
+\textbf{Call a Method of a Concrete Argument}\\
+Implemented in: 
+\begin{itemize}
+    \item virtualCalls
+\end{itemize}
+A class declares a method which takes an argument statically typed as a concrete class. The method calls a method of the class passed as argument.\\
+
+\noindent
+\textbf{Call a Method of an Abstract Argument}\\
+Implemented in: 
+\begin{itemize}
+    \item virtualCalls
+\end{itemize}
+A class declares a method which takes an argument statically typed as an abstract class. The method calls a concrete method of the class passed as argument.\\
+
+\noindent
+\textbf{Call a Method of an Interface Argument}\\
+Implemented in: 
+\begin{itemize}
+    \item virtualCalls
+\end{itemize}
+A class declares a method which takes an argument statically typed as an interface. The method calls a method of the interface passed as argument.\\
+
+\noindent
+\textbf{Call a Method of a Concrete Field}\\
+Implemented in: 
+\begin{itemize}
+    \item virtualCalls
+\end{itemize}
+A class declares a method and a field statically typed as a concrete class. The method calls a method of the field.\\
+
+\noindent
+\textbf{Call a Method of an Abstract Field}\\
+Implemented in: 
+\begin{itemize}
+    \item virtualCalls
+\end{itemize}
+A class declares a method and a field statically typed as an abstract class. The method calls a method of the field.\\
+
+\noindent
+\textbf{Call a Method of an Interface Field}\\
+Implemented in: 
+\begin{itemize}
+    \item virtualCalls
+\end{itemize}
+A class declares a method and a field statically typed as an interface. The method calls a method of the field.\\
+
+\section{New Test Suite}
+
+\end{document}
