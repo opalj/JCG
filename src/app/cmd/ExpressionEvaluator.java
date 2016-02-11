@@ -1,3 +1,32 @@
+/*
+ * BSD 2-Clause License:
+ * Copyright (c) 2009 - 2016
+ * Software Technology Group
+ * Department of Computer Science
+ * Technische Universität Darmstadt
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  - Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ */
 package cmd;
 
 import static annotations.documentation.CGCategory.*;
@@ -42,8 +71,6 @@ import static expressions.PlusOperator.AddExpression;
  *
  *
  *
- *
- *
  * <p>
  * <p>
  * <p>
@@ -61,13 +88,15 @@ public class ExpressionEvaluator {
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructor(receiverType = "expressions/Stack", line = 109)
-    @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java.lang.String")}, line = 74)
-    @CallSite(name = "push", resolvedMethods = {@ResolvedMethod(receiverType = "expressions.Stack")}, line = 117)
+    @InvokedConstructor(receiverType = "expressions/Stack", line = 140)
+    @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java.lang.String")}, line = 103)
+    @CallSite(name = "push", resolvedMethods = {@ResolvedMethod(receiverType = "expressions.Stack")}, line = 148)
     @CallSite(name = "createBinaryExpression",
             resolvedMethods = {@ResolvedMethod( receiverType = BinaryExpression.FQN)},
             parameterTypes = {String.class, Expression.class, Expression.class},
-            line = 120)
+            line = 151)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd.ExpressionEvaluator$CALLBACK")}, line = 110)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd.ExpressionEvaluator$CALLBACK")}, line = 122)
     public static void main(final String[] args) {
 
         @CGNote(value = ARRAY_HANDLING, description = "") // TODO Why is this special?
@@ -78,6 +107,7 @@ public class ExpressionEvaluator {
             @CGNote(value = JVM_CALLBACK, description="invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value= NOTE,description="the related method <Thread>.dispatchUncaughtException is not dead")
             @Override public void uncaughtException(Thread t, Throwable e) {
+                CALLBACK.callback();
                 String msg = "unexpected error while processing "+ Arrays.deepToString(args);
                 System.out.println(msg);
             }
@@ -89,6 +119,7 @@ public class ExpressionEvaluator {
             @CGNote(value = JVM_CALLBACK, description="invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description="the related method<Thread>.run is called by the jvm")
             @Override public void run() {
+                CALLBACK.callback();
                 System.out.println("It was a pleasure to evaluate your expression!");
                 super.run();
             }
@@ -134,4 +165,9 @@ public class ExpressionEvaluator {
         System.out.println("result "+values.pop().getValue());
         }
     }
+
+    /*
+     * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
+     */
+    private static class CALLBACK { static void callback() {/* do nothing*/}}
 }
