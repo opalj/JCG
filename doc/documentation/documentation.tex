@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
-\title{OPAL CallGraph Testsuite Documentation}
+\title{OPAL-JCG Testsuite Documentation}
 \author{Roberts Kolosovs}
 \date{\today}
 
@@ -9,7 +9,17 @@
 
 \maketitle
 
-\section{Old Test Suite}
+\section{Introduction}\label{sec:introduction}
+
+This document provides a structured overview of the test cases for java call graph algorithm testing located in the OPAL-JCG project. It is split into three sections. This section briefly describes the structure of this document and gives a guideline to extending and modifying it.\\
+Section \ref{sec:oldtestsuite}, ''Old Test Suite'', contains the descriptions of the old test suite (the src/main/java folder) case by case grouped by the feature of the Java language they mainly test. The cases consist of a title, a list of instances in the old test suite implementing the case, a short description, and a list of cases in the new suite implementing this case. Some subsections of section \ref{sec:oldtestsuite} contain a ''Missing Cases'' part. That part contains brief descriptions of cases that possibly should be added to the test suite.\\
+Section \ref{sec:newtestsuite}, ''New Test Suite'', contains the description of the new test suite (the src/app and src/lib folders) case by case grouped by the features of the Java language they mainly test. The cases consist of a title, a list of instances in the new test suite implementing this case, and a short description.\\
+When implementing new test cases in the new test suite they should be documented here following the established pattern. The documentation of any old suite cases implementing this new case or case suggestions should be marked as being implemented in the new test suite.\\
+If some of the test cases in the old or the new test suite are to be found invalid their description should not be removed. Instead they should be marked as invalid and a brief description of the problem should be added. This way the same mistake can be avoided in the future and the decision to invalidate a case can be reviewed.\\
+New subsections can be added to the sections \ref{sec:oldtestsuite} and \ref{sec:newtestsuite} and test cases can be moved from one subsection to another. A test case should only be in one subsection even if it deals with multiple Java language features. Finally any changes to the structure of the documentation should be recorded in this section in order to keep this document consistent.
+
+
+\section{Old Test Suite}\label{sec:oldtestsuite}
 \subsection{Serialization}
 \subsubsection{Implemented Cases}
 
@@ -41,7 +51,7 @@ Implemented in:
 A class implements the Externalizable interface and the Serializable interface. The methods writeReplace and readResolve are implemented with the default behavior (return this). The methods readExternal and writeExternal are implemented with the default behavior (do nothing). The methods readObject and writeObject are implemented but never called as they are superceded by read/writeExternal during (de-)serialization.\\
 
 \noindent
-\textbf{Superclass with no no-args Constructor (Serializable)}\\
+\textbf{Superclass with Private No-Args Constructor (Serializable)}\\
 Implemented in: 
 \begin{itemize}
     \item serialization.invalidSuperclass
@@ -49,7 +59,7 @@ Implemented in:
 A class implements the Serializable interface and extends another class. The superclass doesn't implement the Serializable interface and declares a private no-argument constructor. The subclass implements writeReplace, readResolve, readObject and writeObject with the default behavior. The de-serialization of the subclass always fails so readResolve and readObject methods of the subclass are never called.\\
 
 \noindent
-\textbf{Superclass with no no-args Constructor (Externalizable)}\\
+\textbf{Superclass with Private No-Args Constructor (Externalizable)}\\
 Implemented in: 
 \begin{itemize}
     \item serialization.extPrivateNoArgsConstructorSuperclass
@@ -57,7 +67,7 @@ Implemented in:
 A class implements the Externalizable interface and extends another class. The superclass doesn't implement the Serializable or Externalizable interfaces and declares a private no-argument constructor. In contrast to the serializable case the (de-)externalization of subclass completes without errors.\\
 
 \noindent
-\textbf{Serializable Superclass with no no-args Constructor}\\
+\textbf{Serializable Superclass with Private No-Args Constructor}\\
 Implemented in: 
 \begin{itemize}
     \item serialization.serializableExtendingSerializable
@@ -65,7 +75,7 @@ Implemented in:
 A class implements the Serializable interface and extends another class. The superclass also implement the Serializable interface and declares a private no-argument constructor. In contrast to the serializable case with non-serializable superclass the (de-)serialization of the subclass completes without errors.\\
 
 \noindent
-\textbf{Call readObjectNoData}\\
+\textbf{Call ReadObjectNoData}\\
 Implemented in: 
 \begin{itemize}
     \item serialization.serializableExtendingSerializable
@@ -73,7 +83,7 @@ Implemented in:
 A class implements the Serializable interface and extends another class implementing the Serializable interface. The superclass implements the readObjectNoData method with the default behavior (do nothing). ReadObjectNoData can be called during de-serialization of the subclass if the serialization happened before the inheritance was implemented.\\
 
 \noindent
-\textbf{Non-serializable Field}\\
+\textbf{Non-Serializable Field}\\
 Implemented in: 
 \begin{itemize}
     \item serialization.nonSerializableField
@@ -113,7 +123,7 @@ Implemented in:
 A class implements the Serializable interface, declares a field and a method. The method is called during de-serialization by the readObject method if the field doesn't have its default value. However during de-serialization before inStream.defaultReadObject (or equivalent code) is executed each field has its types default value and thus the method is never called.\\
 
 \noindent
-\textbf{Visibility of readResolve and writeReplace}\\
+\textbf{Visibility of ReadResolve and WriteReplace}\\
 Implemented in: 
 \begin{itemize}
     \item serialization.serializableExtendingSerializable
@@ -123,7 +133,7 @@ Implemented in:
 The readResolve and writeReplace methods of classes implementing the Serializable should be declared as private if implemented. If declared as public or protected, they are subject to usual visibility rules for class inheritance.\\
 
 \noindent
-\textbf{Visibility of readObject and writeObject}\\
+\textbf{Visibility of ReadObject and WriteObject}\\
 Implemented in: 
 \begin{itemize}
     \item serialization.protectedReadWriteObject
@@ -131,7 +141,7 @@ Implemented in:
 The readObject and writeObject methods which can be implemented by serializable classes have to be private. They are not called during (de-)serialization if they are declared with some other visibility.\\
 
 \noindent
-\textbf{ReadResolve and writeReplace Redirect Control Flow}\\
+\textbf{ReadResolve and WriteReplace Redirect Control Flow}\\
 Implemented in: 
 \begin{itemize}
     \item serialization.indirectReadResolve (new class created in another class by a static method)
@@ -158,11 +168,11 @@ Each class implementing the Serializable interface or an interface extending Ser
 
 \subsubsection{Missing Cases}
 
-\textbf{Empty readObject}\\
+\textbf{Empty ReadObject}\\
 A serializable class implements the readObject method with empty body (do-nothing behavior). All class fields are set to their default values after readObject is called during de-serialization. This can influence method calls in later steps of de-serialization if they depend on specific field values.\\
 
 \noindent
-\textbf{Empty writeObject}\\
+\textbf{Empty WriteObject}\\
 A serializable class implements the writeObject method with empty body (do-nothing behavior). Nothing is written to stream during serialization. When de-serializing a stream written this way the inStream.defaultReadObject throws a StreamCorruptedException. This can influence method calls in later steps of de-serialization. However this behavior is only exhibited when de-serializing the current version of the code. If another versions of the class were serialized, their de-serialization doesn't necessarily always produce an error.\\
 
 
@@ -224,7 +234,7 @@ Implemented in:
 A class C defines a field statically typed as C and a method calling a method of the field. The field's value is set in the constructor of C and never changed afterwards. The field's dynamic type is a second generation subclass of the class C.\\
 
 \noindent
-\textbf{Call a Method of a Field fetched via a Method Call}\\
+\textbf{Call a Method of a Field Fetched via a Method Call}\\
 Implemented in: 
 \begin{itemize}
     \item branchElimination
@@ -255,7 +265,7 @@ Implemented in:
 \end{itemize}
 Redundant implementation in: 
 \begin{itemize}
-    \item simpleCallgraph (regular calss instead of an inner class)
+    \item simpleCallgraph (regular class instead of an inner class)
 \end{itemize}
 A class C defines a method calling a method of a field. The field is statically typed as an interface and dynamically typed as an inner class of the class C. The field's value is set as the default value of the field and not changed afterwards.\\
 
@@ -313,157 +323,161 @@ Implemented in:
 A class defines a method calling a constructor indirectly via the newInstance method of of the Class class.\\
 
 \subsection{Try-Catch and Exception Handling}
+\subsubsection{Implemented Cases}
 
 \textbf{Simple Call in Catch}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callVirtualMethodInCatch
 \end{itemize}
-\\%TODO
+A class defines a method containing a try-catch block. The try-block throws an exception which is caught in the catch-block. The catch-statement consists of a simple method call.\\
 
 \noindent
 \textbf{Static Call in Catch}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callStaticMethodInCatch
 \end{itemize}
-\\%TODO
+Same as ''Simple Call in Catch'' but the method called in the catch-block is a static method.\\
 
 \noindent
 \textbf{Catch Block Never Executed}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:notCallVirtualMethodInCatch
 \end{itemize}
-\\%TODO
+Same as ''Simple Call in Catch'' but the try-block consists of a statement which doesn't throw any exceptions. The catch-block is never executed.\\
 
 \noindent
 \textbf{Catch Block with Static Method Never Executed}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:notCallStaticMethodInCatch
 \end{itemize}
-\\%TODO
+Same as ''Catch Block Never Executed'' but the method call in the catch-block is a static call. It is still never executed.\\
 
 \noindent
 \textbf{Simple Call in Finally}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callVirtualMethodInFinally
 \end{itemize}
-\\%TODO
+A class defines a method containing a try-catch-finally block. The try-block throws an exception which is caught in the catch-block (otherwise empty). The finally-block then performs a simple method call.\\
 
 \noindent
 \textbf{Static Call in Finally}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callStaticMethodInFinally
 \end{itemize}
-\\%TODO
+Same as ''Simple Call in Finally'' except the finally-block consists of a static call.\\
 
 \noindent
 \textbf{Try a Method Throwing Exception}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callsMethodThatThrowsException
 \end{itemize}
-\\%TODO
+Same as the ''Static Call in Catch'' except the try-block consists of a method call. The called method always throws an exception.\\
 
 \noindent
 \textbf{Several Catch-Statements, Only One Executed}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:throwErrorCatchExceptionOrError
 \end{itemize}
-\\%TODO
+The try-block throws a specific kind of error or exception. The try-block is followed by two catch-blocks both of which contain a method call. The first catch-block catches the wrong throwable and is never executed. The second catches the right throwable and is executed.\\
 
 \noindent
 \textbf{Several Catch-Statements, Every Can Be Executed}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callMethodBasedOnThrowableType
 \end{itemize}
-\\%TODO
+The try-block may throws several different kinds of exceptions based on run-time behavior (here: hashing the code of the object). It is followed by several catch-blocks, one for every kind of throwable, each calling a different method. All of them are potentially executed.\\
 
 \noindent
 \textbf{Several Catch-Statements, All But One Can Be Executed}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callMethodBasedOnThrowableTypePartly
 \end{itemize}
-\\%TODO
+Same as ''Several Catch-Statements, Every Can Be Executed'' except there is at least one catch-statement catching an exception never thrown in the try-block (and thus that catch is never executed).\\
 
 \noindent
 \textbf{Possible Exception Throw Followed by Guaranteed Exception Throw in Try}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callMultipleMethodsInTry
 \end{itemize}
-\\%TODO
+The try-block calls two methods the first sometimes throwing an exception the second always throwing a different exception. Both exceptions are caught in separate catch-blocks and result in calls of two different methods. Botch method calls are possible.\\
 
 \noindent
 \textbf{Guaranteed Exception Throw Followed by Possible Exception Throw in Try}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callMultipleMethodsInTryAlternateOrder
 \end{itemize}
-\\%TODO
+Same as ''Possible Exception Throw Followed by Guaranteed Exception Throw in Try'' except the method calls in try are in reverse order. The one always throwing an exception is called first and thus the catch-block catching the possible exception is never executed.\\
+
+\subsubsection{Missing Cases}
+
+\textbf{Finally Statement with Try Never Throwing Exceptions}\\
+If a try-catch-finally is declared the finally statement is always executed (bar the JVM exiting or the thread being killed while the try-block is being executed). There should be a test case (or two: regular and static calls) for a method call in a finally-block with the try-block never throwing an exception.\\
+
+\noindent
+\textbf{Method Declared to Throw but Never Throwing in Try}\\
+The try-block calls a method declared to throw an exception. However the part of the method throwing the exception is dead code.\\
 
 \subsection{Loops}
 
 \textbf{Call in For-Loop After Break}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callInCatchWithBreak
 \end{itemize}
-\\%TODO
+A method contains a for-loop with a break statement followed by a static method call. The static call is never executed as the break statement terminates the loop.\\
 
 \noindent
 \textbf{Call in For-Loop After Labeled Break}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:noCallInCatchWithLabeledBreak
 \end{itemize}
-\\%TODO
+A method contains a labeled for-loop with another for-loop nested inside of it. The inner loop contains a break statement breaking the outer loop via the label and a method call afterwards. The method call is never executed.\\
 
 \noindent
 \textbf{Call in Empty For-Loop}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callInEmptyForLoop
 \end{itemize}
-\\%TODO
+A method contains a for-loop with zero iterations with a method call inside of it. The method call is never executed.\\
 
 \noindent
-\textbf{Infinite Loop in Catch Before Method Call}\\
+\textbf{Infinite Loop Before Method Call}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:noCallInMethodThatThrowsExceptionCatchInfiniteLoop
 \end{itemize}
-\\%TODO
+A method contains an infinite while-loop followed by a method call. The method call is never executed.\\
 
 \noindent
-\textbf{Non-Infinite Loop in Catch Before Method Call}\\
+\textbf{Non-Infinite Loop Before Method Call}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callsMethodThatThrowsExceptionCatchNoInfiniteLoop
 \end{itemize}
-\\%TODO
+A method contains a while-loop with zero iterations followed by a method call. The method call gets ecxecuted as normal.\\
 
 \noindent
-\textbf{Method Call in a Do-While Loop in Catch}\\
+\textbf{Method Call in a Do-While Loop with Always False Guard}\\
 Implemented in: 
 \begin{itemize}
-    \item misc
+    \item misc.TryCatchFinally:callMethodInCatchWithDoWhile
 \end{itemize}
-\\%TODO
+A method contains a do-while-loop with a trivially false guard. The loop contains a method call which is executed once during the first and only loop iteration.\\
 
-\subsection{Method Visibility}
-%TODO
-%relevant packages:
-    %callability: properties.callableFromOtherPackages.package1, properties.callableFromOtherPackages.package2, properties.callableFromOtherPackages.package3
-    %entry point: properties.entryPoints
-    %methoc accessability: properties.methodAccessibility.instanceMethods, properties.methodAccessibility.staticMethods1, properties.methodAccessibility.staticMethods2
     
 \subsection{Class Instantiability}
 
@@ -491,7 +505,7 @@ Implemented in:
 A public class defining a private and a protected constructor. It also defines a method resembling a factory method but always returning null.\\
 
 \noindent
-\textbf{Class with only Private Constructors}\\
+\textbf{Class with Only Private Constructors}\\
 Implemented in: 
 \begin{itemize}
     \item properties.instantiability.OnlyPrivateConstructors
@@ -568,7 +582,7 @@ A class defines a method instantiating a class and fetching the Method object of
 \textbf{Call a Static Method of a Concrete Class}\\
 Implemented in: 
 \begin{itemize}
-    \item staticCalls
+    \item staticCalls.CallStaticMethods
 \end{itemize}
 A class declares a method calling a static method of another concrete class.\\
 
@@ -576,7 +590,7 @@ A class declares a method calling a static method of another concrete class.\\
 \textbf{Call a Static Method of an Abstract Class}\\
 Implemented in: 
 \begin{itemize}
-    \item staticCalls
+    \item staticCalls.CallStaticMethods
 \end{itemize}
 A class declares a method calling a static method of an abstract class. The called method is concrete.\\
 
@@ -584,7 +598,7 @@ A class declares a method calling a static method of an abstract class. The call
 \textbf{Static Initializer Calling Methods of a Concrete Class}\\
 Implemented in: 
 \begin{itemize}
-    \item staticCalls
+    \item staticCalls.StaticInitializerConcreteObjects
 \end{itemize}
 A class defines a static initializer instantiating a concrete class and calls a method of that class.\\
 
@@ -592,7 +606,7 @@ A class defines a static initializer instantiating a concrete class and calls a 
 \textbf{Static Initializer Calling Methods of an Abstract Class}\\
 Implemented in: 
 \begin{itemize}
-    \item staticCalls
+    \item staticCalls.StaticInitializerConcreteObjects
 \end{itemize}
 A class defines a static initializer instantiating an abstract class and calls a concrete method of that class.\\
 
@@ -600,7 +614,7 @@ A class defines a static initializer instantiating an abstract class and calls a
 \textbf{Static Initializer Calling Methods of a Concrete Class Typed as Interface}\\
 Implemented in: 
 \begin{itemize}
-    \item staticCalls
+    \item staticCalls.StaticInitializerInterfaceObjects
 \end{itemize}
 A class defines a static initializer instantiating a concrete class statically typed as an interface and calls a method of that class.\\
 
@@ -608,7 +622,7 @@ A class defines a static initializer instantiating a concrete class statically t
 \textbf{Static Initializer Calling Methods of an Abstract Class Typed as Interface}\\
 Implemented in: 
 \begin{itemize}
-    \item staticCalls
+    \item staticCalls.StaticInitializerInterfaceObjects
 \end{itemize}
 A class defines a static initializer instantiating an abstract class statically typed as an interface and calls a method of that class.\\
 
@@ -616,7 +630,7 @@ A class defines a static initializer instantiating an abstract class statically 
 \textbf{Static Initializer Calling Static Methods of a Concrete Class}\\
 Implemented in: 
 \begin{itemize}
-    \item staticCalls
+    \item staticCalls.StaticInitializerStaticMethods
 \end{itemize}
 A class defines a static initializer calling a static method of a concrete class.\\
 
@@ -624,9 +638,10 @@ A class defines a static initializer calling a static method of a concrete class
 \textbf{Static Initializer Calling Static Methods of an Abstract Class}\\
 Implemented in: 
 \begin{itemize}
-    \item staticCalls
+    \item staticCalls.StaticInitializerStaticMethods
 \end{itemize}
 A class defines a static initializer calling a concrete static method of an abstract class.\\
+
 
 \subsection{Virtual Calls}
 
@@ -646,18 +661,20 @@ Implemented in:
 A class declares two methods. One of them is private and is called by the other method, which is an entry point.\\
 
 \noindent
-\textbf{Calling the toString or hashCode methods of a Concrete Class}\\
+\textbf{Calling the ToString or HashCode Methods of a Concrete Class}\\
 Implemented in: 
 \begin{itemize}
-    \item virtualCalls
+    \item virtualCalls.CallToStringOnInterface
+    \item virtualCalls.CallHashcodeOnInterface
 \end{itemize}
 A class calls the toString or hashCode method of an object statically typed as an interface and dynamically typed as a concrete class implementing the interface.\\
 
 \noindent
-\textbf{Calling the toString or hashCode methods of an Abstract Class}\\
+\textbf{Calling the ToString or HashCode Methods of an Abstract Class}\\
 Implemented in: 
 \begin{itemize}
-    \item virtualCalls
+    \item virtualCalls.CallToStringOnInterface
+    \item virtualCalls.CallHashcodeOnInterface
 \end{itemize}
 A class calls the toString or hashCode method of an object statically typed as an interface and dynamically typed as an abstract class implementing the interface.\\
 
@@ -665,7 +682,7 @@ A class calls the toString or hashCode method of an object statically typed as a
 \textbf{Call a Method of a Concrete Argument}\\
 Implemented in: 
 \begin{itemize}
-    \item virtualCalls
+    \item virtualCalls.CallByParameter
 \end{itemize}
 A class declares a method which takes an argument statically typed as a concrete class. The method calls a method of the class passed as argument.\\
 
@@ -673,7 +690,7 @@ A class declares a method which takes an argument statically typed as a concrete
 \textbf{Call a Method of an Abstract Argument}\\
 Implemented in: 
 \begin{itemize}
-    \item virtualCalls
+    \item virtualCalls.CallByParameter
 \end{itemize}
 A class declares a method which takes an argument statically typed as an abstract class. The method calls a concrete method of the class passed as argument.\\
 
@@ -681,7 +698,7 @@ A class declares a method which takes an argument statically typed as an abstrac
 \textbf{Call a Method of an Interface Argument}\\
 Implemented in: 
 \begin{itemize}
-    \item virtualCalls
+    \item virtualCalls.CallByParameter
 \end{itemize}
 A class declares a method which takes an argument statically typed as an interface. The method calls a method of the interface passed as argument.\\
 
@@ -689,7 +706,7 @@ A class declares a method which takes an argument statically typed as an interfa
 \textbf{Call a Method of a Concrete Field}\\
 Implemented in: 
 \begin{itemize}
-    \item virtualCalls
+    \item virtualCalls.CallConcreteObjects
 \end{itemize}
 A class declares a method and a field statically typed as a concrete class. The method calls a method of the field.\\
 
@@ -697,7 +714,7 @@ A class declares a method and a field statically typed as a concrete class. The 
 \textbf{Call a Method of an Abstract Field}\\
 Implemented in: 
 \begin{itemize}
-    \item virtualCalls
+    \item virtualCalls.CallConcreteObjects
 \end{itemize}
 A class declares a method and a field statically typed as an abstract class. The method calls a method of the field.\\
 
@@ -705,10 +722,18 @@ A class declares a method and a field statically typed as an abstract class. The
 \textbf{Call a Method of an Interface Field}\\
 Implemented in: 
 \begin{itemize}
-    \item virtualCalls
+    \item virtualCalls.CallInterfaceObjects
 \end{itemize}
 A class declares a method and a field statically typed as an interface. The method calls a method of the field.\\
 
-\section{New Test Suite}
+\noindent
+\textbf{Call a Super Method}\\
+Implemented in: 
+\begin{itemize}
+    \item base.AlternateBase
+\end{itemize}
+A class extends an abstract class and overrides a method implemented by the superclass. The overridden method calls the superclass version of itself via the 'super' keyword.\\
+
+\section{New Test Suite}\label{sec:newtestsuite}
 
 \end{document}
