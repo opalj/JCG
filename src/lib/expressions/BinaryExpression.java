@@ -67,7 +67,7 @@ import java.lang.reflect.Method;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public abstract class BinaryExpression implements Expression {
 
