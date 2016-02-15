@@ -70,7 +70,6 @@ import static expressions.PlusOperator.AddExpression;
  *
  *
  *
- *
  * <p>
  * <p>
  * <p>
@@ -97,6 +96,7 @@ public class ExpressionEvaluator {
             line = 151)
     @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd.ExpressionEvaluator$CALLBACK")}, line = 110)
     @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd.ExpressionEvaluator$CALLBACK")}, line = 122)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd.ExpressionEvaluator$CALLBACK")}, line = 174)
     public static void main(final String[] args) {
 
         @CGNote(value = ARRAY_HANDLING, description = "") // TODO Why is this special?
@@ -164,6 +164,16 @@ public class ExpressionEvaluator {
 
         System.out.println("result "+values.pop().getValue());
         }
+    }
+
+    /*
+     * !!!!! THIS METHOD IS NOT INTENDED TO BE CALLED DIRECTLY !!!!
+     * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
+     * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
+     */
+    public String toString(){
+        CALLBACK.callback();
+        return "ExpressionEvaluater v0.1";
     }
 
     /*
