@@ -277,7 +277,9 @@ Implemented in:
 \end{itemize}
 A class defines a method defining a variable and calling a method of that variable. The variable is statically typed as an interface. Its dynamic type is an anonymous class. The interface has a subtype which is an inner class.\\
 
+
 \subsection{Constructor Calls}
+\subsubsection{Implemented Cases}
 
 \textbf{Simple Constructor Call}\\
 Implemented in: 
@@ -301,6 +303,10 @@ Implemented in:
     \item constructors
 \end{itemize}
 Same as ''Simple Constructor Call'' but with the constructor being called belonging to an inner class.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Calling Constructor of Inner Class
+\end{itemize}
 
 \noindent
 \textbf{Call Constructor Without Assignment}\\
@@ -321,6 +327,19 @@ Implemented in:
     \item reflections
 \end{itemize}
 A class defines a method calling a constructor indirectly via the newInstance method of of the Class class.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Class Instantiation via Reflection
+\end{itemize}
+
+\subsubsection{Missing Cases}
+
+\textbf{Instantiating a Generic Class}\\
+A call to the constructor of a generic class.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Calling Constructor of Generic Class
+\end{itemize}
 
 \subsection{Try-Catch and Exception Handling}
 \subsubsection{Implemented Cases}
@@ -576,8 +595,15 @@ Implemented in:
     \item reflections
 \end{itemize}
 A class defines a method instantiating a class and fetching the Method object of a method of the instantiated class. It then invokes the method via the invoke method of the Method class.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Invoking a Method via Reflection
+\end{itemize}
+
 
 \subsection{Static Calls}
+
+\subsubsection{Implemented Cases}
 
 \textbf{Call a Static Method of a Concrete Class}\\
 Implemented in: 
@@ -642,8 +668,18 @@ Implemented in:
 \end{itemize}
 A class defines a static initializer calling a concrete static method of an abstract class.\\
 
+\subsubsection{Missing Cases}
+
+\textbf{Static Calls in Argument Position of Another Method Call}\\
+A method taking arguments is called and a static method is called in an argument position during the first call.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Calling a Static Method as a Parameter During Method Call
+\end{itemize}
+
 
 \subsection{Virtual Calls}
+\subsubsection{Implemented Cases}
 
 \textbf{Calling Method Defined in Abstract Superclass}\\
 Implemented in: 
@@ -693,6 +729,10 @@ Implemented in:
     \item virtualCalls.CallByParameter
 \end{itemize}
 A class declares a method which takes an argument statically typed as an abstract class. The method calls a concrete method of the class passed as argument.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Calling Method of Abstract Generic Parameter
+\end{itemize}
 
 \noindent
 \textbf{Call a Method of an Interface Argument}\\
@@ -734,6 +774,112 @@ Implemented in:
 \end{itemize}
 A class extends an abstract class and overrides a method implemented by the superclass. The overridden method calls the superclass version of itself via the 'super' keyword.\\
 
+\subsubsection{Missing Cases}
+
+\textbf{Methods of Generic Classes}\\
+Calls to methods defined by generically typed classes. The class may be concrete of abstract. The methods may be static or not and have generic parameters and/or return values or not.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Calling Method of Abstract Generic Parameter
+\end{itemize}
+
+\noindent
+\textbf{Method Call in Argument Position of Another Method Call}\\
+A method taking arguments is called and another method is called in an argument position of the first method call.\\
+
+\noindent
+\textbf{Calls to Methods of Arrays}\\
+Calls to methods of arrays of Java primitive types and non-primitive types.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Calling Method of an Array Parameter (non-primitive type)
+\end{itemize}
+
+\noindent
+\textbf{Calls to Methods of Inner Classes}\\
+Calls to methods of inner classes outside of those classes.\\
+Implementation in new test suite: 
+\begin{itemize}
+    \item Calling a Method of an Inner Class
+\end{itemize}
+
+
 \section{New Test Suite}\label{sec:newtestsuite}
+
+\subsection{Reflections}
+
+\textbf{Class Instantiation via Reflection}\\
+Implemented in: 
+\begin{itemize}
+    \item expressions.BinaryExpression
+\end{itemize}
+A method declares a field and calls the newInstance method of the Class class to construct the instance to initialize the field with.\\
+
+\noindent
+\textbf{Invoking a Method via Reflection}\\
+Implemented in: 
+\begin{itemize}
+    \item expressions.BinaryExpression
+\end{itemize}
+A method is called by creating a corresponding Method object and calling its invoke method.\\
+
+\subsection{Virtual Calls}
+
+\textbf{Calling Method of Abstract Generic Parameter}\\
+Implemented in: 
+\begin{itemize}
+    \item expressions.Constant
+\end{itemize}
+A method excepts an input and calls a method of the input object. The input is statically typed as an abstract, generic class.\\
+
+\noindent
+\textbf{Calling Method of an Array Parameter}\\
+Implemented in: 
+\begin{itemize}
+    \item cmd.ExpressionEvaluator
+\end{itemize}
+A method excepts an input and calls a method of the input object. The input is statically typed as an array of non-primitive types.\\
+
+\noindent
+\textbf{Calling Method of Concrete Generic Variable}\\
+Implemented in: 
+\begin{itemize}
+    \item cmd.ExpressionEvaluator
+\end{itemize}
+A method defines a variable statically typed as a generic type. Then a method of the variable is called.\\
+
+\noindent
+\textbf{Calling a Method of an Inner Class}\\
+Implemented in: 
+\begin{itemize}
+    \item expressions.Map
+\end{itemize}
+A class C defines an inner class with some methods. Class C also defines a method which calls a method of the inner class.\\
+
+\subsection{Static Calls}
+
+\textbf{Calling a Static Method as a Parameter During Method Call}\\
+Implemented in: 
+\begin{itemize}
+    \item cmd.ExpressionEvaluator
+\end{itemize}
+A method taking an arguments is called. Another method call to a static method is called in an argument position of the first method.\\
+
+\subsection{Constructor Calls}
+
+\textbf{Calling Constructor of Inner Class}\\
+Implemented in: 
+\begin{itemize}
+    \item expressions.Map
+\end{itemize}
+A class defines an inner class and a method declaring a variable and instantiating it with an instance of the inner class.\\
+
+\noindent
+\textbf{Calling Constructor of Generic Class}\\
+Implemented in: 
+\begin{itemize}
+    \item cmd.ExpressionEvaluator
+\end{itemize}
+A class defines a method declaring a field and instantiating it with an instance of a generic class.\\
 
 \end{document}
