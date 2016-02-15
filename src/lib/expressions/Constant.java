@@ -81,7 +81,7 @@ public class Constant implements Expression, Serializable{
     @CallSite(name = "visit",
             resolvedMethods = {@ResolvedMethod(receiverType = "expressions/ExpressionPrinter")},
             returnType = Object.class,
-            line = 86
+            line = 87
     )
     public <T> T accept(ExpressionVisitor <T> visitor) {
         return visitor.visit(this);

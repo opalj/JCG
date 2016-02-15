@@ -70,6 +70,7 @@ import static expressions.PlusOperator.AddExpression;
  *
  *
  *
+ *
  * <p>
  * <p>
  * <p>
@@ -88,15 +89,12 @@ public class ExpressionEvaluator {
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     @InvokedConstructor(receiverType = "expressions/Stack", line = 140)
-    @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java.lang.String")}, line = 103)
-    @CallSite(name = "push", resolvedMethods = {@ResolvedMethod(receiverType = "expressions.Stack")}, line = 148)
+    @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/String")}, line = 101)
+    @CallSite(name = "push", resolvedMethods = {@ResolvedMethod(receiverType = "expressions/Stack")}, line = 148)
     @CallSite(name = "createBinaryExpression",
             resolvedMethods = {@ResolvedMethod( receiverType = BinaryExpression.FQN)},
             parameterTypes = {String.class, Expression.class, Expression.class},
             line = 151)
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd.ExpressionEvaluator$CALLBACK")}, line = 110)
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd.ExpressionEvaluator$CALLBACK")}, line = 122)
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd.ExpressionEvaluator$CALLBACK")}, line = 174)
     public static void main(final String[] args) {
 
         @CGNote(value = ARRAY_HANDLING, description = "") // TODO Why is this special?
@@ -106,6 +104,7 @@ public class ExpressionEvaluator {
 
             @CGNote(value = JVM_CALLBACK, description="invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value= NOTE,description="the related method <Thread>.dispatchUncaughtException is not dead")
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 109)
             @Override public void uncaughtException(Thread t, Throwable e) {
                 CALLBACK.callback();
                 String msg = "unexpected error while processing "+ Arrays.deepToString(args);
@@ -118,6 +117,7 @@ public class ExpressionEvaluator {
             // This is an entry point!
             @CGNote(value = JVM_CALLBACK, description="invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description="the related method<Thread>.run is called by the jvm")
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 122)
             @Override public void run() {
                 CALLBACK.callback();
                 System.out.println("It was a pleasure to evaluate your expression!");
@@ -171,6 +171,7 @@ public class ExpressionEvaluator {
      * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 176)
     public String toString(){
         CALLBACK.callback();
         return "ExpressionEvaluater v0.1";

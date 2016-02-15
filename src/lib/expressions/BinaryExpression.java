@@ -71,7 +71,7 @@ import java.lang.reflect.Method;
  */
 public abstract class BinaryExpression implements Expression {
 
-    public static final String FQN = "expressions.BinaryExpression";
+    public static final String FQN = "expressions/BinaryExpression";
 
     abstract protected Expression left();
 
