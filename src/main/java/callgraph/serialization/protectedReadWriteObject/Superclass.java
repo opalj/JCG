@@ -26,7 +26,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.serialization.nonSerializableField;
+package callgraph.serialization.protectedReadWriteObject;
+
+import static org.opalj.annotations.callgraph.properties.AnalysisMode.OPA;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,8 +41,11 @@ import org.opalj.annotations.callgraph.properties.EntryPoint;
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * Serializable class with a non-serializable field. As writeObject and readObject use the default 
- * implementation, all serialization and de-serialization attempts result in an error.
+ * Serializable class with protected read/writeObject methods nested in another class.
+ * No instances of the class are created but it still can be de-serialized, accessed 
+ * via public superclass or by extending the package. However during (de-)serialization 
+ * the protected read/writeObject methods are not called as they need to be private to 
+ * be called during (de-)serialization.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -60,31 +65,26 @@ import org.opalj.annotations.callgraph.properties.EntryPoint;
  * 
  * @author Roberts Kolosovs
  */
-public class SerializableWithNonSerializableField implements Serializable {
+public class Superclass {
 
-	private static final long serialVersionUID = -6141317929433778662L;
-	
-	public StringBox label; //field with non-serializable type (StringBox)
+	protected class ProtectedReadAndWriteObject extends ImplementsSerializable implements Serializable{
 
-	@EntryPoint
-	private Object writeReplace(){ //entry point via serialization
-		return this; //default implementation
-	}
-	
-	@EntryPoint
-	private void writeObject(java.io.ObjectOutputStream out) 
-			throws IOException{ //entry point via serialization;
-		out.defaultWriteObject(); //default implementation; results in java.io.NotSerializableException
-	}
+		private static final long serialVersionUID = -8192945638933075918L;
 
-	private Object readResolve(){ //no entry point; 
-								  //de-serialization attempts result in java.io.WriteAbortedException
-		return this; //default implementation
-	}
-	
-	@EntryPoint
-	private void readObject(java.io.ObjectInputStream in) 
-			throws ClassNotFoundException, IOException{ //entry point via de-serialization;
-		in.defaultReadObject(); //default implementation; results in java.io.WriteAbortedException
+		@EntryPoint(OPA)
+		protected void readObject(java.io.ObjectInputStream in) //no entry point via de-serialization;
+																//this method must be private
+																//de-serialization still completes
+				throws ClassNotFoundException, IOException{
+			in.defaultReadObject(); //default implementation
+		}
+		
+		@EntryPoint(OPA)
+		protected void writeObject(java.io.ObjectOutputStream out) //no entry point via serialization;
+																   //this method must be private
+																   //serialization still completes
+				throws IOException{
+			out.defaultWriteObject(); //default implementation
+		}
 	}
 }

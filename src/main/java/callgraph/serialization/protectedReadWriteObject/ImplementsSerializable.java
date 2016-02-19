@@ -1,5 +1,5 @@
 /* BSD 2-Clause License:
- * Copyright (c) 2009 - 2015
+ * Copyright (c) 2009 - 2014
  * Software Technology Group
  * Department of Computer Science
  * Technische Universität Darmstadt
@@ -13,7 +13,7 @@
  *  - Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -22,29 +22,39 @@
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.properties.isntantiability;
+package callgraph.serialization.protectedReadWriteObject;
 
-import org.opalj.annotations.callgraph.properties.InstantiabilityKeys;
-import org.opalj.annotations.callgraph.properties.InstantiabilityProperty;
+import java.io.Serializable;
 
 /**
- * This class is used for test purpose only.
+ * This class was used to create a class file with some well defined attributes.
+ * The created class is subsequently used by several tests.
  * 
- * @author Michael Reif
+ * Serializable abstract class used as a superclass of ProtectedReadAndWriteObject 
+ * nested class to increase its accessibility.
+ * 
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
+ * 
+ * <!--
+ * 
+ * 
+ * 
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
+ * 
+ * 
+ * 
+ * 
+ * -->
+ * 
+ * @author Roberts Kolosovs
  */
-@InstantiabilityProperty(
-		InstantiabilityKeys.NotInstantiable)
-public class OnlyPrivateConstructors {
+public abstract class ImplementsSerializable implements Serializable {
 
-	private OnlyPrivateConstructors(){
-		
-	}
-	
-	private OnlyPrivateConstructors(Object object){
-		
-	}
 }

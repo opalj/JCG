@@ -1,5 +1,5 @@
 /* BSD 2-Clause License:
- * Copyright (c) 2009 - 2014
+ * Copyright (c) 2009 - 2015
  * Software Technology Group
  * Department of Computer Science
  * Technische Universität Darmstadt
@@ -26,51 +26,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.staticCalls;
+package callgraph.properties.instantiability;
 
-import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.ResolvedMethod;
-
-import callgraph.base.AbstractBase;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
+import org.opalj.annotations.callgraph.properties.FactoryMethodKeys;
+import org.opalj.annotations.callgraph.properties.FactoryMethodProperty;
+import org.opalj.annotations.callgraph.properties.InstantiabilityProperty;
 
 /**
- * This class was used to create a class file with some well defined attributes. The
- * created class is subsequently used by several tests.
  * 
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
+ * This class has a protected constructor, hence it can be instantiated. A factory
+ * method is not offered by this class, since `fakeInstance()` always returns null.
  * 
- * <!--
- * 
- * 
- * 
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * -->
- * 
- * @author Marco Jacobasch
+ * @author Michael Reif
+ *
  */
-public class CallStaticMethods {
+@InstantiabilityProperty
+public class NoFactoryButInstantiable {
 
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/AbstractBase") }, name = "staticMethod", isStatic = true, line = 63)
-    void callStaticAbstract() {
-        AbstractBase.staticMethod();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/ConcreteBase") }, name = "staticMethod", isStatic = true, line = 68)
-    void callStaticConcrete() {
-        ConcreteBase.staticMethod();
-    }
-
-    @CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/base/SimpleBase") }, name = "staticMethod", isStatic = true, line = 73)
-    void callStaticSimple() {
-        SimpleBase.staticMethod();
-    }
-
+	protected NoFactoryButInstantiable(){
+		this("Just kidding!");
+	}
+	
+	
+	private NoFactoryButInstantiable(String msg){
+		System.out.println(msg);
+	}
+	
+	@FactoryMethodProperty(FactoryMethodKeys.NotFactoryMethod)
+	public static NoFactoryButInstantiable fakeInstance() { return null; }
 }

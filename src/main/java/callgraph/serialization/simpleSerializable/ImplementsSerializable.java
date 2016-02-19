@@ -32,8 +32,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.InvokedConstructor;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -63,22 +63,24 @@ public class ImplementsSerializable extends Base implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@EntryPoint
 	private Object writeReplace(){ //entry point via serialization
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 73)
+	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
 			throws IOException { 
 		out.defaultWriteObject();
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 79)
+	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException { // entry point via de-serialization
 		in.defaultReadObject();
 	}
 
+	@EntryPoint
 	private Object readResolve() { // entry point via de-serialization; called after readObject
 		return this; //default implementation
 	}

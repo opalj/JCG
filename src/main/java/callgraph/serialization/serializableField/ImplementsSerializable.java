@@ -26,65 +26,64 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.reflections;
+package callgraph.serialization.serializableField;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.IOException;
+import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.InvokedConstructor;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
- * <p>
+ * 
+ * A serializable class containing a field of a custom serializable type.
+ * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * <p>
+ * 
  * <!--
- * <p>
- * <p>
- * <p>
- * <p>
+ * 
+ * 
+ * 
+ * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * <p>
- * <p>
+ * 
+ * 
+ * 
  * -->
- *
- * @author Marco Jacobasch
+ * 
+ * @author Roberts Kolosovs
  */
-public class Reflections {
+public class ImplementsSerializable implements Serializable {
 
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 70)
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/ConcreteBase")}, name = "implementedMethod", line = 70)
-    void callAfterCastingToInterface() {
-        ((Base) new ConcreteBase()).implementedMethod();
-    }
+	public SerializableBox serializableField; //
+	
+	@EntryPoint
+	private Object writeReplace(){ //entry point via serialization
+		return this; //default implementation
+	}
+	
+	@EntryPoint
+	private void writeObject(java.io.ObjectOutputStream out) //entry point via serialization; called after writeReplace
+															 //writeReplace of serializableField called immediately after
+			throws IOException { 
+		out.defaultWriteObject();
+	}
+	
+	@EntryPoint
+	private void readObject(java.io.ObjectInputStream in) throws IOException,
+			ClassNotFoundException { //entry point via de-serialization; 
+									 //readObject of serializableField called immediately after
+		in.defaultReadObject();
+	}
 
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 77, isReflective = true)
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 78)
-    void callInstantiatedByReflection() throws InstantiationException,
-            IllegalAccessException, ClassNotFoundException {
-        Base instance = (Base) Class.forName("fixture.SimpleBase").newInstance();
-        instance.implementedMethod();
-    }
-
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 85)
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 87, isReflective = true)
-    void callMethodByReflection() throws NoSuchMethodException, SecurityException,
-            IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Base base = new SimpleBase();
-        Method method = base.getClass().getDeclaredMethod("implementedMethod");
-        method.invoke(base);
-    }
-
+	@EntryPoint
+	private Object readResolve() { // entry point via de-serialization; called after readResolve of serializableField
+		return this; //default implementation
+	}
 }

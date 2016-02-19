@@ -31,7 +31,7 @@ package callgraph.serialization.nestedClassNoNewInstances;
 import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.InvokedConstructor;
-import org.opalj.annotations.callgraph.InvokedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -59,16 +59,16 @@ public class Superclass implements Serializable {
 
 	private static final long serialVersionUID = -8714932542828113368L;
 
-	public Superclass() {
-		nestedClassValue = new NewClass(); //only instances of NewClass are created
-	}
+	public Superclass() {}
 	
 	private class OldClass implements ExtendsSerializable { //kept for backwards compatibility, no new instances can be created
 		private static final long serialVersionUID = 1L;
 
 		private OldClass() {} //entry point via de-serialization
 		
-		@InvokedConstructor(receiverType = "callgraph/nestedClassSerializable/Superclass$newClass", line = 72)
+		@InvokedConstructor(
+				receiverType = "callgraph/serialization/nestedClassNoNewInstances/Superclass$NewClass", line = 73)
+		@EntryPoint
 		private Object readResolve() { //entry point via de-serialization
 			return new NewClass(); //create instance of new version of the class instead of an instance of old version
 		}
@@ -82,11 +82,12 @@ public class Superclass implements Serializable {
 		private static final long serialVersionUID = 1L;
 
 		NewClass() {} //entry point
-		
+
+		@EntryPoint
 		public void someMethod() { //living code
 			System.out.println("Executing someMethod of NewClass.");
 		}
 	}
 	
-	private ExtendsSerializable nestedClassValue; //place where OldClass was used / NewClass is used
+	public ExtendsSerializable nestedClassValue; //place where OldClass was used / NewClass is used
 }

@@ -32,6 +32,7 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -60,7 +61,12 @@ import org.opalj.annotations.callgraph.ResolvedMethod;
  */
 public class SerializableWithReadResolve implements Serializable {
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/indirectReadResolve/ReplacementFactory") }, name = "makeReplacement", isStatic = true, line = 65)
+	private static final long serialVersionUID = -8605403644252230415L;
+
+	@CallSite(resolvedMethods = { 
+			@ResolvedMethod(receiverType = "callgraph/serialization/indirectReadResolve/ReplacementFactory") }, 
+			name = "makeReplacement", isStatic = true, line = 71)
+	@EntryPoint
 	private Object readResolve(){ //entry point via de-serialization
 		return ReplacementFactory.makeReplacement(); //returns a replacement object - indirectly
 	}

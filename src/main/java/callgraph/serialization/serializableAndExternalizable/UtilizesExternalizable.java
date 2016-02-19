@@ -58,7 +58,7 @@ import java.io.ObjectOutputStream;
 public class UtilizesExternalizable {
 
 	public SerializableAndExternalizable externalizableField;
-	
+
 	public void performSerialization() throws IOException{ //basic externalization routine
 		FileOutputStream fileOut = new FileOutputStream("/tmp/serializableField.ser");
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -66,7 +66,7 @@ public class UtilizesExternalizable {
 		out.close();
 		fileOut.close();
 	}
-	
+
 	public void performDeserialization() 
 			throws IOException, ClassNotFoundException{ //basic de-externalization routine
 		FileInputStream fileIn = new FileInputStream("/tmp/serializableField.ser");

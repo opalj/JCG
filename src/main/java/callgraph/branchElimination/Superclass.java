@@ -70,26 +70,26 @@ public class Superclass {
     }
 
     @CallSites({
-            @CallSite(name = "implementedInEachSubclass", line = 84, resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2"),
-                    @ResolvedMethod(receiverType = "callgraph/opal/algorithms/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)}),
-                    @ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}),
+            @CallSite(name = "implementedInEachSubclass", line = 84, resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/branchElimination/SubclassLevel2"),
+                    @ResolvedMethod(receiverType = "callgraph/branchElimination/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)}),
+                    @ResolvedMethod(receiverType = "callgraph/branchElimination/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}),
 
-            @CallSite(name = "implementedInEachSubclass", line = 85, resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2"),
-                    @ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}),
+            @CallSite(name = "implementedInEachSubclass", line = 85, resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/branchElimination/SubclassLevel2"),
+                    @ResolvedMethod(receiverType = "callgraph/branchElimination/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})}),
 
-            @CallSite(name = "implementedInEachSubclass", line = 86, resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2"),
-                    @ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)}),
-                    @ResolvedMethod(receiverType = "callgraph/opal/algorithms/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})})})
+            @CallSite(name = "implementedInEachSubclass", line = 86, resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/branchElimination/SubclassLevel2"),
+                    @ResolvedMethod(receiverType = "callgraph/branchElimination/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)}),
+                    @ResolvedMethod(receiverType = "callgraph/branchElimination/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)})})})
     public void callMethods() {
         getInstance().implementedInEachSubclass();
         someSubtype.implementedInEachSubclass();
         top.implementedInEachSubclass();
     }
 
-    @CallSite(name = "implementedInEachSubclass", line = 99, resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel2"),
-            @ResolvedMethod(receiverType = "callgraph/opal/algorithms/AltSubclassLevel2", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.DefaultVTA)}),
-            @ResolvedMethod(receiverType = "callgraph/opal/algorithms/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)}),
-            @ResolvedMethod(receiverType = "callgraph/opal/algorithms/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.CHA)})})
+    @CallSite(name = "implementedInEachSubclass", line = 99, resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/branchElimination/SubclassLevel2"),
+            @ResolvedMethod(receiverType = "callgraph/branchElimination/AltSubclassLevel2", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.DefaultVTA)}),
+            @ResolvedMethod(receiverType = "callgraph/branchElimination/SubclassLevel1", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.BasicVTA)}),
+            @ResolvedMethod(receiverType = "callgraph/branchElimination/Superclass", iff = {@ResolvingCondition(containedInMax = CallGraphAlgorithm.CHA)})})
     public void testInstanceOfExtVTABranchElimination() {
         Superclass field = null;
         if (getInstance() instanceof AltSubclassLevel2)

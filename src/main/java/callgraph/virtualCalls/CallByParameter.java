@@ -57,7 +57,6 @@ import callgraph.base.SimpleBase;
  * <p>
  * <p>
  * -->
- *
  * @author Marco Jacobasch
  */
 public class CallByParameter {

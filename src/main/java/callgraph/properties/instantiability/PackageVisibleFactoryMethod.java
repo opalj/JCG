@@ -26,28 +26,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.properties.isntantiability;
+package callgraph.properties.instantiability;
 
 import org.opalj.annotations.callgraph.properties.FactoryMethodKeys;
 import org.opalj.annotations.callgraph.properties.FactoryMethodProperty;
 import org.opalj.annotations.callgraph.properties.InstantiabilityProperty;
 
-
 /**
  * 
- * This class has a factory method. Native methods have to be considered as factories,
- * because we have to assume, that the native part creates an instance of this class.
+ * This class offers no factory method.
  * 
  * @author Michael Reif
- *
+ * 
  */
 @InstantiabilityProperty
-public class NativeFactoryMethod {
-
-	private NativeFactoryMethod(){
-		
+class PackageVisibleFactoryMethod {
+	
+	PackageVisibleFactoryMethod(){
+		// do weird stuff
 	}
 	
 	@FactoryMethodProperty(FactoryMethodKeys.IsFactoryMethod)
-	public static native void newInstance();
+	private static PackageVisibleFactoryMethod newInstance(){
+		return new PackageVisibleFactoryMethod();
+	}
 }

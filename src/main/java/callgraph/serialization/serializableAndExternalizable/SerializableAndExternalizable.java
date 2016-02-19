@@ -36,6 +36,7 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -65,30 +66,32 @@ public class SerializableAndExternalizable implements Serializable,
 		Externalizable {
 
 	@Override
+	@EntryPoint
 	public void readExternal(ObjectInput arg0) throws IOException,
 			ClassNotFoundException { //entry point via de-serialization
 		//no fields to read; do nothing
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, name = "deadMethod", isStatic = false, line = 75)
 	private void readObject(java.io.ObjectInputStream in) throws IOException { //dead code; superseded by readExternal
 		deadMethod();
 	}
-	
+
+	@EntryPoint
 	private Object readResolve(){ //entry point via de-serialization
 		return this; //living code; called during de-serialization after readExternal
 	}
 
+	@EntryPoint
 	private Object writeReplace(){ //entry point via serialization
 		return this; //living code; called during serialization before writeExternal
 	}
 	
 	@Override
+	@EntryPoint
 	public void writeExternal(ObjectOutput arg0) throws IOException { //entry point via serialization
 		//no fields to write; do nothing
 	}
 
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/serializableAndExternalizable/SerializableAndExternalizable") }, name = "deadMethod", isStatic = false, line = 93)
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException{ //dead code; superseded by writeExternal
 		deadMethod();
 	}

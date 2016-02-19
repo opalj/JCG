@@ -61,7 +61,7 @@ import java.io.ObjectOutputStream;
 public class UtilizesSerializable {
 
 	public ImplementsSerializable serializableField = new ImplementsSerializable(); //serializable field to be (de-)serialized
-	
+
 	public void performSerialization() throws IOException{ //basic serialization routine
 		FileOutputStream fileOut = new FileOutputStream("/tmp/serializableField.ser");
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -69,7 +69,7 @@ public class UtilizesSerializable {
 		out.close();
 		fileOut.close();
 	}
-	
+
 	public void performDeserialization() 
 			throws IOException, ClassNotFoundException{ //basic de-serialization routine
 		FileInputStream fileIn = new FileInputStream("/tmp/serializableField.ser");

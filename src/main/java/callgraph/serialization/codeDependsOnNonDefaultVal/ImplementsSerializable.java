@@ -1,5 +1,5 @@
 /* BSD 2-Clause License:
- * Copyright (c) 2009 - 2014
+ * Copyright (c) 2009 - 2015
  * Software Technology Group
  * Department of Computer Science
  * Technische Universität Darmstadt
@@ -13,7 +13,7 @@
  *  - Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -22,69 +22,67 @@
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.reflections;
+package callgraph.serialization.codeDependsOnNonDefaultVal;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.InvokedConstructor;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-
-import callgraph.base.Base;
-import callgraph.base.ConcreteBase;
-import callgraph.base.SimpleBase;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
  * created class is subsequently used by several tests.
- * <p>
+ * 
+ * Serializable class with a private method called in readObject during de-serialization. 
+ * The call is only executed if the integer field of the class is at any value other than 
+ * the default set in the field declaration. However the field is always set to the data 
+ * types default value at the point the call is made.
+ * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * <p>
+ * 
  * <!--
- * <p>
- * <p>
- * <p>
- * <p>
+ * 
+ * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * <p>
- * <p>
+ * 
+ * 
  * -->
- *
- * @author Marco Jacobasch
+ * 
+ * @author Roberts Kolosovs
  */
-public class Reflections {
+public class ImplementsSerializable implements Serializable {
 
-    @InvokedConstructor(receiverType = "callgraph/base/ConcreteBase", line = 70)
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/ConcreteBase")}, name = "implementedMethod", line = 70)
-    void callAfterCastingToInterface() {
-        ((Base) new ConcreteBase()).implementedMethod();
-    }
-
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 77, isReflective = true)
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 78)
-    void callInstantiatedByReflection() throws InstantiationException,
-            IllegalAccessException, ClassNotFoundException {
-        Base instance = (Base) Class.forName("fixture.SimpleBase").newInstance();
-        instance.implementedMethod();
-    }
-
-    @InvokedConstructor(receiverType = "callgraph/base/SimpleBase", line = 85)
-    @CallSite(resolvedMethods = {@ResolvedMethod(receiverType = "callgraph/base/SimpleBase")}, name = "implementedMethod", line = 87, isReflective = true)
-    void callMethodByReflection() throws NoSuchMethodException, SecurityException,
-            IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Base base = new SimpleBase();
-        Method method = base.getClass().getDeclaredMethod("implementedMethod");
-        method.invoke(base);
-    }
-
+	private int number = 42; //a field always set to 42 per default
+	
+	public ImplementsSerializable(){
+		number = 42; //doesn't matter what the field starts at 42
+	}
+	
+	@CallSite(resolvedMethods = 
+		{ @ResolvedMethod(receiverType = "callgraph/serialization/codeDependsOnNonDefaultVal/ImplementsSerializable") }, 
+		name = "deadCode", isStatic = false, line = 78)
+	@EntryPoint
+	private void readObject(java.io.ObjectInputStream in) throws Exception{ //entry point via de-serialization
+		if(number != 42){ //number always == 0 immediately after de-serialization 
+			throw new Exception();
+		}
+		in.defaultReadObject(); //default implementation
+		deadCode(); //call never executed
+	}
+	
+	private Object readResolve(){ //no entry point; readObject terminates de-serialization with an exception
+		return this; //default implementation
+	}
+	
+	private void deadCode(){ //dead code; calling method terminated by an exception before call
+		System.out.println("I feel dead inside.");
+	}
 }

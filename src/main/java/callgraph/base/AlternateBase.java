@@ -49,7 +49,6 @@ import org.opalj.annotations.callgraph.ResolvedMethod;
  * 
  * 
  * 
- * 
  * -->
  * 
  * @author Marco Jacobasch

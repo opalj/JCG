@@ -66,7 +66,7 @@ public class ExecutionClass {
         }
     }
 
-    @CallSite(name = "interfaceMethod", line = 72, resolvedMethods = {
+    @CallSite(name = "interfaceMethod", line = 73, resolvedMethods = {
             @ResolvedMethod(receiverType = "callgraph/highPrecision/ExecutionClass$InnerClass"),
             @ResolvedMethod(receiverType = "callgraph/highPrecision/ConcreteClass", iff = {@ResolvingCondition(containedInMax = BasicVTA)})})
     public void testInnerClass() {

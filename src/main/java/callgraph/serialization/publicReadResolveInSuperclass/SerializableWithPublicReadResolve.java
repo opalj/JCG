@@ -34,8 +34,7 @@ import java.io.Serializable;
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.InvokedConstructor;
 import org.opalj.annotations.callgraph.ResolvedMethod;
-
-import callgraph.serialization.publicWriteReplaceInSuperclass.SerializableWithPublicWriteReplace;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -75,23 +74,26 @@ public class SerializableWithPublicReadResolve implements Serializable {
 		label = arg;
 	}
 
+	@EntryPoint
 	private Object writeReplace(){ //entry point via serialization
 		return this; //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 85)
+	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization
 		in.defaultReadObject(); //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 91)
+	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization
 		out.defaultWriteObject(); //default implementation
 	}
 	
-    @InvokedConstructor(receiverType = "callgraph/publicReadResolveInSuperclass/SerializableWithPublicReadResolve", line = 97)
+    @InvokedConstructor(
+    		receiverType = "callgraph/serialization/publicReadResolveInSuperclass/SerializableWithPublicReadResolve", line = 99)
+	@EntryPoint
 	public Object readResolve(){ //entry point via de-serialization;
 								 //called when a subclass attempts de-serialization
 		return new SerializableWithPublicReadResolve("replaced " + label); //modifies the label to trace the event of replacement object

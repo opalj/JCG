@@ -26,21 +26,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.serialization.nonSerializableField;
+package callgraph.serialization.externalizableInvalidConstructor;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-import org.opalj.annotations.callgraph.CallSite;
-import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.AccessedField;
 import org.opalj.annotations.callgraph.properties.EntryPoint;
+
+import callgraph.serialization.extPrivateNoArgsConstructorSuperclass.ExternalizableSubclass;
 
 /**
  * This class was used to create a class file with some well defined attributes.
  * The created class is subsequently used by several tests.
  * 
- * Serializable class with a non-serializable field. As writeObject and readObject use the default 
- * implementation, all serialization and de-serialization attempts result in an error.
+ * An invalid externalizable class. Requires a public no-args constructor to perform de-externalization.
  * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -60,31 +62,29 @@ import org.opalj.annotations.callgraph.properties.EntryPoint;
  * 
  * @author Roberts Kolosovs
  */
-public class SerializableWithNonSerializableField implements Serializable {
+public class InvalidExternalizable implements Externalizable {
 
-	private static final long serialVersionUID = -6141317929433778662L;
+	public String label; //a field to make a some args constructor plausible
 	
-	public StringBox label; //field with non-serializable type (StringBox)
-
-	@EntryPoint
-	private Object writeReplace(){ //entry point via serialization
-		return this; //default implementation
-	}
+	private InvalidExternalizable(){} //must be public for the external class to be valid
 	
-	@EntryPoint
-	private void writeObject(java.io.ObjectOutputStream out) 
-			throws IOException{ //entry point via serialization;
-		out.defaultWriteObject(); //default implementation; results in java.io.NotSerializableException
-	}
-
-	private Object readResolve(){ //no entry point; 
-								  //de-serialization attempts result in java.io.WriteAbortedException
-		return this; //default implementation
+	public InvalidExternalizable(String arg){ //public constructor setting the field
+		label = arg;
 	}
 	
+	@Override
 	@EntryPoint
-	private void readObject(java.io.ObjectInputStream in) 
-			throws ClassNotFoundException, IOException{ //entry point via de-serialization;
-		in.defaultReadObject(); //default implementation; results in java.io.WriteAbortedException
+	@AccessedField(declaringType = InvalidExternalizable.class, 
+		fieldType = String.class, name = "label", line = 80)
+	public void writeExternal(ObjectOutput out) throws IOException { //entry point via externalization
+		out.writeUTF(label); //default implementation
 	}
+
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException { //no entry point; 
+									 //de-externalization results in InvalidClassException due to no valid constructor
+		label = in.readUTF(); //default implementation
+	}
+
 }

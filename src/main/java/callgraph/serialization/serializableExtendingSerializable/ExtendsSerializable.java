@@ -29,9 +29,11 @@
 package callgraph.serialization.serializableExtendingSerializable;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes.
@@ -58,7 +60,7 @@ import org.opalj.annotations.callgraph.ResolvedMethod;
  * 
  * @author Roberts Kolosovs
  */
-public class ExtendsSerializable extends ImplementsSerializable {
+public class ExtendsSerializable extends ImplementsSerializable implements Serializable {
 
 	private static final long serialVersionUID = -1253588232410042631L;
 
@@ -66,14 +68,14 @@ public class ExtendsSerializable extends ImplementsSerializable {
 		super(null);
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 73)
+	@EntryPoint
 	private void readObject(java.io.ObjectInputStream in) 
 			throws ClassNotFoundException, IOException{ //entry point via de-serialization; 
 														//called after readObject of superclass
 		in.defaultReadObject(); //default implementation
 	}
 	
-	@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectOutputStream") }, name = "defaultWriteObject", isStatic = false, line = 80)
+	@EntryPoint
 	private void writeObject(java.io.ObjectOutputStream out) 
 			throws IOException{ //entry point via serialization
 								//called after writeObject of superclass

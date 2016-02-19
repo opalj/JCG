@@ -33,6 +33,7 @@ import java.io.Serializable;
 
 import org.opalj.annotations.callgraph.CallSite;
 import org.opalj.annotations.callgraph.ResolvedMethod;
+import org.opalj.annotations.callgraph.properties.EntryPoint;
 
 /**
  * This class was used to create a class file with some well defined attributes. The
@@ -66,13 +67,16 @@ public class Superclass implements Serializable {
 	private class ClassWithTransientField{ 
 		transient int transientField; //transient field; value not saved during serialization
 		
-		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "java/io/ObjectInputStream") }, name = "defaultReadObject", isStatic = false, line = 72)
+		@EntryPoint
 		private void readObject(java.io.ObjectInputStream in) //entry point via de-serialization 
 				throws IOException, ClassNotFoundException{
 			in.defaultReadObject(); //transientField is restored to its default value (0 for int)
 		}
 		
-		@CallSite(resolvedMethods = { @ResolvedMethod(receiverType = "callgraph/transientSerializable/Superclass$ClassWithTransientField") }, name = "deadMethod", isStatic = false, line = 78)
+		@CallSite(resolvedMethods = { 
+				@ResolvedMethod(receiverType = "callgraph/serialization/transientField/Superclass$ClassWithTransientField") }, 
+				name = "deadMethod", isStatic = false, line = 82)
+		@EntryPoint
 		private Object readResolve(){ //entry point via de-serialization, called after readObject
 			if(transientField != 0){ //always false; transientField is always 0 after de-serialization
 				deadMethod(); //dead code; branch never taken

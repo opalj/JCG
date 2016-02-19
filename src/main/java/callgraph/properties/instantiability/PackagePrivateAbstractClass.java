@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package callgraph.properties.isntantiability;
+package callgraph.properties.instantiability;
 
 import org.opalj.annotations.callgraph.properties.InstantiabilityKeys;
 import org.opalj.annotations.callgraph.properties.InstantiabilityProperty;
