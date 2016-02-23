@@ -56,13 +56,13 @@ import static annotations.documentation.CGCategory.*;
  *
  *
  *
- *
  * <--
  * @author Michael Eichberg
  * @author Michael Reif
  */
 public class Map<K, V> {
 
+    public static final String MapReceiverType = "expressions/Map";
     public static final String linkedEntryRecieverType = "expressions/Map$LinkedEntry";
 
     @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.")
@@ -120,7 +120,7 @@ public class Map<K, V> {
             boolean found = false;
 
             LinkedEntry cur = root;
-            while (cur != null) {
+            while (cur != null && !found) {
                 if (cur.key.equals(k)) {
                     cur.value = v;
                     found = true;
@@ -136,19 +136,20 @@ public class Map<K, V> {
         }
     }
 
+    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)}, line = 141)
     public String toString() {
-        String output = "Map(";
+        return "Map(" + contentAsString(root) + ")";
+    }
 
-        LinkedEntry cur = root;
-        while (cur != null) {
-            output += cur.toString();
-            if(cur != last)
-                output += ",";
+    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 152)
+    private String contentAsString(LinkedEntry entry){
+        if(entry == null)
+            return "";
 
-            cur = cur.getNextEntry();
-        }
-
-        return output + ")";
+        if(entry.nextEntry == null)
+            return entry.toString();
+        else
+            return entry.toString() + ", " + contentAsString(entry.nextEntry);
     }
 
     public V get(K name) {

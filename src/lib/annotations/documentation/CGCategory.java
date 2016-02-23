@@ -8,6 +8,8 @@ public enum CGCategory {
     /**
      * Scenarios:
      *  - polymorphic unless the generic type parameters are taken into account..
+     *  - polymorphic unless the concrete type is known..
+     *  - truly polymorphic call, the call graph algorithm doesn't matter
      */
     POLYMORPHIC_CALL,
 

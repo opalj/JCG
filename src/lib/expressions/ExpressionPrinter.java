@@ -92,5 +92,4 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
     public synchronized static void printExpression(Expression e) {
         System.out.print(e.accept(instance));
     }
-
 }
