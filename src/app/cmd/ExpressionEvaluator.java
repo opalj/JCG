@@ -178,7 +178,7 @@ public class ExpressionEvaluator {
                 throw new IllegalArgumentException("the expression is not valid missing operator");
             }
 
-            System.out.println("result " + values.pop().getValue());
+            System.out.println("result " + values.pop().getValue() + " with environment " + NO_VARIABLES.toString());
         }
     }
 

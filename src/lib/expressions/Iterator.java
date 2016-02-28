@@ -33,7 +33,7 @@ package expressions;
 /**
  * Simple iterator interface.
  *
- * Michael Reif
+ * @author Michael Reif
  */
 public interface Iterator<T> {
 

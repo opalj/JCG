@@ -141,19 +141,25 @@ public class Map<K, V> {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 152)
+    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 154)
+    @CallSite(name = "next", resolvedMethods = {
+            @ResolvedMethod(receiverType = MapIterator.FQN),
+            @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
+    line = 154)
+    @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
     private String contentAsString(LinkedEntry entry){
-        if(entry == null)
-            return "";
+        StringBuffer sb = new StringBuffer();
+        Iterator itr = this.iterator();
+        while(itr.hasNext()){
+            sb.append(itr.next().toString());
+            if(itr.hasNext())
+                sb.append(", ");
+        }
 
-        if(entry.nextEntry == null)
-            return entry.toString();
-        else
-            return entry.toString() + ", " + contentAsString(entry.nextEntry);
+        return sb.toString();
     }
 
     public V get(K name) {
-
         LinkedEntry cur = root;
         while(cur != null){
             if(cur.key.equals(name))
@@ -165,11 +171,13 @@ public class Map<K, V> {
         return null;
     }
 
-    public Iterator<LinkedEntry> iterator(){
+    public Iterator iterator(){
         return new MapIterator(root);
     }
 
-    class MapIterator implements Iterator<LinkedEntry>{
+    private class MapIterator implements Iterator<LinkedEntry>{
+
+        private static final String FQN = "expressions/Map$MapIterator";
 
         private LinkedEntry cur;
 
@@ -179,18 +187,19 @@ public class Map<K, V> {
 
         @Override
         public boolean hasNext() {
-            return cur.nextEntry != null;
+            return cur != null;
         }
 
         @Override
         public LinkedEntry next() {
+            LinkedEntry next = cur;
             cur = cur.getNextEntry();
-            return cur;
+            return next;
         }
 
         @Override
         public void remove() throws UnsupportedOperationException {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("This iterator does not support a remove operation.");
         }
     }
 }

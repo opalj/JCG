@@ -102,6 +102,7 @@ public class Stack<V> {
 
     class StackIterator implements Iterator<V>{
 
+        public static final String FQN = "expressions/Stack$StackIterator";
         private V[] data;
         private int cur = 0;
 
