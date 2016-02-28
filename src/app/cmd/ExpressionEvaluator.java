@@ -80,7 +80,6 @@ import static expressions.PlusOperator.AddExpression;
  * <p>
  * <p>
  * <p>
- * <p>
  * -->
  *
  * @author Michael Eichberg
@@ -102,6 +101,7 @@ public class ExpressionEvaluator {
             resolvedMethods = {@ResolvedMethod(receiverType = BinaryExpression.FQN)},
             parameterTypes = {String.class, Expression.class, Expression.class},
             line = 167)
+    @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = UnaryExpression.FQN)}, line = 163)
     public static void main(final String[] args) {
 
         String[] expressions = args.clone();
@@ -110,7 +110,7 @@ public class ExpressionEvaluator {
 
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method <Thread>.dispatchUncaughtException is not dead")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 109)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 116)
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 CALLBACK.callback();
@@ -124,7 +124,7 @@ public class ExpressionEvaluator {
             // This is an entry point!
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method<Thread>.run is called by the jvm")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 122)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 130)
             @Override
             public void run() {
                 CALLBACK.callback();
@@ -187,7 +187,7 @@ public class ExpressionEvaluator {
      * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 176)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 192)
     public String toString() {
         CALLBACK.callback();
         return "ExpressionEvaluater v0.1";

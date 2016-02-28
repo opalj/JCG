@@ -30,12 +30,14 @@
 
 package expressions.java8_expressions;
 
-import annotations.callgraph.CallSite;
+import annotations.callgraph.*;
 import annotations.documentation.CGNote;
 import expressions.*;
+import fancy_expressions.MultOperator;
 
 import java.lang.reflect.Constructor;
 
+import static annotations.callgraph.CallGraphAlgorithm.CHA;
 import static annotations.documentation.CGCategory.REFLECTION;
 import static expressions.java8_expressions.UnaryOperator.IDENTITY;
 
@@ -76,17 +78,18 @@ public abstract class UnaryExpression implements Expression {
 
     public abstract java.util.function.UnaryOperator<Constant> operator();
 
-    public UnaryExpression(Expression expr) {
-        this.expr = expr;
-    }
-
-    public Constant eval(Map<String, Constant> values) {
-        return operator().apply(expr.eval(values));
-    }
-
     @CGNote(value = REFLECTION, description = "The first reflective String can be varied by an enumeration but all possible call targets can be found.")
+    @CallSite(name = "<init>", parameterTypes = {Expression.class},
+            resolvedMethods = {
+                    @ResolvedMethod(receiverType = IdentityExpression.FQN),
+                    @ResolvedMethod(receiverType = IncrementExpression.FQN)},
+            resolution = TargetResolution.REFLECTIVE,
+            line = 100)
     @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
-//    @CallSite(name = "<init>", resolvedMethods = )
+    @CallSite(name = "<init>", parameterTypes = {Expression.class},
+            resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
+            resolution = TargetResolution.REFLECTIVE,
+            line = 106)
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
             final Expression expr) {
@@ -108,5 +111,20 @@ public abstract class UnaryExpression implements Expression {
         }
 
         return uExpr;
+    }
+
+    public UnaryExpression(Expression expr) {
+        this.expr = expr;
+    }
+
+    @CallSite(name = "eval", returnType = Constant.class, parameterTypes = Map.class,
+    resolvedMethods = {
+            @ResolvedMethod(receiverType = UnaryExpression.FQN),
+            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
+            @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
+            @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
+    }, line = 128)
+    public Constant eval(Map<String, Constant> values) {
+        return operator().apply(expr.eval(values));
     }
 }

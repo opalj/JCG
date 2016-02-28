@@ -44,6 +44,10 @@ public enum CGCategory {
 
     ARRAY_HANDLING,
 
+    /**
+     * Scenarios:
+     *  - call a static method of another class
+     */
     STATIC_INITIALIZERS,
 
     /**
