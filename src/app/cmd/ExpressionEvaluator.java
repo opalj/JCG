@@ -44,12 +44,12 @@ import static annotations.callgraph.AnalysisMode.*;
 
 import expressions.*;
 import expressions.java8_expressions.UnaryExpression;
-import expressions.java8_expressions.UnaryOperator;
 
 import java.util.Arrays;
 
 import static expressions.BinaryExpression.createBinaryExpression;
 import static expressions.PlusOperator.AddExpression;
+import static testutils.CallbackTest.callback;
 
 /**
  * This class defines an application use case of the expression library and has some well defined properties
@@ -110,10 +110,10 @@ public class ExpressionEvaluator {
 
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method <Thread>.dispatchUncaughtException is not dead")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 116)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "testutils/CallbackTest")}, line = 116)
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                CALLBACK.callback();
+                callback();
                 String msg = "unexpected error while processing " + Arrays.deepToString(args);
                 System.out.println(msg);
             }
@@ -124,10 +124,10 @@ public class ExpressionEvaluator {
             // This is an entry point!
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method<Thread>.run is called by the jvm")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 130)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "testutils/CallbackTest")}, line = 130)
             @Override
             public void run() {
-                CALLBACK.callback();
+                callback();
                 System.out.println("It was a pleasure to evaluate your expression!");
                 super.run();
             }
@@ -187,16 +187,9 @@ public class ExpressionEvaluator {
      * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 192)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "testutils/CallbackTest")}, line = 192)
     public String toString() {
-        CALLBACK.callback();
+        callback();
         return "ExpressionEvaluater v0.1";
-    }
-
-    /*
-     * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
-     */
-    private static class CALLBACK {
-        static void callback() {/* do nothing*/}
     }
 }
