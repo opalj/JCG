@@ -28,18 +28,19 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package expressions.java8_expressions;
 
-import static annotations.documentation.CGCategory.STATIC_INITIALIZERS;
-
+import annotations.documentation.CGCategory;
 import annotations.documentation.CGNote;
-import expressions.java8_expressions.IncrementExpression;
-import expressions.java8_expressions.UnaryExpression;
+import expressions.Constant;
+import expressions.Expression;
+import expressions.ExpressionVisitor;
+
+import java.util.function.UnaryOperator;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * A IncrementExpression represents an unary operation that increments a constant.
+ *
  * <p>
  * <!--
  * <b>NOTE</b><br>
@@ -62,41 +63,30 @@ import expressions.java8_expressions.UnaryExpression;
  * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
  */
-public final class ExpressionPrinter extends ExpressionVisitor<String> {
+public class IncrementExpression extends UnaryExpression {
 
-    @CGNote(value = STATIC_INITIALIZERS,
-            description = "static initializers are called by the jvm;" +
-                    " called when the class is somehow referenced the first time." +
-                    "I.e. invoking a constructor of a subclass or calling a static method.")
-    private static ExpressionPrinter instance;
+    public static final String FQN = "expressions/java8_expressions/IncrementExpression";
+    private Expression expr;
 
-    static {
-        instance = new ExpressionPrinter();
+    @CGNote(value = CGCategory.INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
+    public UnaryOperator<Constant> operator() {
+        return (Constant constant) -> new Constant(constant.getValue() + 1);
     }
 
-    private ExpressionPrinter() {
+    public IncrementExpression(Expression expr) {
+        super(expr);
     }
 
-    public String visit(Constant c) {
-        return String.valueOf(c.getValue());
+
+
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return null;
     }
 
-    public String visit(Variable v) {
-        return v.name;
-    }
-
-    public String visit(BinaryExpression b) {
-        return "(" + b.left().toString() + b.operator().toString() + b.right().toString() + ")";
-    }
-
-    public String visit(UnaryExpression u) {
-        return u.toString();
-    }
-
-    public synchronized static void printExpression(Expression e) {
-        System.out.print(e.accept(instance));
+    public String toString(){
+        return "Inc("+expr.toString() + ")";
     }
 }

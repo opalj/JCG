@@ -28,18 +28,18 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package expressions.java8_expressions;
 
-import static annotations.documentation.CGCategory.STATIC_INITIALIZERS;
+import expressions.Constant;
+import expressions.Expression;
+import expressions.ExpressionVisitor;
 
-import annotations.documentation.CGNote;
-import expressions.java8_expressions.IncrementExpression;
-import expressions.java8_expressions.UnaryExpression;
+import java.util.function.UnaryOperator;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * An unary expression which represents the identity function. Hence, the encapsulated expression
+ * is mapped to itself.
+ *
  * <p>
  * <!--
  * <b>NOTE</b><br>
@@ -62,41 +62,22 @@ import expressions.java8_expressions.UnaryExpression;
  * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
  */
-public final class ExpressionPrinter extends ExpressionVisitor<String> {
+public class IdentityExpression extends UnaryExpression {
 
-    @CGNote(value = STATIC_INITIALIZERS,
-            description = "static initializers are called by the jvm;" +
-                    " called when the class is somehow referenced the first time." +
-                    "I.e. invoking a constructor of a subclass or calling a static method.")
-    private static ExpressionPrinter instance;
+    public static final String FQN = "expressions/java8_expressions/IdentityExpression";
 
-    static {
-        instance = new ExpressionPrinter();
+    public IdentityExpression(Expression expr){
+        super(expr);
     }
 
-    private ExpressionPrinter() {
+    public UnaryOperator<Constant> operator() {
+        return (Constant c) -> c;
     }
 
-    public String visit(Constant c) {
-        return String.valueOf(c.getValue());
-    }
-
-    public String visit(Variable v) {
-        return v.name;
-    }
-
-    public String visit(BinaryExpression b) {
-        return "(" + b.left().toString() + b.operator().toString() + b.right().toString() + ")";
-    }
-
-    public String visit(UnaryExpression u) {
-        return u.toString();
-    }
-
-    public synchronized static void printExpression(Expression e) {
-        System.out.print(e.accept(instance));
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

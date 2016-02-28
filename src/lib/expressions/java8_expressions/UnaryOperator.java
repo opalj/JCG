@@ -28,50 +28,23 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
-
-import expressions.java8_expressions.UnaryExpression;
+package expressions.java8_expressions;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
  *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- *
- *
- *
- *
- *
- *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- * -->
- *
- * @author Michael Eichberg
- * @author Micahel Reif
+ * @author  Michael Reif
  */
-public abstract class ExpressionVisitor<T> {
+public enum UnaryOperator {
 
-    static {
-System.out.println("Expression Visitor Version 1.00.00.00");
-        }
+    INCREMENT(IncrementExpression.class.getName());
 
-public abstract T visit(Constant c);
+    private String name;
 
-public abstract T visit(Variable v);
+    /* private */ UnaryOperator(String name){
+        this.name = name;
+    }
 
-public abstract T visit(BinaryExpression b);
-
-    public abstract T visit(UnaryExpression b);
-        }
+    public String toString(){
+        return this.name;
+    }
+}

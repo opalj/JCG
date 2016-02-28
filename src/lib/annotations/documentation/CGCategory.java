@@ -20,6 +20,13 @@ public enum CGCategory {
 
     INVOKEDYNAMIC,
 
+    /**
+     * Scenarios:
+     *  - class instantiation by a statically known and unique receiver type
+     *  - class instantiation by a fixed set of statically known receiver types
+     *  - class instantiation by a(n over method boundaries) composed string.
+     *  - method invocation of a statically known method. (class also has been instantiated over reflection)
+     */
     REFLECTION,
 
     SERIALIZABILITY,
