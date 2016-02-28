@@ -95,4 +95,8 @@ public class IdentityExpression extends UnaryExpression {
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
+    public String toString(){
+        return "Id("+expr.toString()+")";
+    }
 }

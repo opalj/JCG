@@ -74,7 +74,7 @@ public abstract class UnaryExpression implements Expression {
 
     public static final String FQN = "expressions/java8_expressions/UnaryExpression";
 
-    private Expression expr;
+    protected Expression expr;
 
     public abstract java.util.function.UnaryOperator<Constant> operator();
 
@@ -117,13 +117,15 @@ public abstract class UnaryExpression implements Expression {
         this.expr = expr;
     }
 
+    public abstract String toString();
+
     @CallSite(name = "eval", returnType = Constant.class, parameterTypes = Map.class,
     resolvedMethods = {
             @ResolvedMethod(receiverType = UnaryExpression.FQN),
             @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
             @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
             @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
-    }, line = 128)
+    }, line = 130)
     public Constant eval(Map<String, Constant> values) {
         return operator().apply(expr.eval(values));
     }

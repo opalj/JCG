@@ -30,13 +30,18 @@
 
 package expressions.java8_expressions;
 
-import annotations.documentation.CGCategory;
+import annotations.callgraph.CallGraphAlgorithm;
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
+import annotations.callgraph.ResolvingCondition;
 import annotations.documentation.CGNote;
-import expressions.Constant;
-import expressions.Expression;
-import expressions.ExpressionVisitor;
+import expressions.*;
+import fancy_expressions.MultOperator;
 
 import java.util.function.UnaryOperator;
+
+import static annotations.callgraph.CallGraphAlgorithm.CHA;
+import static annotations.documentation.CGCategory.INVOKEDYNAMIC;
 
 /**
  * A IncrementExpression represents an unary operation that increments a constant.
@@ -68,9 +73,8 @@ import java.util.function.UnaryOperator;
 public class IncrementExpression extends UnaryExpression {
 
     public static final String FQN = "expressions/java8_expressions/IncrementExpression";
-    private Expression expr;
 
-    @CGNote(value = CGCategory.INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
+    @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
     public UnaryOperator<Constant> operator() {
         return (Constant constant) -> new Constant(constant.getValue() + 1);
     }
@@ -79,14 +83,18 @@ public class IncrementExpression extends UnaryExpression {
         super(expr);
     }
 
-
-
-    @Override
     public <T> T accept(ExpressionVisitor<T> visitor) {
-        return null;
+        return visitor.visit(this);
     }
 
+    @CallSite(name= "toString", resolvedMethods = {
+            @ResolvedMethod(receiverType = IncrementExpression.FQN),
+            @ResolvedMethod(receiverType = IdentityExpression.FQN),
+            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
+            @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
+            @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)
+    }, line = 98)
     public String toString(){
-        return "Inc("+expr.toString() + ")";
+        return "Inc("+ expr.toString() + ")";
     }
 }
