@@ -56,6 +56,7 @@ import static expressions.java8_expressions.UnaryOperator.IDENTITY;
  * <p>
  * <p>
  * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
@@ -82,14 +83,15 @@ public abstract class UnaryExpression implements Expression {
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = {
                     @ResolvedMethod(receiverType = IdentityExpression.FQN),
+                    @ResolvedMethod(receiverType = DecrementExpression.FQN),
                     @ResolvedMethod(receiverType = IncrementExpression.FQN)},
             resolution = TargetResolution.REFLECTIVE,
-            line = 100)
+            line = 102)
     @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
             resolution = TargetResolution.REFLECTIVE,
-            line = 106)
+            line = 108)
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
             final Expression expr) {
@@ -125,7 +127,13 @@ public abstract class UnaryExpression implements Expression {
             @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
             @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
             @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
-    }, line = 130)
+    }, line = 138)
+    @CallSite(name = "apply", returnType = Constant.class, parameterTypes = Constant.class,
+            resolvedMethods = {
+                    @ResolvedMethod(receiverType = "java/util/function/UnaryOperator"),
+                    @ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
+                    @ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(mode = {AnalysisMode.CPA, AnalysisMode.OPA}))
+            }, line = 138)
     public Constant eval(Map<String, Constant> values) {
         return operator().apply(expr.eval(values));
     }

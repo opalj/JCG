@@ -32,13 +32,15 @@ package expressions.java8_expressions;
 
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
-import annotations.properties.CallabilityProperty;
+import annotations.documentation.CGNote;
 import expressions.Constant;
 import expressions.Expression;
 import expressions.ExpressionVisitor;
 import testutils.StaticInitializerTest;
 
 import java.util.function.UnaryOperator;
+
+import static annotations.documentation.CGCategory.NOTE;
 
 /**
  * An unary expression which represents the identity function. Hence, the encapsulated expression
@@ -74,10 +76,12 @@ public class IdentityExpression extends UnaryExpression {
 
     private static /* final */ UnaryOperator<Constant> _IDENTITY;
 
-    @CallSite(name = "staticCall", resolvedMethods = {@ResolvedMethod(receiverType = StaticInitializerTest.FQN)}, isStatic = true, line = 79)
+    @CallSite(name = "staticCall", resolvedMethods = {@ResolvedMethod(receiverType = StaticInitializerTest.FQN)}, isStatic = true, line = 83)
+    @CGNote(value = NOTE, description = "The call on UnaryOperator is a call on an interface default method.")
+    @CallSite(name = "identity", resolvedMethods = @ResolvedMethod(receiverType = "java/util/function/UnaryOperator"), isStatic = true, line = 84)
     private static void clinit(){
         StaticInitializerTest.staticCall();
-        _IDENTITY = (Constant c) -> c;
+        _IDENTITY = UnaryOperator.identity();
     }
 
     static {

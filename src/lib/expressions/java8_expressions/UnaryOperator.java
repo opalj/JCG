@@ -41,6 +41,7 @@ import static annotations.documentation.CGCategory.NOTE;
 public enum UnaryOperator {
 
     INCREMENT(IncrementExpression.class.getName()),
+    DECREMENT(DecrementExpression.class.getName()),
     IDENTITY(IdentityExpression.class.getName()),
 
     @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")

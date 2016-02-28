@@ -30,21 +30,21 @@
 
 package expressions.java8_expressions;
 
-import annotations.callgraph.CallGraphAlgorithm;
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
-import annotations.callgraph.ResolvingCondition;
+import annotations.documentation.CGCategory;
 import annotations.documentation.CGNote;
-import expressions.*;
-import fancy_expressions.MultOperator;
+import expressions.Constant;
+import expressions.Expression;
+import expressions.ExpressionVisitor;
 
+import java.util.function.*;
 import java.util.function.UnaryOperator;
 
-import static annotations.callgraph.CallGraphAlgorithm.CHA;
-import static annotations.documentation.CGCategory.INVOKEDYNAMIC;
+import static annotations.documentation.CGCategory.NOTE;
 
 /**
- * A IncrementExpression represents an unary operation that increments a constant.
+ * An unary expression which represents the decrement function.
+ *
+ * THIS CLASS IS INTENTIONALLY UNUSED WITHIN THE APPLICATION SCENARIO. (CLASS IS NEVER INSTANTIATED)
  *
  * <p>
  * <!--
@@ -70,32 +70,42 @@ import static annotations.documentation.CGCategory.INVOKEDYNAMIC;
  *
  * @author Micahel Reif
  */
-public class IncrementExpression extends UnaryExpression {
+public class DecrementExpression extends UnaryExpression {
 
-    public static final String FQN = "expressions/java8_expressions/IncrementExpression";
-
-    @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
-    @CallSite(name="apply", resolvedMethods = @ResolvedMethod(receiverType = "java/util/funciton/UnaryOperator"), line = 80)
-    public UnaryOperator<Constant> operator() {
-        return (Constant constant) -> new Constant(constant.getValue() + 1);
+    public DecrementExpression(Expression expr){
+        super(expr);
     }
 
-    public IncrementExpression(Expression expr) {
-        super(expr);
+    @CGNote(value = NOTE, description = "")
+    public UnaryOperator<Constant> operator() { return DecrementOperator.newInstance(); }
+
+    public String toString() {
+        return "Dec("+expr.toString()+")";
     }
 
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @CallSite(name= "toString", resolvedMethods = {
-            @ResolvedMethod(receiverType = IncrementExpression.FQN),
-            @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-            @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-            @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)
-    }, line = 99)
-    public String toString(){
-        return "Inc("+ expr.toString() + ")";
+    static class DecrementOperator implements UnaryOperator<Constant>{
+
+        public static final String FQN = "expressions/java8_expressions/DecrementExpression/DecrementOperator";
+
+        private static DecrementOperator _INSTANCE;
+
+        private DecrementOperator(){
+        }
+
+        public static DecrementOperator newInstance() {
+           if(_INSTANCE == null){
+               _INSTANCE = new DecrementOperator();
+           }
+
+            return _INSTANCE;
+        }
+        
+        public Constant apply(Constant constant) {
+            return new Constant(constant.getValue() - 1);
+        }
     }
 }
