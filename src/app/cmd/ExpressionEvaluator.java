@@ -30,6 +30,8 @@
 package cmd;
 
 import static annotations.documentation.CGCategory.*;
+import static expressions.java8_expressions.UnaryOperator.EXCEPTION;
+import static expressions.java8_expressions.UnaryOperator.INCREMENT;
 import static java.lang.Integer.parseInt;
 
 import annotations.callgraph.CallSite;
@@ -37,8 +39,12 @@ import annotations.callgraph.InvokedConstructor;
 import annotations.callgraph.ResolvedMethod;
 import annotations.documentation.CGNote;
 import annotations.properties.EntryPoint;
+
 import static annotations.callgraph.AnalysisMode.*;
+
 import expressions.*;
+import expressions.java8_expressions.UnaryExpression;
+import expressions.java8_expressions.UnaryOperator;
 
 import java.util.Arrays;
 
@@ -49,7 +55,7 @@ import static expressions.PlusOperator.AddExpression;
  * This class defines an application use case of the expression library and has some well defined properties
  * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
  * a given call graph implementation can handle these features.
- *
+ * <p>
  * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -60,17 +66,17 @@ import static expressions.PlusOperator.AddExpression;
  * <p>
  * <p>
  * <p>
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * <p>
  * <p>
  * <p>
@@ -82,43 +88,45 @@ import static expressions.PlusOperator.AddExpression;
  */
 public class ExpressionEvaluator {
 
-    private static final Map<String,Constant> NO_VARIABLES = (Map<String,Constant>)Map.EMPTY;
+    private static final Map<String, Constant> NO_VARIABLES = (Map<String, Constant>) Map.EMPTY;
 
     // 2 34 + 23 Plus == 59
+    //20 20 + 1 Plus ++ Id == 42
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructor(receiverType = "expressions/Stack", line = 140)
-    @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/String")}, line = 101)
-    @CallSite(name = "push", resolvedMethods = {@ResolvedMethod(receiverType = "expressions/Stack")}, line = 148)
+    @InvokedConstructor(receiverType = "expressions/Stack", line = 148)
+    @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/Object")}, line = 107)
+    @CallSite(name = "push", resolvedMethods = {@ResolvedMethod(receiverType = "expressions/Stack")}, line = 152)
     @CallSite(name = "createBinaryExpression",
-            resolvedMethods = {@ResolvedMethod( receiverType = BinaryExpression.FQN)},
+            resolvedMethods = {@ResolvedMethod(receiverType = BinaryExpression.FQN)},
             parameterTypes = {String.class, Expression.class, Expression.class},
-            line = 151)
+            line = 167)
     public static void main(final String[] args) {
 
-        @CGNote(value = ARRAY_HANDLING, description = "") // TODO Why is this special?
         String[] expressions = args.clone();
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
-            @CGNote(value = JVM_CALLBACK, description="invisible callback because no native code is involved; the call graph seems to be complete")
-            @CGNote(value= NOTE,description="the related method <Thread>.dispatchUncaughtException is not dead")
+            @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
+            @CGNote(value = NOTE, description = "the related method <Thread>.dispatchUncaughtException is not dead")
             @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 109)
-            @Override public void uncaughtException(Thread t, Throwable e) {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
                 CALLBACK.callback();
-                String msg = "unexpected error while processing "+ Arrays.deepToString(args);
+                String msg = "unexpected error while processing " + Arrays.deepToString(args);
                 System.out.println(msg);
             }
         });
 
-        Runtime.getRuntime().addShutdownHook(new Thread(){
+        Runtime.getRuntime().addShutdownHook(new Thread() {
 
             // This is an entry point!
-            @CGNote(value = JVM_CALLBACK, description="invisible callback because no native code is involved; the call graph seems to be complete")
-            @CGNote(value = NOTE, description="the related method<Thread>.run is called by the jvm")
+            @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
+            @CGNote(value = NOTE, description = "the related method<Thread>.run is called by the jvm")
             @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 122)
-            @Override public void run() {
+            @Override
+            public void run() {
                 CALLBACK.callback();
                 System.out.println("It was a pleasure to evaluate your expression!");
                 super.run();
@@ -133,36 +141,44 @@ public class ExpressionEvaluator {
             boolean holdsLock = !Thread.holdsLock(ExpressionEvaluator.class);
             if (holdsLock) throw new UnknownError();
 
-        if(args.length == 0) {
-            throw new IllegalArgumentException("no expression");
-        }
-
-        Stack<Constant> values = new Stack();
-
-        for (String expr: expressions) {
-            try {
-                values.push(new Constant(parseInt(expr)));
-            } catch (NumberFormatException nfe) {
-                // so it is not a number...
-                if(expr.equals( "+")){
-                    values.push(new AddExpression(values.pop(),values.pop()).eval(NO_VARIABLES));
-                } else {
-                    try {
-                        values.push(createBinaryExpression(expr, values.pop(), values.pop()).eval(NO_VARIABLES));
-                    } catch (Throwable t){
-                        throw new IllegalArgumentException("unsupported symbol "+expr,t);
-                    }
-                }
-            } finally {
-                System.out.println("processed the symbol "+expr);
+            if (args.length == 0) {
+                throw new IllegalArgumentException("no expression");
             }
-        }
 
-        if(values.size() > 1) {
-            throw new IllegalArgumentException("the expression is not valid missing operator");
-        }
+            Stack<Constant> values = new Stack();
 
-        System.out.println("result "+values.pop().getValue());
+            for (String expr : expressions) {
+                try {
+                    values.push(new Constant(parseInt(expr)));
+                } catch (NumberFormatException nfe) {
+                    // so it is not a number...
+                    switch (expr) {
+                        case "+":
+                            values.push(new AddExpression(values.pop(), values.pop()).eval(NO_VARIABLES));
+                            break;
+                        case "++":
+                            values.push(UnaryExpression.createUnaryExpressions(INCREMENT, values.pop()).eval(NO_VARIABLES));
+                            break;
+                        case "Id":
+                            values.push(UnaryExpression.createUnaryExpressions(EXCEPTION, values.pop()).eval(NO_VARIABLES));
+                            break;
+                        default:
+                            try {
+                                values.push(createBinaryExpression(expr, values.pop(), values.pop()).eval(NO_VARIABLES));
+                            } catch (Throwable t) {
+                                throw new IllegalArgumentException("unsupported symbol " + expr, t);
+                            }
+                    }
+                } finally {
+                    System.out.println("processed the symbol " + expr);
+                }
+            }
+
+            if (values.size() > 1) {
+                throw new IllegalArgumentException("the expression is not valid missing operator");
+            }
+
+            System.out.println("result " + values.pop().getValue());
         }
     }
 
@@ -172,7 +188,7 @@ public class ExpressionEvaluator {
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
     @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator$CALLBACK")}, line = 176)
-    public String toString(){
+    public String toString() {
         CALLBACK.callback();
         return "ExpressionEvaluater v0.1";
     }
@@ -180,5 +196,7 @@ public class ExpressionEvaluator {
     /*
      * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
      */
-    private static class CALLBACK { static void callback() {/* do nothing*/}}
+    private static class CALLBACK {
+        static void callback() {/* do nothing*/}
+    }
 }

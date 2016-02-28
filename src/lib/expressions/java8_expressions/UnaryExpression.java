@@ -30,12 +30,14 @@
 
 package expressions.java8_expressions;
 
+import annotations.callgraph.CallSite;
 import annotations.documentation.CGNote;
 import expressions.*;
 
 import java.lang.reflect.Constructor;
 
 import static annotations.documentation.CGCategory.REFLECTION;
+import static expressions.java8_expressions.UnaryOperator.IDENTITY;
 
 /**
  * An abstract unary Expression where the operation has to be implemented
@@ -84,6 +86,7 @@ public abstract class UnaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "The first reflective String can be varied by an enumeration but all possible call targets can be found.")
     @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
+//    @CallSite(name = "<init>", resolvedMethods = )
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
             final Expression expr) {
@@ -93,15 +96,13 @@ public abstract class UnaryExpression implements Expression {
             Constructor<?> constructor = clazz.getConstructor(Expression.class);
             uExpr = (UnaryExpression) constructor.newInstance(expr);
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
             if (uExpr == null) {
                 try {
-                    Class<?> clazz = Class.forName(IdentityExpression.FQN);
+                    Class<?> clazz = Class.forName(IDENTITY.toString());
                     Constructor<?> constructor = clazz.getConstructor(Expression.class);
                     uExpr = (UnaryExpression) constructor.newInstance(expr);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception e2) {
+                    e2.printStackTrace();
                 }
             }
         }

@@ -28,31 +28,33 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions.java8_expressions;
-
-import annotations.documentation.CGNote;
-import static annotations.documentation.CGCategory.NOTE;
+package testutils;
 
 /**
- *  A enumeration type for all unary operator that are
+ * This class can be called to test static initializers.
  *
- * @author  Michael Reif
+ * E.g.: {{{
+ *     class Foo{
+ *
+ *          // Annotate the call site here.
+ *         private static void clinit(){
+ *              testutils.StaticInitializerTest.staticCall();
+ *             // doSomething ...
+ *         }
+ *
+ *         static {
+ *              clinit();
+ *         }
+ *     }
+ * }}}
+ *
+ * @author Michael Reif
  */
-public enum UnaryOperator {
+public class StaticInitializerTest {
 
-    INCREMENT(IncrementExpression.class.getName()),
-    IDENTITY(IdentityExpression.class.getName()),
+    public static final String FQN = "testutils/StaticInitializerTest";
 
-    @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")
-    EXCEPTION("ForceClassNotFoundExcepiton");
-
-    private String name;
-
-    /* private */ UnaryOperator(String name){
-        this.name = name;
-    }
-
-    public String toString(){
-        return this.name;
+    public static void staticCall(){
+        // method stub
     }
 }

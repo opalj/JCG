@@ -30,9 +30,13 @@
 
 package expressions.java8_expressions;
 
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
+import annotations.properties.CallabilityProperty;
 import expressions.Constant;
 import expressions.Expression;
 import expressions.ExpressionVisitor;
+import testutils.StaticInitializerTest;
 
 import java.util.function.UnaryOperator;
 
@@ -68,15 +72,26 @@ public class IdentityExpression extends UnaryExpression {
 
     public static final String FQN = "expressions/java8_expressions/IdentityExpression";
 
+    private static /* final */ UnaryOperator<Constant> _IDENTITY;
+
+    @CallSite(name = "staticCall", resolvedMethods = {@ResolvedMethod(receiverType = StaticInitializerTest.FQN)}, isStatic = true, line = 79)
+    private static void clinit(){
+        StaticInitializerTest.staticCall();
+        _IDENTITY = (Constant c) -> c;
+    }
+
+    static {
+        clinit();
+    }
+
     public IdentityExpression(Expression expr){
         super(expr);
     }
 
     public UnaryOperator<Constant> operator() {
-        return (Constant c) -> c;
+        return _IDENTITY;
     }
 
-    @Override
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
