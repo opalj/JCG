@@ -33,9 +33,11 @@ package expressions.java8_expressions;
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 import expressions.Constant;
 import expressions.Expression;
 import expressions.ExpressionVisitor;
+import testutils.CallbackTest;
 import testutils.StaticInitializerTest;
 
 import java.util.function.UnaryOperator;
@@ -102,5 +104,13 @@ public class IdentityExpression extends UnaryExpression {
 
     public String toString(){
         return "Id("+expr.toString()+")";
+    }
+
+    @EntryPoint
+    @CGNote(value = NOTE, description = "This method is called during the garbage collection process if no references to this object are hold. It therefore becomes an entry point")
+    @CallSite(name = "garbadeCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
+    @Override public void finalize() throws Throwable{
+        CallbackTest.garbageCollectorCall();
+        super.finalize();
     }
 }

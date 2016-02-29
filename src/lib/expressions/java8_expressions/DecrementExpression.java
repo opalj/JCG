@@ -36,7 +36,6 @@ import expressions.Constant;
 import expressions.Expression;
 import expressions.ExpressionVisitor;
 
-import java.util.function.*;
 import java.util.function.UnaryOperator;
 
 import static annotations.documentation.CGCategory.NOTE;

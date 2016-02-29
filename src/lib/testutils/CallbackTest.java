@@ -52,10 +52,19 @@ package testutils;
  */
 public class CallbackTest {
 
+    public static final String FQN = "testutils/CallbackTest";
+
     /*
-     * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
-     */
+         * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
+         */
     public static void callback(){
         // do nothing
+    }
+
+    /**
+     * This method is defined to document garbade collector calls.
+     */
+    public static void garbageCollectorCall(){
+        // to noting
     }
 }
