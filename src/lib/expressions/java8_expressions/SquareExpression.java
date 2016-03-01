@@ -32,42 +32,64 @@ package expressions.java8_expressions;
 
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
-import annotations.callgraph.TargetResolution;
-import annotations.documentation.CGCategory;
-import annotations.documentation.CGNote;
-import expressions.Constant;
-
-import java.util.function.Function;
-
-import static annotations.callgraph.TargetResolution.DYNAMIC;
-import static annotations.documentation.CGCategory.INVOKEDYNAMIC;
+import expressions.*;
+import fancy_expressions.MultOperator;
 
 /**
- * Represents an operation on a single operand that produces a result of the
- * same type as its operand.  This is a specialization of {@code Function} for
- * the case where the operand and result are of the same type.
+ * A SquareExpression represents an unary operation that squares an expression.
  *
- * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #apply(Object)}.
+ * <p>
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * -->
  *
- * @see Function
- * @since 1.8
- *
- * @author Michael Reif
+ * @author Micahel Reif
  */
-@FunctionalInterface
-public interface IUnaryOperator extends Function<Constant, Constant> {
+public final class SquareExpression extends UnaryExpression {
 
-    String FQN = "expressions/java8_expressions/IUnaryOperator";
+    private Expression square;
 
-    @CGNote(value = INVOKEDYNAMIC, description = "Lambda expressions are invoked over invokedynamic instructions.")
-    @CallSite(resolution = DYNAMIC,
-            name = "lambda$identity$0",
+    public SquareExpression(Expression expr){
+        super(expr);
+        square = new MultOperator.MultExpression(expr, expr);
+    }
+
+    public IUnaryOperator operator() {
+        return (Constant c) -> new Constant(c.getValue() * c.getValue());
+    }
+
+    public String toString() {
+        return expr.toString() + "²";
+    }
+
+    @CallSite(name = "eval",
             returnType = Constant.class,
-            parameterTypes = {Constant.class},
-            resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN),
-            line = 71)
-    static IUnaryOperator identity() {
-        return constant -> constant;
+            parameterTypes = {Map.class},
+            resolvedMethods = @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
+            line = 88)
+    public Constant eval(Map<String, Constant> values) {
+        return square.eval(values);
+    }
+
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

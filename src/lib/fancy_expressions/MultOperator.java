@@ -11,6 +11,8 @@ public class MultOperator extends Operator {
 
     public static class MultExpression extends BinaryExpression {
 
+        public static final String FQN = "expressions/MultOperator$MultExpression";
+
         private final Expression right;
         private final Expression left;
 
