@@ -34,13 +34,10 @@ import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
 import annotations.documentation.CGNote;
 import annotations.properties.EntryPoint;
-import expressions.Constant;
 import expressions.Expression;
 import expressions.ExpressionVisitor;
 import testutils.CallbackTest;
 import testutils.StaticInitializerTest;
-
-import java.util.function.UnaryOperator;
 
 import static annotations.documentation.CGCategory.NOTE;
 
@@ -64,6 +61,7 @@ import static annotations.documentation.CGCategory.NOTE;
  * <p>
  * <p>
  * <p>
+ *
  * <p>
  * <p>
  * <p>
@@ -76,14 +74,14 @@ public class IdentityExpression extends UnaryExpression {
 
     public static final String FQN = "expressions/java8_expressions/IdentityExpression";
 
-    private static /* final */ UnaryOperator<Constant> _IDENTITY;
+    private static /* final */ IUnaryOperator _IDENTITY;
 
     @CallSite(name = "staticCall", resolvedMethods = {@ResolvedMethod(receiverType = StaticInitializerTest.FQN)}, isStatic = true, line = 83)
     @CGNote(value = NOTE, description = "The call on UnaryOperator is a call on an interface default method.")
-    @CallSite(name = "identity", resolvedMethods = @ResolvedMethod(receiverType = "java/util/function/UnaryOperator"), isStatic = true, line = 84)
+    @CallSite(name = "identity", resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN), isStatic = true, line = 84)
     private static void clinit(){
         StaticInitializerTest.staticCall();
-        _IDENTITY = UnaryOperator.identity();
+        _IDENTITY = IUnaryOperator.identity();
     }
 
     static {
@@ -94,7 +92,7 @@ public class IdentityExpression extends UnaryExpression {
         super(expr);
     }
 
-    public UnaryOperator<Constant> operator() {
+    public IUnaryOperator operator() {
         return _IDENTITY;
     }
 
@@ -108,7 +106,7 @@ public class IdentityExpression extends UnaryExpression {
 
     @EntryPoint
     @CGNote(value = NOTE, description = "This method is called during the garbage collection process if no references to this object are hold. It therefore becomes an entry point")
-    @CallSite(name = "garbadeCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
+    @CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
     @Override public void finalize() throws Throwable{
         CallbackTest.garbageCollectorCall();
         super.finalize();

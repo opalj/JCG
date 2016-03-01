@@ -77,7 +77,7 @@ public abstract class UnaryExpression implements Expression {
 
     protected Expression expr;
 
-    public abstract java.util.function.UnaryOperator<Constant> operator();
+    public abstract IUnaryOperator operator();
 
     @CGNote(value = REFLECTION, description = "The first reflective String can be varied by an enumeration but all possible call targets can be found.")
     @CallSite(name = "<init>", parameterTypes = {Expression.class},

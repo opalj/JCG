@@ -76,7 +76,7 @@ public class DecrementExpression extends UnaryExpression {
     }
 
     @CGNote(value = NOTE, description = "")
-    public UnaryOperator<Constant> operator() { return DecrementOperator.newInstance(); }
+    public IUnaryOperator operator() { return DecrementOperator.newInstance(); }
 
     public String toString() {
         return "Dec("+expr.toString()+")";
@@ -86,7 +86,7 @@ public class DecrementExpression extends UnaryExpression {
         return visitor.visit(this);
     }
 
-    static class DecrementOperator implements UnaryOperator<Constant>{
+    static class DecrementOperator implements IUnaryOperator {
 
         public static final String FQN = "expressions/java8_expressions/DecrementExpression/DecrementOperator";
 

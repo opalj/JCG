@@ -75,8 +75,8 @@ public class IncrementExpression extends UnaryExpression {
     public static final String FQN = "expressions/java8_expressions/IncrementExpression";
 
     @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
-    @CallSite(name="apply", resolvedMethods = @ResolvedMethod(receiverType = "java/util/funciton/UnaryOperator"), line = 80)
-    public UnaryOperator<Constant> operator() {
+    @CallSite(name="lambda$operator$0", resolvedMethods = @ResolvedMethod(receiverType = "expressions/java8_expressions/IncrementExpression"), line = 80)
+    public IUnaryOperator operator() {
         return (Constant constant) -> new Constant(constant.getValue() + 1);
     }
 
