@@ -42,6 +42,7 @@ import annotations.properties.EntryPoint;
 import static annotations.callgraph.AnalysisMode.*;
 
 import expressions.*;
+import expressions.java8_expressions.IdentityExpression;
 import expressions.java8_expressions.SquareExpression;
 import expressions.java8_expressions.UnaryExpression;
 
@@ -78,7 +79,6 @@ import static testutils.CallbackTest.callback;
  * <p>
  * <p>
  * <p>
- * <p>
  * -->
  *
  * @author Michael Eichberg
@@ -86,8 +86,8 @@ import static testutils.CallbackTest.callback;
  */
 public class ExpressionEvaluator {
 
-    private static final Map<String, Constant> NO_VARIABLES = (Map<String, Constant>) Map.EMPTY;
-
+    private static final Map<String, Constant> ENV = new Map<String, Constant>();
+    static {ENV.add("x", new Constant(1));}
     // 2 34 + 23 Plus == 59
     //20 20 + 1 Plus ++ Id == 42
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator
@@ -158,21 +158,21 @@ public class ExpressionEvaluator {
                     // so it is not a number...
                     switch (expr) {
                         case "+":
-                            values.push(new AddExpression(values.pop(), values.pop()).eval(NO_VARIABLES));
+                            values.push(new AddExpression(values.pop(), values.pop()).eval(ENV));
                             break;
                         case "++":
-                            values.push(UnaryExpression.createUnaryExpressions(INCREMENT, values.pop()).eval(NO_VARIABLES));
+                            values.push(UnaryExpression.createUnaryExpressions(INCREMENT, values.pop()).eval(ENV));
                             break;
                         case "Id":
-                            values.push(UnaryExpression.createUnaryExpressions(EXCEPTION, values.pop()).eval(NO_VARIABLES));
+                            values.push(new IdentityExpression(values.pop()).eval(ENV));
                             break;
                         case "²":
                             UnaryExpression square = new SquareExpression(values.pop());
-                            values.push(square.eval(NO_VARIABLES));
+                            values.push(square.eval(ENV));
                             break;
                         default:
                             try {
-                                values.push(createBinaryExpression(expr, values.pop(), values.pop()).eval(NO_VARIABLES));
+                                values.push(createBinaryExpression(expr, values.pop(), values.pop()).eval(ENV));
                             } catch (Throwable t) {
                                 throw new IllegalArgumentException("unsupported symbol " + expr, t);
                             }
@@ -186,7 +186,7 @@ public class ExpressionEvaluator {
                 throw new IllegalArgumentException("the expression is not valid missing operator");
             }
 
-            System.out.println("result " + values.pop().getValue() + " with environment " + NO_VARIABLES.toString());
+            System.out.print("result "); ExpressionPrinter.printExpression(values.pop()); System.out.print(" with environment " + ENV.toString());
         }
     }
 

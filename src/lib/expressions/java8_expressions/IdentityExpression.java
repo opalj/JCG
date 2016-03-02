@@ -106,7 +106,7 @@ public class IdentityExpression extends UnaryExpression {
 
     @EntryPoint
     @CGNote(value = NOTE, description = "This method is called during the garbage collection process if no references to this object are hold. It therefore becomes an entry point")
-    @CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
+    @CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 111)
     @Override public void finalize() throws Throwable{
         CallbackTest.garbageCollectorCall();
         super.finalize();

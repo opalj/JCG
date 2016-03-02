@@ -94,10 +94,12 @@ public class IncrementExpression extends UnaryExpression {
     @CallSite(name= "toString", resolvedMethods = {
             @ResolvedMethod(receiverType = IncrementExpression.FQN),
             @ResolvedMethod(receiverType = IdentityExpression.FQN),
+            @ResolvedMethod(receiverType = SquareExpression.FQN),
+            @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
             @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
             @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
             @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)
-    }, line = 99)
+    }, returnType = String.class, line = 104)
     public String toString(){
         return "Inc("+ expr.toString() + ")";
     }

@@ -126,14 +126,13 @@ public abstract class UnaryExpression implements Expression {
             @ResolvedMethod(receiverType = UnaryExpression.FQN),
             @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
             @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
-            @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
-    }, line = 138)
+            @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
+            @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
+    }, line = 137)
     @CallSite(name = "apply", returnType = Constant.class, parameterTypes = Constant.class,
             resolvedMethods = {
-                    @ResolvedMethod(receiverType = "java/util/function/UnaryOperator"),
                     @ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-                    @ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(mode = {AnalysisMode.CPA, AnalysisMode.OPA}))
-            }, line = 138)
+            }, line = 137)
     public Constant eval(Map<String, Constant> values) {
         return operator().apply(expr.eval(values));
     }
