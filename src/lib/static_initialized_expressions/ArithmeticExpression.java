@@ -67,6 +67,8 @@ public interface ArithmeticExpression extends Expression {
 	static String init() {
 		return "arithmetic expression";
 	}
+	
+    Constant eval(Map<String,Constant> values);
 
 }
 

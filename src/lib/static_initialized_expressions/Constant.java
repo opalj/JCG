@@ -62,6 +62,7 @@ public class Constant implements ArithmeticExpression{
 
 	static String name;
 	
+	@EntryPoint(value = {OPA, CPA})
 	static {
 		name = "constant";
 	}

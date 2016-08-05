@@ -64,11 +64,10 @@ public interface Expression {
 
 	static String name = init();
 	
+	@EntryPoint(value = {OPA, CPA})
 	static String init() {
 		return "expression";
 	}
-	
-    Constant eval(Map<String,Constant> values);
 
     default void printName(){
     	System.out.println(name);

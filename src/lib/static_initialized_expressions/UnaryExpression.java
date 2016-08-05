@@ -64,6 +64,7 @@ public class UnaryExpression implements ArithmeticExpression{
 
 	static String name;
 	
+	@EntryPoint(value = {OPA, CPA})
 	static {
 		name = "unary expression";
 	}

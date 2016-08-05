@@ -62,6 +62,7 @@ public class Negation extends UnaryExpression{
 
 	static String name;
 	
+	@EntryPoint(value = {OPA, CPA})
 	static {
 		name = "negation";
 	}
