@@ -36,7 +36,7 @@ import annotations.callgraph.ResolvedMethod;
 import java.io.Serializable;
 
 /**
- * This class simply wraps an integer value.
+ * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -89,4 +89,23 @@ public class Constant implements Expression, Serializable{
 
     public native float toFloat();
 
+    @EntryPoint(value = {OPA, CPA})
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+    	out.defaultWriteObject();
+    }
+    
+    @EntryPoint(value = {OPA, CPA})
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    	in.defaultReadObject();
+    }
+    
+    @EntryPoint(value = {OPA, CPA})
+    private Object writeReplace() throws ObjectStreamException {
+    	return this;
+    }
+    
+    @EntryPoint(value = {OPA, CPA})
+    private Object readResolve() throws ObjectStreamException {
+    	return this;
+    }
 }
