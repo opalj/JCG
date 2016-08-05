@@ -31,9 +31,8 @@
 package static_initialized_expressions;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * This interface defines an expression. It always knows it's name (saved in a static variable, 
+ * initialized via a static method). It also provides a default method for printing its name.
  *
  * <!--
  * <b>NOTE</b><br>

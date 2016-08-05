@@ -31,9 +31,7 @@
 package static_initialized_expressions;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * This class represents a unary arithmetic expression.
  *
  * <!--
  * <b>NOTE</b><br>

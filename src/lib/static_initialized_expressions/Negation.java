@@ -31,7 +31,7 @@
 package static_initialized_expressions;
 
 /**
- * This class simply wraps an integer value.
+ * This class represents a negation operation.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -73,7 +73,7 @@ public class Negation extends UnaryExpression{
         this.value = value;
     }
 
-    public int getValue() {
+    public ArithmeticExpression getValue() {
         return value;
     }
 
