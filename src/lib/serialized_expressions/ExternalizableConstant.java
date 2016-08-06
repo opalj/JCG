@@ -30,11 +30,12 @@
 
 package serialized_expressions;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
 import annotations.properties.EntryPoint;
 
 import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectStreamException;
 
 /**
  * This class simply wraps an integer value. Defines methods to be called during (de-)externalization 
@@ -81,17 +82,6 @@ public class ExternalizableConstant implements Expression, Externalizable{
         return this;
     }
 
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "expressions/ExpressionPrinter")},
-            returnType = Object.class,
-            line = 87
-    )
-    public <T> T accept(ExpressionVisitor <T> visitor) {
-        return visitor.visit(this);
-    }
-
-    public native float toFloat();
-
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
     }
@@ -106,7 +96,7 @@ public class ExternalizableConstant implements Expression, Externalizable{
     }
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    public void writeExternal(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void writeExternal(ObjectOutputStream out) throws IOException {
     	out.writeInt(value);
     }
     

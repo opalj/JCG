@@ -32,9 +32,13 @@ package saver;
 import static annotations.callgraph.CallGraphAlgorithm.CHA;
 import static annotations.documentation.CGCategory.*;
 
-import annotations.callgraph.*;
-import annotations.documentation.CGNote;
 import annotations.properties.EntryPoint;
+
+import java.io.ObjectOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.FileInputStream;
 
 import serialized_expressions.*;
 
@@ -72,12 +76,38 @@ import static annotations.callgraph.AnalysisMode.*;
  * @author Micahel Reif
  * @author Roberts Kolosovs
  */
-public class ExpressionEvaluator {
+public class ExpressionSaver {
 
 	@EntryPoint(value = { DESKTOP_APP, OPA, CPA })
 	public static void main(final String[] args) {
 
-		
-		
+		Constant serializableConst = new Constant(42);
+		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);
+
+		try {
+			save(serializableConst, "const.ser");
+			save(externalizableConst, "extConst.ser");
+
+			serializableConst = (Constant) load("const.ser");
+			externalizableConst = (ExternalizableConstant) load("extConst.ser");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+	}
+	
+	private void save(Object obj, String fileName) throws IOException {
+		FileOutputStream fos = new FileOutputStream(fileName);
+		ObjectOutputStream out = new ObjectOutputStream(fos);
+		out.writeObject(obj);
+		out.close();
+	}
+	
+	private void load(String fileName) throws IOException, ClassNotFoundException {
+		Object obj = null;
+		FileInputStream fis = new FileInputStream(fileName);
+		ObjectInputStream in = new ObjectInputStream(fis);
+		obj = in.readObject();
+		in.close();
 	}
 }

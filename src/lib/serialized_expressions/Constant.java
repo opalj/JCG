@@ -28,13 +28,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package serialized_expressions;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
 import annotations.properties.EntryPoint;
 
 import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectStreamException;
 
 /**
  * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
@@ -61,7 +61,7 @@ import java.io.Serializable;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public class Constant implements Expression, Serializable{
@@ -80,33 +80,22 @@ public class Constant implements Expression, Serializable{
         return this;
     }
 
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "expressions/ExpressionPrinter")},
-            returnType = Object.class,
-            line = 87
-    )
-    public <T> T accept(ExpressionVisitor <T> visitor) {
-        return visitor.visit(this);
-    }
-
-    public native float toFloat();
-
-    @EntryPoint(value = {OPA, CPA})
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
     }
     
-    @EntryPoint(value = {OPA, CPA})
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
     	in.defaultReadObject();
     }
     
-    @EntryPoint(value = {OPA, CPA})
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object writeReplace() throws ObjectStreamException {
     	return this;
     }
     
-    @EntryPoint(value = {OPA, CPA})
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object readResolve() throws ObjectStreamException {
     	return this;
     }

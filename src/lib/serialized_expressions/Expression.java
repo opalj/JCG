@@ -28,14 +28,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package serialized_expressions;
 
 import java.io.Serializable;
 
 /**
  * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * wrt. call graph construction. It covers primarily serialization and externalization.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -60,6 +59,7 @@ import java.io.Serializable;
  *
  * @author Michael Eichberg
  * @author Micahel Reif
+ * @author Roberts Kolosovs
  */
 public interface Expression extends Serializable {
 
