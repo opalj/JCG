@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package serialized_expressions;
 
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
@@ -37,7 +37,8 @@ import annotations.properties.EntryPoint;
 import java.io.Serializable;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
+ * This class simply wraps an integer value. Defines methods to be called during (de-)externalization 
+ * but also contains readObject and writeObject methods.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -64,7 +65,7 @@ import java.io.Serializable;
  * @author Micahel Reif
  * @author Roberts Kolosovs
  */
-public class Constant implements Expression, Serializable{
+public class ExternalizableConstant implements Expression, Externalizable{
 
     private final int value;
 
@@ -91,22 +92,30 @@ public class Constant implements Expression, Serializable{
 
     public native float toFloat();
 
-    @EntryPoint(value = {OPA, CPA})
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
     }
     
-    @EntryPoint(value = {OPA, CPA})
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
     	in.defaultReadObject();
     }
     
-    @EntryPoint(value = {OPA, CPA})
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    public void readExternal(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    	value = in.readInt();
+    }
+
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    public void writeExternal(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    	out.writeInt(value);
+    }
+    
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object writeReplace() throws ObjectStreamException {
     	return this;
     }
     
-    @EntryPoint(value = {OPA, CPA})
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object readResolve() throws ObjectStreamException {
     	return this;
     }
