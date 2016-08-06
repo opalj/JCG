@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package serialized_expressions;
+package expressions.serialized_expressions;
 
 import annotations.properties.EntryPoint;
 

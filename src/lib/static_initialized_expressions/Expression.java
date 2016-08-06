@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package static_initialized_expressions;
+package expressions.static_initialized_expressions;
 
 /**
  * This interface defines an expression. It always knows it's name (saved in a static variable, 

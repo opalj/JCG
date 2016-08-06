@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package static_initialized_expressions;
+package expressions.static_initialized_expressions;
 
 /**
  * This interface extends the general Expression and represents a arithmetic expression 

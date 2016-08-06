@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package static_initialized_expressions;
+package expressions.static_initialized_expressions;
 
 /**
  * This class represents a negation operation.

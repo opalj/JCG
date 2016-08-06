@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.FileInputStream;
 
-import serialized_expressions.*;
+import expressions.serialized_expressions.*;
 
 import static annotations.callgraph.AnalysisMode.*;
 
