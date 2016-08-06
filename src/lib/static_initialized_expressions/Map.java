@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions.static_initialized_expressions;
+package static_initialized_expressions;
 
 import annotations.callgraph.CallSite;
 import annotations.callgraph.InvokedConstructor;
