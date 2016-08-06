@@ -30,14 +30,12 @@
 
 package expressions;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
-import annotations.properties.EntryPoint;
-
 import java.io.Serializable;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
+ * This class defines an application use case of the expression library and has some well defined properties
+ * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
+ * a given call graph implementation can handle these features.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -62,52 +60,15 @@ import java.io.Serializable;
  *
  * @author Michael Eichberg
  * @author Micahel Reif
- * @author Roberts Kolosovs
  */
-public class Constant implements Expression, Serializable{
+public interface Expression extends Serializable {
 
-    private final int value;
+    static final int MajorVersion = 1;
+    static final int MinorVersion = 0;
 
-    public Constant(int value) {
-        this.value = value;
-    }
+    Constant eval(Map<String,Constant> values);
 
-    public int getValue() {
-        return value;
-    }
+    <T> T accept(ExpressionVisitor <T> visitor);
 
-    public Constant eval(Map<String,Constant> values) {
-        return this;
-    }
-
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "expressions/ExpressionPrinter")},
-            returnType = Object.class,
-            line = 87
-    )
-    public <T> T accept(ExpressionVisitor <T> visitor) {
-        return visitor.visit(this);
-    }
-
-    public native float toFloat();
-
-    @EntryPoint(value = {OPA, CPA})
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object writeReplace() throws ObjectStreamException {
-    	return this;
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object readResolve() throws ObjectStreamException {
-    	return this;
-    }
 }
+
