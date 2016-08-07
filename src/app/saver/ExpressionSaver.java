@@ -39,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.FileInputStream;
+import java.awt.EventQueue;
 
 import serialized_expressions.*;
 
@@ -81,6 +82,11 @@ public class ExpressionSaver {
 	@EntryPoint(value = { DESKTOP_APP, OPA, CPA })
 	public static void main(final String[] args) {
 
+		Runnable ip = InputPrinter(args);
+		Runnable aip = AltInputPrinter();
+		
+		EventQueue.invokeLater(ip);
+		
 		Constant serializableConst = new SerializableConstant(42);
 		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);
 
