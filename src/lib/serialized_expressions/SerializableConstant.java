@@ -32,9 +32,13 @@ package serialized_expressions;
 
 import annotations.properties.EntryPoint;
 
+import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectStreamException;
+
 /**
- * This class is a superclass for a serializable implementation of an arithmetic constant. 
- * Defines a finalize method.
+ * This class simply wraps an integer value. Defines methods to be called during 
+ * (de-)serialization and a finalize method.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -61,10 +65,44 @@ import annotations.properties.EntryPoint;
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
-public class Constant implements Expression{
+public class Constant implements Serializable extends Constant{
 
-	@EntryPoint(value = {OPA, CPA})
-	public void finalize () {
-    	System.out.println("Constant object destroyed.");
+    private final int value;
+
+    public Constant(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public Constant eval(Map<String,Constant> values) {
+        return this;
+    }
+
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+    	out.defaultWriteObject();
+    }
+    
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    	in.defaultReadObject();
+    }
+    
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    private Object writeReplace() throws ObjectStreamException {
+    	return this;
+    }
+    
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    private Object readResolve() throws ObjectStreamException {
+    	return this;
+    }
+    
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    public void finalize () {
+    	System.out.println("SerializableConstant object destroyed.");
     }
 }

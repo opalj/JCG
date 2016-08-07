@@ -33,7 +33,7 @@ package serialized_expressions;
 import annotations.properties.EntryPoint;
 
 /**
- * This class is a superclass for a serializable implementation of an arithmetic constant. 
+ * This class is a superclass for an externalizable implementation of an arithmetic constant. 
  * Defines a finalize method.
  *
  * <!--
@@ -61,10 +61,10 @@ import annotations.properties.EntryPoint;
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
-public class Constant implements Expression{
+public class AltConstant implements Expression{
 
-	@EntryPoint(value = {OPA, CPA})
-	public void finalize () {
-    	System.out.println("Constant object destroyed.");
+	@EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    public void finalize () {
+    	System.out.println("AltConstant object destroyed.");
     }
 }

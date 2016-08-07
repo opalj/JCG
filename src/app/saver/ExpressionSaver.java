@@ -81,7 +81,7 @@ public class ExpressionSaver {
 	@EntryPoint(value = { DESKTOP_APP, OPA, CPA })
 	public static void main(final String[] args) {
 
-		Constant serializableConst = new Constant(42);
+		Constant serializableConst = new SerializableConstant(42);
 		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);
 
 		try {
