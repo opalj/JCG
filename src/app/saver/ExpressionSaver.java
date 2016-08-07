@@ -85,12 +85,12 @@ public class ExpressionSaver {
 		Runnable ip = InputPrinter(args);
 		Runnable aip = AltInputPrinter();
 		
-		EventQueue.invokeLater(ip);
-		
 		Constant serializableConst = new SerializableConstant(42);
 		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);
 
 		try {
+			EventQueue.invokeLater(ip);
+			
 			save(serializableConst, "const.ser");
 			save(externalizableConst, "extConst.ser");
 
