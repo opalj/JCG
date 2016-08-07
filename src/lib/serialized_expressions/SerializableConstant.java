@@ -65,7 +65,7 @@ import java.io.ObjectStreamException;
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
-public class Constant implements Serializable extends Constant{
+public class Constant extends Constant implements Serializable {
 
     private final int value;
 

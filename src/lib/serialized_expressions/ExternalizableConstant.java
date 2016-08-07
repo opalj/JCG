@@ -66,7 +66,7 @@ import java.io.ObjectStreamException;
  * @author Micahel Reif
  * @author Roberts Kolosovs
  */
-public class ExternalizableConstant implements Externalizable extends AltConstant{
+public class ExternalizableConstant extends AltConstant implements Externalizable {
 
     private final int value;
 
