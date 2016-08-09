@@ -30,6 +30,8 @@
 
 package static_initialized_expressions;
 
+import annotations.properties.EntryPoint;
+
 /**
  * This class simply wraps an integer value.
  *

@@ -30,6 +30,8 @@
 
 package static_initialized_expressions;
 
+import annotations.properties.EntryPoint;
+
 /**
  * This interface defines an expression. It always knows it's name (saved in a static variable, 
  * initialized via a static method). It also provides a default method for printing its name.
