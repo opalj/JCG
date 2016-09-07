@@ -31,11 +31,18 @@
 package serialized_expressions;
 
 import annotations.properties.EntryPoint;
+import expressions.ExpressionVisitor;
 
 import java.io.Serializable;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
+
+import static annotations.callgraph.AnalysisMode.*;
 
 /**
  * This class simply wraps an integer value. Defines methods to be called during (de-)externalization 
@@ -68,18 +75,14 @@ import java.io.ObjectStreamException;
  */
 public class ExternalizableConstant extends AltConstant implements Externalizable {
 
-    private final int value;
+    private int value;
 
-    public Constant(int value) {
+    public ExternalizableConstant(int value) {
         this.value = value;
     }
 
     public int getValue() {
         return value;
-    }
-
-    public Constant eval(Map<String,Constant> values) {
-        return this;
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
@@ -91,12 +94,12 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    public void readExternal(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     	value = in.readInt();
     }
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    public void writeExternal(ObjectOutputStream out) throws IOException {
+    public void writeExternal(ObjectOutput out) throws IOException {
     	out.writeInt(value);
     }
     
@@ -109,4 +112,14 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
     private Object readResolve() throws ObjectStreamException {
     	return this;
     }
+
+	@Override
+	public Constant eval(Map values) {
+		return null;
+	}
+
+	@Override
+	public Object accept(ExpressionVisitor visitor) {
+		return null;
+	}
 }

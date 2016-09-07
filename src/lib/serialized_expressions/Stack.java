@@ -30,18 +30,12 @@
 
 package serialized_expressions;
 
-import annotations.properties.EntryPoint;
-import expressions.ExpressionVisitor;
-
-import java.io.Serializable;
-import java.io.IOException;
-import java.io.ObjectStreamException;
-
-import static annotations.callgraph.AnalysisMode.*;
+import static annotations.documentation.CGCategory.NATIVE_CALLBACK;
+import annotations.documentation.CGNote;
+import expressions.Iterator;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during 
- * (de-)serialization and a finalize method.
+ * A array-based stack implementation.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -65,54 +59,73 @@ import static annotations.callgraph.AnalysisMode.*;
  * -->
  *
  * @author Michael Eichberg
- * @author Michael Reif
- * @author Roberts Kolosovs
+ * @author Micahel Reif
  */
-public class SerializableConstant extends Constant implements Serializable {
+public class Stack<V> {
 
-    private final int value;
+    private V[] data = (V[]) new Object[100];
+    private int entries = 0;
 
-    public SerializableConstant(int value) {
-        this.value = value;
+    public Stack() {}
+
+    @CGNote(value = NATIVE_CALLBACK,
+            description = "potential callback because an object type is passed to a native method;" +
+                    "methods of this object could be called from native code (I.e. toString, clone etc.)")
+    public void push(V v){
+        if(data.length == entries) {
+            V[]  newData = (V[]) new Object[entries*2+1];
+            System.arraycopy(data,0,newData,0,data.length);
+            data = newData;
+        }
+        data[entries] = v;
+        entries += 1;
     }
 
-    public int getValue() {
-        return value;
+    public int size() {
+        return entries;
     }
 
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
-    }
-    
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    }
-    
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    private Object writeReplace() throws ObjectStreamException {
-    	return this;
-    }
-    
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    private Object readResolve() throws ObjectStreamException {
-    	return this;
-    }
-    
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    public void finalize () {
-    	System.out.println("SerializableConstant object destroyed.");
+    public V peek(){
+        return data[entries-1];
     }
 
-	@Override
-	public Constant eval(Map values) {
-		return null;
-	}
+    public V pop(){
+        V v = data[entries-1];
+                entries -= 1;
+                        return  v;
+    }
 
-	@Override
-	public Object accept(ExpressionVisitor visitor) {
-		return null;
-	}
+    public boolean isEmpty(){ return entries == 0; }
 
+    public Iterator<V> iterator(){
+        return new StackIterator(data, entries);
+    }
+
+    class StackIterator implements Iterator<V>{
+
+        public static final String FQN = "expressions/Stack$StackIterator";
+        private V[] data;
+        private int cur = 0;
+
+
+        public StackIterator(V[] data, int top){
+            this.data = data;
+            cur = top-1;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cur >= 0;
+        }
+
+        @Override
+        public V next() {
+            return data[cur--];
+        }
+
+        @Override
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException();
+        }
+    }
 }

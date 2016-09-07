@@ -32,6 +32,7 @@ package static_initialized_expressions;
 
 import annotations.properties.EntryPoint;
 
+import static annotations.callgraph.AnalysisMode.*;
 /**
  * This class represents a negation operation.
  *
@@ -64,8 +65,12 @@ public class Negation extends UnaryExpression{
 
 	static String name;
 	
-	@EntryPoint(value = {OPA, CPA})
 	static {
+		init();
+	}
+
+	@EntryPoint(value = {OPA, CPA})
+	private static void init(){
 		name = "negation";
 	}
 	
@@ -79,8 +84,8 @@ public class Negation extends UnaryExpression{
         return value;
     }
 
-    public Constant eval(Map<String,Constant> values) {
-        return Constant(-value.eval(values));
+    public int eval(Map<String,Constant> values) {
+        return -(value.eval(values));
     }
 
 }

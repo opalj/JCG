@@ -32,6 +32,8 @@ package static_initialized_expressions;
 
 import annotations.properties.EntryPoint;
 
+import static annotations.callgraph.AnalysisMode.*;
+
 /**
  * This class simply wraps an integer value.
  *
@@ -64,8 +66,12 @@ public class Constant implements ArithmeticExpression{
 
 	static String name;
 	
-	@EntryPoint(value = {OPA, CPA})
 	static {
+		init();
+	}
+
+	@EntryPoint(value = {OPA, CPA})
+	private static void init(){
 		name = "constant";
 	}
 	
@@ -79,8 +85,8 @@ public class Constant implements ArithmeticExpression{
         return value;
     }
 
-    public Constant eval(Map<String,Constant> values) {
-        return this;
+    public int eval(Map<String,Constant> values) {
+        return value;
     }
 
 }

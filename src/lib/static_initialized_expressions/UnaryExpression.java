@@ -32,6 +32,7 @@ package static_initialized_expressions;
 
 import annotations.properties.EntryPoint;
 
+import static annotations.callgraph.AnalysisMode.*;
 /**
  * This class represents a unary arithmetic expression.
  *
@@ -64,9 +65,18 @@ public class UnaryExpression implements ArithmeticExpression{
 
 	static String name;
 	
-	@EntryPoint(value = {OPA, CPA})
 	static {
+		init();
+	}
+
+	@EntryPoint(value = {OPA, CPA})
+	private static void init(){
 		name = "unary expression";
+	}
+
+	@Override
+	public int eval(Map<String, Constant> values) {
+		return 0;
 	}
 
 }
