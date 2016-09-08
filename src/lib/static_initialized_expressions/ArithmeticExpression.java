@@ -30,6 +30,11 @@
 
 package static_initialized_expressions;
 
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
+import testutils.CallbackTest;
+import testutils.StaticInitializerTest;
+
 /**
  * This interface extends the general Expression and represents a arithmetic expression 
  * (as opposed to a logical expression). It provides an abstract method eval.
@@ -63,11 +68,13 @@ public interface ArithmeticExpression extends Expression {
 
 	static String name = init();
 	
+	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 73)
 	static String init() {
+		StaticInitializerTest.staticCall();
 		return "arithmetic expression";
 	}
 	
-    Constant eval(Map<String,Constant> values);
+    int eval(Map<String,Constant> values);
 
 }
 

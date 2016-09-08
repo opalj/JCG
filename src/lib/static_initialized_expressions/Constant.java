@@ -31,8 +31,12 @@
 package static_initialized_expressions;
 
 import annotations.properties.EntryPoint;
+import testutils.StaticInitializerTest;
 
 import static annotations.callgraph.AnalysisMode.*;
+
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
 
 /**
  * This class simply wraps an integer value.
@@ -71,7 +75,9 @@ public class Constant implements ArithmeticExpression{
 	}
 
 	@EntryPoint(value = {OPA, CPA})
+	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 80)
 	private static void init(){
+		StaticInitializerTest.staticCall();
 		name = "constant";
 	}
 	

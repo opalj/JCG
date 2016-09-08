@@ -31,6 +31,12 @@
 package static_initialized_expressions;
 
 import annotations.properties.EntryPoint;
+import testutils.StaticInitializerTest;
+
+import static annotations.callgraph.AnalysisMode.*;
+
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
 
 /**
  * This interface defines an expression. It always knows it's name (saved in a static variable, 
@@ -66,7 +72,9 @@ public interface Expression {
 	static String name = init();
 	
 	@EntryPoint(value = {OPA, CPA})
+	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 77)
 	static String init() {
+		StaticInitializerTest.staticCall();
 		return "expression";
 	}
 

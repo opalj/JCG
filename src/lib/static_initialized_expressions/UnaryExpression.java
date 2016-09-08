@@ -31,8 +31,12 @@
 package static_initialized_expressions;
 
 import annotations.properties.EntryPoint;
+import testutils.StaticInitializerTest;
 
 import static annotations.callgraph.AnalysisMode.*;
+
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
 /**
  * This class represents a unary arithmetic expression.
  *
@@ -70,7 +74,9 @@ public class UnaryExpression implements ArithmeticExpression{
 	}
 
 	@EntryPoint(value = {OPA, CPA})
+	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 79)
 	private static void init(){
+		StaticInitializerTest.staticCall();
 		name = "unary expression";
 	}
 
