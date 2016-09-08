@@ -30,10 +30,14 @@
 
 package expressions;
 
+import static annotations.callgraph.AnalysisMode.*;
+
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
 import annotations.properties.EntryPoint;
 
+import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 /**
@@ -83,7 +87,7 @@ public class Constant implements Expression, Serializable{
     @CallSite(name = "visit",
             resolvedMethods = {@ResolvedMethod(receiverType = "expressions/ExpressionPrinter")},
             returnType = Object.class,
-            line = 87
+            line = 93
     )
     public <T> T accept(ExpressionVisitor <T> visitor) {
         return visitor.visit(this);
