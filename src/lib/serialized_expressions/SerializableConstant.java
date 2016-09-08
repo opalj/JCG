@@ -30,8 +30,11 @@
 
 package serialized_expressions;
 
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
 import annotations.properties.EntryPoint;
 import expressions.ExpressionVisitor;
+import testutils.CallbackTest;
 
 import java.io.Serializable;
 import java.io.IOException;
@@ -101,7 +104,9 @@ public class SerializableConstant extends Constant implements Serializable {
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 109)
     public void finalize () {
+		CallbackTest.garbageCollectorCall();
     	System.out.println("SerializableConstant object destroyed.");
     }
 

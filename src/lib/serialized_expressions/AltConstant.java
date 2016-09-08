@@ -31,6 +31,12 @@
 package serialized_expressions;
 
 import annotations.properties.EntryPoint;
+import testutils.CallbackTest;
+
+import static annotations.callgraph.AnalysisMode.*;
+
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
 
 /**
  * This class is a superclass for an externalizable implementation of an arithmetic constant. 
@@ -61,10 +67,12 @@ import annotations.properties.EntryPoint;
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
-public class AltConstant implements Expression{
+public abstract class AltConstant implements Expression{
 
 	@EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 75)
     public void finalize () {
+		CallbackTest.garbageCollectorCall();
     	System.out.println("AltConstant object destroyed.");
     }
 }

@@ -33,22 +33,22 @@ package expressions;
 import expressions.java8_expressions.UnaryExpression;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * This class defines an application use case of the expression library and has
+ * some well defined properties wrt. call graph construction. It covers ( inlc.
+ * the library) serveral Java language features to test whether a given call
+ * graph implementation can handle these features.
  *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- *
- *
+ * <!-- <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
  *
  *
  *
  *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
  *
  *
  *
@@ -63,15 +63,15 @@ import expressions.java8_expressions.UnaryExpression;
  */
 public abstract class ExpressionVisitor<T> {
 
-    static {
-System.out.println("Expression Visitor Version 1.00.00.00");
-        }
+	static {
+		System.out.println("Expression Visitor Version 1.00.00.00");
+	}
 
-public abstract T visit(Constant c);
+	public abstract T visit(Constant c);
 
-public abstract T visit(Variable v);
+	public abstract T visit(Variable v);
 
-public abstract T visit(BinaryExpression b);
+	public abstract T visit(BinaryExpression b);
 
-    public abstract T visit(UnaryExpression b);
-        }
+	public abstract T visit(UnaryExpression b);
+}
