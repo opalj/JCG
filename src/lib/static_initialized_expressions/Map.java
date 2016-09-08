@@ -35,6 +35,7 @@ import annotations.callgraph.InvokedConstructor;
 import annotations.callgraph.ResolvedMethod;
 import annotations.documentation.CGNote;
 import annotations.properties.EntryPoint;
+import expressions.Iterator;
 
 import static annotations.documentation.CGCategory.*;
 
@@ -48,8 +49,6 @@ import static annotations.documentation.CGCategory.*;
  *
  *
  * SPACE LEFT INTENTIONALLY FREE TO HANDLE FUTURE ADAPTIONS
- *
- *
  *
  *
  *
