@@ -32,6 +32,11 @@ package serialized_expressions;
 
 import annotations.properties.EntryPoint;
 
+import static annotations.callgraph.AnalysisMode.*;
+
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
+
 /**
  * This class is a runnable intended for printing expressions provided as input.
  *
@@ -62,14 +67,21 @@ import annotations.properties.EntryPoint;
  */
 public class InputPrinter implements Runnable{
 
+    public static final String InputPrinterReceiverType = "serialized_expressions/InputPrinter";
+	
 	String[] val;
 	
 	public InputPrinter(String[] arg){
 		val = arg;
 	}
 	
+	@CallSite(name = "printConfirmation", resolvedMethods = {@ResolvedMethod(receiverType = InputPrinterReceiverType)}, line = 81)
 	@EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     public void run(){
+		printConfirmation();
+	}
+	
+	private void printConfirmation() {
 		System.out.println(val);
 	}
 }

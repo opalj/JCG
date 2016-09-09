@@ -61,10 +61,6 @@ import static annotations.callgraph.AnalysisMode.*;
  *
  *
  *
- *
- *
- *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -72,6 +68,10 @@ import static annotations.callgraph.AnalysisMode.*;
  * @author Roberts Kolosovs
  */
 public class SerializableConstant extends Constant implements Serializable {
+	
+	public static final String SerializableConstantReceiverType = "serialized_expressions/SerializableConstant";
+	public static final String OOSReceiverType = "java/io/ObjectOutputStream";
+	public static final String OISReceiverType = "java/io/ObjectInputStream";
 
     private final int value;
 
@@ -83,28 +83,36 @@ public class SerializableConstant extends Constant implements Serializable {
         return value;
     }
 
+    @CallSite(name = "defaultWriteObject", resolvedMethods = {@ResolvedMethod(receiverType = OOSReceiverType)}, line = 89)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
     }
     
+    @CallSite(name = "defaultReadObject", resolvedMethods = {@ResolvedMethod(receiverType = OISReceiverType)}, line = 95)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
     	in.defaultReadObject();
     }
     
+    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 101)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object writeReplace() throws ObjectStreamException {
-    	return this;
+    	return replacementFactory();
     }
     
+    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 107)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object readResolve() throws ObjectStreamException {
+    	return replacementFactory();
+    }
+    
+    private Object replacementFactory() {
     	return this;
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 109)
+	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 117)
     public void finalize () {
 		CallbackTest.garbageCollectorCall();
     	System.out.println("SerializableConstant object destroyed.");
