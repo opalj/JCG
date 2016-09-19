@@ -49,14 +49,15 @@ package testutils;
  * }}}
  *
  * @author Michael Reif
+ * @author Roberts Kolosovs
  */
 public class CallbackTest {
 
     public static final String FQN = "testutils/CallbackTest";
 
-    /*
-         * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
-         */
+    /**
+     * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
+     */
     public static void callback(){
         // do nothing
     }
@@ -65,6 +66,14 @@ public class CallbackTest {
      * This method is defined to document garbade collector calls.
      */
     public static void garbageCollectorCall(){
-        // to noting
+        // do nothing
+    }
+    
+
+    /**
+     * This method is defined to document calls to run method of Runnable.
+     */
+    public static void runnableRunCall(){
+        // do nothing
     }
 }

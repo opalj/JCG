@@ -31,6 +31,12 @@
 package serialized_expressions;
 
 import annotations.properties.EntryPoint;
+import testutils.CallbackTest;
+
+import static annotations.callgraph.AnalysisMode.*;
+
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
 
 /**
  * This class is a runnable intended for printing input.
@@ -54,6 +60,7 @@ import annotations.properties.EntryPoint;
  *
  *
  *
+ *
  * -->
  *
  * @author Michael Eichberg
@@ -63,7 +70,9 @@ import annotations.properties.EntryPoint;
 public class AltInputPrinter implements Runnable{
 	
 	@EntryPoint(value = {OPA, CPA})
+	@CallSite(name = "runnableRunCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 75)
     public void run(){
+		testutils.CallbackTest.runnableRunCall();
 		System.out.println("input");
 	}
 }
