@@ -30,8 +30,12 @@
 
 package static_initialized_expressions;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
+
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
+import annotations.properties.EntryPoint;
 import testutils.CallbackTest;
 import testutils.StaticInitializerTest;
 
@@ -68,12 +72,13 @@ public interface ArithmeticExpression extends Expression {
 
 	static String name = init();
 	
-	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 73)
+	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 77)
 	static String init() {
 		StaticInitializerTest.staticCall();
 		return "arithmetic expression";
 	}
-	
+
+    @EntryPoint(value = {OPA})
     int eval(Map<String,Constant> values);
 
 }

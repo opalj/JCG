@@ -87,10 +87,12 @@ public class Constant implements ArithmeticExpression{
         this.value = value;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public int getValue() {
         return value;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public int eval(Map<String,Constant> values) {
         return value;
     }

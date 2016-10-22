@@ -60,8 +60,6 @@ import java.io.Serializable;
  *
  *
  *
- *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -69,6 +67,8 @@ import java.io.Serializable;
  * @author Roberts Kolosovs
  */
 public class Constant implements Expression, Serializable{
+	
+	public static final String FQN = "expressions/Constant";
 
     private final int value;
 
@@ -76,10 +76,12 @@ public class Constant implements Expression, Serializable{
         this.value = value;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public int getValue() {
         return value;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String,Constant> values) {
         return this;
     }
@@ -87,8 +89,9 @@ public class Constant implements Expression, Serializable{
     @CallSite(name = "visit",
             resolvedMethods = {@ResolvedMethod(receiverType = "expressions/ExpressionPrinter")},
             returnType = Object.class,
-            line = 93
+            line = 96
     )
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor) {
         return visitor.visit(this);
     }

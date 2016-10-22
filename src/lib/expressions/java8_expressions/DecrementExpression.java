@@ -32,12 +32,15 @@ package expressions.java8_expressions;
 
 import annotations.documentation.CGCategory;
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 import expressions.Constant;
 import expressions.Expression;
 import expressions.ExpressionVisitor;
 
 import java.util.function.UnaryOperator;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.NOTE;
 
 /**
@@ -71,30 +74,36 @@ import static annotations.documentation.CGCategory.NOTE;
  */
 public class DecrementExpression extends UnaryExpression {
 
+	public static final String FQN = "expressions/java8_expressions/DecrementExpression"; 
+	
     public DecrementExpression(Expression expr){
         super(expr);
     }
 
     @CGNote(value = NOTE, description = "")
+    @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() { return DecrementOperator.newInstance(); }
 
+    @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Dec("+expr.toString()+")";
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
     static class DecrementOperator implements IUnaryOperator {
 
-        public static final String FQN = "expressions/java8_expressions/DecrementExpression/DecrementOperator";
+        public static final String FQN = "expressions/java8_expressions/DecrementExpression$DecrementOperator";
 
         private static DecrementOperator _INSTANCE;
 
         private DecrementOperator(){
         }
 
+        @EntryPoint(value = {OPA, CPA})
         public static DecrementOperator newInstance() {
            if(_INSTANCE == null){
                _INSTANCE = new DecrementOperator();
@@ -102,7 +111,8 @@ public class DecrementExpression extends UnaryExpression {
 
             return _INSTANCE;
         }
-        
+
+        @EntryPoint(value = {OPA, CPA})
         public Constant apply(Constant constant) {
             return new Constant(constant.getValue() - 1);
         }

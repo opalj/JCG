@@ -63,6 +63,8 @@ import java.io.Serializable;
  */
 public interface Expression extends Serializable {
 
+	public static final String FQN = "expressions/Expression";
+	
     static final int MajorVersion = 1;
     static final int MinorVersion = 0;
 

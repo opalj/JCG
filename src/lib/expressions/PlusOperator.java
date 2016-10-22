@@ -30,6 +30,11 @@
 
 package expressions;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
+
+import annotations.properties.EntryPoint;
+
 /**
  * A plus operator that creates a binary add expression.
  *
@@ -67,17 +72,23 @@ public class PlusOperator extends Operator {
 
     public static class AddExpression extends BinaryExpression {
 
+    	public static final String FQN = "expressions/PlusOperator$AddExpression";
+    	
         private final Expression right;
         private final Expression left;
 
-        public AddExpression(Expression left , Expression right) {
+        public AddExpression(Expression left, Expression right) {
          this.left = left;
             this.right = right;
         }
+
+        @EntryPoint(value = {OPA, CPA})
         public Expression left(){return this.left;}
 
+        @EntryPoint(value = {OPA, CPA})
         public Expression right(){return this.right;}
 
+        @EntryPoint(value = {OPA, CPA})
         public Operator operator(){return PlusOperator.instance;}
 
         @Override public Constant eval(Map<String, Constant> values) {
@@ -85,10 +96,12 @@ public class PlusOperator extends Operator {
         }
     }
 
-    static BinaryExpression createBinaryExpression(Expression left,Expression right ) {
-        return new AddExpression(left,right);
+    @EntryPoint(value = {OPA})
+    static BinaryExpression createBinaryExpression(Expression left, Expression right ) {
+        return new AddExpression(left, right);
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "+";
     }

@@ -79,29 +79,30 @@ public class SerializableConstant extends Constant implements Serializable {
         this.value = value;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public int getValue() {
         return value;
     }
 
-    @CallSite(name = "defaultWriteObject", resolvedMethods = {@ResolvedMethod(receiverType = OOSReceiverType)}, line = 89)
+    @CallSite(name = "defaultWriteObject", resolvedMethods = {@ResolvedMethod(receiverType = OOSReceiverType)}, line = 90)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
     }
     
-    @CallSite(name = "defaultReadObject", resolvedMethods = {@ResolvedMethod(receiverType = OISReceiverType)}, line = 95)
+    @CallSite(name = "defaultReadObject", resolvedMethods = {@ResolvedMethod(receiverType = OISReceiverType)}, line = 96)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
     	in.defaultReadObject();
     }
     
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 101)
+    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 102)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object writeReplace() throws ObjectStreamException {
     	return replacementFactory();
     }
     
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 107)
+    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 108)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object readResolve() throws ObjectStreamException {
     	return replacementFactory();
@@ -112,18 +113,20 @@ public class SerializableConstant extends Constant implements Serializable {
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 117)
+	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 118)
     public void finalize () {
 		CallbackTest.garbageCollectorCall();
     	System.out.println("SerializableConstant object destroyed.");
     }
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public Constant eval(Map values) {
 		return null;
 	}
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public Object accept(ExpressionVisitor visitor) {
 		return null;
 	}

@@ -81,6 +81,7 @@ public class UnaryExpression implements ArithmeticExpression{
 	}
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public int eval(Map<String, Constant> values) {
 		return 0;
 	}

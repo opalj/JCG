@@ -30,9 +30,12 @@
 
 package expressions;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.STATIC_INITIALIZERS;
 
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 import expressions.java8_expressions.IncrementExpression;
 import expressions.java8_expressions.UnaryExpression;
 
@@ -66,6 +69,8 @@ import expressions.java8_expressions.UnaryExpression;
  * @author Micahel Reif
  */
 public final class ExpressionPrinter extends ExpressionVisitor<String> {
+	
+	public static final String FQN = "expressions/ExpressionPrinter";
 
     @CGNote(value = STATIC_INITIALIZERS,
             description = "static initializers are called by the jvm;" +
@@ -80,22 +85,27 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
     private ExpressionPrinter() {
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String visit(Constant c) {
         return String.valueOf(c.getValue());
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String visit(Variable v) {
         return v.name;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String visit(BinaryExpression b) {
         return "(" + b.left().toString() + b.operator().toString() + b.right().toString() + ")";
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String visit(UnaryExpression u) {
         return u.toString();
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public synchronized static void printExpression(Expression e) {
         System.out.print(e.accept(instance));
     }

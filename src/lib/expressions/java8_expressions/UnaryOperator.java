@@ -31,6 +31,10 @@
 package expressions.java8_expressions;
 
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
+
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.NOTE;
 
 /**
@@ -54,6 +58,7 @@ public enum UnaryOperator {
         this.name = name;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return this.name;
     }

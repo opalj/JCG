@@ -78,8 +78,8 @@ import static annotations.callgraph.AnalysisMode.*;
 public class ExternalizableConstant extends AltConstant implements Externalizable {
 
 	public static final String ExternalizableConstantReceiverType = "serialized_expressions/ExternalizableConstant";
-	public static final String ObjectOutputSReceiverType = "java/io/ObjectOutput";
-	public static final String ObjectInputReceiverType = "java/io/ObjectInput";
+	public static final String ObjectOutputStreamReceiverType = "java/io/ObjectOutputStream";
+	public static final String ObjectInputStreamReceiverType = "java/io/ObjectInputStream";
 
     private int value;
 
@@ -87,6 +87,7 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
         this.value = value;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public int getValue() {
         return value;
     }
@@ -100,25 +101,25 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "readInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectInputReceiverType)}, line = 105)
+    @CallSite(name = "readInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectInputStreamReceiverType)}, line = 106)
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     	value = in.readInt();
     }
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "writeInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectOutputSReceiverType)}, line = 111)
+    @CallSite(name = "writeInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectOutputStreamReceiverType)}, line = 112)
     public void writeExternal(ObjectOutput out) throws IOException {
     	out.writeInt(value);
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 117)
+    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 118)
     private Object writeReplace() throws ObjectStreamException {
     	return replacementFactory();
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 123)
+    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 124)
     private Object readResolve() throws ObjectStreamException {
     	return replacementFactory();
     }
@@ -128,11 +129,13 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
     }
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public Constant eval(Map values) {
 		return null;
 	}
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public Object accept(ExpressionVisitor visitor) {
 		return null;
 	}

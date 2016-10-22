@@ -35,10 +35,13 @@ import annotations.callgraph.ResolvedMethod;
 import annotations.callgraph.TargetResolution;
 import annotations.documentation.CGCategory;
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 import expressions.Constant;
 
 import java.util.function.Function;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.callgraph.TargetResolution.DYNAMIC;
 import static annotations.documentation.CGCategory.INVOKEDYNAMIC;
 
@@ -66,7 +69,8 @@ public interface IUnaryOperator extends Function<Constant, Constant> {
             returnType = Constant.class,
             parameterTypes = {Constant.class},
             resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN),
-            line = 71)
+            line = 75)
+    @EntryPoint(value = {OPA})
     static IUnaryOperator identity() {
         return constant -> constant;
     }

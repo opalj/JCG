@@ -34,7 +34,10 @@ import annotations.callgraph.CallSite;
 import annotations.callgraph.InvokedConstructor;
 import annotations.callgraph.ResolvedMethod;
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.*;
 
 /**
@@ -110,8 +113,9 @@ public class Map<K, V> {
 
     }
 
-    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 117)
-    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 128)
+    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 121)
+    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 132)
+    @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
             root = new LinkedEntry(k, v);
@@ -136,16 +140,17 @@ public class Map<K, V> {
         }
     }
 
-    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)}, line = 141)
+    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)}, line = 146)
+    @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 154)
+    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 159)
     @CallSite(name = "next", resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 154)
+    line = 159)
     @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();
@@ -159,6 +164,7 @@ public class Map<K, V> {
         return sb.toString();
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public V get(K name) {
         LinkedEntry cur = root;
         while(cur != null){
@@ -171,6 +177,7 @@ public class Map<K, V> {
         return null;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public Iterator iterator(){
         return new MapIterator(root);
     }

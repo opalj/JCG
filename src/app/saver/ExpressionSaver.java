@@ -82,8 +82,8 @@ public class ExpressionSaver {
 	@EntryPoint(value = { DESKTOP_APP, OPA, CPA })
 	public static void main(final String[] args) {
 
-		Runnable ip = InputPrinter(args);
-		Runnable aip = AltInputPrinter();
+		Runnable ip = new InputPrinter(args);
+		Runnable aip = new AltInputPrinter();
 		
 		Constant serializableConst = new SerializableConstant(42);
 		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);
@@ -102,18 +102,19 @@ public class ExpressionSaver {
 
 	}
 	
-	private void save(Object obj, String fileName) throws IOException {
+	private static void save(Object obj, String fileName) throws IOException {
 		FileOutputStream fos = new FileOutputStream(fileName);
 		ObjectOutputStream out = new ObjectOutputStream(fos);
 		out.writeObject(obj);
 		out.close();
 	}
 	
-	private void load(String fileName) throws IOException, ClassNotFoundException {
+	private static Object load(String fileName) throws IOException, ClassNotFoundException {
 		Object obj = null;
 		FileInputStream fis = new FileInputStream(fileName);
 		ObjectInputStream in = new ObjectInputStream(fis);
 		obj = in.readObject();
 		in.close();
+		return obj;
 	}
 }

@@ -30,6 +30,11 @@
 
 package testutils;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
+
+import annotations.properties.EntryPoint;
+
 /**
  * This class can be called to test static initializers.
  *
@@ -54,6 +59,7 @@ public class StaticInitializerTest {
 
     public static final String FQN = "testutils/StaticInitializerTest";
 
+    @EntryPoint(value = {OPA, CPA})
     public static void staticCall(){
         // method stub
     }

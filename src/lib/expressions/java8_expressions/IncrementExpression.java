@@ -32,11 +32,14 @@ package expressions.java8_expressions;
 
 import annotations.callgraph.*;
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 import expressions.*;
 import fancy_expressions.MultOperator;
 
 import java.util.function.UnaryOperator;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.callgraph.CallGraphAlgorithm.CHA;
 import static annotations.callgraph.TargetResolution.DYNAMIC;
 import static annotations.documentation.CGCategory.INVOKEDYNAMIC;
@@ -78,7 +81,8 @@ public class IncrementExpression extends UnaryExpression {
             returnType = Constant.class,
             parameterTypes = {Constant.class},
             resolvedMethods = @ResolvedMethod(receiverType = "expressions/java8_expressions/IncrementExpression"),
-            line = 83)
+            line = 87)
+    @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
         return (Constant constant) -> new Constant(constant.getValue() + 1);
     }
@@ -87,6 +91,7 @@ public class IncrementExpression extends UnaryExpression {
         super(expr);
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
@@ -99,7 +104,8 @@ public class IncrementExpression extends UnaryExpression {
             @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
             @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
             @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)
-    }, returnType = String.class, line = 104)
+    }, returnType = String.class, line = 110)
+    @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Inc("+ expr.toString() + ")";
     }

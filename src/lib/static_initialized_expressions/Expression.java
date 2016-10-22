@@ -78,6 +78,7 @@ public interface Expression {
 		return "expression";
 	}
 
+    @EntryPoint(value = {OPA})
     default void printName(){
     	System.out.println(name);
     }

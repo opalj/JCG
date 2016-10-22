@@ -30,6 +30,11 @@
 
 package testutils;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
+
+import annotations.properties.EntryPoint;
+
 /**
  * This class can be called to test static initializers.
  *
@@ -58,6 +63,7 @@ public class CallbackTest {
     /**
      * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
      */
+    @EntryPoint(value = {OPA, CPA})
     public static void callback(){
         // do nothing
     }
@@ -65,6 +71,7 @@ public class CallbackTest {
     /**
      * This method is defined to document garbade collector calls.
      */
+    @EntryPoint(value = {OPA, CPA})
     public static void garbageCollectorCall(){
         // do nothing
     }
@@ -73,6 +80,7 @@ public class CallbackTest {
     /**
      * This method is defined to document calls to run method of Runnable.
      */
+    @EntryPoint(value = {OPA, CPA})
     public static void runnableRunCall(){
         // do nothing
     }

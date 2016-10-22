@@ -32,6 +32,8 @@ package serialized_expressions;
 
 import java.io.Serializable;
 
+import expressions.ExpressionVisitor;
+
 /**
  * This class defines an application use case of the expression library and has some well defined properties
  * wrt. call graph construction. It covers primarily serialization and externalization.
@@ -60,15 +62,16 @@ import java.io.Serializable;
  * @author Michael Eichberg
  * @author Micahel Reif
  * @author Roberts Kolosovs
+ * @param <T>
  */
-public interface Expression extends Serializable {
+public interface Expression<T> extends Serializable {
 
     static final int MajorVersion = 1;
     static final int MinorVersion = 0;
 
     Constant eval(Map<String,Constant> values);
 
-    <T> T accept(ExpressionVisitor <T> visitor);
+    T accept(ExpressionVisitor <T> visitor);
 
 }
 

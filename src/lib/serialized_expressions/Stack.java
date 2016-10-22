@@ -30,8 +30,11 @@
 
 package serialized_expressions;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.NATIVE_CALLBACK;
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 import expressions.Iterator;
 
 /**
@@ -71,6 +74,7 @@ public class Stack<V> {
     @CGNote(value = NATIVE_CALLBACK,
             description = "potential callback because an object type is passed to a native method;" +
                     "methods of this object could be called from native code (I.e. toString, clone etc.)")
+    @EntryPoint(value = {OPA, CPA})
     public void push(V v){
         if(data.length == entries) {
             V[]  newData = (V[]) new Object[entries*2+1];
@@ -81,29 +85,34 @@ public class Stack<V> {
         entries += 1;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public int size() {
         return entries;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public V peek(){
         return data[entries-1];
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public V pop(){
         V v = data[entries-1];
                 entries -= 1;
                         return  v;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public boolean isEmpty(){ return entries == 0; }
 
+    @EntryPoint(value = {OPA, CPA})
     public Iterator<V> iterator(){
         return new StackIterator(data, entries);
     }
 
     class StackIterator implements Iterator<V>{
 
-        public static final String FQN = "expressions/Stack$StackIterator";
+        public static final String FQN = "serialized_expressions/Stack$StackIterator";
         private V[] data;
         private int cur = 0;
 
@@ -114,16 +123,19 @@ public class Stack<V> {
         }
 
         @Override
+        @EntryPoint(value = {OPA, CPA})
         public boolean hasNext() {
             return cur >= 0;
         }
 
         @Override
+        @EntryPoint(value = {OPA, CPA})
         public V next() {
             return data[cur--];
         }
 
         @Override
+        @EntryPoint(value = {OPA, CPA})
         public void remove() throws UnsupportedOperationException {
             throw new UnsupportedOperationException();
         }

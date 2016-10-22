@@ -32,11 +32,14 @@ package expressions.java8_expressions;
 
 import annotations.callgraph.*;
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 import expressions.*;
 import fancy_expressions.MultOperator;
 
 import java.lang.reflect.Constructor;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.callgraph.CallGraphAlgorithm.CHA;
 import static annotations.documentation.CGCategory.REFLECTION;
 import static expressions.java8_expressions.UnaryOperator.IDENTITY;
@@ -86,12 +89,13 @@ public abstract class UnaryExpression implements Expression {
                     @ResolvedMethod(receiverType = DecrementExpression.FQN),
                     @ResolvedMethod(receiverType = IncrementExpression.FQN)},
             resolution = TargetResolution.REFLECTIVE,
-            line = 102)
+            line = 106)
     @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
             resolution = TargetResolution.REFLECTIVE,
-            line = 108)
+            line = 112)
+    @EntryPoint(value = {OPA, CPA})
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
             final Expression expr) {
@@ -119,6 +123,7 @@ public abstract class UnaryExpression implements Expression {
         this.expr = expr;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public abstract String toString();
 
     @CallSite(name = "eval", returnType = Constant.class, parameterTypes = Map.class,
@@ -128,11 +133,12 @@ public abstract class UnaryExpression implements Expression {
             @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
             @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
             @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
-    }, line = 137)
+    }, line = 143)
     @CallSite(name = "apply", returnType = Constant.class, parameterTypes = Constant.class,
             resolvedMethods = {
                     @ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-            }, line = 137)
+            }, line = 143)
+    @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String, Constant> values) {
         return operator().apply(expr.eval(values));
     }

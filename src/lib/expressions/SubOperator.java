@@ -30,6 +30,11 @@
 
 package expressions;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
+
+import annotations.properties.EntryPoint;
+
 /**
  *
  *
@@ -74,6 +79,8 @@ public class SubOperator extends Operator {
 
     public static class SubExpression extends BinaryExpression {
 
+    	public static final String FQN = "expressions/SubOperator$SubExpression";
+    	
         private final Expression right;
         private final Expression left;
 
@@ -81,10 +88,14 @@ public class SubOperator extends Operator {
          this.left = left;
             this.right = right;
         }
+
+        @EntryPoint(value = {OPA, CPA})
         public Expression left(){return this.left;}
 
+        @EntryPoint(value = {OPA, CPA})
         public Expression right(){return this.right;}
 
+        @EntryPoint(value = {OPA, CPA})
         public Operator operator(){return SubOperator.instance;}
 
         @Override public Constant eval(Map<String, Constant> values) {
@@ -92,10 +103,12 @@ public class SubOperator extends Operator {
         }
     }
 
+    @EntryPoint(value = {OPA})
     static BinaryExpression createBinaryExpression(Expression left,Expression right ) {
         return new SubExpression(left,right);
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "-";
     }

@@ -195,7 +195,8 @@ public class ExpressionEvaluator {
      * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "testutils/CallbackTest")}, line = 200)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "testutils/CallbackTest")}, line = 201)
+    @EntryPoint(value = {OPA, CPA})
     public String toString() {
         callback();
         return "ExpressionEvaluater v0.1";

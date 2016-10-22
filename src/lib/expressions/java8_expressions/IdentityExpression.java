@@ -39,6 +39,8 @@ import expressions.ExpressionVisitor;
 import testutils.CallbackTest;
 import testutils.StaticInitializerTest;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.NOTE;
 
 /**
@@ -76,9 +78,10 @@ public class IdentityExpression extends UnaryExpression {
 
     private static /* final */ IUnaryOperator _IDENTITY;
 
-    @CallSite(name = "staticCall", resolvedMethods = {@ResolvedMethod(receiverType = StaticInitializerTest.FQN)}, isStatic = true, line = 83)
+    @CallSite(name = "staticCall", resolvedMethods = {@ResolvedMethod(receiverType = StaticInitializerTest.FQN)}, isStatic = true, line = 86)
     @CGNote(value = NOTE, description = "The call on UnaryOperator is a call on an interface default method.")
-    @CallSite(name = "identity", resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN), isStatic = true, line = 84)
+    @CallSite(name = "identity", resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN), isStatic = true, line = 87)
+    @EntryPoint(value = {OPA, CPA})
     private static void clinit(){
         StaticInitializerTest.staticCall();
         _IDENTITY = IUnaryOperator.identity();
@@ -92,21 +95,24 @@ public class IdentityExpression extends UnaryExpression {
         super(expr);
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
         return _IDENTITY;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Id("+expr.toString()+")";
     }
 
     @EntryPoint
     @CGNote(value = NOTE, description = "This method is called during the garbage collection process if no references to this object are hold. It therefore becomes an entry point")
-    @CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 111)
+    @CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 117)
     @Override public void finalize() throws Throwable{
         CallbackTest.garbageCollectorCall();
         super.finalize();

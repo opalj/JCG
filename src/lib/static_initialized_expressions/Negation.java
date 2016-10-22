@@ -86,10 +86,12 @@ public class Negation extends UnaryExpression{
         this.value = value;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public ArithmeticExpression getValue() {
         return value;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public int eval(Map<String,Constant> values) {
         return -(value.eval(values));
     }

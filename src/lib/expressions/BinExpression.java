@@ -31,10 +31,13 @@
 package expressions;
 
 import annotations.documentation.CGNote;
+import annotations.properties.EntryPoint;
 
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.SERIALIZABILITY;
 
 /**
@@ -66,6 +69,8 @@ import static annotations.documentation.CGCategory.SERIALIZABILITY;
  * @author Micahel Reif
  */
 public class BinExpression implements Expression {
+	
+	public static final String FQN = "expressions/BinExpression"; 
 
     private Expression left;
     private Expression right;
@@ -75,22 +80,27 @@ public class BinExpression implements Expression {
     private BinExpression() {
     }
 
+    @EntryPoint(value = {CPA, OPA})
     protected Expression left() {
         throw new UnknownError();
     }
 
+    @EntryPoint(value = {CPA, OPA})
     protected Expression right() {
         throw new UnknownError();
     }
 
+    @EntryPoint(value = {CPA, OPA})
     protected Operator operator() {
         throw new UnknownError();
     }
 
+    @EntryPoint(value = {OPA, CPA})
     @Override public Constant eval(Map<String, Constant> values) {
         throw new UnknownError();
     }
 
+    @EntryPoint(value = {OPA, CPA})
     @Override public <T> T accept(ExpressionVisitor<T> visitor) {
         throw new UnknownError();
     }
@@ -98,6 +108,7 @@ public class BinExpression implements Expression {
     @CGNote(
             value = SERIALIZABILITY,
             description = "This method is called if an old instance of this class is read from some stream.")
+    @EntryPoint(value = {OPA, CPA})
     private Object readResolve() throws ObjectStreamException {
         if(operator == PlusOperator.instance)
             return new PlusOperator.AddExpression(left,right);

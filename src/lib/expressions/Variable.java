@@ -30,6 +30,11 @@
 
 package expressions;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
+
+import annotations.properties.EntryPoint;
+
 /**
  * Wraps a String and represents a variable.
  *
@@ -58,15 +63,19 @@ package expressions;
  * @author Micahel Reif
  */
 public class Variable implements Expression {
-
+	
+	public static final String FQN = "expressions/Variable";
+	
     public final String name;
 
     public Variable(String name) {this.name = name;}
 
+    @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String,Constant> values){
         return values.get(name);
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor) {
         return visitor.visit(this);
     }

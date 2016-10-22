@@ -37,6 +37,8 @@ import annotations.documentation.CGNote;
 import annotations.properties.EntryPoint;
 import expressions.Iterator;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.*;
 
 /**
@@ -62,8 +64,8 @@ import static annotations.documentation.CGCategory.*;
  */
 public class Map<K, V> {
 
-    public static final String MapReceiverType = "expressions/Map";
-    public static final String linkedEntryRecieverType = "expressions/Map$LinkedEntry";
+    public static final String MapReceiverType = "static_initialized_expressions/Map";
+    public static final String linkedEntryRecieverType = "static_initialized_expressions/Map$LinkedEntry";
 
     @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.")
     private class LinkedEntry {
@@ -110,8 +112,9 @@ public class Map<K, V> {
 
     }
 
-    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 117)
-    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 128)
+    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 120)
+    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 131)
+    @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
             root = new LinkedEntry(k, v);
@@ -136,17 +139,19 @@ public class Map<K, V> {
         }
     }
 
-    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)}, line = 141)
+    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)}, line = 145)
+    @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 154)
+    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 159)
     @CallSite(name = "next", resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 154)
+    line = 159)
     @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
+    @EntryPoint(value = {OPA, CPA})
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();
         Iterator itr = this.iterator();
@@ -159,6 +164,7 @@ public class Map<K, V> {
         return sb.toString();
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public V get(K name) {
         LinkedEntry cur = root;
         while(cur != null){
@@ -171,13 +177,14 @@ public class Map<K, V> {
         return null;
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public Iterator iterator(){
         return new MapIterator(root);
     }
 
     private class MapIterator implements Iterator<LinkedEntry>{
 
-        private static final String FQN = "expressions/Map$MapIterator";
+        private static final String FQN = "static_initialized_expressions/Map$MapIterator";
 
         private LinkedEntry cur;
 

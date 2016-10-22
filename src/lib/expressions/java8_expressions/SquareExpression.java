@@ -30,8 +30,12 @@
 
 package expressions.java8_expressions;
 
+import static annotations.callgraph.AnalysisMode.CPA;
+import static annotations.callgraph.AnalysisMode.OPA;
+
 import annotations.callgraph.CallSite;
 import annotations.callgraph.ResolvedMethod;
+import annotations.properties.EntryPoint;
 import expressions.*;
 import fancy_expressions.MultOperator;
 
@@ -56,14 +60,14 @@ import fancy_expressions.MultOperator;
  * <p>
  * <p>
  * <p>
- * <p>
- * <p>
  * -->
  *
  * @author Micahel Reif
  */
 public final class SquareExpression extends UnaryExpression {
 
+	public static final String FQN = "expressions/java8_expressions/SquareExpression";
+	
     private Expression square;
 
     public SquareExpression(Expression expr){
@@ -71,10 +75,12 @@ public final class SquareExpression extends UnaryExpression {
         square = new MultOperator.MultExpression(expr, expr);
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
         return (Constant c) -> new Constant(c.getValue() * c.getValue());
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return expr.toString() + "²";
     }
@@ -83,12 +89,14 @@ public final class SquareExpression extends UnaryExpression {
             returnType = Constant.class,
             parameterTypes = {Map.class},
             resolvedMethods = @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
-            line = 88)
+            line = 95)
+    @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String, Constant> values) {
         return square.eval(values);
     }
 
     @Override
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
