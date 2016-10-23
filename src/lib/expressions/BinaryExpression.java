@@ -91,7 +91,7 @@ public abstract class BinaryExpression implements Expression {
                     @ResolvedMethod(receiverType = SubOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})
             },
             resolution = TargetResolution.REFLECTIVE,
-            line = 100
+            line = 101
     )
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
