@@ -123,19 +123,19 @@ public class Stack<V> {
         }
 
         @Override
-        @EntryPoint(value = {OPA, CPA})
+        @EntryPoint(value = {OPA})
         public boolean hasNext() {
             return cur >= 0;
         }
 
         @Override
-        @EntryPoint(value = {OPA, CPA})
+        @EntryPoint(value = {OPA})
         public V next() {
             return data[cur--];
         }
 
         @Override
-        @EntryPoint(value = {OPA, CPA})
+        @EntryPoint(value = {OPA})
         public void remove() throws UnsupportedOperationException {
             throw new UnsupportedOperationException();
         }

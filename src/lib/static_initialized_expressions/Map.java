@@ -56,8 +56,6 @@ import static annotations.documentation.CGCategory.*;
  *
  *
  *
- *
- *
  * <--
  * @author Michael Eichberg
  * @author Michael Reif
@@ -99,10 +97,12 @@ public class Map<K, V> {
     @CGNote(value = POLYMORPHIC_CALL, description = "an anonymous class is created; the methods of this class become potential call targets.")
     public static final Map<?,?> EMPTY = new Map<Object,Object>(){
 
+        @EntryPoint(value = {OPA, CPA})
         @Override public void add(Object o, Object o2) {
             throw new UnsupportedOperationException();
         }
 
+        @EntryPoint(value = {OPA, CPA})
         @Override public Object get(Object name) {
             return null;
         }
@@ -145,13 +145,12 @@ public class Map<K, V> {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 159)
+    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 158)
     @CallSite(name = "next", resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 159)
+    line = 158)
     @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
-    @EntryPoint(value = {OPA, CPA})
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();
         Iterator itr = this.iterator();

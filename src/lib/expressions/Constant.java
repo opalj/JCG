@@ -96,6 +96,7 @@ public class Constant implements Expression, Serializable{
         return visitor.visit(this);
     }
 
+    @EntryPoint(value = {OPA, CPA})
     public native float toFloat();
 
     @EntryPoint(value = {OPA, CPA})
