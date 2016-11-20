@@ -70,12 +70,8 @@ import static testutils.CallbackTest.callback;
  * <p>
  * <p>
  * <p>
- * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * <p>
  * <p>
  * <p>
  * <p>
@@ -83,6 +79,7 @@ import static testutils.CallbackTest.callback;
  *
  * @author Michael Eichberg
  * @author Micahel Reif
+ * @author Roberts Kolosovs
  */
 public class ExpressionEvaluator {
 
@@ -107,6 +104,9 @@ public class ExpressionEvaluator {
             parameterTypes = {String.class, Expression.class, Expression.class},
             line = 175)
     public static void main(final String[] args) {
+ 
+    	ExpressionEvaluator mainClass = new ExpressionEvaluator();
+    	mainClass.printSubtraction(new PlusOperator.AddExpression(null, null));
 
         String[] expressions = args.clone();
 
@@ -200,5 +200,25 @@ public class ExpressionEvaluator {
     public String toString() {
         callback();
         return "ExpressionEvaluater v0.1";
+    }
+    
+    /*
+     * This method contains calls which are not detected if this method is not labeled 
+     * as an entry point and a context sensitive analysis is employed.
+     */
+    @CallSite(name = "printText", resolvedMethods = {
+    		@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator", 
+    						iff = {@ResolvingCondition(mode = {OPA, CPA})})}, line = 215)
+    @EntryPoint(value = {OPA, CPA})
+    public void printSubtraction(Expression op){
+    	if (op instanceof SubOperator.SubExpression) {
+			printText(((SubOperator.SubExpression) op).left() + "-" + ((SubOperator.SubExpression) op).right());
+		} else {
+			//do nothing
+		}
+    }
+    
+    private void printText(String txt){
+    	System.out.println(txt);
     }
 }
