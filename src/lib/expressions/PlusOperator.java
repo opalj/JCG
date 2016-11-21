@@ -3,7 +3,7 @@
  * Copyright (c) 2009 - 2016
  * Software Technology Group
  * Department of Computer Science
- * Technische UniversitÃ¤t Darmstadt
+ * Technische Universität Darmstadt
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ import annotations.properties.EntryPoint;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public class PlusOperator extends Operator {
 
