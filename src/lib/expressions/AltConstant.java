@@ -101,13 +101,13 @@ public class AltConstant implements Externalizable{
     @EntryPoint(value = {OPA, CPA})
     public native float toFloat();
 
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "readInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectInputStreamReceiverType)}, line = 107)
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     	value = in.readInt();
     }
 
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "writeInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectOutputStreamReceiverType)}, line = 113)
     public void writeExternal(ObjectOutput out) throws IOException {
     	out.writeInt(value);
@@ -123,7 +123,7 @@ public class AltConstant implements Externalizable{
     	return this;
     }
     
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    @EntryPoint(value = {OPA, CPA})
 	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 129)
     public void finalize () {
 		CallbackTest.garbageCollectorCall();
