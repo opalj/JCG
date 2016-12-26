@@ -30,8 +30,13 @@
 
 package serialized_expressions;
 
-import java.io.Serializable;
+import static annotations.callgraph.AnalysisMode.*;
 
+import java.io.Serializable;
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
+
+import annotations.properties.EntryPoint;
 import expressions.ExpressionVisitor;
 
 /**
@@ -47,10 +52,8 @@ import expressions.ExpressionVisitor;
  *
  *
  *
- *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
  *
  *
  *
@@ -73,5 +76,17 @@ public interface Expression<T> extends Serializable {
 
     T accept(ExpressionVisitor <T> visitor);
 
+    @EntryPoint(value = {OPA, CPA})
+    @CallSite(name= "makeVersionName", resolvedMethods = {
+    		@ResolvedMethod(receiverType = "serialized_expressions/Expression")
+    }, line = 84)
+    public static String getVersion(){
+    	return makeVersionName();
+    }
+    
+    @EntryPoint(value = {OPA})
+    static String makeVersionName(){
+    	return MajorVersion + "." + MinorVersion;
+    }
 }
 

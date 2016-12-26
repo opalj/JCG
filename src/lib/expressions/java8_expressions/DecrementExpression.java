@@ -30,6 +30,9 @@
 
 package expressions.java8_expressions;
 
+import annotations.callgraph.CallSite;
+import annotations.callgraph.InvokedConstructor;
+import annotations.callgraph.ResolvedMethod;
 import annotations.documentation.CGCategory;
 import annotations.documentation.CGNote;
 import annotations.properties.EntryPoint;
@@ -104,6 +107,7 @@ public class DecrementExpression extends UnaryExpression {
         }
 
         @EntryPoint(value = {OPA, CPA})
+        @InvokedConstructor(receiverType = FQN, line = 113)
         public static DecrementOperator newInstance() {
            if(_INSTANCE == null){
                _INSTANCE = new DecrementOperator();
@@ -113,6 +117,9 @@ public class DecrementExpression extends UnaryExpression {
         }
 
         @EntryPoint(value = {OPA, CPA})
+        @CallSite(name= "getValue", resolvedMethods = {
+        		@ResolvedMethod(receiverType = Constant.FQN)
+        }, line = 124)
         public Constant apply(Constant constant) {
             return new Constant(constant.getValue() - 1);
         }

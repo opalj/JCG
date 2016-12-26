@@ -37,10 +37,13 @@ import static annotations.callgraph.AnalysisMode.CPA;
 import static annotations.callgraph.AnalysisMode.OPA;
 import static annotations.documentation.CGCategory.NOTE;
 
+import annotations.callgraph.CallSite;
+import annotations.callgraph.ResolvedMethod;
+
 /**
  *  A enumeration type for all unary operator that are
- *
  * @author  Michael Reif
+ * @author Roberts Kolosovs
  */
 public enum UnaryOperator {
 
@@ -59,7 +62,15 @@ public enum UnaryOperator {
     }
 
     @EntryPoint(value = {OPA, CPA})
+    @CallSite(name= "consoleWrite", resolvedMethods = {
+    		@ResolvedMethod(receiverType = "expressions/java8_expressions/UnaryOperator")
+    }, line = 69)
     public String toString(){
+    	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
         return this.name;
+    }
+    
+    private void consoleWrite(String s) {
+    	System.out.println(s);
     }
 }
