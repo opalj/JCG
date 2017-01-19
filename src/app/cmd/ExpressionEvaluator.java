@@ -71,6 +71,7 @@ import static testutils.CallbackTest.callback;
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
  * <p>
+ * 
  * -->
  *
  * @author Michael Eichberg
@@ -86,10 +87,9 @@ public class ExpressionEvaluator {
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructors({
-    	@InvokedConstructor(receiverType = "cmd/ExpressionEvaluator", line = 108),
-    	@InvokedConstructor(receiverType = "expressions/PlusOperator", line = 109),
-    	@InvokedConstructor(receiverType = "expressions/Stack", line = 152)})
+    @InvokedConstructor(receiverType = "cmd/ExpressionEvaluator", line = 108)
+    @InvokedConstructor(receiverType = "expressions/PlusOperator", line = 109)
+    @InvokedConstructor(receiverType = "expressions/Stack", line = 152)
     @CallSite(name = "printSubtraction", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator")}, line = 109) 
     @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/Object")}, line = 111)
     @CallSite(name = "push", parameterTypes = {Constant.class}, resolvedMethods = {@ResolvedMethod(receiverType = "expressions/Stack")}, line = 156)
