@@ -1,14 +1,6 @@
-name := "Annotated Java Call Graph (JCG) Expressions"
+name := "Expressions"
 
-version := "0.0.1-SNAPSHOT"
+// TODO Move the Java annotations to test-fixtures!
+unmanagedSourceDirectories in Test := (javaSource in Test).value :: (scalaSource in Test).value :: Nil
 
-scalacOptions in (Compile, doc) := Opts.doc.title("The Annotated Java Call Graph Project")
-
-lazy val commonSettings = Seq(
-  version := "0.1-SNAPSHOT",
-  organization := "de.opal-project",
-  scalaVersion := "2.11.7"
-)
-
-lazy val app = (project in file("app")).
-  settings(commonSettings: _*)
+fork in run := true

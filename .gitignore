@@ -1,5 +1,5 @@
 /bin/
-target
+target/
 .project
 .classpath
 .cache-main
@@ -8,6 +8,7 @@ target
 *.ipr
 *.iml
 src/lib/out
+.settings
 *.soc
 *.aux
 *.out
