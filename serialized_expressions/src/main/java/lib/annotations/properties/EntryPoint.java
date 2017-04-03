@@ -1,8 +1,8 @@
-package annotations.properties;
+package lib.annotations.properties;
 
-import annotations.callgraph.AnalysisMode;
+import lib.annotations.callgraph.AnalysisMode;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 /**
  * 
  * This annotation indicates whether a method is an entry point. 

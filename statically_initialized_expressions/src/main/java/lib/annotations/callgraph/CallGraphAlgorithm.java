@@ -26,9 +26,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package annotations.callgraph;
+package lib.annotations.callgraph;
 
-import static annotations.callgraph.CallGraphAlgorithmOrder.*;
+import static lib.annotations.callgraph.CallGraphAlgorithmOrder.*;
 
 /**
  * Represents the different call graph algorithms. The algorithms form a lattice

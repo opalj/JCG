@@ -1,4 +1,4 @@
-package annotations.documentation;
+package lib.annotations.documentation;
 
 /**
  * Created by eichberg on 28.01.16.

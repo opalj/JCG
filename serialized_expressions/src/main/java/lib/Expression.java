@@ -28,16 +28,15 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package serialized_expressions;
+package lib;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
 import java.io.Serializable;
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 
-import annotations.properties.EntryPoint;
-import expressions.ExpressionVisitor;
+import lib.annotations.properties.EntryPoint;
 
 /**
  * This class defines an application use case of the expression library and has some well defined properties

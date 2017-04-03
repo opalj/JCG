@@ -28,14 +28,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package serialized_expressions;
+package lib;
 
-import static annotations.callgraph.AnalysisMode.CPA;
-import static annotations.callgraph.AnalysisMode.OPA;
-import static annotations.documentation.CGCategory.NATIVE_CALLBACK;
-import annotations.documentation.CGNote;
-import annotations.properties.EntryPoint;
-import expressions.Iterator;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.NATIVE_CALLBACK;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
 
 /**
  * A array-based stack implementation.

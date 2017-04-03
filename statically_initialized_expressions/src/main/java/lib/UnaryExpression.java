@@ -28,15 +28,15 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package static_initialized_expressions;
+package lib;
 
-import annotations.properties.EntryPoint;
-import testutils.StaticInitializerTest;
+import lib.annotations.properties.EntryPoint;
+import lib.testutils.StaticInitializerTest;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 /**
  * This class represents a unary arithmetic expression.
  *

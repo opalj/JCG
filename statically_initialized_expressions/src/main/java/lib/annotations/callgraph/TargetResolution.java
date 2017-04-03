@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package annotations.callgraph;
+package lib.annotations.callgraph;
 
 /**
  * Describes whether the method call instruction is a standard invoke instruction

@@ -28,19 +28,18 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package serialized_expressions;
+package lib;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
-import annotations.properties.EntryPoint;
-import expressions.ExpressionVisitor;
-import testutils.CallbackTest;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
+import lib.testutils.CallbackTest;
 
 import java.io.Serializable;
 import java.io.IOException;
 import java.io.ObjectStreamException;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
  * This class simply wraps an integer value. Defines methods to be called during 

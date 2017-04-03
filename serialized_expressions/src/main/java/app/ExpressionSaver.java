@@ -27,12 +27,12 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package saver;
+package app;
 
-import static annotations.callgraph.CallGraphAlgorithm.CHA;
-import static annotations.documentation.CGCategory.*;
+import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
+import static lib.annotations.documentation.CGCategory.*;
 
-import annotations.properties.EntryPoint;
+import lib.annotations.properties.EntryPoint;
 
 import java.io.ObjectOutputStream;
 import java.io.FileOutputStream;
@@ -41,9 +41,9 @@ import java.io.ObjectInputStream;
 import java.io.FileInputStream;
 import java.awt.EventQueue;
 
-import serialized_expressions.*;
+import lib.*;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
  * This class defines an application which saves an expression to a file via the

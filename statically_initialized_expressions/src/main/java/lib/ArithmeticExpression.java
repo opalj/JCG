@@ -28,16 +28,16 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package static_initialized_expressions;
+package lib;
 
-import static annotations.callgraph.AnalysisMode.CPA;
-import static annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
-import annotations.properties.EntryPoint;
-import testutils.CallbackTest;
-import testutils.StaticInitializerTest;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
+import lib.testutils.CallbackTest;
+import lib.testutils.StaticInitializerTest;
 
 /**
  * This interface extends the general Expression and represents a arithmetic expression 

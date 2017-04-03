@@ -28,15 +28,15 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package serialized_expressions;
+package lib;
 
-import annotations.properties.EntryPoint;
-import testutils.CallbackTest;
+import lib.annotations.properties.EntryPoint;
+import lib.testutils.CallbackTest;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 
 /**
  * This class is a runnable intended for printing input.

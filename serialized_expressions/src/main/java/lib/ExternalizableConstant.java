@@ -28,12 +28,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package serialized_expressions;
+package lib;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
-import annotations.properties.EntryPoint;
-import expressions.ExpressionVisitor;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
 
 import java.io.Serializable;
 import java.io.Externalizable;
@@ -44,7 +43,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
  * This class simply wraps an integer value. Defines methods to be called during (de-)externalization 

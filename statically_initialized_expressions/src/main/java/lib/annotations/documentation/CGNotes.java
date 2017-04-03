@@ -1,4 +1,4 @@
-package annotations.documentation;
+package lib.annotations.documentation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
