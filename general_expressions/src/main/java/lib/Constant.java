@@ -28,13 +28,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package lib;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
-import annotations.properties.EntryPoint;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
 
 import java.io.IOException;
 import java.io.ObjectStreamException;

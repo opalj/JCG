@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package lib;
 
 import java.io.Serializable;
 

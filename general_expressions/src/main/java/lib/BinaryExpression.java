@@ -27,17 +27,17 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package expressions;
+package lib;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.ResolvedMethod;
-import annotations.callgraph.ResolvingCondition;
-import annotations.callgraph.TargetResolution;
-import annotations.documentation.CGNote;
-import annotations.properties.EntryPoint;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.callgraph.ResolvingCondition;
+import lib.annotations.callgraph.TargetResolution;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
 
-import static annotations.callgraph.AnalysisMode.*;
-import static annotations.documentation.CGCategory.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.documentation.CGCategory.*;
 
 import java.lang.reflect.Method;
 

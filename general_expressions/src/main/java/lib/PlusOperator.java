@@ -28,12 +28,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package lib;
 
-import static annotations.callgraph.AnalysisMode.CPA;
-import static annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
-import annotations.properties.EntryPoint;
+import lib.annotations.properties.EntryPoint;
 
 /**
  * A plus operator that creates a binary add expression.

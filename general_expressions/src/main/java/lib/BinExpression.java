@@ -28,17 +28,17 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package lib;
 
-import annotations.documentation.CGNote;
-import annotations.properties.EntryPoint;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
 
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 
-import static annotations.callgraph.AnalysisMode.CPA;
-import static annotations.callgraph.AnalysisMode.OPA;
-import static annotations.documentation.CGCategory.SERIALIZABILITY;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.SERIALIZABILITY;
 
 /**
  * This class is no longer used, but if we deserialize an old expression it replaces itself

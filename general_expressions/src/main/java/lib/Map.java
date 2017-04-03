@@ -28,17 +28,17 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package lib;
 
-import annotations.callgraph.CallSite;
-import annotations.callgraph.InvokedConstructor;
-import annotations.callgraph.ResolvedMethod;
-import annotations.documentation.CGNote;
-import annotations.properties.EntryPoint;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.InvokedConstructor;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
 
-import static annotations.callgraph.AnalysisMode.CPA;
-import static annotations.callgraph.AnalysisMode.OPA;
-import static annotations.documentation.CGCategory.*;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.*;
 
 /**
  *

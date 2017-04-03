@@ -28,12 +28,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package testutils;
+package lib.testutils;
 
-import static annotations.callgraph.AnalysisMode.CPA;
-import static annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
-import annotations.properties.EntryPoint;
+import lib.annotations.properties.EntryPoint;
 
 /**
  * This class can be called to test static initializers.

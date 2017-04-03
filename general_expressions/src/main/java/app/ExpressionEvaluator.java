@@ -27,30 +27,25 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package cmd;
+package app;
 
-import static annotations.callgraph.CallGraphAlgorithm.CHA;
-import static annotations.documentation.CGCategory.*;
-import static expressions.java8_expressions.UnaryOperator.EXCEPTION;
-import static expressions.java8_expressions.UnaryOperator.INCREMENT;
+import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
+import static lib.annotations.documentation.CGCategory.*;
 import static java.lang.Integer.parseInt;
 
-import annotations.callgraph.*;
-import annotations.documentation.CGNote;
-import annotations.properties.EntryPoint;
+import lib.annotations.callgraph.*;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
 
-import static annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
-import expressions.*;
-import expressions.java8_expressions.IdentityExpression;
-import expressions.java8_expressions.SquareExpression;
-import expressions.java8_expressions.UnaryExpression;
+import lib.*;
 
 import java.util.Arrays;
 
-import static expressions.BinaryExpression.createBinaryExpression;
-import static expressions.PlusOperator.AddExpression;
-import static testutils.CallbackTest.callback;
+import static lib.BinaryExpression.createBinaryExpression;
+import static lib.PlusOperator.AddExpression;
+import static lib.testutils.CallbackTest.callback;
 
 /**
  * This class defines an application use case of the expression library and has some well defined properties

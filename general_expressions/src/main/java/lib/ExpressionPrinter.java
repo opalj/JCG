@@ -28,16 +28,14 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
+package lib;
 
-import static annotations.callgraph.AnalysisMode.CPA;
-import static annotations.callgraph.AnalysisMode.OPA;
-import static annotations.documentation.CGCategory.STATIC_INITIALIZERS;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.STATIC_INITIALIZERS;
 
-import annotations.documentation.CGNote;
-import annotations.properties.EntryPoint;
-import expressions.java8_expressions.IncrementExpression;
-import expressions.java8_expressions.UnaryExpression;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
 
 /**
  * This class defines an application use case of the expression library and has some well defined properties
@@ -66,7 +64,7 @@ import expressions.java8_expressions.UnaryExpression;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public final class ExpressionPrinter extends ExpressionVisitor<String> {
 	

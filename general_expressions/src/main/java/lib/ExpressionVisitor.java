@@ -28,9 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package expressions;
-
-import expressions.java8_expressions.UnaryExpression;
+package lib;
 
 /**
  * This class defines an application use case of the expression library and has
