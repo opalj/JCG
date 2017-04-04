@@ -40,6 +40,8 @@ import lib.annotations.callgraph.ResolvedMethod;
 /**
  * This class represents a unary arithmetic expression.
  *
+ * This class has a static initializer block. It is called first time the class is used.
+ *
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -49,10 +51,8 @@ import lib.annotations.callgraph.ResolvedMethod;
  *
  *
  *
- *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
  *
  *
  *
@@ -69,7 +69,7 @@ public class UnaryExpression implements ArithmeticExpression{
 
 	static String name;
 	
-	static {
+	static { //TODO: This should be the entry point but it can't be annotated.
 		init();
 	}
 

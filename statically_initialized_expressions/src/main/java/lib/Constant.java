@@ -41,10 +41,13 @@ import lib.annotations.callgraph.ResolvedMethod;
 /**
  * This class simply wraps an integer value.
  *
+ * This class has a static initializer in form of a method call in a static variables declaration.
+ *
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
+ *
  *
  *
  *
@@ -60,6 +63,7 @@ import lib.annotations.callgraph.ResolvedMethod;
  *
  *
  *
+ *
  * -->
  *
  * @author Michael Eichberg
@@ -68,17 +72,13 @@ import lib.annotations.callgraph.ResolvedMethod;
  */
 public class Constant implements ArithmeticExpression{
 
-	static String name;
-	
-	static {
-		init();
-	}
+	static String name = init();
 
 	@EntryPoint(value = {OPA, CPA})
 	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 80)
-	private static void init(){
+	private static String init(){
 		StaticInitializerTest.staticCall();
-		name = "constant";
+		return "constant";
 	}
 	
     private final int value;

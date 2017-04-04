@@ -42,6 +42,9 @@ import lib.annotations.callgraph.ResolvedMethod;
  * This interface defines an expression. It always knows it's name (saved in a static variable, 
  * initialized via a static method). It also provides a default method for printing its name.
  *
+ * This interface has a static initializer and defines a default method. Thus the static 
+ * initializer is called when the interface is first used.
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -51,11 +54,8 @@ import lib.annotations.callgraph.ResolvedMethod;
  *
  *
  *
- *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
  *
  *
  *

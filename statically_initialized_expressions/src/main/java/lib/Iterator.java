@@ -28,60 +28,33 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package lib.testutils;
-
-import static lib.annotations.callgraph.AnalysisMode.CPA;
-import static lib.annotations.callgraph.AnalysisMode.OPA;
-
-import lib.annotations.properties.EntryPoint;
+package lib;
 
 /**
- * This class can be called to test static initializers.
- *
- * E.g.: {{{
- *     class Foo{
- *
- *          // Annotate the call site here.
- *         private static void clinit(){
- *              testutils.StaticInitializerTest.staticCall();
- *             // doSomething ...
- *         }
- *
- *         static {
- *              clinit();
- *         }
- *     }
- * }}}
+ * Simple iterator interface.
  *
  * @author Michael Reif
- * @author Roberts Kolosovs
  */
-public class CallbackTest {
-
-    public static final String FQN = "lib/testutils/CallbackTest";
+public interface Iterator<T> {
 
     /**
-     * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
+     * Returns ´true´ if the iteration has more elements.
+     *
+     * @return ´true´, if the iteration has more elements.
      */
-    @EntryPoint(value = {OPA, CPA})
-    public static void callback(){
-        // do nothing
-    }
+    boolean hasNext();
 
     /**
-     * This method is defined to document garbade collector calls.
+     * Returns the next element in the iteration.
      */
-    @EntryPoint(value = {OPA, CPA})
-    public static void garbageCollectorCall(){
-        // do nothing
-    }
-    
+    T next();
 
     /**
-     * This method is defined to document calls to run method of Runnable.
+     * Removes from the underlying collection the last element returned by this iterator (optional operation).
+     * This method can be called only once per call to next(). The behavior of an iterator is unspecified if the underlying
+     * collection is modified while the iteration is in progress in any way other than by calling this method.
+     *
+     * @throws UnsupportedOperationException - if the remove operation is not supported by this iterator.
      */
-    @EntryPoint(value = {OPA, CPA})
-    public static void runnableRunCall(){
-        // do nothing
-    }
+    void remove() throws UnsupportedOperationException;
 }

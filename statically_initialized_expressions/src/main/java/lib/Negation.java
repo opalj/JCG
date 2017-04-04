@@ -40,11 +40,12 @@ import lib.annotations.callgraph.ResolvedMethod;
 /**
  * This class represents a negation operation.
  *
+ * This class has a static initializer block. It is called first time the class is used.
+ *
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
  *
  *
  *
@@ -58,7 +59,6 @@ import lib.annotations.callgraph.ResolvedMethod;
  *
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -66,10 +66,10 @@ import lib.annotations.callgraph.ResolvedMethod;
  * @author Roberts Kolosovs
  */
 public class Negation extends UnaryExpression{
-
+	
 	static String name;
 	
-	static {
+	static { //TODO: This should be the entry point but it can't be annotated.
 		init();
 	}
 

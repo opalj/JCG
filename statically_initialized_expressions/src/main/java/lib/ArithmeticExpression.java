@@ -43,6 +43,9 @@ import lib.testutils.StaticInitializerTest;
  * This interface extends the general Expression and represents a arithmetic expression 
  * (as opposed to a logical expression). It provides an abstract method eval.
  *
+ * This interface has a static initializer but defines no default method. Thus the static 
+ * initializer is not called the first time a class implementing the interface is instantiated.
+ *
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -51,11 +54,8 @@ import lib.testutils.StaticInitializerTest;
  *
  *
  *
- *
- *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
  *
  *
  *
