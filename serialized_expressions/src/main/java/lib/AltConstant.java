@@ -39,8 +39,7 @@ import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 
 /**
- * This class is a superclass for an externalizable implementation of an arithmetic constant. 
- * Defines a finalize method.
+ * This class is a superclass for an externalizable implementation of an arithmetic constant.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -69,10 +68,4 @@ import lib.annotations.callgraph.ResolvedMethod;
  */
 public abstract class AltConstant implements Expression{
 
-	@EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 75)
-    public void finalize () {
-		CallbackTest.garbageCollectorCall();
-    	System.out.println("AltConstant object destroyed.");
-    }
 }

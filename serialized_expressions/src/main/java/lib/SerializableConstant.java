@@ -42,16 +42,17 @@ import java.io.ObjectStreamException;
 import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during 
- * (de-)serialization and a finalize method.
+ * This class represents a mathematical constant by simply wrapping an integer value. 
+ * It has support for being saved to and loaded from an external file via the 
+ * Serializable interface.
+ * 
+ * Defines methods to be called during (de-)serialization. These are entrypoints in the 
+ * application scenario as (de-)serialization is performed in a main method in this project.
  *
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
  *
  *
  *
@@ -109,13 +110,6 @@ public class SerializableConstant extends Constant implements Serializable {
     
     private Object replacementFactory() {
     	return this;
-    }
-    
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 118)
-    public void finalize () {
-		CallbackTest.garbageCollectorCall();
-    	System.out.println("SerializableConstant object destroyed.");
     }
 
 	@Override

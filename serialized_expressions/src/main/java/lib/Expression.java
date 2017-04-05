@@ -39,8 +39,9 @@ import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers primarily serialization and externalization.
+ * Interface at the root of the class hierarchy. Models all expressions.
+ * 
+ * This interface defines a static method which is accessible as a entrypoint in the library scenario.
  *
  * <!--
  * <b>NOTE</b><br>

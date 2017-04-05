@@ -48,7 +48,7 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
  * This class defines an application which saves an expression to a file via the
- * serialization mechanism.
+ * serialization mechanism and then loads them.
  * 
  * This application class performs serialization and deserialization of serializable
  * classes thus making the serialization-specific methods of those classes entrypoints 
@@ -88,11 +88,11 @@ public class ExpressionSaver {
 		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);
 
 		try {
-			save(serializableConst, "const.ser");
-			save(externalizableConst, "extConst.ser");
-
 			serializableConst = (Constant) load("const.ser");
 			externalizableConst = (ExternalizableConstant) load("extConst.ser");
+			
+			save(serializableConst, "const.ser");
+			save(externalizableConst, "extConst.ser");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

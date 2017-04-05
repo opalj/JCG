@@ -46,8 +46,13 @@ import java.io.ObjectStreamException;
 import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during (de-)externalization 
- * but also contains readObject and writeObject methods.
+ * This class represents a mathematical constant by simply wrapping an integer value. 
+ * It has support for being saved to and loaded from an external file via the 
+ * Externalizable interface.
+ * 
+ * Defines methods to be called during (de-)externalization but also contains 
+ * readObject and writeObject methods. Those are dead code when defined in a class 
+ * implementing the Externalizable interface.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -57,12 +62,8 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  *
  *
  *
- *
- *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
  *
  *
  *
