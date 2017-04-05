@@ -77,7 +77,7 @@ public interface Expression<T> extends Serializable {
 
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name= "makeVersionName", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "serialized_expressions/Expression")
+    		@ResolvedMethod(receiverType = "lib/Expression")
     }, line = 84)
     public static String getVersion(){
     	return makeVersionName();

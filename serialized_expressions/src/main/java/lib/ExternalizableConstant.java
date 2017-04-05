@@ -76,7 +76,7 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  */
 public class ExternalizableConstant extends AltConstant implements Externalizable {
 
-	public static final String ExternalizableConstantReceiverType = "serialized_expressions/ExternalizableConstant";
+	public static final String ExternalizableConstantReceiverType = "lib/ExternalizableConstant";
 	public static final String ObjectOutputStreamReceiverType = "java/io/ObjectOutputStream";
 	public static final String ObjectInputStreamReceiverType = "java/io/ObjectInputStream";
 
