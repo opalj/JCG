@@ -61,8 +61,8 @@ import static lib.annotations.documentation.CGCategory.*;
  */
 public class Map<K, V> {
 
-    public static final String MapReceiverType = "static_initialized_expressions/Map";
-    public static final String linkedEntryRecieverType = "static_initialized_expressions/Map$LinkedEntry";
+    public static final String MapReceiverType = "lib/Map";
+    public static final String linkedEntryRecieverType = "lib/Map$LinkedEntry";
 
     @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.")
     private class LinkedEntry {
@@ -182,7 +182,7 @@ public class Map<K, V> {
 
     private class MapIterator implements Iterator<LinkedEntry>{
 
-        private static final String FQN = "static_initialized_expressions/Map$MapIterator";
+        private static final String FQN = "lib/Map$MapIterator";
 
         private LinkedEntry cur;
 
