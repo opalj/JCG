@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package lib;
+package lib.testutils;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
@@ -57,7 +57,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class StaticInitializerTest {
 
-    public static final String FQN = "testutils/StaticInitializerTest";
+    public static final String FQN = "lib/testutils/StaticInitializerTest";
 
     @EntryPoint(value = {OPA, CPA})
     public static void staticCall(){

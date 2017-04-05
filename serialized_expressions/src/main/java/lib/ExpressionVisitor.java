@@ -30,28 +30,23 @@
 
 package lib;
 
-import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.*;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-
 /**
- * This class is a runnable intended for printing expressions provided as input.
+ * This class defines an application use case of the expression library and has
+ * some well defined properties wrt. call graph construction. It covers ( inlc.
+ * the library) serveral Java language features to test whether a given call
+ * graph implementation can handle these features.
  *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- *
- *
- *
- *
+ * <!-- <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
  *
  *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
  *
  *
  *
@@ -62,26 +57,13 @@ import lib.annotations.callgraph.ResolvedMethod;
  * -->
  *
  * @author Michael Eichberg
- * @author Michael Reif
- * @author Roberts Kolosovs
+ * @author Micahel Reif
  */
-public class InputPrinter implements Runnable{
+public abstract class ExpressionVisitor<T> {
 
-    public static final String InputPrinterReceiverType = "serialized_expressions/InputPrinter";
-	
-	String[] val;
-	
-	public InputPrinter(String[] arg){
-		val = arg;
+	static {
+		System.out.println("Expression Visitor Version 1.00.00.00");
 	}
-	
-	@CallSite(name = "printConfirmation", resolvedMethods = {@ResolvedMethod(receiverType = InputPrinterReceiverType)}, line = 81)
-	@EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    public void run(){
-		printConfirmation();
-	}
-	
-	private void printConfirmation() {
-		System.out.println(val);
-	}
+
+	public abstract T visit(Constant c);
 }

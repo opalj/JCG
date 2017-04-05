@@ -28,7 +28,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package lib;
+package lib.testutils;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
@@ -58,7 +58,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class CallbackTest {
 
-    public static final String FQN = "testutils/CallbackTest";
+    public static final String FQN = "lib/testutils/CallbackTest";
 
     /**
      * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.

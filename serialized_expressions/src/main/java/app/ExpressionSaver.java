@@ -32,6 +32,7 @@ package app;
 import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
 import static lib.annotations.documentation.CGCategory.*;
 
+import lib.annotations.callgraph.InvokedConstructor;
 import lib.annotations.properties.EntryPoint;
 
 import java.io.ObjectOutputStream;
@@ -48,7 +49,10 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 /**
  * This class defines an application which saves an expression to a file via the
  * serialization mechanism.
- * <p>
+ * 
+ * This application class performs serialization and deserialization of serializable
+ * classes thus making the serialization-specific methods of those classes entrypoints 
+ * in an application scenario.
  * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -61,11 +65,8 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  * <p>
  * <p>
  * <p>
- * <p>
- * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
  * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
- * <p>
  * <p>
  * <p>
  * <p>
@@ -80,17 +81,13 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 public class ExpressionSaver {
 
 	@EntryPoint(value = { DESKTOP_APP, OPA, CPA })
+	@InvokedConstructor(receiverType = "lib/SerializableConstant", line = 87)
+	@InvokedConstructor(receiverType = "lib/ExternalizableConstant", line = 88)
 	public static void main(final String[] args) {
-
-		Runnable ip = new InputPrinter(args);
-		Runnable aip = new AltInputPrinter();
-		
 		Constant serializableConst = new SerializableConstant(42);
 		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);
 
 		try {
-			EventQueue.invokeLater(ip);
-			
 			save(serializableConst, "const.ser");
 			save(externalizableConst, "extConst.ser");
 

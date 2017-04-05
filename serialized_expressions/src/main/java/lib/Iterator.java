@@ -30,49 +30,31 @@
 
 package lib;
 
-import lib.annotations.properties.EntryPoint;
-import lib.testutils.CallbackTest;
-
-import static lib.annotations.callgraph.AnalysisMode.*;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-
 /**
- * This class is a runnable intended for printing input.
+ * Simple iterator interface.
  *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- *
- *
- *
- *
- *
- *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- *
- * -->
- *
- * @author Michael Eichberg
  * @author Michael Reif
- * @author Roberts Kolosovs
  */
-public class AltInputPrinter implements Runnable{
-	
-	@EntryPoint(value = {OPA, CPA})
-	@CallSite(name = "runnableRunCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 75)
-    public void run(){
-		testutils.CallbackTest.runnableRunCall();
-		System.out.println("input");
-	}
+public interface Iterator<T> {
+
+    /**
+     * Returns ´true´ if the iteration has more elements.
+     *
+     * @return ´true´, if the iteration has more elements.
+     */
+    boolean hasNext();
+
+    /**
+     * Returns the next element in the iteration.
+     */
+    T next();
+
+    /**
+     * Removes from the underlying collection the last element returned by this iterator (optional operation).
+     * This method can be called only once per call to next(). The behavior of an iterator is unspecified if the underlying
+     * collection is modified while the iteration is in progress in any way other than by calling this method.
+     *
+     * @throws UnsupportedOperationException - if the remove operation is not supported by this iterator.
+     */
+    void remove() throws UnsupportedOperationException;
 }
