@@ -5,9 +5,6 @@ object JCGBuild extends Build {
     lazy val general_expressions = Project(id = "general_expressions",
                            base = file("general_expressions"))
 
-    lazy val inner_class_expressions = Project(id = "inner_class_expressions",
-                           base = file("inner_class_expressions"))
-
     lazy val lambda_expressions = Project(id = "lambda_expressions",
                            base = file("lambda_expressions"))
 

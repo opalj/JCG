@@ -76,20 +76,7 @@ public class IdentityExpression extends UnaryExpression {
 
     public static final String FQN = "lib/IdentityExpression";
 
-    private static /* final */ IUnaryOperator _IDENTITY;
-
-    @CallSite(name = "staticCall", resolvedMethods = {@ResolvedMethod(receiverType = StaticInitializerTest.FQN)}, isStatic = true, line = 86)
-    @CGNote(value = NOTE, description = "The call on UnaryOperator is a call on an interface default method.")
-    @CallSite(name = "identity", resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN), isStatic = true, line = 87)
-    @EntryPoint(value = {OPA, CPA})
-    private static void clinit(){
-        StaticInitializerTest.staticCall();
-        _IDENTITY = IUnaryOperator.identity();
-    }
-
-    static {
-        clinit();
-    }
+    private static /* final */ IUnaryOperator _IDENTITY = IUnaryOperator.identity();
 
     public IdentityExpression(Expression expr){
         super(expr);

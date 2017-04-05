@@ -28,44 +28,39 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package lib;
+package lib.testutils;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
+import lib.annotations.properties.EntryPoint;
 
 /**
- * This class defines an application use case of the expression library and has
- * some well defined properties wrt. call graph construction. It covers ( inlc.
- * the library) serveral Java language features to test whether a given call
- * graph implementation can handle these features.
+ * This class can be called to test static initializers.
  *
- * <!-- <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves
- * documentation purposes.
+ * E.g.: {{{
+ *     class Foo{
  *
+ *          // Annotate the call site here.
+ *         private static void clinit(){
+ *              testutils.StaticInitializerTest.staticCall();
+ *             // doSomething ...
+ *         }
  *
+ *         static {
+ *              clinit();
+ *         }
+ *     }
+ * }}}
  *
- *
- *
- *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
- * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- * -->
- *
- * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
-public abstract class ExpressionVisitor<T> {
+public class StaticInitializerTest {
 
-	public abstract T visit(Constant c);
+    public static final String FQN = "testutils/StaticInitializerTest";
 
-	public abstract T visit(Variable v);
-
-	public abstract T visit(BinaryExpression b);
-
-	public abstract T visit(UnaryExpression b);
+    @EntryPoint(value = {OPA, CPA})
+    public static void staticCall(){
+        // method stub
+    }
 }

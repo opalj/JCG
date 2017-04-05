@@ -1,1 +1,8 @@
 This JCG sub-project highlights the java reflection API including the java8 addition of the Executable class.
+Contains following test cases:
+
+1. Class instantiated with the Class.newInstance() method.  
+  - BinaryExpression  
+  - UnaryExpression  
+2. Calling a method via Method.invoke().  
+  - BinaryExpression  

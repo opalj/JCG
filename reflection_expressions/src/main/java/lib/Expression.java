@@ -30,23 +30,25 @@
 
 package lib;
 
+import java.io.Serializable;
+
 /**
- * This class defines an application use case of the expression library and has
- * some well defined properties wrt. call graph construction. It covers ( inlc.
- * the library) serveral Java language features to test whether a given call
- * graph implementation can handle these features.
+ * This class defines an application use case of the expression library and has some well defined properties
+ * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
+ * a given call graph implementation can handle these features.
  *
- * <!-- <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves
- * documentation purposes.
- *
- *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
  *
  *
  *
  *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
- * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
  *
  *
  *
@@ -59,13 +61,16 @@ package lib;
  * @author Michael Eichberg
  * @author Micahel Reif
  */
-public abstract class ExpressionVisitor<T> {
+public interface Expression {
 
-	public abstract T visit(Constant c);
+	public static final String FQN = "lib/Expression";
+	
+    static final int MajorVersion = 1;
+    static final int MinorVersion = 0;
 
-	public abstract T visit(Variable v);
+    Constant eval(Map<String,Constant> values);
 
-	public abstract T visit(BinaryExpression b);
+    <T> T accept(ExpressionVisitor <T> visitor);
 
-	public abstract T visit(UnaryExpression b);
 }
+

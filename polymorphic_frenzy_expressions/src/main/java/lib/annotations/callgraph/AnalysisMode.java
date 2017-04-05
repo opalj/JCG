@@ -27,45 +27,42 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-
-package lib;
+package lib.annotations.callgraph;
 
 /**
- * This class defines an application use case of the expression library and has
- * some well defined properties wrt. call graph construction. It covers ( inlc.
- * the library) serveral Java language features to test whether a given call
- * graph implementation can handle these features.
- *
- * <!-- <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves
- * documentation purposes.
- *
- *
- *
- *
- *
- *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
- * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- * -->
- *
- * @author Michael Eichberg
- * @author Micahel Reif
+ * 
+ * This enum describes the mode which is used to analyze a project. The chosen mode reflects different
+ * scenarios where different assumption can be applied.
+ * 
+ * Depending on the chosen mode, the following attributes should differ:
+ *    1. The entry point set has to be identified according to the analysis mode.
+ *    2. The analysis modes decides whether call-by-signature has to be applied on interface method calls.
+ * 
+ * @author Michael Reif
  */
-public abstract class ExpressionVisitor<T> {
+public enum AnalysisMode {
+	/**
+	 * The project is analyzed as a desktop application with a fixed entry point set and a whole program analysis.
+	 */
+	DESKTOP_APP,
+	
+	/**
+	 * The project is a library analyzed under the open packages assumption; e.g. the client is allowed
+	 * to contribute to the library's packages. Call-by-signature has to be applied.
+	 */
+	OPA,
+	
+	/**
+	 * The project is a library analyzed under the closed packages assumption; e.g. the client is not allowed
+	 * to contribute to the library's packages. Call-by-signature has to be applied.
+	 */
+	CPA,
+	
+	/**
+	 * The project is a pure web application developed with JavaEE 6.
+	 */
+	EJB6_APP,
 
-	public abstract T visit(Constant c);
 
-	public abstract T visit(Variable v);
-
-	public abstract T visit(BinaryExpression b);
-
-	public abstract T visit(UnaryExpression b);
+	OSGI_BUNDLE
 }

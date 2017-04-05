@@ -28,44 +28,60 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package lib;
+package lib.testutils;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
+import lib.annotations.properties.EntryPoint;
 
 /**
- * This class defines an application use case of the expression library and has
- * some well defined properties wrt. call graph construction. It covers ( inlc.
- * the library) serveral Java language features to test whether a given call
- * graph implementation can handle these features.
+ * This class can be called to test static initializers.
  *
- * <!-- <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves
- * documentation purposes.
+ * E.g.: {{{
+ *     class Foo{
  *
+ *          // Annotate the call site here.
+ *         private static void clinit(){
+ *              testutils.StaticInitializerTest.staticCall();
+ *             // doSomething ...
+ *         }
  *
+ *         static {
+ *              clinit();
+ *         }
+ *     }
+ * }}}
  *
- *
- *
- *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
- * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- * -->
- *
- * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
+ * @author Roberts Kolosovs
  */
-public abstract class ExpressionVisitor<T> {
+public class CallbackTest {
 
-	public abstract T visit(Constant c);
+    public static final String FQN = "testutils/CallbackTest";
 
-	public abstract T visit(Variable v);
+    /**
+     * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
+     */
+    @EntryPoint(value = {OPA, CPA})
+    public static void callback(){
+        // do nothing
+    }
 
-	public abstract T visit(BinaryExpression b);
+    /**
+     * This method is defined to document garbade collector calls.
+     */
+    @EntryPoint(value = {OPA, CPA})
+    public static void garbageCollectorCall(){
+        // do nothing
+    }
+    
 
-	public abstract T visit(UnaryExpression b);
+    /**
+     * This method is defined to document calls to run method of Runnable.
+     */
+    @EntryPoint(value = {OPA, CPA})
+    public static void runnableRunCall(){
+        // do nothing
+    }
 }
