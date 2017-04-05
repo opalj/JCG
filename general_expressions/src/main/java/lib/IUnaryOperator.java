@@ -30,47 +30,45 @@
 
 package lib;
 
-import java.io.Serializable;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
+import lib.Constant;
+
+import java.util.function.Function;
+
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.callgraph.TargetResolution.DYNAMIC;
+import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * Represents an operation on a single operand that produces a result of the
+ * same type as its operand.  This is a specialization of {@code Function} for
+ * the case where the operand and result are of the same type.
  *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
+ * <p>This is a <a href="package-summary.html">functional interface</a>
+ * whose functional method is {@link #apply(Object)}.
  *
+ * @see Function
+ * @since 1.8
  *
- *
- *
- *
- *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- * -->
- *
- * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
-public interface Expression extends Serializable {
+@FunctionalInterface
+public interface IUnaryOperator extends Function<Constant, Constant> {
 
-	public static final String FQN = "lib/Expression";
-	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
+    String FQN = "lib/IUnaryOperator";
 
-    Constant eval(Map<String,Constant> values);
-
-    <T> T accept(ExpressionVisitor <T> visitor);
-
+    @CGNote(value = INVOKEDYNAMIC, description = "Lambda expressions are invoked over invokedynamic instructions.")
+    @CallSite(resolution = DYNAMIC,
+            name = "lambda$identity$0",
+            returnType = Constant.class,
+            parameterTypes = {Constant.class},
+            resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN),
+            line = 75)
+    @EntryPoint(value = {OPA})
+    static IUnaryOperator identity() {
+        return constant -> constant;
+    }
 }
-

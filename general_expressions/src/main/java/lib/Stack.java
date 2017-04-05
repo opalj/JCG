@@ -111,7 +111,7 @@ public class Stack<V> {
 
     class StackIterator implements Iterator<V>{
 
-        public static final String FQN = "expressions/Stack$StackIterator";
+        public static final String FQN = "lib/Stack$StackIterator";
         private V[] data;
         private int cur = 0;
 

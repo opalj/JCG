@@ -70,7 +70,7 @@ import static lib.annotations.documentation.CGCategory.SERIALIZABILITY;
  */
 public class BinExpression implements Expression {
 	
-	public static final String FQN = "expressions/BinExpression"; 
+	public static final String FQN = "lib/BinExpression"; 
 
     private Expression left;
     private Expression right;

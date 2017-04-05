@@ -82,12 +82,12 @@ public class ExpressionEvaluator {
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator
     // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructor(receiverType = "cmd/ExpressionEvaluator", line = 108)
-    @InvokedConstructor(receiverType = "expressions/PlusOperator", line = 109)
-    @InvokedConstructor(receiverType = "expressions/Stack", line = 152)
-    @CallSite(name = "printSubtraction", resolvedMethods = {@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator")}, line = 109) 
+    @InvokedConstructor(receiverType = "app/ExpressionEvaluator", line = 108)
+    @InvokedConstructor(receiverType = "lib/PlusOperator", line = 109)
+    @InvokedConstructor(receiverType = "lib/Stack", line = 152)
+    @CallSite(name = "printSubtraction", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 109) 
     @CallSite(name = "clone", resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/Object")}, line = 111)
-    @CallSite(name = "push", parameterTypes = {Constant.class}, resolvedMethods = {@ResolvedMethod(receiverType = "expressions/Stack")}, line = 156)
+    @CallSite(name = "push", parameterTypes = {Constant.class}, resolvedMethods = {@ResolvedMethod(receiverType = "lib/Stack")}, line = 156)
     @CallSite(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, resolvedMethods = {@ResolvedMethod(receiverType = UnaryExpression.FQN)}, line = 164)
     @CallSite(name = "eval", returnType = Constant.class, parameterTypes = {Map.class},
             resolvedMethods = {
@@ -109,7 +109,7 @@ public class ExpressionEvaluator {
 
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method <Thread>.dispatchUncaughtException is not dead")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "testutils/CallbackTest")}, line = 120)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 120)
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 callback();
@@ -123,7 +123,7 @@ public class ExpressionEvaluator {
             // This is an entry point!
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method<Thread>.run is called by the jvm")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "testutils/CallbackTest")}, line = 134)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 134)
             @Override
             public void run() {
                 callback();
@@ -190,7 +190,7 @@ public class ExpressionEvaluator {
      * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "testutils/CallbackTest")}, line = 201)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 201)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         callback();
@@ -202,7 +202,7 @@ public class ExpressionEvaluator {
      * as an entry point and a context sensitive analysis is employed.
      */
     @CallSite(name = "printText", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "cmd/ExpressionEvaluator", 
+    		@ResolvedMethod(receiverType = "app/ExpressionEvaluator", 
     						iff = {@ResolvingCondition(mode = {OPA, CPA})})}, line = 215)
     @EntryPoint(value = {OPA, CPA})
     public void printSubtraction(Expression op){

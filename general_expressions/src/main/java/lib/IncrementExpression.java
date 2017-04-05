@@ -30,17 +30,22 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.CPA;
-import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.STATIC_INITIALIZERS;
-
+import lib.annotations.callgraph.*;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
+import lib.*;
+
+import java.util.function.UnaryOperator;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
+import static lib.annotations.callgraph.TargetResolution.DYNAMIC;
+import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * A IncrementExpression represents an unary operation that increments a constant.
+ *
  * <p>
  * <!--
  * <b>NOTE</b><br>
@@ -63,48 +68,44 @@ import lib.annotations.properties.EntryPoint;
  * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Michael Reif
  */
-public final class ExpressionPrinter extends ExpressionVisitor<String> {
-	
-	public static final String FQN = "lib/ExpressionPrinter";
+public class IncrementExpression extends UnaryExpression {
 
-    @CGNote(value = STATIC_INITIALIZERS,
-            description = "static initializers are called by the jvm;" +
-                    " called when the class is somehow referenced the first time." +
-                    "I.e. invoking a constructor of a subclass or calling a static method.")
-    private static ExpressionPrinter instance;
+    public static final String FQN = "lib/IncrementExpression";
 
-    static {
-        instance = new ExpressionPrinter();
+    @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
+    @CallSite(resolution = DYNAMIC,
+            name="lambda$operator$0",
+            returnType = Constant.class,
+            parameterTypes = {Constant.class},
+            resolvedMethods = @ResolvedMethod(receiverType = "lib/IncrementExpression"),
+            line = 87)
+    @EntryPoint(value = {OPA, CPA})
+    public IUnaryOperator operator() {
+        return (Constant constant) -> new Constant(constant.getValue() + 1);
     }
 
-    private ExpressionPrinter() {
+    public IncrementExpression(Expression expr) {
+        super(expr);
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public String visit(Constant c) {
-        return String.valueOf(c.getValue());
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
+    @CallSite(name= "toString", resolvedMethods = {
+            @ResolvedMethod(receiverType = IncrementExpression.FQN),
+            @ResolvedMethod(receiverType = IdentityExpression.FQN),
+            @ResolvedMethod(receiverType = SquareExpression.FQN),
+            @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
+            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
+            @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
+            @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)
+    }, returnType = String.class, line = 110)
     @EntryPoint(value = {OPA, CPA})
-    public String visit(Variable v) {
-        return v.name;
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public String visit(BinaryExpression b) {
-        return "(" + b.left().toString() + b.operator().toString() + b.right().toString() + ")";
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public String visit(UnaryExpression u) {
-        return u.toString();
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public synchronized static void printExpression(Expression e) {
-        System.out.print(e.accept(instance));
+    public String toString(){
+        return "Inc("+ expr.toString() + ")";
     }
 }

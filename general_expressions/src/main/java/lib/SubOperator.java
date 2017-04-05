@@ -71,7 +71,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class SubOperator extends Operator {
 
-    public static final String FQN = "expressions/SubOperator";
+    public static final String FQN = "lib/SubOperator";
 
     protected SubOperator() {}
 
@@ -79,7 +79,7 @@ public class SubOperator extends Operator {
 
     public static class SubExpression extends BinaryExpression {
 
-    	public static final String FQN = "expressions/SubOperator$SubExpression";
+    	public static final String FQN = "lib/SubOperator$SubExpression";
     	
         private final Expression right;
         private final Expression left;

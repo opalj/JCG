@@ -30,92 +30,73 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
-
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
+import lib.*;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
+ * A SquareExpression represents an unary operation that squares an expression.
  *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
- * @author Roberts Kolosovs
  */
-public class Constant implements Expression, Serializable{
+public final class SquareExpression extends UnaryExpression {
+
+	public static final String FQN = "lib/SquareExpression";
 	
-	public static final String FQN = "lib/Constant";
+    private Expression square;
 
-    private final int value;
-
-    public Constant(int value) {
-        this.value = value;
+    public SquareExpression(Expression expr){
+        super(expr);
+        square = new MultOperator.MultExpression(expr, expr);
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public int getValue() {
-        return value;
+    public IUnaryOperator operator() {
+        return (Constant c) -> new Constant(c.getValue() * c.getValue());
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public Constant eval(Map<String,Constant> values) {
-        return this;
+    public String toString() {
+        return expr.toString() + "²";
     }
 
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
-            returnType = Object.class,
-            line = 96
-    )
+    @CallSite(name = "eval",
+            returnType = Constant.class,
+            parameterTypes = {Map.class},
+            resolvedMethods = @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
+            line = 95)
     @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor <T> visitor) {
+    public Constant eval(Map<String, Constant> values) {
+        return square.eval(values);
+    }
+
+    @Override
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public native float toFloat();
-
-    @EntryPoint(value = {OPA, CPA})
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object writeReplace() throws ObjectStreamException {
-    	return this;
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object readResolve() throws ObjectStreamException {
-    	return this;
     }
 }

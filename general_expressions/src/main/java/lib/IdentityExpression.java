@@ -30,92 +30,91 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
+import lib.Expression;
+import lib.ExpressionVisitor;
+import lib.testutils.CallbackTest;
+import lib.testutils.StaticInitializerTest;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.NOTE;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
+ * An unary expression which represents the identity function. Hence, the encapsulated expression
+ * is mapped to itself.
  *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
+ * <p>
+ * <p>
+ * <p>
  *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
- * @author Roberts Kolosovs
  */
-public class Constant implements Expression, Serializable{
-	
-	public static final String FQN = "lib/Constant";
+public class IdentityExpression extends UnaryExpression {
 
-    private final int value;
+    public static final String FQN = "lib/IdentityExpression";
 
-    public Constant(int value) {
-        this.value = value;
+    private static /* final */ IUnaryOperator _IDENTITY;
+
+    @CallSite(name = "staticCall", resolvedMethods = {@ResolvedMethod(receiverType = StaticInitializerTest.FQN)}, isStatic = true, line = 86)
+    @CGNote(value = NOTE, description = "The call on UnaryOperator is a call on an interface default method.")
+    @CallSite(name = "identity", resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN), isStatic = true, line = 87)
+    @EntryPoint(value = {OPA, CPA})
+    private static void clinit(){
+        StaticInitializerTest.staticCall();
+        _IDENTITY = IUnaryOperator.identity();
+    }
+
+    static {
+        clinit();
+    }
+
+    public IdentityExpression(Expression expr){
+        super(expr);
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public int getValue() {
-        return value;
+    public IUnaryOperator operator() {
+        return _IDENTITY;
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public Constant eval(Map<String,Constant> values) {
-        return this;
-    }
-
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
-            returnType = Object.class,
-            line = 96
-    )
-    @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor <T> visitor) {
+    public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public native float toFloat();
+    public String toString(){
+        return "Id("+expr.toString()+")";
+    }
 
-    @EntryPoint(value = {OPA, CPA})
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object writeReplace() throws ObjectStreamException {
-    	return this;
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object readResolve() throws ObjectStreamException {
-    	return this;
+    @EntryPoint
+    @CGNote(value = NOTE, description = "This method is called during the garbage collection process if no references to this object are hold. It therefore becomes an entry point")
+    @CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 117)
+    @Override public void finalize() throws Throwable{
+        CallbackTest.garbageCollectorCall();
+        super.finalize();
     }
 }

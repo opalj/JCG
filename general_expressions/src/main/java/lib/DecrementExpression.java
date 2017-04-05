@@ -30,92 +30,95 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-
 import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.InvokedConstructor;
 import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
+import lib.Constant;
+import lib.Expression;
+import lib.ExpressionVisitor;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.NOTE;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
+ * An unary expression which represents the decrement function.
  *
+ * THIS CLASS IS INTENTIONALLY UNUSED WITHIN THE APPLICATION SCENARIO. (CLASS IS NEVER INSTANTIATED)
+ *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
- * @author Roberts Kolosovs
  */
-public class Constant implements Expression, Serializable{
+public class DecrementExpression extends UnaryExpression {
+
+	public static final String FQN = "lib/DecrementExpression"; 
 	
-	public static final String FQN = "lib/Constant";
+    public DecrementExpression(Expression expr){
+        super(expr);
+    }
 
-    private final int value;
+    @CGNote(value = NOTE, description = "")
+    @EntryPoint(value = {OPA, CPA})
+    public IUnaryOperator operator() { return DecrementOperator.newInstance(); }
 
-    public Constant(int value) {
-        this.value = value;
+    @EntryPoint(value = {OPA, CPA})
+    public String toString() {
+        return "Dec("+expr.toString()+")";
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public int getValue() {
-        return value;
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public Constant eval(Map<String,Constant> values) {
-        return this;
-    }
-
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
-            returnType = Object.class,
-            line = 96
-    )
-    @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor <T> visitor) {
+    public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @EntryPoint(value = {OPA, CPA})
-    public native float toFloat();
+    static class DecrementOperator implements IUnaryOperator {
 
-    @EntryPoint(value = {OPA, CPA})
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object writeReplace() throws ObjectStreamException {
-    	return this;
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object readResolve() throws ObjectStreamException {
-    	return this;
+        public static final String FQN = "lib/DecrementExpression$DecrementOperator";
+
+        private static DecrementOperator _INSTANCE;
+
+        private DecrementOperator(){
+        }
+
+        @EntryPoint(value = {OPA, CPA})
+        @InvokedConstructor(receiverType = FQN, line = 113)
+        public static DecrementOperator newInstance() {
+           if(_INSTANCE == null){
+               _INSTANCE = new DecrementOperator();
+           }
+
+            return _INSTANCE;
+        }
+
+        @EntryPoint(value = {OPA, CPA})
+        @CallSite(name= "getValue", resolvedMethods = {
+        		@ResolvedMethod(receiverType = Constant.FQN)
+        }, line = 124)
+        public Constant apply(Constant constant) {
+            return new Constant(constant.getValue() - 1);
+        }
     }
 }

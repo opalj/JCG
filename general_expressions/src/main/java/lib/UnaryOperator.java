@@ -30,47 +30,47 @@
 
 package lib;
 
-import java.io.Serializable;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.NOTE;
+
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
- *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- *
- *
- *
- *
- *
- *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- * -->
- *
- * @author Michael Eichberg
- * @author Micahel Reif
+ *  A enumeration type for all unary operator that are
+ * @author  Michael Reif
+ * @author Roberts Kolosovs
  */
-public interface Expression extends Serializable {
+public enum UnaryOperator {
 
-	public static final String FQN = "lib/Expression";
-	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
+    INCREMENT(IncrementExpression.class.getName()),
+    DECREMENT(DecrementExpression.class.getName()),
+    IDENTITY(IdentityExpression.class.getName()),
+    SQUARE(SquareExpression.class.getName()),
 
-    Constant eval(Map<String,Constant> values);
+    @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")
+    EXCEPTION("ForceClassNotFoundExcepiton");
 
-    <T> T accept(ExpressionVisitor <T> visitor);
+    private String name;
 
+    /* private */ UnaryOperator(String name){
+        this.name = name;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    @CallSite(name= "consoleWrite", resolvedMethods = {
+    		@ResolvedMethod(receiverType = "lib/UnaryOperator")
+    }, line = 69)
+    public String toString(){
+    	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
+        return this.name;
+    }
+    
+    private void consoleWrite(String s) {
+    	System.out.println(s);
+    }
 }
-

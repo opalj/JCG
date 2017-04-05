@@ -78,7 +78,7 @@ import java.io.ObjectStreamException;
  */
 public class AltConstant implements Externalizable{
 	
-	public static final String FQN = "expressions/AltConstant";
+	public static final String FQN = "lib/AltConstant";
 	public static final String ObjectOutputStreamReceiverType = "java/io/ObjectOutputStream";
 	public static final String ObjectInputStreamReceiverType = "java/io/ObjectInputStream";
 
