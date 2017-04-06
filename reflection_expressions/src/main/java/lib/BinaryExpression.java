@@ -42,9 +42,11 @@ import static lib.annotations.documentation.CGCategory.*;
 import java.lang.reflect.Method;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * This abstract class models a binary arithmetic expression. It contains factory methods 
+ * for creating new binary expressions.
+ * 
+ * This class uses reflection in both of its methods. It uses the newInstance() method of 
+ * the Constructor class and invoke() method of the Method class.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -86,12 +88,9 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote( value = REFLECTION,description = "a new instance is created by Java Reflection")
     @CallSite(name = "<init>",
-            resolvedMethods = {
-                    @ResolvedMethod(receiverType = PlusOperator.FQN),
-                    @ResolvedMethod(receiverType = SubOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})
-            },
+            resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN)},
             resolution = TargetResolution.REFLECTIVE,
-            line = 101
+            line = 100
     )
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
@@ -122,15 +121,11 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @CallSite(name = "createBinaryExpression",
-    resolvedMethods = {
-            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-            @ResolvedMethod(
-                    receiverType = SubOperator.SubExpression.FQN,
-                    iff = {@ResolvingCondition(mode = {OPA, CPA})})},
+    resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN)},
     resolution = TargetResolution.REFLECTIVE,
     returnType = BinaryExpression.class,
     parameterTypes = {Operator.class, Expression.class, Expression.class},
-    line = 145)
+    line = 142)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,
@@ -138,7 +133,7 @@ public abstract class BinaryExpression implements Expression {
             final Expression right) throws Exception{
         Class<?> operatorClass = null;
         try {
-            operatorClass = Class.forName("expressions." + operator + "Operator");
+            operatorClass = Class.forName("lib." + operator + "Operator");
         } catch (ClassNotFoundException cnfe) {
             operatorClass = Class.forName(operator);
         }

@@ -6,3 +6,7 @@ Contains following test cases:
   - UnaryExpression  
 2. Calling a method via Method.invoke().  
   - BinaryExpression  
+3. Application class instantiating classes employing reflection  
+  - MasonsExpressions  
+  - BinaryExpression  
+  - UnaryExpression  

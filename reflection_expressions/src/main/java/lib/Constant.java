@@ -30,47 +30,72 @@
 
 package lib;
 
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.CPA;
-import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.NOTE;
+import static lib.annotations.callgraph.AnalysisMode.*;
 
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
+
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 
 /**
- *  A enumeration type for all unary operator there are.
- * @author  Michael Reif
+ * This class models a mathematical constant by simply wrapping an integer value.
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
  * @author Roberts Kolosovs
  */
-public enum UnaryOperator {
+public class Constant implements Expression {
+	
+	public static final String FQN = "lib/Constant";
 
-    INCREMENT(IncrementExpression.class.getName()),
-    DECREMENT(DecrementExpression.class.getName()),
-    IDENTITY(IdentityExpression.class.getName()),
-    SQUARE(SquareExpression.class.getName()),
+    private final int value;
 
-    @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")
-    EXCEPTION("ForceClassNotFoundExcepiton");
-
-    private String name;
-
-    /* private */ UnaryOperator(String name){
-        this.name = name;
+    public Constant(int value) {
+        this.value = value;
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name= "consoleWrite", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "lib/UnaryOperator")
-    }, line = 69)
-    public String toString(){
-    	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
-        return this.name;
+    public int getValue() {
+        return value;
     }
-    
-    private void consoleWrite(String s) {
-    	System.out.println(s);
+
+    @EntryPoint(value = {OPA, CPA})
+    public Constant eval(Map<String,Constant> values) {
+        return this;
     }
+
+    @CallSite(name = "visit",
+            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
+            returnType = Object.class,
+            line = 96
+    )
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor <T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public native float toFloat();
 }

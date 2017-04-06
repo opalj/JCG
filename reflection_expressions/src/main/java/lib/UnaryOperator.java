@@ -42,13 +42,13 @@ import lib.annotations.callgraph.ResolvedMethod;
 
 /**
  *  A enumeration type for all unary operator there are.
+ *  
+ *  
  * @author  Michael Reif
  * @author Roberts Kolosovs
  */
 public enum UnaryOperator {
 
-    INCREMENT(IncrementExpression.class.getName()),
-    DECREMENT(DecrementExpression.class.getName()),
     IDENTITY(IdentityExpression.class.getName()),
     SQUARE(SquareExpression.class.getName()),
 

@@ -3,7 +3,7 @@
  * Copyright (c) 2009 - 2016
  * Software Technology Group
  * Department of Computer Science
- * Technische Universität Darmstadt
+ * Technische Universitaet Darmstadt
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,13 @@
 
 package lib;
 
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
+import lib.annotations.properties.EntryPoint;
+
 /**
- * This interface is the root for class hierarchy modeling mathematical expression.
+ * A plus operator that creates a binary add expression.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -55,18 +60,50 @@ package lib;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
-public interface Expression {
+public class PlusOperator extends Operator {
 
-	public static final String FQN = "lib/Expression";
-	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
+    public static final String FQN = "lib/PlusOperator";
 
-    Constant eval(Map<String,Constant> values);
+    protected PlusOperator() {}
 
-    <T> T accept(ExpressionVisitor <T> visitor);
+    public final static Operator instance = new PlusOperator();
 
+    public static class AddExpression extends BinaryExpression {
+
+    	public static final String FQN = "lib/PlusOperator$AddExpression";
+    	
+        private final Expression right;
+        private final Expression left;
+
+        public AddExpression(Expression left, Expression right) {
+         this.left = left;
+            this.right = right;
+        }
+
+        @EntryPoint(value = {OPA, CPA})
+        public Expression left(){return this.left;}
+
+        @EntryPoint(value = {OPA, CPA})
+        public Expression right(){return this.right;}
+
+        @EntryPoint(value = {OPA, CPA})
+        public Operator operator(){return PlusOperator.instance;}
+
+        @Override public Constant eval(Map<String, Constant> values) {
+            return new Constant( left.eval(values).getValue() + right.eval(values).getValue() );
+        }
+    }
+
+    @EntryPoint(value = {OPA})
+    static BinaryExpression createBinaryExpression(Expression left, Expression right ) {
+        return new AddExpression(left, right);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public String toString(){
+        return "+";
+    }
 }
 

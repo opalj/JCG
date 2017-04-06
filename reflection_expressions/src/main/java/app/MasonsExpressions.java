@@ -27,46 +27,64 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+package app;
 
-package lib;
+import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
+import static lib.annotations.documentation.CGCategory.*;
+import static java.lang.Integer.parseInt;
+
+import lib.annotations.callgraph.*;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
+
+import static lib.annotations.callgraph.AnalysisMode.*;
+import static lib.UnaryOperator.*;
+
+import lib.*;
+
+import java.util.Arrays;
+
+import static lib.BinaryExpression.createBinaryExpression;
+import static lib.PlusOperator.AddExpression;
+import static lib.testutils.CallbackTest.callback;
 
 /**
- * This interface is the root for class hierarchy modeling mathematical expression.
- *
- * <!--
+ * This class defines an application use case of the expression library featuring reflection. 
+ * It just creates a binary expression representing the mason's angle (3²+4²=5²) and does nothing with it.
+ * <p>
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <!--
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * 
  * -->
  *
  * @author Michael Eichberg
  * @author Micahel Reif
+ * @author Roberts Kolosovs
  */
-public interface Expression {
+public class MasonsExpressions {
 
-	public static final String FQN = "lib/Expression";
-	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
-
-    Constant eval(Map<String,Constant> values);
-
-    <T> T accept(ExpressionVisitor <T> visitor);
-
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+	@CallSite(name = "createBinaryExpression",
+            resolvedMethods = {@ResolvedMethod(receiverType = BinaryExpression.FQN)},
+            resolution = TargetResolution.REFLECTIVE,
+            line = 86
+    )
+	@InvokedConstructor(receiverType = "lib/Constant", line = 87)
+	@InvokedConstructor(receiverType = "lib/Constant", line = 88)
+	public static void main(final String[] args) throws Exception {
+		BinaryExpression masonsAngle = BinaryExpression.createBinaryExpression("Plus", 
+				(Expression) UnaryExpression.createUnaryExpressions(SQUARE, new Constant(3)), 
+				(Expression) UnaryExpression.createUnaryExpressions(SQUARE, new Constant(4)));
+	}
 }
-

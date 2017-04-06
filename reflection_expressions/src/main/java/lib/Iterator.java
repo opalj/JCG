@@ -30,47 +30,31 @@
 
 package lib;
 
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.CPA;
-import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.NOTE;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-
 /**
- *  A enumeration type for all unary operator there are.
- * @author  Michael Reif
- * @author Roberts Kolosovs
+ * Simple iterator interface.
+ *
+ * @author Michael Reif
  */
-public enum UnaryOperator {
+public interface Iterator<T> {
 
-    INCREMENT(IncrementExpression.class.getName()),
-    DECREMENT(DecrementExpression.class.getName()),
-    IDENTITY(IdentityExpression.class.getName()),
-    SQUARE(SquareExpression.class.getName()),
+    /**
+     * Returns ´true´ if the iteration has more elements.
+     *
+     * @return ´true´, if the iteration has more elements.
+     */
+    boolean hasNext();
 
-    @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")
-    EXCEPTION("ForceClassNotFoundExcepiton");
+    /**
+     * Returns the next element in the iteration.
+     */
+    T next();
 
-    private String name;
-
-    /* private */ UnaryOperator(String name){
-        this.name = name;
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    @CallSite(name= "consoleWrite", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "lib/UnaryOperator")
-    }, line = 69)
-    public String toString(){
-    	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
-        return this.name;
-    }
-    
-    private void consoleWrite(String s) {
-    	System.out.println(s);
-    }
+    /**
+     * Removes from the underlying collection the last element returned by this iterator (optional operation).
+     * This method can be called only once per call to next(). The behavior of an iterator is unspecified if the underlying
+     * collection is modified while the iteration is in progress in any way other than by calling this method.
+     *
+     * @throws UnsupportedOperationException - if the remove operation is not supported by this iterator.
+     */
+    void remove() throws UnsupportedOperationException;
 }

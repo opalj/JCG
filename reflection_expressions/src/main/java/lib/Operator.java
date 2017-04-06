@@ -30,47 +30,32 @@
 
 package lib;
 
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.CPA;
-import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.NOTE;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-
 /**
- *  A enumeration type for all unary operator there are.
- * @author  Michael Reif
- * @author Roberts Kolosovs
+ * Common superclass of an operator.
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Michael Eichberg
+ * @author Micahel Reif
  */
-public enum UnaryOperator {
-
-    INCREMENT(IncrementExpression.class.getName()),
-    DECREMENT(DecrementExpression.class.getName()),
-    IDENTITY(IdentityExpression.class.getName()),
-    SQUARE(SquareExpression.class.getName()),
-
-    @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")
-    EXCEPTION("ForceClassNotFoundExcepiton");
-
-    private String name;
-
-    /* private */ UnaryOperator(String name){
-        this.name = name;
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    @CallSite(name= "consoleWrite", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "lib/UnaryOperator")
-    }, line = 69)
-    public String toString(){
-    	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
-        return this.name;
-    }
-    
-    private void consoleWrite(String s) {
-    	System.out.println(s);
-    }
+public abstract class Operator {
 }

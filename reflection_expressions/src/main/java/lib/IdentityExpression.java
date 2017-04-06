@@ -30,47 +30,63 @@
 
 package lib;
 
-import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
+import lib.Expression;
+import lib.ExpressionVisitor;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.NOTE;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 
 /**
- *  A enumeration type for all unary operator there are.
- * @author  Michael Reif
- * @author Roberts Kolosovs
+ * An unary expression which represents the identity function. Hence, the encapsulated expression
+ * is mapped to itself.
+ *
+ * <p>
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ * <p>
+ * <p>
+ * <p>
+ *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * -->
+ *
+ * @author Micahel Reif
  */
-public enum UnaryOperator {
+public class IdentityExpression extends UnaryExpression {
 
-    INCREMENT(IncrementExpression.class.getName()),
-    DECREMENT(DecrementExpression.class.getName()),
-    IDENTITY(IdentityExpression.class.getName()),
-    SQUARE(SquareExpression.class.getName()),
+    public static final String FQN = "lib/IdentityExpression";
 
-    @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")
-    EXCEPTION("ForceClassNotFoundExcepiton");
-
-    private String name;
-
-    /* private */ UnaryOperator(String name){
-        this.name = name;
+    public IdentityExpression(Expression expr){
+        super(expr);
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name= "consoleWrite", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "lib/UnaryOperator")
-    }, line = 69)
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
     public String toString(){
-    	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
-        return this.name;
+        return "Id("+expr.toString()+")";
     }
-    
-    private void consoleWrite(String s) {
-    	System.out.println(s);
-    }
+
+	@Override
+	public Constant eval(Map<String, Constant> values) {
+		return (Constant) expr;
+	}
+
 }
