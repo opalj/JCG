@@ -27,54 +27,71 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-import static java.lang.Integer.parseInt;
-
-import lib.annotations.callgraph.*;
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
+package lib;
 
 import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
 
-import lib.*;
-
-import java.util.Arrays;
-
-import static lib.testutils.CallbackTest.callback;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
- * <p>
- * <p>
+ * This class models a mathematical constant by simply wrapping an integer value.
+ *
+ * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * <p>
- * <!--
- * <p>
- * <p>
- * <p>
- * <p>
+ *
+ *
+ *
+ *
+ *
+ *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * 
+ *
+ *
+ *
+ *
+ *
  * -->
  *
  * @author Michael Eichberg
  * @author Micahel Reif
  * @author Roberts Kolosovs
  */
-public class ExpressionEvaluator {
+public class Constant implements Expression {
+	
+	public static final String FQN = "lib/Constant";
 
-    public static void main(final String[] args) {
-    	
+    private final int value;
+
+    public Constant(int value) {
+        this.value = value;
     }
+
+    @EntryPoint(value = {OPA, CPA})
+    public int getValue() {
+        return value;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public Constant eval(Map<String,Constant> values) {
+        return this;
+    }
+
+    @CallSite(name = "visit",
+            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
+            returnType = Object.class,
+            line = 92
+    )
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor <T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public native float toFloat();
 }

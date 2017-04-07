@@ -30,12 +30,8 @@
 
 package lib;
 
-import java.io.Serializable;
-
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * This interface represents mathematical expressions and is the root of the inheritance hierarchy.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -61,7 +57,7 @@ import java.io.Serializable;
  * @author Michael Eichberg
  * @author Micahel Reif
  */
-public interface Expression extends Serializable {
+public interface Expression {
 
 	public static final String FQN = "lib/Expression";
 	

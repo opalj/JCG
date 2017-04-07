@@ -27,36 +27,30 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-import static java.lang.Integer.parseInt;
+package lib;
 
-import lib.annotations.callgraph.*;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.callgraph.TargetResolution.DYNAMIC;
+import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
+
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
-
-import lib.*;
-
-import java.util.Arrays;
-
-import static lib.testutils.CallbackTest.callback;
-
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * A SquareExpression represents an unary operation that squares an expression.
+ * 
+ * Has a method returning an instance of a FunctionalInterface with a lambda expression.
+ *
  * <p>
- * <p>
+ * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
  * <p>
- * <!--
  * <p>
  * <p>
  * <p>
@@ -65,16 +59,49 @@ import static lib.testutils.CallbackTest.callback;
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
  * <p>
- * 
+ * <p>
+ * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
- * @author Roberts Kolosovs
  */
-public class ExpressionEvaluator {
+public final class SquareExpression extends UnaryExpression {
 
-    public static void main(final String[] args) {
-    	
+	public static final String FQN = "lib/SquareExpression";
+	
+    private Expression operand;
+
+    public SquareExpression(Expression expr){
+        super(expr);
+        operand = expr;
+    }
+    
+    @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
+    @CallSite(resolution = DYNAMIC,
+            name="lambda$operator$0",
+            returnType = Constant.class,
+            parameterTypes = {Constant.class},
+            resolvedMethods = @ResolvedMethod(receiverType = "lib/IncrementExpression"),
+            line = 88)
+    @EntryPoint(value = {OPA, CPA})
+    public IUnaryOperator operator() {
+        return (Constant c) -> new Constant(c.getValue() * c.getValue());
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public String toString() {
+        return expr.toString() + "²";
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public Constant eval(Map<String, Constant> values) {
+    	int opVal = operand.eval(values).getValue();
+        return new Constant(opVal * opVal);
+    }
+
+    @Override
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

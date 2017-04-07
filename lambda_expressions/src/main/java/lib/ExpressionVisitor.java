@@ -27,54 +27,40 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-import static java.lang.Integer.parseInt;
-
-import lib.annotations.callgraph.*;
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
-
-import lib.*;
-
-import java.util.Arrays;
-
-import static lib.testutils.CallbackTest.callback;
+package lib;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
- * <p>
- * <p>
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- * <p>
- * <!--
- * <p>
- * <p>
- * <p>
- * <p>
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
+ * This abstract class is a visitor for expressions.
  * 
+ * No test cases specific to lambda expression are found here.
+ *
+ * <!-- <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  * -->
  *
  * @author Michael Eichberg
  * @author Micahel Reif
- * @author Roberts Kolosovs
  */
-public class ExpressionEvaluator {
+public abstract class ExpressionVisitor<T> {
 
-    public static void main(final String[] args) {
-    	
-    }
+	public abstract T visit(Constant c);
+
+	public abstract T visit(UnaryExpression b);
 }

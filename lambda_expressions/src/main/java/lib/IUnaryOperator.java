@@ -27,54 +27,48 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-import static java.lang.Integer.parseInt;
+package lib;
 
-import lib.annotations.callgraph.*;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
+import lib.Constant;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
+import java.util.function.Function;
 
-import lib.*;
-
-import java.util.Arrays;
-
-import static lib.testutils.CallbackTest.callback;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.callgraph.TargetResolution.DYNAMIC;
+import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
- * <p>
- * <p>
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- * <p>
- * <!--
- * <p>
- * <p>
- * <p>
- * <p>
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * 
- * -->
+ * Represents an operation on a single operand that produces a result of the
+ * same type as its operand.  This is a specialization of {@code Function} for
+ * the case where the operand and result are of the same type.
  *
- * @author Michael Eichberg
- * @author Micahel Reif
- * @author Roberts Kolosovs
+ * <p>This is a <a href="package-summary.html">functional interface</a>
+ * whose functional method is {@link #apply(Object)}.
+ *
+ * @see Function
+ * @since 1.8
+ *
+ * @author Michael Reif
  */
-public class ExpressionEvaluator {
+@FunctionalInterface
+public interface IUnaryOperator extends Function<Constant, Constant> {
 
-    public static void main(final String[] args) {
-    	
+    String FQN = "lib/IUnaryOperator";
+
+    @CGNote(value = INVOKEDYNAMIC, description = "Lambda expressions are invoked over invokedynamic instructions.")
+    @CallSite(resolution = DYNAMIC,
+            name = "lambda$identity$0",
+            returnType = Constant.class,
+            parameterTypes = {Constant.class},
+            resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN),
+            line = 72)
+    @EntryPoint(value = {OPA})
+    static IUnaryOperator identity() {
+        return constant -> constant;
     }
 }

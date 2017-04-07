@@ -27,54 +27,50 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-import static java.lang.Integer.parseInt;
+package lib;
 
-import lib.annotations.callgraph.*;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.NOTE;
 
-import lib.*;
-
-import java.util.Arrays;
-
-import static lib.testutils.CallbackTest.callback;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
- * <p>
- * <p>
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- * <p>
- * <!--
- * <p>
- * <p>
- * <p>
- * <p>
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * 
- * -->
- *
- * @author Michael Eichberg
- * @author Micahel Reif
+ *  A enumeration type for all unary operator there are.
+ * @author  Michael Reif
  * @author Roberts Kolosovs
  */
-public class ExpressionEvaluator {
+public enum UnaryOperator {
 
-    public static void main(final String[] args) {
-    	
+    INCREMENT(IncrementExpression.class.getName()),
+    DECREMENT(DecrementExpression.class.getName()),
+    IDENTITY(IdentityExpression.class.getName()),
+    SQUARE(SquareExpression.class.getName()),
+
+    @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")
+    EXCEPTION("ForceClassNotFoundExcepiton");
+
+    private String name;
+
+    /* private */ UnaryOperator(String name){
+        this.name = name;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    @CallSite(name= "consoleWrite", resolvedMethods = {
+    		@ResolvedMethod(receiverType = "lib/UnaryOperator")
+    }, line = 69)
+    public String toString(){
+    	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
+        return this.name;
+    }
+    
+    private void consoleWrite(String s) {
+    	System.out.println(s);
     }
 }

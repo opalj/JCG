@@ -27,36 +27,27 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-import static java.lang.Integer.parseInt;
+package lib;
 
-import lib.annotations.callgraph.*;
-import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
+import lib.Expression;
+import lib.ExpressionVisitor;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
-
-import lib.*;
-
-import java.util.Arrays;
-
-import static lib.testutils.CallbackTest.callback;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * An unary expression which represents the identity function. Hence, the encapsulated expression
+ * is mapped to itself.
+ *
  * <p>
- * <p>
+ * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
  * <p>
- * <!--
+ * <p>
  * <p>
  * <p>
  * <p>
@@ -65,16 +56,38 @@ import static lib.testutils.CallbackTest.callback;
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
  * <p>
- * 
+ * <p>
+ *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
- * @author Roberts Kolosovs
  */
-public class ExpressionEvaluator {
+public class IdentityExpression extends UnaryExpression {
 
-    public static void main(final String[] args) {
-    	
+    public static final String FQN = "lib/IdentityExpression";
+
+    private static /* final */ IUnaryOperator _IDENTITY = IUnaryOperator.identity();
+
+    public IdentityExpression(Expression expr){
+        super(expr);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public IUnaryOperator operator() {
+        return _IDENTITY;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public String toString(){
+        return "Id("+expr.toString()+")";
     }
 }
