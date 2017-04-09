@@ -31,7 +31,7 @@
 package lib;
 
 /**
- * This interface is the root for class hierarchy modeling mathematical expression.
+ * Common superclass of an operator.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -57,16 +57,5 @@ package lib;
  * @author Michael Eichberg
  * @author Micahel Reif
  */
-public interface Expression {
-
-	public static final String FQN = "lib/Expression";
-	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
-
-    Constant eval(Map<String,Constant> values);
-
-    <T> T accept(ExpressionVisitor <T> visitor);
-
+public abstract class Operator {
 }
-

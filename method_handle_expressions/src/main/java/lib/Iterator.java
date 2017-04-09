@@ -31,42 +31,30 @@
 package lib;
 
 /**
- * This interface is the root for class hierarchy modeling mathematical expression.
+ * Simple iterator interface.
  *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- *
- *
- *
- *
- *
- *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- * -->
- *
- * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
-public interface Expression {
+public interface Iterator<T> {
 
-	public static final String FQN = "lib/Expression";
-	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
+    /**
+     * Returns ´true´ if the iteration has more elements.
+     *
+     * @return ´true´, if the iteration has more elements.
+     */
+    boolean hasNext();
 
-    Constant eval(Map<String,Constant> values);
+    /**
+     * Returns the next element in the iteration.
+     */
+    T next();
 
-    <T> T accept(ExpressionVisitor <T> visitor);
-
+    /**
+     * Removes from the underlying collection the last element returned by this iterator (optional operation).
+     * This method can be called only once per call to next(). The behavior of an iterator is unspecified if the underlying
+     * collection is modified while the iteration is in progress in any way other than by calling this method.
+     *
+     * @throws UnsupportedOperationException - if the remove operation is not supported by this iterator.
+     */
+    void remove() throws UnsupportedOperationException;
 }
-

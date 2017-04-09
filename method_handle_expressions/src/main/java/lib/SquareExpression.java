@@ -30,43 +30,67 @@
 
 package lib;
 
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
+
 /**
- * This interface is the root for class hierarchy modeling mathematical expression.
+ * A SquareExpression represents an unary operation that squares an expression.
  *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
  */
-public interface Expression {
+public final class SquareExpression extends UnaryExpression {
 
-	public static final String FQN = "lib/Expression";
+	public static final String FQN = "lib/SquareExpression";
 	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
+    private Expression square;
 
-    Constant eval(Map<String,Constant> values);
+    public SquareExpression(Expression expr){
+        super(expr);
+        square = new MultOperator.MultExpression(expr, expr);
+    }
 
-    <T> T accept(ExpressionVisitor <T> visitor);
+    @EntryPoint(value = {OPA, CPA})
+    public String toString() {
+        return expr.toString() + "²";
+    }
 
+    @CallSite(name = "eval",
+            returnType = Constant.class,
+            parameterTypes = {Map.class},
+            resolvedMethods = @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
+            line = 88)
+    @EntryPoint(value = {OPA, CPA})
+    public Constant eval(Map<String, Constant> values) {
+        return square.eval(values);
+    }
+
+    @Override
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
-

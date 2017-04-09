@@ -30,43 +30,63 @@
 
 package lib;
 
+import lib.annotations.properties.EntryPoint;
+import lib.Expression;
+import lib.ExpressionVisitor;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
 /**
- * This interface is the root for class hierarchy modeling mathematical expression.
+ * An unary expression which represents the identity function. Hence, the encapsulated expression
+ * is mapped to itself.
  *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
+ * <p>
+ * <p>
+ * <p>
  *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Micahel Reif
  */
-public interface Expression {
+public class IdentityExpression extends UnaryExpression {
 
-	public static final String FQN = "lib/Expression";
-	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
+    public static final String FQN = "lib/IdentityExpression";
 
-    Constant eval(Map<String,Constant> values);
+    public IdentityExpression(Expression expr){
+        super(expr);
+    }
 
-    <T> T accept(ExpressionVisitor <T> visitor);
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public String toString(){
+        return "Id("+expr.toString()+")";
+    }
+
+	@Override
+	public Constant eval(Map<String, Constant> values) {
+		return (Constant) expr;
+	}
 
 }
-

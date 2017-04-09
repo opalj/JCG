@@ -30,8 +30,18 @@
 
 package lib;
 
+import static lib.annotations.callgraph.AnalysisMode.*;
+
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
+
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+
 /**
- * This interface is the root for class hierarchy modeling mathematical expression.
+ * This class models a mathematical constant by simply wrapping an integer value.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -50,23 +60,42 @@ package lib;
  *
  *
  *
- *
- *
  * -->
  *
  * @author Michael Eichberg
  * @author Micahel Reif
+ * @author Roberts Kolosovs
  */
-public interface Expression {
-
-	public static final String FQN = "lib/Expression";
+public class Constant implements Expression {
 	
-    static final int MajorVersion = 1;
-    static final int MinorVersion = 0;
+	public static final String FQN = "lib/Constant";
 
-    Constant eval(Map<String,Constant> values);
+    private final int value;
 
-    <T> T accept(ExpressionVisitor <T> visitor);
+    public Constant(int value) {
+        this.value = value;
+    }
 
+    @EntryPoint(value = {OPA, CPA})
+    public int getValue() {
+        return value;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public Constant eval(Map<String,Constant> values) {
+        return this;
+    }
+
+    @CallSite(name = "visit",
+            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
+            returnType = Object.class,
+            line = 96
+    )
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor <T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public native float toFloat();
 }
-
