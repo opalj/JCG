@@ -3,5 +3,5 @@ Contains following test cases:
 
 1. Calling a method via a MethodHandle.  
   - BinaryExpression  
-2. Constructor call via a Methodhandle  
+2. Constructor call via a MethodHandle  
   - UnaryExpression  
