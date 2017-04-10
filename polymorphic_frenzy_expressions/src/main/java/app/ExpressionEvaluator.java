@@ -38,7 +38,6 @@ import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
 
 import lib.*;
 

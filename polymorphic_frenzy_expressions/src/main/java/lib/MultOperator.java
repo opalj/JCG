@@ -7,8 +7,29 @@ import lib.annotations.properties.EntryPoint;
 import lib.*;
 
 /**
- * Created by eichberg on 27.01.16.
- */
+*
+* A multiplication operator that creates a binary multiplication expression.
+*
+* <--
+*
+*
+*
+*
+*
+* SPACE LEFT INTENTIONALLY FREE TO HANDLE FUTURE ADAPTIONS
+*
+*
+*
+*
+*
+*
+*
+*
+*
+* <--
+* @author Michael Eichberg
+* @author Roberts Kolosovs
+*/
 public class MultOperator extends Operator {
 	
     public static final String FQN = "lib/MultOperator";

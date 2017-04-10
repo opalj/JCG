@@ -30,12 +30,8 @@
 
 package lib;
 
-import java.io.Serializable;
-
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * Interface at the root of the class hierarchy. Models all expressions.
  *
  * <!--
  * <b>NOTE</b><br>

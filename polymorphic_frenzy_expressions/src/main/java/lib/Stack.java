@@ -38,6 +38,8 @@ import lib.annotations.properties.EntryPoint;
 
 /**
  * A array-based stack implementation.
+ * 
+ * Has an inner package private class which can be used in the open package scenario.
  *
  * <!--
  * <b>NOTE</b><br>

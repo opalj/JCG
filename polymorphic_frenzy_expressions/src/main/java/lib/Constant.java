@@ -41,7 +41,7 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 /**
- * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
+ * This class simply wraps an integer value.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -55,6 +55,7 @@ import java.io.Serializable;
  *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
+ *
  *
  *
  *
@@ -89,8 +90,7 @@ public class Constant implements Expression {
     @CallSite(name = "visit",
             resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
             returnType = Object.class,
-            line = 96
-    )
+            line = 96)
     @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor) {
         return visitor.visit(this);

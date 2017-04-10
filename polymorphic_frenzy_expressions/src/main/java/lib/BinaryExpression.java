@@ -30,21 +30,14 @@
 package lib;
 
 import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.InvokedConstructor;
 import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.callgraph.ResolvingCondition;
-import lib.annotations.callgraph.TargetResolution;
-import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.annotations.documentation.CGCategory.*;
-
-import java.lang.reflect.Method;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * This abstract class models a binary mathematical expression.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -56,8 +49,14 @@ import java.lang.reflect.Method;
  *
  *
  *
+ *
+ *
+ *
+ *
+ *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
+ *
  *
  *
  *
@@ -84,6 +83,7 @@ public abstract class BinaryExpression implements Expression {
         return visitor.visit(this);
     }
 
+    @InvokedConstructor(receiverType = BinaryExpression.FQN, line = 96)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             Operator operator,
@@ -93,24 +93,35 @@ public abstract class BinaryExpression implements Expression {
 
         return new BinaryExpression(){
 
-            @Override public Constant eval(Map<String, Constant> values) {
+            @Override 
+            @EntryPoint(value = {OPA, CPA})
+            public Constant eval(Map<String, Constant> values) {
                 throw new UnsupportedOperationException();
             }
 
-            @Override protected Expression left() {
+            @Override 
+            @EntryPoint(value = {OPA, CPA})
+            protected Expression left() {
                 return left;
             }
 
-            @Override protected Expression right() {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            protected Expression right() {
                 return right;
             }
 
-            @Override protected Operator operator() {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            protected Operator operator() {
                 return op;
             }
         };
     }
 
+    //TODO: Correct receiver types depending on algorithm.
+    @CallSite(name = "createBinaryExpression", resolvedMethods = {
+    		@ResolvedMethod(receiverType = "lib/Operator")}, line = 130) 
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             Operator operator,

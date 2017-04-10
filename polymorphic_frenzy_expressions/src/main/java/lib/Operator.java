@@ -59,7 +59,7 @@ import java.io.Serializable;
  * @author Michael Eichberg
  * @author Micahel Reif
  */
-public abstract class Operator implements Serializable {
+public abstract class Operator {
 	
 	abstract BinaryExpression createBinaryExpression(Expression left, Expression right);
 }
