@@ -2,7 +2,6 @@ This JCG sub-project highlights the effects of java polymorphism on call graphs.
 Contains following test cases:  
 
 1. Static inner class.  
-  - DecrementExpression$DecrementOperator  
   - MultOperator$MultExpression  
   - PlusOperator$AddExpression  
   - SubOperator$SubExpression  

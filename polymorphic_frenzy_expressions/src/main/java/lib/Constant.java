@@ -66,7 +66,7 @@ import java.io.Serializable;
  * @author Micahel Reif
  * @author Roberts Kolosovs
  */
-public class Constant implements Expression, Serializable{
+public class Constant implements Expression {
 	
 	public static final String FQN = "lib/Constant";
 
@@ -96,26 +96,4 @@ public class Constant implements Expression, Serializable{
         return visitor.visit(this);
     }
 
-    @EntryPoint(value = {OPA, CPA})
-    public native float toFloat();
-
-    @EntryPoint(value = {OPA, CPA})
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object writeReplace() throws ObjectStreamException {
-    	return this;
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object readResolve() throws ObjectStreamException {
-    	return this;
-    }
 }

@@ -60,4 +60,6 @@ import java.io.Serializable;
  * @author Micahel Reif
  */
 public abstract class Operator implements Serializable {
+	
+	abstract BinaryExpression createBinaryExpression(Expression left, Expression right);
 }

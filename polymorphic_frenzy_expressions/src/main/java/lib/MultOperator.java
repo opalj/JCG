@@ -43,7 +43,7 @@ public class MultOperator extends Operator {
     }
 
     @EntryPoint(value = {OPA})
-    static BinaryExpression createBinaryExpression(Expression left,Expression right ) {
+    BinaryExpression createBinaryExpression(Expression left,Expression right ) {
         return new MultExpression(left,right);
     }
 

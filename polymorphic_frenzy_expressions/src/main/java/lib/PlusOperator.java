@@ -97,7 +97,7 @@ public class PlusOperator extends Operator {
     }
 
     @EntryPoint(value = {OPA})
-    static BinaryExpression createBinaryExpression(Expression left, Expression right ) {
+    BinaryExpression createBinaryExpression(Expression left, Expression right ) {
         return new AddExpression(left, right);
     }
 

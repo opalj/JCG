@@ -84,21 +84,12 @@ public abstract class BinaryExpression implements Expression {
         return visitor.visit(this);
     }
 
-    @CGNote( value = REFLECTION,description = "a new instance is created by Java Reflection")
-    @CallSite(name = "<init>",
-            resolvedMethods = {
-                    @ResolvedMethod(receiverType = PlusOperator.FQN),
-                    @ResolvedMethod(receiverType = SubOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})
-            },
-            resolution = TargetResolution.REFLECTIVE,
-            line = 101
-    )
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
-            String operator,
+            Operator operator,
             final Expression left,
             final Expression right) throws Exception{
-        final Operator op = (Operator) Class.forName("expression."+operator+"Operator").newInstance();
+        final Operator op = operator;
 
         return new BinaryExpression(){
 
@@ -120,31 +111,12 @@ public abstract class BinaryExpression implements Expression {
         };
     }
 
-    @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
-    @CallSite(name = "createBinaryExpression",
-    resolvedMethods = {
-            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-            @ResolvedMethod(
-                    receiverType = SubOperator.SubExpression.FQN,
-                    iff = {@ResolvingCondition(mode = {OPA, CPA})})},
-    resolution = TargetResolution.REFLECTIVE,
-    returnType = BinaryExpression.class,
-    parameterTypes = {Operator.class, Expression.class, Expression.class},
-    line = 145)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
-            String operator,
+            Operator operator,
             final Expression left,
             final Expression right) throws Exception{
-        Class<?> operatorClass = null;
-        try {
-            operatorClass = Class.forName("expressions." + operator + "Operator");
-        } catch (ClassNotFoundException cnfe) {
-            operatorClass = Class.forName(operator);
-        }
-        Method m = operatorClass.getDeclaredMethod("createBinaryExpression",Expression.class,Expression.class);
-        m.setAccessible(true);
-        return (BinaryExpression) m.invoke(null,left,right);
+        return operator.createBinaryExpression(left, right);
     }
 }
 

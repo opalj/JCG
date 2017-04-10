@@ -61,7 +61,7 @@ import java.io.Serializable;
  * @author Michael Eichberg
  * @author Micahel Reif
  */
-public interface Expression extends Serializable {
+public interface Expression {
 
 	public static final String FQN = "lib/Expression";
 	

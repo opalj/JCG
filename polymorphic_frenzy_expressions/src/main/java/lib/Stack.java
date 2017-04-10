@@ -70,14 +70,13 @@ public class Stack<V> {
 
     public Stack() {}
 
-    @CGNote(value = NATIVE_CALLBACK,
-            description = "potential callback because an object type is passed to a native method;" +
-                    "methods of this object could be called from native code (I.e. toString, clone etc.)")
     @EntryPoint(value = {OPA, CPA})
     public void push(V v){
         if(data.length == entries) {
             V[]  newData = (V[]) new Object[entries*2+1];
-            System.arraycopy(data,0,newData,0,data.length);
+            for (int i = 0; i<data.length; i++){
+            	newData[i] = data[i];
+            }
             data = newData;
         }
         data[entries] = v;
