@@ -30,13 +30,11 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
-import lib.testutils.CallbackTest;
 import lib.testutils.StaticInitializerTest;
 
 /**
@@ -54,6 +52,8 @@ import lib.testutils.StaticInitializerTest;
  *
  *
  *
+ *
+ *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  *
@@ -65,7 +65,7 @@ import lib.testutils.StaticInitializerTest;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public interface ArithmeticExpression extends Expression {

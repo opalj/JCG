@@ -30,6 +30,8 @@
 
 package lib;
 
+import java.util.function.Function;
+
 /**
  * This interface represents mathematical expressions and is the root of the inheritance hierarchy.
  *
@@ -55,7 +57,7 @@ package lib;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public interface Expression {
 
@@ -66,7 +68,7 @@ public interface Expression {
 
     Constant eval(Map<String,Constant> values);
 
-    <T> T accept(ExpressionVisitor <T> visitor);
+    <T> T accept(Function<Expression, T> visit);
 
 }
 

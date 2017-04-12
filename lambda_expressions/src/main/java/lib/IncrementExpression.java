@@ -35,6 +35,7 @@ import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 import lib.*;
 
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
@@ -92,8 +93,8 @@ public class IncrementExpression extends UnaryExpression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor<T> visitor) {
-        return visitor.visit(this);
+    public <T> T accept(Function<Expression, T> visit) {
+        return visit.apply(this);
     }
 
     @CallSite(name= "toString", resolvedMethods = {

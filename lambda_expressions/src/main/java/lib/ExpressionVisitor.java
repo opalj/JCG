@@ -57,10 +57,9 @@ package lib;
  *
  * @author Michael Eichberg
  * @author Micahel Reif
+ * @author Roberts Kolosovs
  */
 public abstract class ExpressionVisitor<T> {
 
-	public abstract T visit(Constant c);
-
-	public abstract T visit(UnaryExpression b);
+	public abstract T visit(Expression e);
 }

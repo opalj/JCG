@@ -35,6 +35,8 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 import static lib.annotations.callgraph.TargetResolution.DYNAMIC;
 import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
 
+import java.util.function.Function;
+
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.documentation.CGNote;
@@ -101,7 +103,7 @@ public final class SquareExpression extends UnaryExpression {
 
     @Override
     @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor<T> visitor) {
-        return visitor.visit(this);
+    public <T> T accept(Function<Expression, T> visit) {
+        return visit.apply(this);
     }
 }

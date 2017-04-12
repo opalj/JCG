@@ -64,7 +64,7 @@ import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 
 public abstract class UnaryExpression implements Expression {
@@ -117,6 +117,10 @@ public abstract class UnaryExpression implements Expression {
 		this.expr = expr;
 	}
 
+	public Expression getExpr(){
+		return expr;
+	}
+	
 	@EntryPoint(value = { OPA, CPA })
 	public abstract String toString();
 

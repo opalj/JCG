@@ -7,11 +7,19 @@ Contains following test cases:
 2. Lambda function returned by a functional interface and invoked via apply.  
   - UnaryExpression  
   - IUnaryOperator  
-3. Method reference of a object's method  
+3. Method accepting a method reference by accepting a Function<T,R> as input.  
+  - Constant  
+  - Expression  
+  - DecrementExpression  
+  - IdentityExpression  
+  - IncrementExpression  
+  - SquareExpression  
+4. Method reference of an object's method used as input.  
+  - ExpressionPrinter$ExpressionStringifier  
+  - ExpressionPrinter  
+5. Method reference of a type's method  
   - TODO  
-4. Method reference of a type's method  
+6. Method reference of a static method  
   - TODO  
-5. Method reference of a static method  
-  - TODO  
-6. Method reference of a constructor  
+7. Method reference of a constructor  
   - TODO  

@@ -29,10 +29,16 @@
  */
 package app;
 
+import lib.Constant;
+import lib.DecrementExpression;
+import lib.Expression;
+import lib.ExpressionVisitor;
+import lib.IdentityExpression;
+import lib.IncrementExpression;
+import lib.SquareExpression;
+
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * 
  * <p>
  * <p>
  * <b>NOTE</b><br>
@@ -51,13 +57,33 @@ package app;
  * 
  * -->
  *
- * @author Michael Eichberg
- * @author Micahel Reif
  * @author Roberts Kolosovs
  */
-public class ExpressionEvaluator {
+public class ExpressionPrinter {
 
     public static void main(final String[] args) {
-    	
+    	Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
+    	ExpressionStringifier stringifier = new ExpressionPrinter().new ExpressionStringifier();
+    	System.out.println(expr.accept(stringifier::visit));
+    }
+    
+    private class ExpressionStringifier extends ExpressionVisitor<String> {
+
+		@Override
+		public String visit(Expression e) {
+			if (e instanceof DecrementExpression) {
+				return "(" + ((DecrementExpression)e).getExpr().accept(this::visit) + ")--";
+			} else if (e instanceof IncrementExpression) {
+				return "(" + ((IncrementExpression)e).getExpr().accept(this::visit) + ")++";
+			} else if (e instanceof IdentityExpression) {
+				return "Id(" + ((IdentityExpression)e).getExpr().accept(this::visit) + ")";
+			} else if (e instanceof SquareExpression) {
+				return "(" + ((SquareExpression)e).getExpr().accept(this::visit) + ")²";
+			} else if (e instanceof Constant) {
+				return String.valueOf(((Constant)e).getValue());
+			} else {
+				return "unknown expression";
+			}
+		}
     }
 }

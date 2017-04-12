@@ -32,6 +32,8 @@ package lib;
 
 import static lib.annotations.callgraph.AnalysisMode.*;
 
+import java.util.function.Function;
+
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
@@ -59,7 +61,7 @@ import lib.annotations.properties.EntryPoint;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public class Constant implements Expression {
@@ -88,10 +90,7 @@ public class Constant implements Expression {
             line = 92
     )
     @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor <T> visitor) {
-        return visitor.visit(this);
+    public <T> T accept(Function<Expression, T> visit) {
+    	return visit.apply(this);
     }
-
-    @EntryPoint(value = {OPA, CPA})
-    public native float toFloat();
 }

@@ -37,11 +37,12 @@ import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 import lib.Constant;
 import lib.Expression;
-import lib.ExpressionVisitor;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 import static lib.annotations.documentation.CGCategory.NOTE;
+
+import java.util.function.Function;
 
 /**
  * An unary expression which represents the decrement function.
@@ -90,8 +91,8 @@ public class DecrementExpression extends UnaryExpression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor<T> visitor) {
-        return visitor.visit(this);
+    public <T> T accept(Function<Expression, T> visit) {
+        return visit.apply(this);
     }
 
     static class DecrementOperator implements IUnaryOperator {
