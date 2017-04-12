@@ -14,11 +14,11 @@ Contains following test cases:
   - IdentityExpression  
   - IncrementExpression  
   - SquareExpression  
-4. Method reference of an object's method used as input.  
+4. Method reference to a method of a particular object used as input.  
   - ExpressionPrinter$ExpressionStringifier  
   - ExpressionPrinter  
-5. Method reference of a type's method  
-  - TODO  
+5. Method reference to a method of an arbitrary object of particular type used as input.  
+  - ExpressionPrinter$ExpressionStringifier  
 6. Method reference of a static method  
   - TODO  
 7. Method reference of a constructor  

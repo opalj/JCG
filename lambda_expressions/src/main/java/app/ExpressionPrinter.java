@@ -29,6 +29,9 @@
  */
 package app;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 import lib.Constant;
 import lib.DecrementExpression;
 import lib.Expression;
@@ -36,6 +39,7 @@ import lib.ExpressionVisitor;
 import lib.IdentityExpression;
 import lib.IncrementExpression;
 import lib.SquareExpression;
+import lib.UnaryExpression;
 
 /**
  * 
@@ -72,18 +76,22 @@ public class ExpressionPrinter {
 		@Override
 		public String visit(Expression e) {
 			if (e instanceof DecrementExpression) {
-				return "(" + ((DecrementExpression)e).getExpr().accept(this::visit) + ")--";
+				return "(" + recursiveAccept(e, Expression::accept) + ")--";
 			} else if (e instanceof IncrementExpression) {
-				return "(" + ((IncrementExpression)e).getExpr().accept(this::visit) + ")++";
+				return "(" + recursiveAccept(e, Expression::accept) + ")++";
 			} else if (e instanceof IdentityExpression) {
-				return "Id(" + ((IdentityExpression)e).getExpr().accept(this::visit) + ")";
+				return "Id(" + recursiveAccept(e, Expression::accept) + ")";
 			} else if (e instanceof SquareExpression) {
-				return "(" + ((SquareExpression)e).getExpr().accept(this::visit) + ")²";
+				return "(" + recursiveAccept(e, Expression::accept) + ")²";
 			} else if (e instanceof Constant) {
 				return String.valueOf(((Constant)e).getValue());
 			} else {
 				return "unknown expression";
 			}
+		}
+		
+		public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
+			return func.apply(e, this::visit);
 		}
     }
 }
