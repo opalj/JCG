@@ -29,8 +29,11 @@
  */
 package app;
 
+import static lib.annotations.callgraph.AnalysisMode.*;
+
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import lib.Constant;
 import lib.DecrementExpression;
@@ -39,7 +42,7 @@ import lib.ExpressionVisitor;
 import lib.IdentityExpression;
 import lib.IncrementExpression;
 import lib.SquareExpression;
-import lib.UnaryExpression;
+import lib.annotations.properties.EntryPoint;
 
 /**
  * 
@@ -64,11 +67,20 @@ import lib.UnaryExpression;
  * @author Roberts Kolosovs
  */
 public class ExpressionPrinter {
-
+	
+	private ExpressionPrinter(){}
+	
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     public static void main(final String[] args) {
     	Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
-    	ExpressionStringifier stringifier = new ExpressionPrinter().new ExpressionStringifier();
+    	Supplier<ExpressionPrinter> instance = ExpressionPrinter::instance;
+    	ExpressionStringifier stringifier = instance.get().new ExpressionStringifier();
     	System.out.println(expr.accept(stringifier::visit));
+    }
+    
+    static ExpressionPrinter instance() {
+    	Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
+    	return printerConstructor.get();
     }
     
     private class ExpressionStringifier extends ExpressionVisitor<String> {

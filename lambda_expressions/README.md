@@ -19,7 +19,7 @@ Contains following test cases:
   - ExpressionPrinter  
 5. Method reference to a method of an arbitrary object of particular type used as input.  
   - ExpressionPrinter$ExpressionStringifier  
-6. Method reference of a static method  
-  - TODO  
+6. Method reference of a static method of a class  
+  - ExpressionPrinter  
 7. Method reference of a constructor  
-  - TODO  
+  - ExpressionPrinter  
