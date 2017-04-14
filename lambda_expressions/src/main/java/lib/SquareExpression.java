@@ -103,6 +103,10 @@ public final class SquareExpression extends UnaryExpression {
 
     @Override
     @EntryPoint(value = {OPA, CPA})
+    @CallSite(name = "visit",
+    resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
+    returnType = Object.class,
+    line = 111)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }

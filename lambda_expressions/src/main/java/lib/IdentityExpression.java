@@ -30,6 +30,8 @@
 
 package lib;
 
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 import lib.Expression;
 
@@ -65,7 +67,7 @@ import java.util.function.Function;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public class IdentityExpression extends UnaryExpression {
 
@@ -83,6 +85,10 @@ public class IdentityExpression extends UnaryExpression {
     }
 
     @EntryPoint(value = {OPA, CPA})
+    @CallSite(name = "visit",
+    resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
+    returnType = Object.class,
+    line = 93)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }

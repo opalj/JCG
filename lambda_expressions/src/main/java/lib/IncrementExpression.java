@@ -93,6 +93,10 @@ public class IncrementExpression extends UnaryExpression {
     }
 
     @EntryPoint(value = {OPA, CPA})
+    @CallSite(name = "visit",
+    resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
+    returnType = Object.class,
+    line = 101)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }
@@ -102,7 +106,7 @@ public class IncrementExpression extends UnaryExpression {
             @ResolvedMethod(receiverType = IdentityExpression.FQN),
             @ResolvedMethod(receiverType = SquareExpression.FQN),
             @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
-    }, returnType = String.class, line = 107)
+    }, returnType = String.class, line = 112)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Inc("+ expr.toString() + ")";

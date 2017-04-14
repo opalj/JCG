@@ -85,9 +85,9 @@ public class Constant implements Expression {
     }
 
     @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
+            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
             returnType = Object.class,
-            line = 92
+            line = 94
     )
     @EntryPoint(value = {OPA, CPA})
     public <T> T accept(Function<Expression, T> visit) {
