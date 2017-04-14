@@ -88,13 +88,13 @@ public class ExpressionPrinter {
 		@Override
 		public String visit(Expression e) {
 			if (e instanceof DecrementExpression) {
-				return "(" + recursiveAccept(e, Expression::accept) + ")--";
+				return "(" + recursiveAccept(((DecrementExpression)e).getExpr(), Expression::accept) + ")--";
 			} else if (e instanceof IncrementExpression) {
-				return "(" + recursiveAccept(e, Expression::accept) + ")++";
+				return "(" + recursiveAccept(((IncrementExpression)e).getExpr(), Expression::accept) + ")++";
 			} else if (e instanceof IdentityExpression) {
-				return "Id(" + recursiveAccept(e, Expression::accept) + ")";
+				return "Id(" + recursiveAccept(((IdentityExpression)e).getExpr(), Expression::accept) + ")";
 			} else if (e instanceof SquareExpression) {
-				return "(" + recursiveAccept(e, Expression::accept) + ")²";
+				return "(" + recursiveAccept(((SquareExpression)e).getExpr(), Expression::accept) + ")²";
 			} else if (e instanceof Constant) {
 				return String.valueOf(((Constant)e).getValue());
 			} else {
