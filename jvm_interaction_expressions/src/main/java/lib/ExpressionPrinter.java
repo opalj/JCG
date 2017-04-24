@@ -88,20 +88,20 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
         return String.valueOf(c.getValue());
     }
 
-    @EntryPoint(value = {OPA, CPA})
-    public String visit(Variable v) {
-        return v.name;
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public String visit(BinaryExpression b) {
-        return "(" + b.left().toString() + b.operator().toString() + b.right().toString() + ")";
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public String visit(UnaryExpression u) {
-        return u.toString();
-    }
+//    @EntryPoint(value = {OPA, CPA})
+//    public String visit(Variable v) {
+//        return v.name;
+//    }
+//
+//    @EntryPoint(value = {OPA, CPA})
+//    public String visit(BinaryExpression b) {
+//        return "(" + b.left().toString() + b.operator().toString() + b.right().toString() + ")";
+//    }
+//
+//    @EntryPoint(value = {OPA, CPA})
+//    public String visit(UnaryExpression u) {
+//        return u.toString();
+//    }
 
     @EntryPoint(value = {OPA, CPA})
     public synchronized static void printExpression(Expression e) {

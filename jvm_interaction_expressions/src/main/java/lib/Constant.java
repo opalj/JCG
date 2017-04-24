@@ -35,10 +35,13 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
+import lib.testutils.CallbackTest;
 
+import java.io.Externalizable;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
-import java.io.Serializable;
 
 /**
  * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
@@ -53,8 +56,15 @@ import java.io.Serializable;
  *
  *
  *
+ *
+ *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
  *
  *
  *
@@ -63,14 +73,16 @@ import java.io.Serializable;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
-public class Constant implements Expression, Serializable{
+public class Constant{
 	
 	public static final String FQN = "lib/Constant";
+	public static final String ObjectOutputStreamReceiverType = "java/io/ObjectOutputStream";
+	public static final String ObjectInputStreamReceiverType = "java/io/ObjectInputStream";
 
-    private final int value;
+    private int value;
 
     public Constant(int value) {
         this.value = value;
@@ -86,36 +98,10 @@ public class Constant implements Expression, Serializable{
         return this;
     }
 
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
-            returnType = Object.class,
-            line = 96
-    )
     @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor <T> visitor) {
-        return visitor.visit(this);
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public native float toFloat();
-
-    @EntryPoint(value = {OPA, CPA})
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object writeReplace() throws ObjectStreamException {
-    	return this;
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-    private Object readResolve() throws ObjectStreamException {
-    	return this;
+	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 129)
+    public void finalize () {
+		CallbackTest.garbageCollectorCall();
+    	System.out.println("AltConstant object destroyed.");
     }
 }
