@@ -1,8 +1,13 @@
-This JCG sub-project contains all cases not waranting their own sub-project. The project implements a library modeling simple arithmetic expressions and an app using said library to process arithmetic expressions. Folowing features of java programing language are used:
+This JCG sub-project highlights language constructs which cause JVm callbacks.
+Contains following test cases:  
 
-- Private classes instantiable with factory methods
-- Finalization with the finalize() method
-- Runnable interface with the run() method
-- Running code with Thread.UncaughtExceptionHandler
-- Running code with AddShutdownHook
-- Classes implementing Serializable and Externalizable interfaces without the app performing (de-)serialization
+1. Finalize method of a class instantiated in the app.  
+  - Constant  
+2. Finalize method of a class not instantiated in the app.  
+  - AltConstant  
+3. Method defined in Thread.UncaughtExceptionHandler().  
+  - ExpressionEvaluator  
+4. Registering a Thread with a run method via addShutdownHook.  
+  - ExpressionEvaluator  
+5. Run method of a class implementing Runnable.  
+  - TODO  

@@ -30,20 +30,36 @@
 
 package lib;
 
+import static lib.annotations.callgraph.AnalysisMode.*;
+
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
+import lib.testutils.CallbackTest;
+
 /**
- * This class defines an abstract visitor for mathematical expressions.
+ * This class simply wraps an integer value.
+ * 
+ * It defines a finalize method which is only an entry point when this code is used as a 
+ * library because no instance of this class is created in the application code.
  *
- * <!-- <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves
- * documentation purposes.
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
  *
  *
  *
  *
  *
  *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
- * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
  *
  *
  *
@@ -55,9 +71,37 @@ package lib;
  *
  * @author Michael Eichberg
  * @author Michael Reif
+ * @author Roberts Kolosovs
  */
-public abstract class ExpressionVisitor<T> {
+public class AltConstant implements Expression {
+	
+	public static final String FQN = "lib/AltConstant";
 
-	public abstract T visit(Constant c);
+    private int value;
 
+    public AltConstant(int value) {
+        this.value = value;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public int getValue() {
+        return value;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 94)
+    public void finalize () {
+		CallbackTest.garbageCollectorCall();
+    	System.out.println("AltConstant object destroyed.");
+    }
+
+	@Override
+	public <T> T accept(ExpressionVisitor<T> visitor) {
+		return null;
+	}
+
+	@Override
+	public Constant eval(Map<String, Constant> values) {
+		return null;
+	}
 }

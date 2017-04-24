@@ -37,14 +37,10 @@ import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 import lib.testutils.CallbackTest;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
-
 /**
- * This class simply wraps an integer value. Defines methods to be called during (de-)serialization.
+ * This class simply wraps an integer value.
+ * 
+ * It defines a finalize method and is instantiated in the application class.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -76,11 +72,9 @@ import java.io.ObjectStreamException;
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
-public class Constant{
+public class Constant implements Expression {
 	
 	public static final String FQN = "lib/Constant";
-	public static final String ObjectOutputStreamReceiverType = "java/io/ObjectOutputStream";
-	public static final String ObjectInputStreamReceiverType = "java/io/ObjectInputStream";
 
     private int value;
 
@@ -98,10 +92,15 @@ public class Constant{
         return this;
     }
 
-    @EntryPoint(value = {OPA, CPA})
-	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 129)
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 98)
     public void finalize () {
 		CallbackTest.garbageCollectorCall();
-    	System.out.println("AltConstant object destroyed.");
+    	System.out.println("Constant object destroyed.");
     }
+
+	@Override
+	public <T> T accept(ExpressionVisitor<T> visitor) {
+		return null;
+	}
 }
