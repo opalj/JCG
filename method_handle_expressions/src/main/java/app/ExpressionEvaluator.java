@@ -29,25 +29,6 @@
  */
 package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-import static java.lang.Integer.parseInt;
-
-import lib.annotations.callgraph.*;
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
-
-import lib.*;
-
-import java.util.Arrays;
-
-import static lib.BinaryExpression.createBinaryExpression;
-import static lib.PlusOperator.AddExpression;
-import static lib.testutils.CallbackTest.callback;
-
 /**
  * This class defines an application use case of the expression library and has some well defined properties
  * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether

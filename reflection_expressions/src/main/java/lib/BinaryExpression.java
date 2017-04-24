@@ -66,7 +66,6 @@ import java.lang.reflect.Method;
  *
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -88,7 +87,8 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote( value = REFLECTION,description = "a new instance is created by Java Reflection")
     @CallSite(name = "<init>",
-            resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN)},
+            resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})}),
+            		@ResolvedMethod(receiverType = MultOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})},
             resolution = TargetResolution.REFLECTIVE,
             line = 100
     )
@@ -121,11 +121,12 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @CallSite(name = "createBinaryExpression",
-    resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN)},
+    resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
+    		@ResolvedMethod(receiverType = MultOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})},
     resolution = TargetResolution.REFLECTIVE,
     returnType = BinaryExpression.class,
     parameterTypes = {Operator.class, Expression.class, Expression.class},
-    line = 142)
+    line = 143)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,

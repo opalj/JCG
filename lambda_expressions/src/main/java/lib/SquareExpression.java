@@ -65,7 +65,7 @@ import lib.annotations.properties.EntryPoint;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public final class SquareExpression extends UnaryExpression {
 
@@ -84,7 +84,7 @@ public final class SquareExpression extends UnaryExpression {
             returnType = Constant.class,
             parameterTypes = {Constant.class},
             resolvedMethods = @ResolvedMethod(receiverType = "lib/IncrementExpression"),
-            line = 88)
+            line = 90)
     @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
         return (Constant c) -> new Constant(c.getValue() * c.getValue());

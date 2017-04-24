@@ -64,11 +64,10 @@ import static lib.UnaryOperator.IDENTITY;
  * <p>
  * <p>
  * <p>
- * <p>
- * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
+ * @author Roberts Kolosovs
  */
 
 public abstract class UnaryExpression implements Expression {
@@ -79,7 +78,8 @@ public abstract class UnaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "The first reflective String can be varied by an enumeration but all possible call targets can be found.")
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
-            resolvedMethods = {@ResolvedMethod(receiverType = IdentityExpression.FQN)},
+            resolvedMethods = {@ResolvedMethod(receiverType = SquareExpression.FQN),
+            		@ResolvedMethod(receiverType = IdentityExpression.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})},
             resolution = TargetResolution.REFLECTIVE,
             line = 98)
     @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")

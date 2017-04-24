@@ -63,7 +63,7 @@ import lib.annotations.properties.EntryPoint;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  * @param <T>
  */

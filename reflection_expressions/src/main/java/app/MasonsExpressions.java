@@ -29,24 +29,13 @@
  */
 package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-import static java.lang.Integer.parseInt;
-
 import lib.annotations.callgraph.*;
-import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.*;
 import static lib.UnaryOperator.*;
 
 import lib.*;
-
-import java.util.Arrays;
-
-import static lib.BinaryExpression.createBinaryExpression;
-import static lib.PlusOperator.AddExpression;
-import static lib.testutils.CallbackTest.callback;
 
 /**
  * This class defines an application use case of the expression library featuring reflection. 
@@ -68,8 +57,9 @@ import static lib.testutils.CallbackTest.callback;
  * 
  * -->
  *
+ *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public class MasonsExpressions {
@@ -78,10 +68,10 @@ public class MasonsExpressions {
 	@CallSite(name = "createBinaryExpression",
             resolvedMethods = {@ResolvedMethod(receiverType = BinaryExpression.FQN)},
             resolution = TargetResolution.REFLECTIVE,
-            line = 86
+            line = 76
     )
-	@InvokedConstructor(receiverType = "lib/Constant", line = 87)
-	@InvokedConstructor(receiverType = "lib/Constant", line = 88)
+	@InvokedConstructor(receiverType = "lib/Constant", line = 77)
+	@InvokedConstructor(receiverType = "lib/Constant", line = 78)
 	public static void main(final String[] args) throws Exception {
 		BinaryExpression masonsAngle = BinaryExpression.createBinaryExpression("Plus", 
 				(Expression) UnaryExpression.createUnaryExpressions(SQUARE, new Constant(3)), 

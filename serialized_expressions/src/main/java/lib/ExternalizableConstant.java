@@ -34,13 +34,10 @@ import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
-import java.io.Serializable;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 
 import static lib.annotations.callgraph.AnalysisMode.*;
@@ -62,8 +59,11 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  *
  *
  *
+ *
+ *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
+ *
  *
  *
  *
@@ -72,7 +72,7 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public class ExternalizableConstant extends AltConstant implements Externalizable {

@@ -54,7 +54,7 @@ package lib;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public abstract class ExpressionVisitor<T> {
 

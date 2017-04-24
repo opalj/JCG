@@ -36,10 +36,6 @@ import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-
 /**
  * This class models a mathematical constant by simply wrapping an integer value.
  *
@@ -53,8 +49,12 @@ import java.io.Serializable;
  *
  *
  *
+ *
+ *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
  *
  *
  *

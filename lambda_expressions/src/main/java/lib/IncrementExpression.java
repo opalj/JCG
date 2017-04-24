@@ -33,10 +33,8 @@ package lib;
 import lib.annotations.callgraph.*;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
-import lib.*;
 
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
@@ -58,11 +56,12 @@ import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
  * <p>
  * <p>
  * <p>
+ * 
+ * 
  * <p>
  * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
  * <p>
  * <p>
  * <p>
@@ -96,7 +95,7 @@ public class IncrementExpression extends UnaryExpression {
     @CallSite(name = "visit",
     resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
     returnType = Object.class,
-    line = 101)
+    line = 100)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }
@@ -106,7 +105,7 @@ public class IncrementExpression extends UnaryExpression {
             @ResolvedMethod(receiverType = IdentityExpression.FQN),
             @ResolvedMethod(receiverType = SquareExpression.FQN),
             @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
-    }, returnType = String.class, line = 112)
+    }, returnType = String.class, line = 111)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Inc("+ expr.toString() + ")";

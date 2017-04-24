@@ -54,8 +54,10 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  *
  *
  *
+ *
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
+ *
  *
  *
  *
@@ -119,9 +121,11 @@ public abstract class BinaryExpression implements Expression {
         };
     }
 
-    //TODO: Correct receiver types depending on algorithm.
-    @CallSite(name = "createBinaryExpression", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "lib/Operator")}, line = 130) 
+    @CallSite(name = "createBinaryExpression", 
+    		resolvedMethods = {@ResolvedMethod(receiverType = "lib/MultOperator"), 
+    				@ResolvedMethod(receiverType = "lib/PlusOperator"), 
+    				@ResolvedMethod(receiverType = "lib/SubOperator")}, 
+    		line = 134) 
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             Operator operator,

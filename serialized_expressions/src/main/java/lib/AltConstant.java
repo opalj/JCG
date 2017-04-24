@@ -30,14 +30,6 @@
 
 package lib;
 
-import lib.annotations.properties.EntryPoint;
-import lib.testutils.CallbackTest;
-
-import static lib.annotations.callgraph.AnalysisMode.*;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-
 /**
  * This class is a superclass for an externalizable implementation of an arithmetic constant.
  *

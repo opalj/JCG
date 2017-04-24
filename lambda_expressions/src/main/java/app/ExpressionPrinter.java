@@ -63,6 +63,9 @@ import lib.annotations.properties.EntryPoint;
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
  * <p>
+ * <p>
+ * <p>
+ * <p>
  * 
  * -->
  *
@@ -79,12 +82,9 @@ public class ExpressionPrinter {
     @InvokedConstructor(receiverType = "lib/Constant", line = 91)
     @InvokedConstructor(receiverType = "app/ExpressionPrinter$ExpressionStringifier", line = 93)
     @CallSite(name = "accept",
-    	resolvedMethods = {//TODO: Better algorithms recognize that IdentityExpression is the receiver. Does any see Expression as the receiver?
-    			@ResolvedMethod(receiverType = "lib/Expression"),
-    			@ResolvedMethod(receiverType = "lib/SquareExpression"),
+    	resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression"),
     			@ResolvedMethod(receiverType = "lib/IdentityExpression"),
-    			@ResolvedMethod(receiverType = "lib/IncrementExpression"),
-    			@ResolvedMethod(receiverType = "lib/DecrementExpression")},
+    			@ResolvedMethod(receiverType = "lib/IncrementExpression")},
     	returnType = Object.class,
     	line = 94)
     public static void main(final String[] args) {
@@ -120,14 +120,11 @@ public class ExpressionPrinter {
 		}
 
 	    @CallSite(name = "accept",
-	        	resolvedMethods = {//TODO: Does any algorithm see Expression as the receiver?
-	        			@ResolvedMethod(receiverType = "lib/Expression"),
-	        			@ResolvedMethod(receiverType = "lib/SquareExpression"),
+	        	resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression"),
 	        			@ResolvedMethod(receiverType = "lib/IdentityExpression"),
-	        			@ResolvedMethod(receiverType = "lib/IncrementExpression"),
-	        			@ResolvedMethod(receiverType = "lib/DecrementExpression")},
+	        			@ResolvedMethod(receiverType = "lib/IncrementExpression")},
 	        	returnType = Object.class,
-	    line = 132)
+	    line = 129)
 		public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
 			return func.apply(e, this::visit);
 		}

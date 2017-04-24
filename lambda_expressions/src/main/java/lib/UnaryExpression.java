@@ -126,9 +126,9 @@ public abstract class UnaryExpression implements Expression {
 
 	@CallSite(name = "eval", returnType = Constant.class, parameterTypes = Map.class, resolvedMethods = {
 			@ResolvedMethod(receiverType = UnaryExpression.FQN),
-			@ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)) }, line = 130)
+			@ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)) }, line = 134)
 	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = Constant.class, resolvedMethods = {
-			@ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA)), }, line = 130)
+			@ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA)), }, line = 134)
 	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {
 		return operator().apply(expr.eval(values));

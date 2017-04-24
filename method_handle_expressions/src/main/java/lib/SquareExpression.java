@@ -60,7 +60,7 @@ import lib.annotations.properties.EntryPoint;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public final class SquareExpression extends UnaryExpression {
 

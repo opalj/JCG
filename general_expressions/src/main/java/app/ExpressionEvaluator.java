@@ -78,10 +78,7 @@ public class ExpressionEvaluator {
 
     private static final Map<String, Constant> ENV = new Map<String, Constant>();
     static {ENV.add("x", new Constant(1));}
-    // 2 34 + 23 Plus == 59
-    //20 20 + 1 Plus ++ Id == 42
-    // 2 3 + 5 Plus 2 fancy_expressions.MultOperator
-    // 2 3 + 5 Plus 2 fancy_expressions.MultOperator Crash
+
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     @InvokedConstructor(receiverType = "app/ExpressionEvaluator", line = 108)
     @InvokedConstructor(receiverType = "lib/PlusOperator", line = 109)

@@ -68,10 +68,9 @@ import static lib.UnaryOperator.IDENTITY;
  * <p>
  * <p>
  * <p>
- * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 
 public abstract class UnaryExpression implements Expression {
@@ -81,7 +80,8 @@ public abstract class UnaryExpression implements Expression {
     protected Expression expr;
 
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
-            resolvedMethods = {@ResolvedMethod(receiverType = IdentityExpression.FQN)},
+            resolvedMethods = {@ResolvedMethod(receiverType = IdentityExpression.FQN),
+            		@ResolvedMethod(receiverType = SquareExpression.FQN)},
             line = 98)
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),

@@ -33,7 +33,6 @@ package lib;
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
-import lib.testutils.CallbackTest;
 
 import java.io.Serializable;
 import java.io.IOException;
@@ -53,6 +52,7 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
+ *
  *
  *
  *
