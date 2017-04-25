@@ -73,7 +73,7 @@ import java.io.ObjectStreamException;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public class AltConstant implements Externalizable{
@@ -121,12 +121,5 @@ public class AltConstant implements Externalizable{
     @EntryPoint(value = {OPA, CPA})
     private Object readResolve() throws ObjectStreamException {
     	return this;
-    }
-    
-    @EntryPoint(value = {OPA, CPA})
-	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 129)
-    public void finalize () {
-		CallbackTest.garbageCollectorCall();
-    	System.out.println("AltConstant object destroyed.");
     }
 }

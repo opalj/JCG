@@ -70,7 +70,7 @@ import static lib.UnaryOperator.IDENTITY;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 
 public abstract class UnaryExpression implements Expression {

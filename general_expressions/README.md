@@ -5,9 +5,13 @@ Contains following test cases:
   - TODO  
 2. Native calls.  
   - TODO  
-3. Exceptions affecting call graph.  
+3. Native methods.  
+  - Constant  
+4. Exceptions affecting call graph.  
   - TODO  
-4. Generics using wildcard typing.  
+5. Generics using wildcard typing.  
   - TODO  
-5. Classes implementing Serializable and Externalizable without serialization or deserialization in the application class.  
-  - TODO   
+6. Classes implementing Serializable without serialization or deserialization in the application class.  
+  - Constant   
+7. Classes implementing Externalizable without serialization or deserialization in the application class.  
+  - AltConstant  

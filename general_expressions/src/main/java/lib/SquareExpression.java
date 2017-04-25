@@ -61,7 +61,7 @@ import lib.*;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public final class SquareExpression extends UnaryExpression {
 

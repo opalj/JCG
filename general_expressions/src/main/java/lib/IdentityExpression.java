@@ -70,7 +70,7 @@ import static lib.annotations.documentation.CGCategory.NOTE;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public class IdentityExpression extends UnaryExpression {
 
@@ -95,13 +95,5 @@ public class IdentityExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Id("+expr.toString()+")";
-    }
-
-    @EntryPoint
-    @CGNote(value = NOTE, description = "This method is called during the garbage collection process if no references to this object are hold. It therefore becomes an entry point")
-    @CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 117)
-    @Override public void finalize() throws Throwable{
-        CallbackTest.garbageCollectorCall();
-        super.finalize();
     }
 }

@@ -194,24 +194,4 @@ public class ExpressionEvaluator {
         callback();
         return "ExpressionEvaluater v0.1";
     }
-    
-    /*
-     * This method contains calls which are not detected if this method is not labeled 
-     * as an entry point and a context sensitive analysis is employed.
-     */
-    @CallSite(name = "printText", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "app/ExpressionEvaluator", 
-    						iff = {@ResolvingCondition(mode = {OPA, CPA})})}, line = 215)
-    @EntryPoint(value = {OPA, CPA})
-    public void printSubtraction(Expression op){
-    	if (op instanceof SubOperator.SubExpression) {
-			printText(((SubOperator.SubExpression) op).left() + "-" + ((SubOperator.SubExpression) op).right());
-		} else {
-			//do nothing
-		}
-    }
-    
-    private void printText(String txt){
-    	System.out.println(txt);
-    }
 }

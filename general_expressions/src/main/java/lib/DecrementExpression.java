@@ -70,7 +70,7 @@ import static lib.annotations.documentation.CGCategory.NOTE;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public class DecrementExpression extends UnaryExpression {
 
