@@ -9,5 +9,7 @@ Contains following test cases:
   - ExpressionEvaluator  
 4. Registering a Thread with a run method via addShutdownHook.  
   - ExpressionEvaluator  
-5. Run method of a class implementing Runnable.  
-  - TODO  
+5. Run method of a class implementing Runnable used in the app.  
+  - Thread in ExpressionEvaluator  
+6. Run method of a class implementing Runnable not used in the app.  
+  - AltConstant  

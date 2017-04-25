@@ -73,7 +73,7 @@ import lib.testutils.CallbackTest;
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
-public class AltConstant implements Expression {
+public class AltConstant implements Expression, Runnable {
 	
 	public static final String FQN = "lib/AltConstant";
 
@@ -95,6 +95,12 @@ public class AltConstant implements Expression {
     	System.out.println("AltConstant object destroyed.");
     }
 
+    @EntryPoint(value = {OPA, CPA})
+	@CallSite(name = "runnableRunCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 101)
+    public void run() {
+    	CallbackTest.runnableRunCall();
+    }
+    
 	@Override
 	public <T> T accept(ExpressionVisitor<T> visitor) {
 		return null;
