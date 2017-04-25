@@ -12,6 +12,6 @@ Contains following test cases:
 4. Package private class escapes local scope only under the open package assumption.  
   - Stack$StackIterator  
 5. Private inner class escapes local scope due to deserialization.  
-  - TODO  
+  - IdentityExpression$IdentityOperator  
 6. Private inner class looks like it escapes due to deserialization but locks itself in via readResolve.  
-  - TODO  
+  - SquareExpression$SquareOperator  

@@ -61,4 +61,6 @@ public abstract class ExpressionVisitor<T> {
 	public abstract T visit(Constant c);
 
 	public abstract T visit(BinaryExpression b);
+	
+	public abstract T visit(UnaryExpression u);
 }
