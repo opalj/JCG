@@ -79,45 +79,6 @@ public abstract class UnaryExpression implements Expression {
 
     protected Expression expr;
 
-    public abstract IUnaryOperator operator();
-
-    @CGNote(value = REFLECTION, description = "The first reflective String can be varied by an enumeration but all possible call targets can be found.")
-    @CallSite(name = "<init>", parameterTypes = {Expression.class},
-            resolvedMethods = {
-                    @ResolvedMethod(receiverType = IdentityExpression.FQN),
-                    @ResolvedMethod(receiverType = DecrementExpression.FQN),
-                    @ResolvedMethod(receiverType = IncrementExpression.FQN)},
-            resolution = TargetResolution.REFLECTIVE,
-            line = 106)
-    @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
-    @CallSite(name = "<init>", parameterTypes = {Expression.class},
-            resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            resolution = TargetResolution.REFLECTIVE,
-            line = 112)
-    @EntryPoint(value = {OPA, CPA})
-    public static UnaryExpression createUnaryExpressions(
-            UnaryOperator operator,
-            final Expression expr) {
-        UnaryExpression uExpr = null;
-        try {
-            Class<?> clazz = Class.forName(operator.toString());
-            Constructor<?> constructor = clazz.getConstructor(Expression.class);
-            uExpr = (UnaryExpression) constructor.newInstance(expr);
-        } catch (Exception e) {
-            if (uExpr == null) {
-                try {
-                    Class<?> clazz = Class.forName(IDENTITY.toString());
-                    Constructor<?> constructor = clazz.getConstructor(Expression.class);
-                    uExpr = (UnaryExpression) constructor.newInstance(expr);
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-            }
-        }
-
-        return uExpr;
-    }
-
     public UnaryExpression(Expression expr) {
         this.expr = expr;
     }
@@ -125,20 +86,5 @@ public abstract class UnaryExpression implements Expression {
     @EntryPoint(value = {OPA, CPA})
     public abstract String toString();
 
-    @CallSite(name = "eval", returnType = Constant.class, parameterTypes = Map.class,
-    resolvedMethods = {
-            @ResolvedMethod(receiverType = UnaryExpression.FQN),
-            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-            @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
-            @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-            @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
-    }, line = 143)
-    @CallSite(name = "apply", returnType = Constant.class, parameterTypes = Constant.class,
-            resolvedMethods = {
-                    @ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-            }, line = 143)
-    @EntryPoint(value = {OPA, CPA})
-    public Constant eval(Map<String, Constant> values) {
-        return operator().apply(expr.eval(values));
-    }
+    public abstract Constant eval(Map<String, Constant> values);
 }

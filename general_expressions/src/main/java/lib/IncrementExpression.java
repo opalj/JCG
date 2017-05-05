@@ -74,18 +74,6 @@ public class IncrementExpression extends UnaryExpression {
 
     public static final String FQN = "lib/IncrementExpression";
 
-    @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
-    @CallSite(resolution = DYNAMIC,
-            name="lambda$operator$0",
-            returnType = Constant.class,
-            parameterTypes = {Constant.class},
-            resolvedMethods = @ResolvedMethod(receiverType = "lib/IncrementExpression"),
-            line = 87)
-    @EntryPoint(value = {OPA, CPA})
-    public IUnaryOperator operator() {
-        return (Constant constant) -> new Constant(constant.getValue() + 1);
-    }
-
     public IncrementExpression(Expression expr) {
         super(expr);
     }
@@ -108,4 +96,9 @@ public class IncrementExpression extends UnaryExpression {
     public String toString(){
         return "Inc("+ expr.toString() + ")";
     }
+
+	@Override
+	public Constant eval(Map<String, Constant> values) {
+		return new Constant(expr.eval(values).getValue() + 1);
+	}
 }

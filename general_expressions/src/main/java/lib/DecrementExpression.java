@@ -80,10 +80,6 @@ public class DecrementExpression extends UnaryExpression {
         super(expr);
     }
 
-    @CGNote(value = NOTE, description = "")
-    @EntryPoint(value = {OPA, CPA})
-    public IUnaryOperator operator() { return DecrementOperator.newInstance(); }
-
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Dec("+expr.toString()+")";
@@ -94,31 +90,8 @@ public class DecrementExpression extends UnaryExpression {
         return visitor.visit(this);
     }
 
-    static class DecrementOperator implements IUnaryOperator {
-
-        public static final String FQN = "lib/DecrementExpression$DecrementOperator";
-
-        private static DecrementOperator _INSTANCE;
-
-        private DecrementOperator(){
-        }
-
-        @EntryPoint(value = {OPA, CPA})
-        @InvokedConstructor(receiverType = FQN, line = 113)
-        public static DecrementOperator newInstance() {
-           if(_INSTANCE == null){
-               _INSTANCE = new DecrementOperator();
-           }
-
-            return _INSTANCE;
-        }
-
-        @EntryPoint(value = {OPA, CPA})
-        @CallSite(name= "getValue", resolvedMethods = {
-        		@ResolvedMethod(receiverType = Constant.FQN)
-        }, line = 124)
-        public Constant apply(Constant constant) {
-            return new Constant(constant.getValue() - 1);
-        }
-    }
+	@Override
+	public Constant eval(Map<String, Constant> values) {
+		return new Constant(expr.eval(values).getValue() - 1);
+	}
 }

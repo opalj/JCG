@@ -3,7 +3,7 @@
  * Copyright (c) 2009 - 2016
  * Software Technology Group
  * Department of Computer Science
- * Technische Universität Darmstadt
+ * Technische Universitaet Darmstadt
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,27 +36,19 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 import lib.annotations.properties.EntryPoint;
 
 /**
+ * A plus operator that creates a binary add expression.
  *
- *
- * @author Michael Reif
- */
-/**
- * Models an arithmetic subtraction. Negative values are allowed.
- *
- * This class is intentionally unused and not instantiated.
- *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
+ * <!-- <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
  *
  *
  *
  *
  *
  *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
  *
  *
  *
@@ -69,48 +61,30 @@ import lib.annotations.properties.EntryPoint;
  * @author Michael Eichberg
  * @author Michael Reif
  */
-public class SubOperator extends Operator {
+public class AddExpression extends BinaryExpression {
 
-    public static final String FQN = "lib/SubOperator";
+	public static final String FQN = "lib/PlusOperator$AddExpression";
 
-    protected SubOperator() {}
+	private final Expression right;
+	private final Expression left;
 
-    public final static Operator instance = new SubOperator();
+	public AddExpression(Expression left, Expression right) {
+		this.left = left;
+		this.right = right;
+	}
 
-    public static class SubExpression extends BinaryExpression {
+	@EntryPoint(value = { OPA, CPA })
+	public Expression left() {
+		return this.left;
+	}
 
-    	public static final String FQN = "lib/SubOperator$SubExpression";
-    	
-        private final Expression right;
-        private final Expression left;
+	@EntryPoint(value = { OPA, CPA })
+	public Expression right() {
+		return this.right;
+	}
 
-        public SubExpression(Expression left , Expression right) {
-         this.left = left;
-            this.right = right;
-        }
-
-        @EntryPoint(value = {OPA, CPA})
-        public Expression left(){return this.left;}
-
-        @EntryPoint(value = {OPA, CPA})
-        public Expression right(){return this.right;}
-
-        @EntryPoint(value = {OPA, CPA})
-        public Operator operator(){return SubOperator.instance;}
-
-        @Override public Constant eval(Map<String, Constant> values) {
-            return new Constant( left.eval(values).getValue() - right.eval(values).getValue() );
-        }
-    }
-
-    @EntryPoint(value = {OPA})
-    static BinaryExpression createBinaryExpression(Expression left,Expression right ) {
-        return new SubExpression(left,right);
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public String toString(){
-        return "-";
-    }
+	@Override
+	public Constant eval(Map<String, Constant> values) {
+		return new Constant(left.eval(values).getValue() + right.eval(values).getValue());
+	}
 }
-

@@ -2,7 +2,7 @@ This JCG sub-project contains all cases not waranting their own sub-project. The
 Contains following test cases:  
 
 1. Class instantiable only via a factory method.  
-  - TODO  
+  - ExpressionPrinter  
 2. Native calls.  
   - TODO  
 3. Native methods.  

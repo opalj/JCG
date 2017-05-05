@@ -70,17 +70,11 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
 	
 	public static final String FQN = "lib/ExpressionPrinter";
 
-    @CGNote(value = STATIC_INITIALIZERS,
-            description = "static initializers are called by the jvm;" +
-                    " called when the class is somehow referenced the first time." +
-                    "I.e. invoking a constructor of a subclass or calling a static method.")
-    private static ExpressionPrinter instance;
-
-    static {
-        instance = new ExpressionPrinter();
-    }
-
     private ExpressionPrinter() {
+    }
+    
+    public ExpressionPrinter expressionPrinterFactory() {
+    	return new ExpressionPrinter();
     }
 
     @EntryPoint(value = {OPA, CPA})

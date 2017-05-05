@@ -30,23 +30,32 @@
 
 package lib;
 
-import java.io.Serializable;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
+import lib.annotations.properties.EntryPoint;
 
 /**
- * Common superclass of an operator.
- *
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
  *
  *
+ * @author Michael Reif
+ */
+/**
+ * Models an arithmetic subtraction. Negative values are allowed.
+ *
+ * This class is intentionally unused and not instantiated.
+ *
+ * <!-- <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves
+ * documentation purposes.
  *
  *
  *
  *
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE
+ * STABLE IF THE CODE (E.G. IMPORTS) CHANGE.
  *
  *
  *
@@ -59,5 +68,30 @@ import java.io.Serializable;
  * @author Michael Eichberg
  * @author Michael Reif
  */
-public abstract class Operator implements Serializable {
+public class SubExpression extends BinaryExpression {
+
+	public static final String FQN = "lib/SubOperator$SubExpression";
+
+	private final Expression right;
+	private final Expression left;
+
+	public SubExpression(Expression left, Expression right) {
+		this.left = left;
+		this.right = right;
+	}
+
+	@EntryPoint(value = { OPA, CPA })
+	public Expression left() {
+		return this.left;
+	}
+
+	@EntryPoint(value = { OPA, CPA })
+	public Expression right() {
+		return this.right;
+	}
+
+	@Override
+	public Constant eval(Map<String, Constant> values) {
+		return new Constant(left.eval(values).getValue() - right.eval(values).getValue());
+	}
 }

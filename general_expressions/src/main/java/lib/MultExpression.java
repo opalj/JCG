@@ -7,15 +7,32 @@ import lib.annotations.properties.EntryPoint;
 import lib.*;
 
 /**
- * Created by eichberg on 27.01.16.
+ * TODO
+ *
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ *
+ * @author Roberts Kolosovs
  */
-public class MultOperator extends Operator {
-	
-    public static final String FQN = "lib/MultOperator";
-
-    public final static Operator instance = new MultOperator();
-
-    public static class MultExpression extends BinaryExpression {
+public class MultExpression extends BinaryExpression {
 
         public static final String FQN = "lib/MultOperator$MultExpression";
 
@@ -23,8 +40,8 @@ public class MultOperator extends Operator {
         private final Expression left;
 
         public MultExpression(Expression left , Expression right) {
-         this.left = left;
-            this.right = right;
+        	this.left = left;
+        	this.right = right;
         }
 
         @EntryPoint(value = {OPA, CPA})
@@ -34,22 +51,8 @@ public class MultOperator extends Operator {
         public Expression right(){return this.right;}
 
         @EntryPoint(value = {OPA, CPA})
-        public Operator operator(){return MultOperator.instance;}
-
-        @EntryPoint(value = {OPA, CPA})
         @Override public Constant eval(Map<String, Constant> values) {
             return new Constant( left.eval(values).getValue() * right.eval(values).getValue() );
         }
-    }
-
-    @EntryPoint(value = {OPA})
-    static BinaryExpression createBinaryExpression(Expression left,Expression right ) {
-        return new MultExpression(left,right);
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public String toString(){
-        return "*";
-    }
 }
 

@@ -71,12 +71,7 @@ public final class SquareExpression extends UnaryExpression {
 
     public SquareExpression(Expression expr){
         super(expr);
-        square = new MultOperator.MultExpression(expr, expr);
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public IUnaryOperator operator() {
-        return (Constant c) -> new Constant(c.getValue() * c.getValue());
+        square = new MultExpression(expr, expr);
     }
 
     @EntryPoint(value = {OPA, CPA})
@@ -87,7 +82,7 @@ public final class SquareExpression extends UnaryExpression {
     @CallSite(name = "eval",
             returnType = Constant.class,
             parameterTypes = {Map.class},
-            resolvedMethods = @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
+            resolvedMethods = @ResolvedMethod(receiverType = MultExpression.FQN),
             line = 95)
     @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String, Constant> values) {

@@ -76,15 +76,8 @@ public class IdentityExpression extends UnaryExpression {
 
     public static final String FQN = "lib/IdentityExpression";
 
-    private static /* final */ IUnaryOperator _IDENTITY = IUnaryOperator.identity();
-
     public IdentityExpression(Expression expr){
         super(expr);
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public IUnaryOperator operator() {
-        return _IDENTITY;
     }
 
     @EntryPoint(value = {OPA, CPA})
@@ -92,6 +85,12 @@ public class IdentityExpression extends UnaryExpression {
         return visitor.visit(this);
     }
 
+	@Override
+    @EntryPoint(value = {OPA, CPA})
+	public Constant eval(Map<String, Constant> values) {
+		return expr.eval(values);
+	}
+    
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Id("+expr.toString()+")";
