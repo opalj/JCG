@@ -33,7 +33,6 @@ package lib;
 import lib.annotations.callgraph.*;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
-import lib.*;
 
 import java.util.function.UnaryOperator;
 
@@ -88,9 +87,9 @@ public class IncrementExpression extends UnaryExpression {
             @ResolvedMethod(receiverType = IdentityExpression.FQN),
             @ResolvedMethod(receiverType = SquareExpression.FQN),
             @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-            @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-            @ResolvedMethod(receiverType = SubOperator.SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-            @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)
+            @ResolvedMethod(receiverType = AddExpression.FQN),
+            @ResolvedMethod(receiverType = SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
+            @ResolvedMethod(receiverType = MultExpression.FQN)
     }, returnType = String.class, line = 110)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){

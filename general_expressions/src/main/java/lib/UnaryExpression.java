@@ -30,18 +30,10 @@
 
 package lib;
 
-import lib.annotations.callgraph.*;
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
-import lib.*;
-
-import java.lang.reflect.Constructor;
-
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.REFLECTION;
-import static lib.UnaryOperator.IDENTITY;
+
+import lib.annotations.properties.EntryPoint;
 
 /**
  * An abstract unary Expression where the operation has to be implemented

@@ -36,11 +36,6 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 import lib.annotations.properties.EntryPoint;
 
 /**
- *
- *
- * @author Michael Reif
- */
-/**
  * Models an arithmetic subtraction. Negative values are allowed.
  *
  * This class is intentionally unused and not instantiated.

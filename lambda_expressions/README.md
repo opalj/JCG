@@ -1,4 +1,4 @@
-This JCG sub-project features java8 lambda functions. It implements a library modeling simple arithmetic expressions while heavily relying on lambda functions.
+This JCG sub-project features java8 lambda functions. It implements a library modeling simple arithmetic expressions while heavily relying on lambda functions. Test cases featuring method references and generics do not feature the use of wildcards in the generic typing as wildcards are not permitted in this context (JLS8 page 78).
 Contains following test cases:
 
 1. Lambda function call.  

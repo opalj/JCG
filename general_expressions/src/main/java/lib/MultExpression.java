@@ -4,7 +4,6 @@ import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 import lib.annotations.properties.EntryPoint;
-import lib.*;
 
 /**
  * TODO

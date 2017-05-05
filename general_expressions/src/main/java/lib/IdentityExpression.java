@@ -30,18 +30,12 @@
 
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 import lib.Expression;
 import lib.ExpressionVisitor;
-import lib.testutils.CallbackTest;
-import lib.testutils.StaticInitializerTest;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.NOTE;
 
 /**
  * An unary expression which represents the identity function. Hence, the encapsulated expression

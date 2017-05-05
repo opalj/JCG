@@ -29,18 +29,6 @@
  */
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.callgraph.ResolvingCondition;
-import lib.annotations.callgraph.TargetResolution;
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.annotations.documentation.CGCategory.*;
-
-import java.lang.reflect.Method;
-
 /**
  * This class defines an application use case of the expression library and has some well defined properties
  * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether

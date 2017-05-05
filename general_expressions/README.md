@@ -3,9 +3,9 @@ Contains following test cases:
 
 1. Class instantiable only via a factory method.  
   - ExpressionPrinter  
-2. Native calls.  
-  - TODO  
-3. Native methods.  
+2. Calls to native method arrayCopy affecting the data flow and thus call targets.  
+  - ExpressionEvaluator  
+3. Declaration of native methods.  
   - Constant  
 4. Exceptions affecting call graph.  
   - TODO  

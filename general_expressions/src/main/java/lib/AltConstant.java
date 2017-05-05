@@ -35,7 +35,6 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
-import lib.testutils.CallbackTest;
 
 import java.io.Externalizable;
 import java.io.IOException;

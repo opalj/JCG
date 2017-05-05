@@ -36,7 +36,6 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
-import lib.*;
 
 /**
  * A SquareExpression represents an unary operation that squares an expression.
