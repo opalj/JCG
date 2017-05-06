@@ -36,7 +36,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 import lib.annotations.properties.EntryPoint;
 
 /**
- * A plus operator that creates a binary add expression.
+ * A mathematical add expression.
  *
  * <!-- <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
@@ -60,10 +60,11 @@ import lib.annotations.properties.EntryPoint;
  *
  * @author Michael Eichberg
  * @author Michael Reif
+ * @author Roberts Kolosovs
  */
 public class AddExpression extends BinaryExpression {
 
-	public static final String FQN = "lib/PlusOperator$AddExpression";
+	public static final String FQN = "lib/AddExpression";
 
 	private final Expression right;
 	private final Expression left;
@@ -84,6 +85,7 @@ public class AddExpression extends BinaryExpression {
 	}
 
 	@Override
+	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {
 		return new Constant(left.eval(values).getValue() + right.eval(values).getValue());
 	}

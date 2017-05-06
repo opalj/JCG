@@ -47,15 +47,15 @@ import lib.SquareExpression;
 import lib.SubExpression;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
- * <p>
- * <b>NOTE</b><br>
+ * This class defines an application use case of the expression library. It uses native 
+ * arraycopy method extensively.
+ * 
+ * NOTE
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * <p>
+ * 
  * <!--
+ * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * 
@@ -74,9 +74,9 @@ public class ExpressionEvaluator {
 			new MultExpression(new Constant(2), new Constant(1)), null};
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "evalFirstEntry", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 101)
-    @CallSite(name = "evalSecondEntry", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 101)
-    @CallSite(name = "evalAll", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 101)
+    @CallSite(name = "evalFirstEntry", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 82)
+    @CallSite(name = "evalSecondEntry", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 86)
+    @CallSite(name = "evalAll", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 92)
     public static void main(final String[] args) {
     	ExpressionEvaluator evaluatorOne = new ExpressionEvaluator();
     	evaluatorOne.evalFirstEntry();

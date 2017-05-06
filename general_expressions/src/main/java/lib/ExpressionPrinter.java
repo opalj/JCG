@@ -38,9 +38,7 @@ import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * This class defines a visitor that prints visited expressions.
  * <p>
  * <!--
  * <b>NOTE</b><br>
@@ -89,7 +87,7 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
 
     @EntryPoint(value = {OPA, CPA})
     public String visit(BinaryExpression b) {
-        return "(" + b.left().toString() + b.operator().toString() + b.right().toString() + ")";
+        return "(" + b.left().toString() + b.operator() + b.right().toString() + ")";
     }
 
     @EntryPoint(value = {OPA, CPA})
@@ -98,7 +96,7 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public synchronized static void printExpression(Expression e) {
-        System.out.print(e.accept(instance));
+    public void printExpression(Expression e) {
+        System.out.print(e.accept(this));
     }
 }

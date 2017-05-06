@@ -30,9 +30,7 @@
 package lib;
 
 /**
- * This class defines an application use case of the expression library and has some well defined properties
- * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
- * a given call graph implementation can handle these features.
+ * Abstract superclass of all classes representing binary mathematic expressions.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -69,5 +67,7 @@ public abstract class BinaryExpression implements Expression {
     public <T> T accept(ExpressionVisitor <T> visitor){
         return visitor.visit(this);
     }
+    
+    public abstract String operator();
 }
 

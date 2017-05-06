@@ -38,7 +38,8 @@ import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
 /**
- * A SquareExpression represents an unary operation that squares an expression.
+ * A SquareExpression represents an unary operation that squares an expression. 
+ * Uses the MultExpression to implement the squaring.
  *
  * <p>
  * <!--
@@ -82,7 +83,7 @@ public final class SquareExpression extends UnaryExpression {
             returnType = Constant.class,
             parameterTypes = {Map.class},
             resolvedMethods = @ResolvedMethod(receiverType = MultExpression.FQN),
-            line = 95)
+            line = 89)
     @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String, Constant> values) {
         return square.eval(values);

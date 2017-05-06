@@ -86,7 +86,14 @@ public class SubExpression extends BinaryExpression {
 	}
 
 	@Override
+	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {
 		return new Constant(left.eval(values).getValue() - right.eval(values).getValue());
+	}
+
+	@Override
+	@EntryPoint(value = { OPA, CPA })
+	public String operator() {
+		return "-";
 	}
 }

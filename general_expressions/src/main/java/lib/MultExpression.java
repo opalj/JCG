@@ -6,7 +6,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 import lib.annotations.properties.EntryPoint;
 
 /**
- * TODO
+ * Mathematical expression multiplying two numbers.
  *
  * <!--
  * <b>NOTE</b><br>
@@ -53,5 +53,11 @@ public class MultExpression extends BinaryExpression {
         @Override public Constant eval(Map<String, Constant> values) {
             return new Constant( left.eval(values).getValue() * right.eval(values).getValue() );
         }
+
+		@Override
+        @EntryPoint(value = {OPA, CPA})
+		public String operator() {
+			return "*";
+		}
 }
 

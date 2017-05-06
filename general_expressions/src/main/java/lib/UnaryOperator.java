@@ -41,7 +41,29 @@ import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 
 /**
- * A enumeration type for all unary operator there are.
+ * A enumeration type for all unary operator there are. * 
+ * 
+ * <!--
+ * <b>NOTE</b><br>
+ * This class is not meant to be (automatically) recompiled; it just serves documentation
+ * purposes.
+ *
+ *
+ *
+ *
+ *
+ *
+ * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
+ * CODE (E.G. IMPORTS) CHANGE.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * -->
+ * 
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
@@ -64,7 +86,7 @@ public enum UnaryOperator {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name= "consoleWrite", resolvedMethods = {
     		@ResolvedMethod(receiverType = "lib/UnaryOperator")
-    }, line = 69)
+    }, line = 92)
     public String toString(){
     	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
         return this.name;
