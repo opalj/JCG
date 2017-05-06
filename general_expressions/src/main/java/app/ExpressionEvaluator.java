@@ -42,24 +42,23 @@ import lib.Constant;
 import lib.Expression;
 import lib.IncrementExpression;
 import lib.Map;
+import lib.MultExpression;
 import lib.SquareExpression;
+import lib.SubExpression;
 
 /**
  * This class defines an application use case of the expression library and has some well defined properties
  * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
  * a given call graph implementation can handle these features.
  * <p>
- * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
  * <p>
  * <!--
- * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
+ * 
  * -->
  *
  * @author Michael Eichberg
@@ -71,7 +70,8 @@ public class ExpressionEvaluator {
 			new IncrementExpression(new Constant(1)), 
 			new IncrementExpression(new Constant(2))};
 	
-	private Expression[] expressionArray = new Expression[3];
+	private Expression[] expressionArray = {new SubExpression(new Constant(2), new Constant(1)), 
+			new MultExpression(new Constant(2), new Constant(1)), null};
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     @CallSite(name = "evalFirstEntry", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 101)
