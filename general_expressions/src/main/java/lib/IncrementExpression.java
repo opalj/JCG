@@ -92,6 +92,7 @@ public class IncrementExpression extends UnaryExpression {
     }
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public Constant eval(Map<String, Constant> values) {
 		return new Constant(expr.eval(values).getValue() + 1);
 	}

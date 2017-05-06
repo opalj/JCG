@@ -30,6 +30,8 @@
 
 package lib;
 
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 import lib.Constant;
 import lib.Expression;
@@ -66,6 +68,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  * -->
  *
  * @author Michael Reif
+ * @author Roberts Kolosovs
  */
 public class DecrementExpression extends UnaryExpression {
 
@@ -86,7 +89,33 @@ public class DecrementExpression extends UnaryExpression {
     }
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
+    @CallSite(name = "checkIfDecrement", resolvedMethods = {
+    		@ResolvedMethod(receiverType = DecrementExpression.FQN)}, line = 107)
+    @CallSite(name = "eval", resolvedMethods = {
+    		@ResolvedMethod(receiverType = AddExpression.FQN),
+    		@ResolvedMethod(receiverType = AltConstant.FQN),
+    		@ResolvedMethod(receiverType = Constant.FQN),
+    		@ResolvedMethod(receiverType = IdentityExpression.FQN),
+    		@ResolvedMethod(receiverType = IncrementExpression.FQN),
+    		@ResolvedMethod(receiverType = MultExpression.FQN),
+    		@ResolvedMethod(receiverType = SquareExpression.FQN),
+    		@ResolvedMethod(receiverType = SubExpression.FQN),
+    		@ResolvedMethod(receiverType = Variable.FQN)}, line = 109)
 	public Constant eval(Map<String, Constant> values) {
-		return new Constant(expr.eval(values).getValue() - 1);
+		try {
+			checkIfDecrement(this.expr);
+		} catch (Exception e) {
+			return new Constant(expr.eval(values).getValue() - 1);
+		}
+		return new Constant( ((UnaryExpression) expr).expr.eval(values).getValue() - 2);
+	}
+	
+	private void checkIfDecrement(Object vals) throws Exception{
+		if(!(vals instanceof DecrementExpression)){
+			//do nothing
+		} else {
+			throw new Exception();
+		}
 	}
 }

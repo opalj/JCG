@@ -8,10 +8,12 @@ Contains following test cases:
 3. Declaration of native methods.  
   - Constant  
 4. Exceptions affecting call graph.  
+  - DecrementExpression  
+5. Generics using wildcard typing and type erasures stemming from that.  
   - TODO  
-5. Generics using wildcard typing.  
+6. Arrays break type security and prevent further execution.  
   - TODO  
-6. Classes implementing Serializable without serialization or deserialization in the application class.  
+7. Classes implementing Serializable without serialization or deserialization in the application class.  
   - Constant   
-7. Classes implementing Externalizable without serialization or deserialization in the application class.  
+8. Classes implementing Externalizable without serialization or deserialization in the application class.  
   - AltConstant  
