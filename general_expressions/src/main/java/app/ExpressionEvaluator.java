@@ -40,6 +40,7 @@ import static lib.testutils.CallbackTest.callback;
 import lib.AddExpression;
 import lib.Constant;
 import lib.Expression;
+import lib.IdentityExpression;
 import lib.IncrementExpression;
 import lib.Map;
 import lib.MultExpression;
@@ -131,10 +132,24 @@ public class ExpressionEvaluator {
      * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 201)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 137)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         callback();
         return "ExpressionEvaluater v0.1";
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public Constant altEvaluateFirst(){
+    	this.expressionArray = this.coutToThree;
+    	expressionArray[1] = new IdentityExpression(expressionArray[0]); //crashes the program
+    	copyPrivateArrays(); //never executed
+    	return null;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public void runAltEvaluation(){
+    	altEvaluateFirst(); //crashes the program
+    	copyPrivateArrays(); //never executed
     }
 }

@@ -12,7 +12,7 @@ Contains following test cases:
 5. Generics using wildcard typing and type erasures stemming from that.  
   - TODO  
 6. Arrays break type security and prevent further execution.  
-  - TODO  
+  - ExpressionEvaluator  
 7. Classes implementing Serializable without serialization or deserialization in the application class.  
   - Constant   
 8. Classes implementing Externalizable without serialization or deserialization in the application class.  
