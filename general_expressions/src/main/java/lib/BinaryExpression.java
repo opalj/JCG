@@ -30,7 +30,7 @@
 package lib;
 
 /**
- * Abstract superclass of all classes representing binary mathematic expressions.
+ * Abstract superclass of all classes representing binary mathematical expressions.
  *
  * <!--
  * <b>NOTE</b><br>

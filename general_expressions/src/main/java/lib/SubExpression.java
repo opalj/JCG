@@ -65,7 +65,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class SubExpression extends BinaryExpression {
 
-	public static final String FQN = "lib/SubOperator$SubExpression";
+	public static final String FQN = "lib/SubExpression";
 
 	private final Expression right;
 	private final Expression left;

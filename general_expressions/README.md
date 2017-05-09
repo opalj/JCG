@@ -10,7 +10,7 @@ Contains following test cases:
 4. Exceptions affecting call graph.  
   - DecrementExpression  
 5. Generics using wildcard typing and type erasures stemming from that.  
-  - TODO  
+  - ExpressionEvaluator$ParameterizedEvaluator  
 6. Arrays break type security and prevent further execution.  
   - ExpressionEvaluator  
 7. Classes implementing Serializable without serialization or deserialization in the application class.  

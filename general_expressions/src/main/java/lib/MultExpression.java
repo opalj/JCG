@@ -33,7 +33,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class MultExpression extends BinaryExpression {
 
-        public static final String FQN = "lib/MultOperator$MultExpression";
+        public static final String FQN = "lib/MultExpression";
 
         private final Expression right;
         private final Expression left;

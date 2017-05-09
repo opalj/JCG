@@ -89,4 +89,9 @@ public class AddExpression extends BinaryExpression {
 	public Constant eval(Map<String, Constant> values) {
 		return new Constant(left.eval(values).getValue() + right.eval(values).getValue());
 	}
+
+	@Override
+	public String operator() {
+		return "+";
+	}
 }
