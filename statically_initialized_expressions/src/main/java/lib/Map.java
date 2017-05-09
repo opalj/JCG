@@ -44,7 +44,7 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  * Simple map implementation which maintains a linked list of key-value pairs.
  *
- * <--
+ * <!--
  *
  *
  *
@@ -55,7 +55,11 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  *
  *
- * <--
+ *
+ *
+ *
+ *
+ * -->
  * @author Michael Eichberg
  * @author Michael Reif
  */
@@ -96,12 +100,10 @@ public class Map<K, V> {
     @CGNote(value = POLYMORPHIC_CALL, description = "an anonymous class is created; the methods of this class become potential call targets.")
     public static final Map<?,?> EMPTY = new Map<Object,Object>(){
 
-        @EntryPoint(value = {OPA, CPA})
         @Override public void add(Object o, Object o2) {
             throw new UnsupportedOperationException();
         }
 
-        @EntryPoint(value = {OPA, CPA})
         @Override public Object get(Object name) {
             return null;
         }
@@ -111,8 +113,8 @@ public class Map<K, V> {
 
     }
 
-    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 120)
-    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 131)
+    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 121)
+    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 132)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
@@ -138,17 +140,17 @@ public class Map<K, V> {
         }
     }
 
-    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)}, line = 145)
+    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)}, line = 146)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 158)
+    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 159)
     @CallSite(name = "next", resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 158)
+    line = 159)
     @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();

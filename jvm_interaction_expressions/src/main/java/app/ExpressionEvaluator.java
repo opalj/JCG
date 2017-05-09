@@ -47,26 +47,26 @@ import static lib.testutils.CallbackTest.callback;
 /**
  * This class defines an application use case of the expression library and has some well defined properties
  * wrt. call graph construction. It covers language features causing JVM callbacks.
- * <p>
- * <p>
- * <p>
- * <p>
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- * <p>
+ * 
  * <!--
- * <p>
- * <p>
- * <p>
- * <p>
+ * <b>NOTE</b><br>
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * <p>
- * <p>
- * <p>
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  * 
  * 
  * -->

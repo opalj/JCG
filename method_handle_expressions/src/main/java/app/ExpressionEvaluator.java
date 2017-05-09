@@ -33,26 +33,26 @@ package app;
  * This class defines an application use case of the expression library and has some well defined properties
  * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
  * a given call graph implementation can handle these features.
- * <p>
- * <p>
+ * <!--
+ * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * <p>
- * <!--
- * <p>
- * <p>
- * <p>
- * <p>
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
+ * 
+ * 
  * 
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public class ExpressionEvaluator {

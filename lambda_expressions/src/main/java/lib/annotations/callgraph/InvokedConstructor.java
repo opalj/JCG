@@ -44,7 +44,7 @@ import static java.lang.annotation.ElementType.*;
 @Repeatable(InvokedConstructors.class)
 public @interface InvokedConstructor {
 
-    /**
+    /*
      * The type name of the receiver using JVM notation (e.g., "java/lang/Object").
      */
     String receiverType();

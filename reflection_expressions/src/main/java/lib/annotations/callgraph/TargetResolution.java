@@ -39,13 +39,13 @@ public enum TargetResolution {
 
     /**
      * Describes a method call made using one of the following instructions:
-     * <ul>
-     * <li>invokevirtual</li>
-     * <li>invokestatic</li>
-     * <li>invokespecial</li>
-     * <li>invokeinterface</li>
-     * </ul>
-     * .
+     * 
+     * invokevirtual
+     * invokestatic
+     * invokespecial
+     * invokeinterface
+     * 
+     * 
      */
     DEFAULT,
     /**

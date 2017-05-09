@@ -94,14 +94,14 @@ public enum CallGraphAlgorithm {
 	 * Getter for the directly less precise call graph algorithms.
 	 * 
 	 * @return An array of call graph algorithms that are in a direct 'less
-	 *         pricise' relation to <code>this</code>.
+	 *         precise' relation to <code>this</code>.
 	 */
 	public CallGraphAlgorithm[] getDirectlyLessPreciseCallGraphAlgorithms() {
 		return directlyLessPrecise;
 	}
 
 	/**
-	 * Compares <code>this<code> call graph algorithms with <code>other</code>
+	 * Compares <code>this</code> call graph algorithms with <code>other</code>
 	 * in terms of precision.
 	 * 
 	 * @param other
@@ -134,7 +134,7 @@ public enum CallGraphAlgorithm {
 	/**
 	 * Calculates the supremum of <code>this</code> and <code>other</code>.
 	 * 
-	 * @param other
+	 * @param other the call graph algorithm to be compared with.
 	 * @return the common supremum of <code>this</code> and <code>other</code>.
 	 */
 	public CallGraphAlgorithm getSupremum(CallGraphAlgorithm other) {
@@ -153,7 +153,7 @@ public enum CallGraphAlgorithm {
 	/**
 	 * Calculates the infimum of <code>this</code> and <code>other</code>.
 	 * 
-	 * @param other
+	 * @param other the call graph algorithm to be compared with.
 	 * @return the common infimum of <code>this</code> and <code>other</code>.
 	 */
 	public CallGraphAlgorithm getInfimum(CallGraphAlgorithm other) {

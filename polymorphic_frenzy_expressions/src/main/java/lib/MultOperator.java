@@ -10,7 +10,7 @@ import lib.*;
 *
 * A multiplication operator that creates a binary multiplication expression.
 *
-* <--
+* <!--
 *
 *
 *
@@ -26,7 +26,7 @@ import lib.*;
 *
 *
 *
-* <--
+* -->
 * @author Michael Eichberg
 * @author Roberts Kolosovs
 */

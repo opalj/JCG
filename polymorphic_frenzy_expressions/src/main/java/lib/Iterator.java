@@ -46,6 +46,8 @@ public interface Iterator<T> {
 
     /**
      * Returns the next element in the iteration.
+     * 
+     * @return next element T.
      */
     T next();
 

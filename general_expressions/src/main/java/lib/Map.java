@@ -44,7 +44,7 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  * Simple map implementation which maintains a linked list of key-value pairs.
  *
- * <--
+ * <!--
  *
  *
  *
@@ -59,7 +59,7 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  *
  *
- * <--
+ * -->
  * @author Michael Eichberg
  * @author Michael Reif
  */

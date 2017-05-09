@@ -44,7 +44,7 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  * Simple map implementation which maintains a linked list of key-value pairs.
  *
- * <--
+ * <!--
  *
  *
  *
@@ -56,7 +56,10 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  *
  *
- * <--
+ *
+ *
+ *
+ * -->
  * @author Michael Eichberg
  * @author Michael Reif
  */
@@ -97,12 +100,10 @@ public class Map<K, V> {
     @CGNote(value = POLYMORPHIC_CALL, description = "an anonymous class is created; the methods of this class become potential call targets.")
     public static final Map<?,?> EMPTY = new Map<Object,Object>(){
 
-        @EntryPoint(value = {OPA, CPA})
         @Override public void add(Object o, Object o2) {
             throw new UnsupportedOperationException();
         }
 
-        @EntryPoint(value = {OPA, CPA})
         @Override public Object get(Object name) {
             return null;
         }

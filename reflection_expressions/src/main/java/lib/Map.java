@@ -44,8 +44,7 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  * Simple map implementation which maintains a linked list of key-value pairs.
  *
- * <--
- *
+ * <!--
  *
  *
  *
@@ -60,7 +59,7 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  *
  *
- * <--
+ * -->
  * @author Michael Eichberg
  * @author Michael Reif
  */
@@ -69,7 +68,8 @@ public class Map<K, V> {
     public static final String MapReceiverType = "lib/Map";
     public static final String linkedEntryRecieverType = "lib/Map$LinkedEntry";
 
-    @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.") class LinkedEntry {
+    @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.")
+    private class LinkedEntry {
 
         final K key;
         V value;

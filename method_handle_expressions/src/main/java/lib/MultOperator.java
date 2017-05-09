@@ -9,7 +9,7 @@ import lib.annotations.properties.EntryPoint;
 *
 * A multiplication operator that creates a binary multiplication expression.
 *
-* <--
+* <!--
 *
 *
 *
@@ -25,7 +25,7 @@ import lib.annotations.properties.EntryPoint;
 *
 *
 *
-* <--
+* -->
 * @author Michael Eichberg
 * @author Roberts Kolosovs
 */

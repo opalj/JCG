@@ -49,23 +49,23 @@ import lib.annotations.properties.EntryPoint;
 
 /**
  * 
- * <p>
- * <p>
+ * <!--
+ * 
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * <p>
- * <!--
- * <p>
- * <p>
- * <p>
+ * 
+ * 
+ * 
+ * 
+ * 
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * <p>
- * <p>
- * <p>
+ * 
+ * 
+ * 
+ * 
+ * 
  * 
  * -->
  *

@@ -7,13 +7,17 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  * 
  * This annotation indicates whether a method is an entry point. 
  * 
- * @note The annotater should be aware of the different analysis modes and there semantic.
+ * 
+ * <!--
+ * <b>NOTE</b><br> 
+ * The annotater should be aware of the different analysis modes and there semantic.
+ * -->
  * 
  * @author Michael Reif
  */
 public @interface EntryPoint {
 
-	/**
+	/*
 	 * The default value is set to the analysis modes OPA and CPA since
 	 * any kind of applications has only a small pre-defined set of entry points.
 	 */

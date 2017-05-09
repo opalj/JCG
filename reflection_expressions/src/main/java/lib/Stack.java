@@ -61,7 +61,7 @@ import lib.annotations.properties.EntryPoint;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public class Stack<V> {
 
