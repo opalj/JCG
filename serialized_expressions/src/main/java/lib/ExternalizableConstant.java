@@ -107,19 +107,20 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
     }
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "writeInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectOutputStreamReceiverType)}, line = 112)
+    @CallSite(name = "writeInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectOutputStreamReceiverType)},
+        	parameterTypes = {int.class}, line = 113)
     public void writeExternal(ObjectOutput out) throws IOException {
     	out.writeInt(value);
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 118)
+    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 119)
     private Object writeReplace() throws ObjectStreamException {
     	return replacementFactory();
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 124)
+    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 125)
     private Object readResolve() throws ObjectStreamException {
     	return replacementFactory();
     }

@@ -125,7 +125,8 @@ public abstract class BinaryExpression implements Expression {
     		resolvedMethods = {@ResolvedMethod(receiverType = "lib/MultOperator"), 
     				@ResolvedMethod(receiverType = "lib/PlusOperator"), 
     				@ResolvedMethod(receiverType = "lib/SubOperator")}, 
-    		line = 134) 
+    	    parameterTypes = {Expression.class, Expression.class},
+    		line = 135) 
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             Operator operator,

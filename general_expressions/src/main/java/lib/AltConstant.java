@@ -108,7 +108,8 @@ public class AltConstant implements Externalizable{
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "writeInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectOutputStreamReceiverType)}, line = 113)
+    @CallSite(name = "writeInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectOutputStreamReceiverType)},
+    		parameterTypes = {int.class}, line = 114)
     public void writeExternal(ObjectOutput out) throws IOException {
     	out.writeInt(value);
     }

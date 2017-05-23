@@ -84,7 +84,8 @@ public class IdentityExpression extends UnaryExpression {
     @CallSite(name = "apply", 
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/IdentityExpression$IdentityOperator"),
     			@ResolvedMethod(receiverType = "lib/IdentityExpression$NewIdentityOperator")}, 
-    	line = 90)
+        parameterTypes = {Expression.class, Map.class},
+    	line = 91)
 	@Override
 	public Constant eval(Map<String, Constant> values) {
 		return (Constant) operator.apply(expr, values);

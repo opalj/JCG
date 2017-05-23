@@ -57,7 +57,7 @@ import java.io.Serializable;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public abstract class Operator {
 	

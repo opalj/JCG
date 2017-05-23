@@ -89,7 +89,8 @@ public class Constant implements Expression, Serializable{
     @CallSite(name = "visit",
             resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
             returnType = Object.class,
-            line = 96
+            parameterTypes = {Constant.class},
+            line = 97
     )
     @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor) {

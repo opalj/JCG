@@ -41,6 +41,7 @@ import lib.Expression;
 import lib.ExpressionVisitor;
 import lib.IdentityExpression;
 import lib.IncrementExpression;
+import lib.Map;
 import lib.SquareExpression;
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.InvokedConstructor;
@@ -76,17 +77,18 @@ public class ExpressionPrinter {
 	private ExpressionPrinter(){}
 	
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructor(receiverType = "lib/IdentityExpression", line = 91)
-    @InvokedConstructor(receiverType = "lib/SquareExpression", line = 91)
-    @InvokedConstructor(receiverType = "lib/IncrementExpression", line = 91)
-    @InvokedConstructor(receiverType = "lib/Constant", line = 91)
-    @InvokedConstructor(receiverType = "app/ExpressionPrinter$ExpressionStringifier", line = 93)
+    @InvokedConstructor(receiverType = "lib/IdentityExpression", line = 93)
+    @InvokedConstructor(receiverType = "lib/SquareExpression", line = 93)
+    @InvokedConstructor(receiverType = "lib/IncrementExpression", line = 93)
+    @InvokedConstructor(receiverType = "lib/Constant", line = 93)
+    @InvokedConstructor(receiverType = "app/ExpressionPrinter$ExpressionStringifier", line = 95)
     @CallSite(name = "accept",
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression"),
     			@ResolvedMethod(receiverType = "lib/IdentityExpression"),
     			@ResolvedMethod(receiverType = "lib/IncrementExpression")},
     	returnType = Object.class,
-    	line = 94)
+        parameterTypes = {Function.class},
+    	line = 96)
     public static void main(final String[] args) {
     	Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
     	Supplier<ExpressionPrinter> instance = ExpressionPrinter::instance;
@@ -94,7 +96,7 @@ public class ExpressionPrinter {
     	System.out.println(expr.accept(stringifier::visit));
     }
     
-    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 100)
+    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 101)
     static ExpressionPrinter instance() {
     	Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
     	return printerConstructor.get();
@@ -124,7 +126,8 @@ public class ExpressionPrinter {
 	        			@ResolvedMethod(receiverType = "lib/IdentityExpression"),
 	        			@ResolvedMethod(receiverType = "lib/IncrementExpression")},
 	        	returnType = Object.class,
-	    line = 129)
+	            parameterTypes = {Function.class},
+	    line = 132)
 		public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
 			return func.apply(e, this::visit);
 		}

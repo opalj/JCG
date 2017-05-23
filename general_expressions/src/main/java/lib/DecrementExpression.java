@@ -91,7 +91,8 @@ public class DecrementExpression extends UnaryExpression {
 	@Override
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "checkIfDecrement", resolvedMethods = {
-    		@ResolvedMethod(receiverType = DecrementExpression.FQN)}, line = 107)
+    		@ResolvedMethod(receiverType = DecrementExpression.FQN)},
+    		parameterTypes = {Object.class}, line = 109)
     @CallSite(name = "eval", resolvedMethods = {
     		@ResolvedMethod(receiverType = AddExpression.FQN),
     		@ResolvedMethod(receiverType = AltConstant.FQN),
@@ -101,7 +102,8 @@ public class DecrementExpression extends UnaryExpression {
     		@ResolvedMethod(receiverType = MultExpression.FQN),
     		@ResolvedMethod(receiverType = SquareExpression.FQN),
     		@ResolvedMethod(receiverType = SubExpression.FQN),
-    		@ResolvedMethod(receiverType = Variable.FQN)}, line = 109)
+    		@ResolvedMethod(receiverType = Variable.FQN)},
+    		parameterTypes = {Map.class}, line = 111)
 	public Constant eval(Map<String, Constant> values) {
 		try {
 			checkIfDecrement(this.expr);

@@ -96,9 +96,11 @@ public class ExpressionEvaluator {
 
     @CGNote( value = NATIVE_CALLBACK,description = "monomorph, intraprocedural case of arraycopy test case.")
     @CallSite(name = "arraycopy", isStatic = true, resolvedMethods = {
-    		@ResolvedMethod(receiverType = "java/lang/System")}, line = 104)
+    		@ResolvedMethod(receiverType = "java/lang/System")},
+    		parameterTypes = {IncrementExpression[].class, int.class, Object.class, int.class, int.class}, line = 105)
     @CallSite(name = "eval", resolvedMethods = {
-    		@ResolvedMethod(receiverType = IncrementExpression.FQN)}, line = 105)
+    		@ResolvedMethod(receiverType = IncrementExpression.FQN)},
+    		parameterTypes = {Map.class}, line = 107)
     private int evalFirstEntry(){
     	Expression[] tempArray = new Expression[3];
     	System.arraycopy(coutToThree, 0, tempArray, 0, 3);
@@ -106,7 +108,8 @@ public class ExpressionEvaluator {
     }
 
     @CGNote( value = NATIVE_CALLBACK,description = "monomorph, interprocedural case of arraycopy test case.")
-    @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN)}, line = 111)
+    @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN)},
+    		parameterTypes = {Map.class}, line = 114)
     private int evalSecondEntry(){
     	return expressionArray[1].eval(new Map<String,Constant>()).getValue();
     }
@@ -114,7 +117,8 @@ public class ExpressionEvaluator {
     @CGNote( value = NATIVE_CALLBACK,description = "polymorph, interprocedural case of arraycopy test case.")
     @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN),
     		@ResolvedMethod(receiverType = SquareExpression.FQN),
-    		@ResolvedMethod(receiverType = AddExpression.FQN)}, line = 121)
+    		@ResolvedMethod(receiverType = AddExpression.FQN)},
+    		parameterTypes = {Map.class}, line = 125)
     private int[] evalAll(){
     	int[] result = new int[3];
     	for(int i = 0; i<expressionArray.length; i++){
@@ -124,7 +128,8 @@ public class ExpressionEvaluator {
     }
 
     @CallSite(name = "arraycopy", isStatic = true, 
-    		resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/System")}, line = 130)
+    		resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/System")},
+    		parameterTypes = {IncrementExpression[].class, int.class, Object.class, int.class, int.class}, line = 135)
     @CGNote( value = NATIVE_CALLBACK,description = "array with well known types is copied into other array.")
     private void copyPrivateArrays() {
     	System.arraycopy(coutToThree, 0, expressionArray, 0, 3);
@@ -135,7 +140,7 @@ public class ExpressionEvaluator {
      * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 141)
+    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 146)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         callback();
@@ -160,7 +165,7 @@ public class ExpressionEvaluator {
      * This is the only way to obtain an instance of ParameterizedEvaluator.
      */
     @EntryPoint(value = {OPA, CPA})
-    @InvokedConstructor(receiverType = ExpressionEvaluator.ParameterizedEvaluator.FQN, line = 165)
+    @InvokedConstructor(receiverType = ExpressionEvaluator.ParameterizedEvaluator.FQN, line = 170)
     public ParameterizedEvaluator<? extends BinaryExpression> makeParamEvaluator(){
     	return new ParameterizedEvaluator<>();
     }
@@ -171,7 +176,8 @@ public class ExpressionEvaluator {
     	@CallSite(name = "eval", resolvedMethods = {
     			@ResolvedMethod(receiverType = AddExpression.FQN),
     			@ResolvedMethod(receiverType = MultExpression.FQN),
-    			@ResolvedMethod(receiverType = SubExpression.FQN)}, line = 179)
+    			@ResolvedMethod(receiverType = SubExpression.FQN)},
+        		parameterTypes = {Map.class}, line = 185)
     	/*
     	 * Due to the way this is instantiated only BinaryExpressions ever make it this far.
     	 */

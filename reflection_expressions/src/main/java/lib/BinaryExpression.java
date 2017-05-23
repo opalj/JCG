@@ -121,12 +121,12 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @CallSite(name = "createBinaryExpression",
-    resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
+    	resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
     		@ResolvedMethod(receiverType = MultOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})},
-    resolution = TargetResolution.REFLECTIVE,
-    returnType = BinaryExpression.class,
-    parameterTypes = {Operator.class, Expression.class, Expression.class},
-    line = 143)
+    	resolution = TargetResolution.REFLECTIVE,
+    	returnType = BinaryExpression.class,
+    	parameterTypes = {Operator.class, Expression.class, Expression.class},
+    	line = 143)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,

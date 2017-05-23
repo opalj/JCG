@@ -112,11 +112,11 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CallSite(name = "createBinaryExpression",
-    resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-    		@ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)},
-    returnType = BinaryExpression.class,
-    parameterTypes = {String.class, Expression.class, Expression.class},
-    line = 134)
+    		resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
+    				@ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)},
+    		returnType = BinaryExpression.class,
+    		parameterTypes = {String.class, Expression.class, Expression.class},
+    		line = 134)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,

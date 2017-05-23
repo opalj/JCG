@@ -92,9 +92,10 @@ public class DecrementExpression extends UnaryExpression {
 
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "visit",
-    resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
-    returnType = Object.class,
-    line = 99)
+    	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
+    	returnType = Object.class,
+     	parameterTypes = {Expression.class},
+    	line = 100)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }
@@ -109,7 +110,7 @@ public class DecrementExpression extends UnaryExpression {
         }
 
         @EntryPoint(value = {OPA, CPA})
-        @InvokedConstructor(receiverType = FQN, line = 115)
+        @InvokedConstructor(receiverType = FQN, line = 116)
         public static DecrementOperator newInstance() {
            if(_INSTANCE == null){
                _INSTANCE = new DecrementOperator();
@@ -121,7 +122,7 @@ public class DecrementExpression extends UnaryExpression {
         @EntryPoint(value = {OPA, CPA})
         @CallSite(name= "getValue", resolvedMethods = {
         		@ResolvedMethod(receiverType = Constant.FQN)
-        }, line = 126)
+        }, line = 127)
         public Constant apply(Constant constant) {
             return new Constant(constant.getValue() - 1);
         }

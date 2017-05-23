@@ -68,8 +68,8 @@ public class MasonsExpressions {
 	@CallSite(name = "createBinaryExpression",
             resolvedMethods = {@ResolvedMethod(receiverType = BinaryExpression.FQN)},
             resolution = TargetResolution.REFLECTIVE,
-            line = 76
-    )
+            parameterTypes = {String.class, Expression.class, Expression.class},
+            line = 76)
 	@InvokedConstructor(receiverType = "lib/Constant", line = 77)
 	@InvokedConstructor(receiverType = "lib/Constant", line = 78)
 	public static void main(final String[] args) throws Exception {

@@ -63,8 +63,8 @@ public enum UnaryOperator {
 
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name= "consoleWrite", resolvedMethods = {
-    		@ResolvedMethod(receiverType = "lib/UnaryOperator")
-    }, line = 69)
+    		@ResolvedMethod(receiverType = "lib/UnaryOperator")},
+    		parameterTypes = {String.class}, line = 69)
     public String toString(){
     	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
         return this.name;

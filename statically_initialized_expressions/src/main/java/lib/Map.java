@@ -140,17 +140,18 @@ public class Map<K, V> {
         }
     }
 
-    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)}, line = 146)
+    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)},
+        	parameterTypes = {String.class}, line = 147)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 159)
+    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 160)
     @CallSite(name = "next", resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 159)
+    line = 160)
     @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();

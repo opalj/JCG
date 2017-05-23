@@ -67,7 +67,7 @@ import lib.annotations.callgraph.ResolvedMethod;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public class Constant implements ArithmeticExpression{

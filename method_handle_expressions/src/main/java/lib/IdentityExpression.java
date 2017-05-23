@@ -64,7 +64,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  * <p>
  * -->
  *
- * @author Micahel Reif
+ * @author Michael Reif
  */
 public class IdentityExpression extends UnaryExpression {
 

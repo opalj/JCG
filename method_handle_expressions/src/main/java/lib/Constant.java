@@ -63,7 +63,7 @@ import java.io.Serializable;
  * -->
  *
  * @author Michael Eichberg
- * @author Micahel Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public class Constant implements Expression {
@@ -88,7 +88,7 @@ public class Constant implements Expression {
 
     @CallSite(name = "visit",
             resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter")},
-            returnType = Object.class,
+            returnType = Object.class, parameterTypes = {Constant.class},
             line = 96
     )
     @EntryPoint(value = {OPA, CPA})
