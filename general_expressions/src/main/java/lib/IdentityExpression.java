@@ -41,7 +41,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  * An unary expression which represents the identity function. Hence, the encapsulated expression
  * is mapped to itself.
  *
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation

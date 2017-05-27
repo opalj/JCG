@@ -86,7 +86,7 @@ public class ExpressionPrinter {
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression"),
     			@ResolvedMethod(receiverType = "lib/IdentityExpression"),
     			@ResolvedMethod(receiverType = "lib/IncrementExpression")},
-    	returnType = Object.class,
+    	returnType = String.class,
         parameterTypes = {Function.class},
     	line = 96)
     public static void main(final String[] args) {
@@ -96,7 +96,7 @@ public class ExpressionPrinter {
     	System.out.println(expr.accept(stringifier::visit));
     }
     
-    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 101)
+    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 102)
     static ExpressionPrinter instance() {
     	Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
     	return printerConstructor.get();

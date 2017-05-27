@@ -40,7 +40,7 @@ import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
 /**
  * A IncrementExpression represents an unary operation that increments a constant.
  *
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -85,7 +85,7 @@ public class IncrementExpression extends UnaryExpression {
             @ResolvedMethod(receiverType = AddExpression.FQN),
             @ResolvedMethod(receiverType = SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
             @ResolvedMethod(receiverType = MultExpression.FQN)
-    }, returnType = String.class, line = 110)
+    }, returnType = String.class, line = 91)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Inc("+ expr.toString() + ")";

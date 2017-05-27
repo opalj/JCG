@@ -47,7 +47,7 @@ import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
  * 
  * Has a method returning an instance of a FunctionalInterface with a lambda expression.
  *
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -94,7 +94,7 @@ public class IncrementExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "visit",
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
-    	returnType = Object.class, parameterTypes = {Expression.class},
+    	returnType = Object.class, parameterTypes = {IncrementExpression.class},
     	line = 100)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);

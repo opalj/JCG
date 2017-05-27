@@ -41,7 +41,7 @@ import lib.annotations.properties.EntryPoint;
  * A SquareExpression represents an unary operation that squares an expression. 
  * Uses the MultExpression to implement the squaring.
  *
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation

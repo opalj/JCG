@@ -36,7 +36,8 @@ package lib;
  * the library) serveral Java language features to test whether a given call
  * graph implementation can handle these features.
  *
- * <!-- <b>NOTE</b><br>
+ * <!-- 
+ * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
  * documentation purposes.
  *

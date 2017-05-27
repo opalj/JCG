@@ -39,7 +39,7 @@ import lib.annotations.properties.EntryPoint;
 
 /**
  * This class visits mathematical expressions and prints them to console.
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation

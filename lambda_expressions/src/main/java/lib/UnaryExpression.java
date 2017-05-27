@@ -41,7 +41,7 @@ import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
  * An abstract unary Expression where the operation has to be implemented via a
  * lambda function.
  *
- * <p>
+ * 
  * <!-- <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
  * documentation purposes.

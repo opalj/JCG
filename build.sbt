@@ -1,5 +1,5 @@
 lazy val commonSettings = Seq(
-  assemblyOutputPath in assembly := new File("./jars/")
+  assemblyOutputPath in (ThisBuild, assembly) := new File("./jars/")
 )
 
 lazy val general_expressions = project

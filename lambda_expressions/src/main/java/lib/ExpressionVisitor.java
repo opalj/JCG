@@ -35,7 +35,8 @@ package lib;
  * 
  * No test cases specific to lambda expression are found here.
  *
- * <!-- <b>NOTE</b><br>
+ * <!-- 
+ * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
  * documentation purposes.
  *

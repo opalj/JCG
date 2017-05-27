@@ -49,7 +49,7 @@ import java.util.function.Function;
  *
  * THIS CLASS IS INTENTIONALLY UNUSED WITHIN THE APPLICATION SCENARIO. (CLASS IS NEVER INSTANTIATED)
  *
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -94,7 +94,7 @@ public class DecrementExpression extends UnaryExpression {
     @CallSite(name = "visit",
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
     	returnType = Object.class,
-     	parameterTypes = {Expression.class},
+     	parameterTypes = {DecrementExpression.class},
     	line = 100)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);

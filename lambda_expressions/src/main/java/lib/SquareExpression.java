@@ -47,7 +47,7 @@ import lib.annotations.properties.EntryPoint;
  * 
  * Has a method returning an instance of a FunctionalInterface with a lambda expression.
  *
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -105,7 +105,7 @@ public final class SquareExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "visit",
     resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
-    returnType = Object.class, parameterTypes = {Expression.class},
+    returnType = Object.class, parameterTypes = {SquareExpression.class},
     line = 111)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);

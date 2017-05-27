@@ -141,7 +141,7 @@ public class Map<K, V> {
     }
 
     @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)},
-        	parameterTypes = {String.class}, line = 147)
+        	parameterTypes = {Map.LinkedEntry.class}, returnType = String.class, line = 147)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";

@@ -54,7 +54,7 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  * classes thus making the serialization-specific methods of those classes entrypoints 
  * in an application scenario.
  * <!-- 
- * * <p>
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
  * documentation purposes.

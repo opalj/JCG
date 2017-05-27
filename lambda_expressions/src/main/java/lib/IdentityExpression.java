@@ -44,7 +44,7 @@ import java.util.function.Function;
  * An unary expression which represents the identity function. Hence, the encapsulated expression
  * is mapped to itself.
  *
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -87,7 +87,7 @@ public class IdentityExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "visit",
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
-    	returnType = Object.class, parameterTypes = {Expression.class},
+    	returnType = Object.class, parameterTypes = {IdentityExpression.class},
     	line = 93)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);

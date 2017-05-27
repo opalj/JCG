@@ -33,7 +33,8 @@ package lib;
 /**
  * An abstract superclass for expression visitors.
  *
- * <!-- <b>NOTE</b><br>
+ * <!-- 
+ * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
  * documentation purposes.
  *

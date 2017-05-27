@@ -44,7 +44,7 @@ import lib.annotations.callgraph.ResolvedMethod;
  *  A enumeration type for all unary operator there are.
  *  
  *  
- * @author  Michael Reif
+ * @author Michael Reif
  * @author Roberts Kolosovs
  */
 public enum UnaryOperator {

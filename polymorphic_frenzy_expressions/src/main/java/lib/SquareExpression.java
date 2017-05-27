@@ -66,7 +66,6 @@ import lib.annotations.properties.EntryPoint;
  *
  *
  *
- *
  * -->
  *
  * @author Roberts Kolosovs
@@ -84,6 +83,7 @@ public class SquareExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "apply", 
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression$NewSquareOperator")}, 
+    	parameterTypes ={Expression.class, Map.class}, returnType = Expression.class,
     	line = 90)
 	@Override
 	public Constant eval(Map<String, Constant> values) {

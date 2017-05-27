@@ -45,7 +45,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  *
  * THIS CLASS IS INTENTIONALLY UNUSED WITHIN THE APPLICATION SCENARIO. (CLASS IS NEVER INSTANTIATED)
  *
- * <p>
+ * 
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -92,7 +92,7 @@ public class DecrementExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "checkIfDecrement", resolvedMethods = {
     		@ResolvedMethod(receiverType = DecrementExpression.FQN)},
-    		parameterTypes = {Object.class}, line = 109)
+    		parameterTypes = {Expression.class}, line = 109)
     @CallSite(name = "eval", resolvedMethods = {
     		@ResolvedMethod(receiverType = AddExpression.FQN),
     		@ResolvedMethod(receiverType = AltConstant.FQN),

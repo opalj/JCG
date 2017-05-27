@@ -40,13 +40,13 @@ import lib.*;
 /**
  * This class defines an application use case of the expression library featuring reflection. 
  * It just creates a binary expression representing the mason's angle (3²+4²=5²) and does nothing with it.
+ * <!-- 
  * <p>
  * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
  * <p>
- * <!--
  * <p>
  * <p>
  * <p>

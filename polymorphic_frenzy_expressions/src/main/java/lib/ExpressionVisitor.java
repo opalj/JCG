@@ -33,7 +33,8 @@ package lib;
 /**
  * This abstract class is a visitor for expressions.
  *
- * <!-- <b>NOTE</b><br>
+ * <!-- 
+ * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves
  * documentation purposes.
  *
