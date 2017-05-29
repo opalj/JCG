@@ -7,6 +7,9 @@ Contains following test cases:
   - ExpressionEvaluator  
 3. Declaration of native methods.  
   - Constant  
+4. Native method implemented in present C code and called  
+  - NativeAddExpression  
+  - ExpressionEvaluator  
 4. Exceptions affecting call graph.  
   - DecrementExpression  
 5. Generics using wildcard typing and type erasures stemming from that.  
