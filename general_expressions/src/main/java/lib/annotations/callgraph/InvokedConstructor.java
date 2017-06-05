@@ -34,8 +34,8 @@ import static java.lang.annotation.RetentionPolicy.*;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Describes a constructor call made by an invokedynamic instruction or through use of the
- * Java reflection API.
+ * Describes a constructor call made by an invokedynamic instruction, through faulty 
+ * code throwing exception or through use of the Java reflection API.
  * 
  * @author Arne Lottmann
  */
