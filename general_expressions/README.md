@@ -7,16 +7,18 @@ Contains following test cases:
   - ExpressionEvaluator  
 3. Declaration of native methods.  
   - Constant  
-4. Native method implemented in present C code and called  
+4. Native method implemented in present C code and called.  
   - NativeAddExpression  
   - ExpressionEvaluator  
-4. Exceptions affecting call graph.  
-  - DecrementExpression  
-5. Generics using wildcard typing and type erasures stemming from that.  
-  - ExpressionEvaluator$ParameterizedEvaluator  
-6. Arrays break type security and prevent further execution.  
+5. New NullPointerException with 'throw null' statement.   
   - ExpressionEvaluator  
-7. Classes implementing Serializable without serialization or deserialization in the application class.  
+6. Exceptions affecting call graph.  
+  - DecrementExpression  
+7. Generics using wildcard typing and type erasures stemming from that.  
+  - ExpressionEvaluator$ParameterizedEvaluator  
+8. Arrays break type security and prevent further execution.  
+  - ExpressionEvaluator  
+9. Classes implementing Serializable without serialization or deserialization in the application class.  
   - Constant   
-8. Classes implementing Externalizable without serialization or deserialization in the application class.  
+10. Classes implementing Externalizable without serialization or deserialization in the application class.  
   - AltConstant  

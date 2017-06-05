@@ -195,4 +195,9 @@ public class ExpressionEvaluator {
     		return expression.eval(new Map<String, Constant>());
     	}
     }
+
+    @InvokedConstructor(receiverType = "java/lang/NullPointerException", line = 201)
+    public void getNullPointerException() throws Exception{
+    	throw null;
+    }
 }
