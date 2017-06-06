@@ -1,4 +1,4 @@
-#include <lib.h>
+#include <jni.h>
 #include <stdlib.h>
 #include "ArithmeticOperations.h"
 
