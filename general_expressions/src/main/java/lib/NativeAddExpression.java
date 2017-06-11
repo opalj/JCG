@@ -17,7 +17,9 @@ import lib.annotations.properties.EntryPoint;
 public class NativeAddExpression extends BinaryExpression {
 
 	private static final long serialVersionUID = 1010267344516507320L;
-
+	
+	public static final String FQN = "lib/NativeAddExpression";
+	
 	private final Object left;
 
 	private final Object right;
@@ -32,31 +34,26 @@ public class NativeAddExpression extends BinaryExpression {
 	}
 
 	@Override
-	@CallSite(name = "left", resolvedMethods = { @ResolvedMethod(receiverType = "expressions/AddExpression"),
-			@ResolvedMethod(receiverType = "expressions/SubExpression"),
-			@ResolvedMethod(receiverType = "fancy_expressions/MultExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/AddExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/SubExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/MulExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/DivExpression") })
-	@CallSite(name = "right", resolvedMethods = { @ResolvedMethod(receiverType = "expressions/AddExpression"),
-			@ResolvedMethod(receiverType = "expressions/SubExpression"),
-			@ResolvedMethod(receiverType = "fancy_expressions/MultExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/AddExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/SubExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/MulExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/DivExpression") })
-	@CallSite(name = "eval", resolvedMethods = { @ResolvedMethod(receiverType = "expressions/AddExpression"),
-			@ResolvedMethod(receiverType = "expressions/SubExpression"),
-			@ResolvedMethod(receiverType = "fancy_expressions/MultExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/AddExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/SubExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/MulExpression"),
-			@ResolvedMethod(receiverType = "expressions/jni/DivExpression") })
-	@CallSite(name = "getValue", resolvedMethods = { @ResolvedMethod(receiverType = "expressions/Constant") })
-	@CallSite(name = "<init>", resolvedMethods = { @ResolvedMethod(receiverType = "expressions/Constant") })
+	@CallSite(name = "left", resolvedMethods = { @ResolvedMethod(receiverType = NativeAddExpression.FQN)})
+	@CallSite(name = "right", resolvedMethods = { @ResolvedMethod(receiverType = NativeAddExpression.FQN)})
+	@CallSite(name = "eval", resolvedMethods = { @ResolvedMethod(receiverType = IncrementExpression.FQN),
+			@ResolvedMethod(receiverType = MultExpression.FQN),
+			@ResolvedMethod(receiverType = DecrementExpression.FQN),
+			@ResolvedMethod(receiverType = AddExpression.FQN),
+			@ResolvedMethod(receiverType = Constant.FQN),
+			@ResolvedMethod(receiverType = IdentityExpression.FQN),
+			@ResolvedMethod(receiverType = SquareExpression.FQN),
+			@ResolvedMethod(receiverType = SubExpression.FQN),
+			@ResolvedMethod(receiverType = Variable.FQN),
+			@ResolvedMethod(receiverType = NativeAddExpression.FQN)})
+	@CallSite(name = "getValue", resolvedMethods = { @ResolvedMethod(receiverType = Constant.FQN) })
+	@CallSite(name = "<init>", resolvedMethods = { @ResolvedMethod(receiverType = Constant.FQN) })
 	@CallSite(name = "<init>", resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/NullPointerException") })
 	@EntryPoint(value = {OPA, CPA})
+	/**
+	 * This method is implemented in native/lib/ArithmeticOperations.c which is to be compiled into 
+	 * the arithmetic_operations binary.
+	 */
 	public native Constant eval(Map<String, Constant> values);
 
 	@Override
