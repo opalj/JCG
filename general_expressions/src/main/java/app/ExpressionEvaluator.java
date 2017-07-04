@@ -187,16 +187,17 @@ public class ExpressionEvaluator {
     			@ResolvedMethod(receiverType = AddExpression.FQN),
     			@ResolvedMethod(receiverType = MultExpression.FQN),
     			@ResolvedMethod(receiverType = SubExpression.FQN)},
-        		parameterTypes = {Map.class}, line = 195)
+        		parameterTypes = {Map.class}, line = 196)
     	/*
     	 * Due to the way this is instantiated only BinaryExpressions ever make it this far.
     	 */
+        @EntryPoint(value = {OPA, CPA})
     	public Constant execute(T expression){
     		return expression.eval(new Map<String, Constant>());
     	}
     }
 
-    @InvokedConstructor(receiverType = "java/lang/NullPointerException", line = 201)
+    @InvokedConstructor(receiverType = "java/lang/NullPointerException", line = 202)
     public void getNullPointerException() throws Exception{
     	throw null;
     }

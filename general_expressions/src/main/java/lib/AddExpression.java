@@ -91,6 +91,7 @@ public class AddExpression extends BinaryExpression {
 	}
 
 	@Override
+	@EntryPoint(value = { OPA, CPA })
 	public String operator() {
 		return "+";
 	}

@@ -1,7 +1,12 @@
 package app;
 
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.DESKTOP_APP;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
 import lib.*;
 import lib.annotations.callgraph.InvokedConstructor;
+import lib.annotations.properties.EntryPoint;
 /**
  * This class is the main class of the application. The app simply makes the expression "-1" 
  * and does nothing with it.
@@ -39,8 +44,9 @@ import lib.annotations.callgraph.InvokedConstructor;
 public class Main {
 
 	@SuppressWarnings("unused")
-	@InvokedConstructor(receiverType = "lib/Negation", line = 45)
-	@InvokedConstructor(receiverType = "lib/Constant", line = 45)
+	@InvokedConstructor(receiverType = "lib/Negation", line = 51)
+	@InvokedConstructor(receiverType = "lib/Constant", line = 51)
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
 	public static void main(String[] args) {
 		Negation minusOne = new Negation(new Constant(1));
 	}

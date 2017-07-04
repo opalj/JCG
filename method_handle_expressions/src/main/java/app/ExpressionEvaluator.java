@@ -29,6 +29,12 @@
  */
 package app;
 
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.DESKTOP_APP;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
+import lib.annotations.properties.EntryPoint;
+
 /**
  * This class defines an application use case of the expression library and has some well defined properties
  * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
@@ -57,7 +63,7 @@ package app;
  */
 public class ExpressionEvaluator {
 
-    
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     public static void main(final String[] args) {
  
     }

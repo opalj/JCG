@@ -29,6 +29,11 @@
  */
 package lib;
 
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
+import lib.annotations.properties.EntryPoint;
+
 /**
  * Abstract superclass of all classes representing binary mathematical expressions.
  *
@@ -64,6 +69,7 @@ public abstract class BinaryExpression implements Expression {
 
     abstract protected Expression right();
 
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor){
         return visitor.visit(this);
     }
