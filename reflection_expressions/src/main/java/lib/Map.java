@@ -81,14 +81,17 @@ public class Map<K, V> {
             this.value = value;
         }
 
+        @EntryPoint(value = {OPA, CPA})
         public LinkedEntry getNextEntry() {
             return nextEntry;
         }
 
+        @EntryPoint(value = {OPA, CPA})
         public void setNextEntry(LinkedEntry nextEntry) {
             this.nextEntry = nextEntry;
         }
 
+        @EntryPoint(value = {OPA, CPA})
         public String toString(){
             return key.toString() + " -> " + value.toString();
         }
@@ -100,11 +103,15 @@ public class Map<K, V> {
     @CGNote(value = POLYMORPHIC_CALL, description = "an anonymous class is created; the methods of this class become potential call targets.")
     public static final Map<?,?> EMPTY = new Map<Object,Object>(){
 
-        @Override public void add(Object o, Object o2) {
+        @Override
+        @EntryPoint(value = {OPA, CPA})
+        public void add(Object o, Object o2) {
             throw new UnsupportedOperationException();
         }
 
-        @Override public Object get(Object name) {
+        @Override
+        @EntryPoint(value = {OPA, CPA})
+        public Object get(Object name) {
             return null;
         }
     };
@@ -113,8 +120,8 @@ public class Map<K, V> {
 
     }
 
-    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 121)
-    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 132)
+    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 128)
+    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 139)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
@@ -141,17 +148,17 @@ public class Map<K, V> {
     }
 
     @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)},
-    		parameterTypes = {String.class}, line = 147)
+    		parameterTypes = {String.class}, line = 154)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 160)
+    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 167)
     @CallSite(name = "next", resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 160)
+    line = 167)
     @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();
@@ -194,11 +201,13 @@ public class Map<K, V> {
         }
 
         @Override
+        @EntryPoint(value = {OPA, CPA})
         public boolean hasNext() {
             return cur != null;
         }
 
         @Override
+        @EntryPoint(value = {OPA, CPA})
         public LinkedEntry next() {
             LinkedEntry next = cur;
             cur = cur.getNextEntry();
@@ -206,6 +215,7 @@ public class Map<K, V> {
         }
 
         @Override
+        @EntryPoint(value = {OPA, CPA})
         public void remove() throws UnsupportedOperationException {
             throw new UnsupportedOperationException("This iterator does not support a remove operation.");
         }

@@ -30,6 +30,7 @@
 
 package lib;
 
+import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 import lib.annotations.callgraph.CallSite;
@@ -72,13 +73,13 @@ public interface ArithmeticExpression extends Expression {
 
 	static String name = init();
 	
-	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 77)
+	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 79)
+    @EntryPoint(value = {OPA, CPA})
 	static String init() {
 		StaticInitializerTest.staticCall();
 		return "arithmetic expression";
 	}
 
-    @EntryPoint(value = {OPA})
     int eval(Map<String,Constant> values);
 
 }

@@ -80,6 +80,7 @@ public abstract class BinaryExpression implements Expression {
 
     abstract protected Operator operator();
 
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor){
         return visitor.visit(this);
     }
@@ -93,19 +94,27 @@ public abstract class BinaryExpression implements Expression {
 
         return new BinaryExpression(){
 
-            @Override public Constant eval(Map<String, Constant> values) {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            public Constant eval(Map<String, Constant> values) {
                 throw new UnsupportedOperationException();
             }
 
-            @Override protected Expression left() {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            protected Expression left() {
                 return left;
             }
 
-            @Override protected Expression right() {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            protected Expression right() {
                 return right;
             }
 
-            @Override protected Operator operator() {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            protected Operator operator() {
                 return op;
             }
         };
@@ -116,7 +125,7 @@ public abstract class BinaryExpression implements Expression {
     				@ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)},
     		returnType = BinaryExpression.class,
     		parameterTypes = {String.class, Expression.class, Expression.class},
-    		line = 134)
+    		line = 143)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,

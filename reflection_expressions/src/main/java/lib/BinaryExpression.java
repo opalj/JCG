@@ -81,6 +81,7 @@ public abstract class BinaryExpression implements Expression {
 
     abstract protected Operator operator();
 
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor){
         return visitor.visit(this);
     }
@@ -90,8 +91,7 @@ public abstract class BinaryExpression implements Expression {
             resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})}),
             		@ResolvedMethod(receiverType = MultOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})},
             resolution = TargetResolution.REFLECTIVE,
-            line = 100
-    )
+            line = 100)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             String operator,
@@ -101,19 +101,27 @@ public abstract class BinaryExpression implements Expression {
 
         return new BinaryExpression(){
 
-            @Override public Constant eval(Map<String, Constant> values) {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            public Constant eval(Map<String, Constant> values) {
                 throw new UnsupportedOperationException();
             }
 
-            @Override protected Expression left() {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            protected Expression left() {
                 return left;
             }
 
-            @Override protected Expression right() {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            protected Expression right() {
                 return right;
             }
 
-            @Override protected Operator operator() {
+            @Override
+            @EntryPoint(value = {OPA, CPA})
+            protected Operator operator() {
                 return op;
             }
         };
@@ -126,7 +134,7 @@ public abstract class BinaryExpression implements Expression {
     	resolution = TargetResolution.REFLECTIVE,
     	returnType = BinaryExpression.class,
     	parameterTypes = {Operator.class, Expression.class, Expression.class},
-    	line = 143)
+    	line = 151)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,

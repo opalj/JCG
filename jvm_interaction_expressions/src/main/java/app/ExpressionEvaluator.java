@@ -95,7 +95,7 @@ public class ExpressionEvaluator {
             @CGNote(value = NOTE, description = "the related method <Thread>.dispatchUncaughtException is not dead")
             @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 100)
             @Override
-            @EntryPoint
+            @EntryPoint(value = {OPA, CPA})
             public void uncaughtException(Thread t, Throwable e) {
                 callback();
                 String msg = "unexpected error while processing " + Arrays.deepToString(args);
@@ -109,7 +109,7 @@ public class ExpressionEvaluator {
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method<Thread>.run is called by the jvm")
             @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 115)
-            @EntryPoint
+            @EntryPoint(value = {OPA, CPA})
             @Override
             public void run() {
                 callback();

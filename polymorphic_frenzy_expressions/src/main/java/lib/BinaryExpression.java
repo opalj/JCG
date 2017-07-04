@@ -81,11 +81,12 @@ public abstract class BinaryExpression implements Expression {
 
     abstract protected Operator operator();
 
+    @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor){
         return visitor.visit(this);
     }
 
-    @InvokedConstructor(receiverType = BinaryExpression.FQN, line = 96)
+    @InvokedConstructor(receiverType = BinaryExpression.FQN, line = 97)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             Operator operator,
@@ -126,7 +127,7 @@ public abstract class BinaryExpression implements Expression {
     				@ResolvedMethod(receiverType = "lib/PlusOperator"), 
     				@ResolvedMethod(receiverType = "lib/SubOperator")}, 
     	    parameterTypes = {Expression.class, Expression.class},
-    		line = 135) 
+    		line = 136) 
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             Operator operator,

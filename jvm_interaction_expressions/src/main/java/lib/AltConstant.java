@@ -102,11 +102,13 @@ public class AltConstant implements Expression, Runnable {
     }
     
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public <T> T accept(ExpressionVisitor<T> visitor) {
 		return null;
 	}
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public Constant eval(Map<String, Constant> values) {
 		return null;
 	}

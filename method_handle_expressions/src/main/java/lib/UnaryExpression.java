@@ -116,9 +116,7 @@ public abstract class UnaryExpression implements Expression {
         this.expr = expr;
     }
 
-    @EntryPoint(value = {OPA, CPA})
     public abstract String toString();
 
-    @EntryPoint(value = {OPA, CPA})
     public abstract Constant eval(Map<String, Constant> values);
 }

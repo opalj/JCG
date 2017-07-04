@@ -73,7 +73,7 @@ public class Negation extends UnaryExpression{
 		init();
 	}
 
-	@EntryPoint(value = {OPA, CPA})
+	@EntryPoint(value = {OPA, CPA}) //TODO: This annotation is actually meant for the static block above
 	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 79)
 	private static void init(){
 		StaticInitializerTest.staticCall();

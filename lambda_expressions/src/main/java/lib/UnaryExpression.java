@@ -117,11 +117,11 @@ public abstract class UnaryExpression implements Expression {
 		this.expr = expr;
 	}
 
+    @EntryPoint(value = {OPA, CPA})
 	public Expression getExpr(){
 		return expr;
 	}
 	
-	@EntryPoint(value = { OPA, CPA })
 	public abstract String toString();
 
 	@CallSite(name = "eval", returnType = Constant.class, parameterTypes = Map.class, resolvedMethods = {
@@ -129,7 +129,7 @@ public abstract class UnaryExpression implements Expression {
 			@ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)) }, 
 			line = 136)
 	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = Constant.class, resolvedMethods = {
-			@ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA)), }, 
+			@ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA))}, 
 			line = 136)
 	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {

@@ -93,7 +93,9 @@ public class SubOperator extends Operator {
         @EntryPoint(value = {OPA, CPA})
         public Operator operator(){return SubOperator.instance;}
 
-        @Override public Constant eval(Map<String, Constant> values) {
+        @Override
+        @EntryPoint(value = {OPA, CPA})
+        public Constant eval(Map<String, Constant> values) {
             return new Constant( left.eval(values).getValue() - right.eval(values).getValue() );
         }
     }

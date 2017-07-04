@@ -100,6 +100,7 @@ public class Constant implements Expression {
     }
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public <T> T accept(ExpressionVisitor<T> visitor) {
 		return null;
 	}

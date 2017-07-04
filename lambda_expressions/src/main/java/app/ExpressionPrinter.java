@@ -126,7 +126,8 @@ public class ExpressionPrinter {
     	Constant zero = constantSupplier.get();
     }
     
-    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 132)
+    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 133)
+    @EntryPoint(value = {OPA, CPA})
     static ExpressionPrinter instance() {
     	Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
     	return printerConstructor.get();
@@ -183,7 +184,7 @@ public class ExpressionPrinter {
 	        		@ResolvedMethod(receiverType = "lib/IncrementExpression")},
 	        returnType = Object.class,
 	        parameterTypes = {Function.class},
-	        line = 188)
+	        line = 189)
 		public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
 			return func.apply(e, this::visit);
 		}

@@ -85,6 +85,7 @@ public class IdentityExpression extends UnaryExpression {
     }
 
 	@Override
+    @EntryPoint(value = {OPA, CPA})
 	public Constant eval(Map<String, Constant> values) {
 		return (Constant) expr;
 	}
