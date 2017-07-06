@@ -59,6 +59,7 @@ import lib.annotations.callgraph.ResolvedMethod;
  *
  *
  *
+ *
  * -->
  *
  * @author Michael Eichberg
@@ -73,7 +74,6 @@ public class UnaryExpression implements ArithmeticExpression{
 		init();
 	}
 
-	@EntryPoint(value = {OPA, CPA}) //TODO: This annotation is actually meant for the static block above
 	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 79)
 	private static void init(){
 		StaticInitializerTest.staticCall();

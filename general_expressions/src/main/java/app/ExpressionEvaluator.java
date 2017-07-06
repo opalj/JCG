@@ -197,7 +197,8 @@ public class ExpressionEvaluator {
     	}
     }
 
-    @InvokedConstructor(receiverType = "java/lang/NullPointerException", line = 202)
+    @InvokedConstructor(receiverType = "java/lang/NullPointerException", line = 203)
+    @EntryPoint(value = {OPA, CPA})
     public void getNullPointerException() throws Exception{
     	throw null;
     }
