@@ -65,7 +65,7 @@ import lib.*;
 public class MasonsExpressions {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-	@CallSite(name = "createBinaryExpression",
+	@CallSite(name = "createBinaryExpression", returnType = BinaryExpression.class,
             resolvedMethods = {@ResolvedMethod(receiverType = BinaryExpression.FQN)},
             resolution = TargetResolution.REFLECTIVE,
             parameterTypes = {String.class, Expression.class, Expression.class},

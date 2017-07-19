@@ -102,7 +102,7 @@ public class AltConstant implements Externalizable{
     public native float toFloat();
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "readInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectInputStreamReceiverType)}, line = 107)
+    @CallSite(name = "readInt", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = ObjectInputStreamReceiverType)}, line = 107)
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     	value = in.readInt();
     }

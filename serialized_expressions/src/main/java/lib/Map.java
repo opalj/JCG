@@ -121,7 +121,7 @@ public class Map<K, V> {
     }
 
     @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 128)
-    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 139)
+    @CallSite(name = "getNextEntry", returnType = LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 139)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
@@ -154,8 +154,8 @@ public class Map<K, V> {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 167)
-    @CallSite(name = "next", resolvedMethods = {
+    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 167)
+    @CallSite(name = "next", returnType = Object.class, resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
     	line = 167)

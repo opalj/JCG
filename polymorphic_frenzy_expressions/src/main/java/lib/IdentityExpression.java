@@ -81,7 +81,7 @@ public class IdentityExpression extends UnaryExpression {
 	}
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "apply", 
+    @CallSite(name = "apply", returnType = Expression.class, 
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/IdentityExpression$IdentityOperator"),
     			@ResolvedMethod(receiverType = "lib/IdentityExpression$NewIdentityOperator")}, 
         parameterTypes = {Expression.class, Map.class},

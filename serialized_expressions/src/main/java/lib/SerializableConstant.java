@@ -96,13 +96,15 @@ public class SerializableConstant extends Constant implements Serializable {
     	in.defaultReadObject();
     }
     
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 102)
+    @CallSite(name = "replacementFactory", returnType = SerializableConstant.class, 
+    		resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 103)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object writeReplace() throws ObjectStreamException {
     	return replacementFactory();
     }
     
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 108)
+    @CallSite(name = "replacementFactory", returnType = SerializableConstant.class, 
+    		resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 110)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object readResolve() throws ObjectStreamException {
     	return replacementFactory();

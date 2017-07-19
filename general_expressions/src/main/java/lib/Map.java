@@ -119,7 +119,7 @@ public class Map<K, V> {
     }
 
     @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 126)
-    @CallSite(name = "getNextEntry", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 137)
+    @CallSite(name = "getNextEntry", returnType = LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 137)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
@@ -146,14 +146,14 @@ public class Map<K, V> {
     }
 
     @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)},
-    		parameterTypes = {Map.LinkedEntry.class}, line = 152)
+    		parameterTypes = {Map.LinkedEntry.class}, returnType = String.class, line = 152)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 165)
-    @CallSite(name = "next", resolvedMethods = {
+    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 165)
+    @CallSite(name = "next", returnType = Object.class, resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
     line = 165)

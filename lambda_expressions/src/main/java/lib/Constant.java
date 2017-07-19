@@ -86,7 +86,7 @@ public class Constant implements Expression {
 
     @CallSite(name = "visit",
             resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
-            returnType = Object.class,
+            returnType = String.class,
             parameterTypes = {Constant.class},
             line = 95
     )

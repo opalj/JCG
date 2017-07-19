@@ -101,7 +101,7 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "readInt", resolvedMethods = {@ResolvedMethod(receiverType = ObjectInputStreamReceiverType)}, line = 106)
+    @CallSite(name = "readInt", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = ObjectInputStreamReceiverType)}, line = 106)
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     	value = in.readInt();
     }
@@ -114,13 +114,13 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 119)
+    @CallSite(name = "replacementFactory", returnType = ExternalizableConstant.class, resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 119)
     private Object writeReplace() throws ObjectStreamException {
     	return replacementFactory();
     }
     
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "replacementFactory", resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 125)
+    @CallSite(name = "replacementFactory", returnType = ExternalizableConstant.class, resolvedMethods = {@ResolvedMethod(receiverType = ExternalizableConstantReceiverType)}, line = 125)
     private Object readResolve() throws ObjectStreamException {
     	return replacementFactory();
     }

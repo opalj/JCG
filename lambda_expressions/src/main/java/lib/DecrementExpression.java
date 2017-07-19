@@ -93,7 +93,7 @@ public class DecrementExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "visit",
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
-    	returnType = Object.class,
+    	returnType = String.class,
      	parameterTypes = {DecrementExpression.class},
     	line = 100)
     public <T> T accept(Function<Expression, T> visit) {
@@ -122,7 +122,7 @@ public class DecrementExpression extends UnaryExpression {
         @EntryPoint(value = {OPA, CPA})
         @CallSite(name= "getValue", resolvedMethods = {
         		@ResolvedMethod(receiverType = Constant.FQN)
-        }, line = 127)
+        }, returnType = int.class, line = 127)
         public Constant apply(Constant constant) {
             return new Constant(constant.getValue() - 1);
         }

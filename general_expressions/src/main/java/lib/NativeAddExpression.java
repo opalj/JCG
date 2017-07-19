@@ -34,9 +34,9 @@ public class NativeAddExpression extends BinaryExpression {
 	}
 
 	@Override
-	@CallSite(name = "left", resolvedMethods = { @ResolvedMethod(receiverType = NativeAddExpression.FQN)})
-	@CallSite(name = "right", resolvedMethods = { @ResolvedMethod(receiverType = NativeAddExpression.FQN)})
-	@CallSite(name = "eval", resolvedMethods = { @ResolvedMethod(receiverType = IncrementExpression.FQN),
+	@CallSite(name = "left", returnType = Object.class, resolvedMethods = { @ResolvedMethod(receiverType = NativeAddExpression.FQN)})
+	@CallSite(name = "right", returnType = Object.class, resolvedMethods = { @ResolvedMethod(receiverType = NativeAddExpression.FQN)})
+	@CallSite(name = "eval", returnType = Constant.class, resolvedMethods = { @ResolvedMethod(receiverType = IncrementExpression.FQN),
 			@ResolvedMethod(receiverType = MultExpression.FQN),
 			@ResolvedMethod(receiverType = DecrementExpression.FQN),
 			@ResolvedMethod(receiverType = AddExpression.FQN),
@@ -46,9 +46,9 @@ public class NativeAddExpression extends BinaryExpression {
 			@ResolvedMethod(receiverType = SubExpression.FQN),
 			@ResolvedMethod(receiverType = Variable.FQN),
 			@ResolvedMethod(receiverType = NativeAddExpression.FQN)})
-	@CallSite(name = "getValue", resolvedMethods = { @ResolvedMethod(receiverType = Constant.FQN) })
-	@CallSite(name = "<init>", resolvedMethods = { @ResolvedMethod(receiverType = Constant.FQN) })
-	@CallSite(name = "<init>", resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/NullPointerException") })
+	@CallSite(name = "getValue", returnType = int.class, resolvedMethods = { @ResolvedMethod(receiverType = Constant.FQN) })
+	@CallSite(name = "<init>", returnType = Constant.class, resolvedMethods = { @ResolvedMethod(receiverType = Constant.FQN) })
+	@CallSite(name = "<init>", returnType = NullPointerException.class, resolvedMethods = { @ResolvedMethod(receiverType = "java/lang/NullPointerException") })
 	@EntryPoint(value = {OPA, CPA})
 	/**
 	 * This method is implemented in native/lib/ArithmeticOperations.c which is to be compiled into 

@@ -87,7 +87,7 @@ public class IdentityExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "visit",
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
-    	returnType = Object.class, parameterTypes = {IdentityExpression.class},
+    	returnType = String.class, parameterTypes = {IdentityExpression.class},
     	line = 93)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);

@@ -82,10 +82,10 @@ public abstract class UnaryExpression implements Expression {
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = {@ResolvedMethod(receiverType = IdentityExpression.FQN),
             		@ResolvedMethod(receiverType = SquareExpression.FQN)},
-            line = 98)
+            returnType = UnaryExpression.class, line = 98)
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            line = 105)
+            returnType = IdentityExpression.class, line = 105)
     @EntryPoint(value = {OPA, CPA})
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,

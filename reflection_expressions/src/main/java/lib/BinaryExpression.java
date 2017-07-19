@@ -87,7 +87,7 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote( value = REFLECTION,description = "a new instance is created by Java Reflection")
-    @CallSite(name = "<init>",
+    @CallSite(name = "<init>", returnType = BinaryExpression.class,
             resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})}),
             		@ResolvedMethod(receiverType = MultOperator.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})},
             resolution = TargetResolution.REFLECTIVE,

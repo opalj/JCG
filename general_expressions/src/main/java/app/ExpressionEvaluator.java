@@ -80,10 +80,10 @@ public class ExpressionEvaluator {
 			new MultExpression(new Constant(2), new Constant(1)), null};
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "evalFirstEntry", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 89)
-    @CallSite(name = "evalSecondEntry", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 93)
-    @CallSite(name = "evalAll", resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 99)
-    @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = "lib/NativeAddExpression")}, line = 102)
+    @CallSite(name = "evalFirstEntry", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 89)
+    @CallSite(name = "evalSecondEntry", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 93)
+    @CallSite(name = "evalAll", returnType = int[].class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 99)
+    @CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {@ResolvedMethod(receiverType = "lib/NativeAddExpression")}, line = 102)
     public static void main(final String[] args) {
     	ExpressionEvaluator evaluatorOne = new ExpressionEvaluator();
     	evaluatorOne.evalFirstEntry();
@@ -106,7 +106,7 @@ public class ExpressionEvaluator {
     @CallSite(name = "arraycopy", isStatic = true, resolvedMethods = {
     		@ResolvedMethod(receiverType = "java/lang/System")},
     		parameterTypes = {IncrementExpression[].class, int.class, Expression[].class, int.class, int.class}, line = 114)
-    @CallSite(name = "eval", resolvedMethods = {
+    @CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {
     		@ResolvedMethod(receiverType = IncrementExpression.FQN)},
     		parameterTypes = {Map.class}, line = 115)
     private int evalFirstEntry(){
@@ -117,7 +117,7 @@ public class ExpressionEvaluator {
 
     @CGNote( value = NATIVE_CALLBACK,description = "monomorph, interprocedural case of arraycopy test case.")
     @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN)},
-    		parameterTypes = {Map.class}, line = 122)
+    		parameterTypes = {Map.class}, returnType = Constant.class, line = 122)
     private int evalSecondEntry(){
     	return expressionArray[1].eval(new Map<String,Constant>()).getValue();
     }
@@ -126,7 +126,7 @@ public class ExpressionEvaluator {
     @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN),
     		@ResolvedMethod(receiverType = SquareExpression.FQN),
     		@ResolvedMethod(receiverType = AddExpression.FQN)},
-    		parameterTypes = {Map.class}, line = 133)
+    		parameterTypes = {Map.class}, returnType = Constant.class, line = 133)
     private int[] evalAll(){ //expressionArray manipulated before this method is called (lines 94, 95 and 96)
     	int[] result = new int[3];
     	for(int i = 0; i<expressionArray.length; i++){
@@ -183,7 +183,7 @@ public class ExpressionEvaluator {
     private class ParameterizedEvaluator<T extends Expression>{
     	public static final String FQN = "app/ExpressionEvaluator$ParameterizedEvaluator";
     	
-    	@CallSite(name = "eval", resolvedMethods = {
+    	@CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {
     			@ResolvedMethod(receiverType = AddExpression.FQN),
     			@ResolvedMethod(receiverType = MultExpression.FQN),
     			@ResolvedMethod(receiverType = SubExpression.FQN)},

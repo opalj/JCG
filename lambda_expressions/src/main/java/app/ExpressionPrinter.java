@@ -37,6 +37,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+
 import lib.Constant;
 import lib.DecrementExpression;
 import lib.Expression;
@@ -102,7 +104,7 @@ public class ExpressionPrinter {
     	parameterTypes = int[].class,
     	returnType = Expression[].class,
     	line = 122)
-    @CallSite(name = "asList",
+    @CallSite(name = "asList", returnType = List.class,
 		resolvedMethods = {@ResolvedMethod(receiverType = "java/util/Arrays")},
 		parameterTypes = Expression[].class,
 		line = 124)

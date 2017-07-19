@@ -80,12 +80,12 @@ public abstract class UnaryExpression implements Expression {
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = {@ResolvedMethod(receiverType = SquareExpression.FQN),
             		@ResolvedMethod(receiverType = IdentityExpression.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})},
-            resolution = TargetResolution.REFLECTIVE,
+            resolution = TargetResolution.REFLECTIVE, returnType = UnaryExpression.class,
             line = 98)
     @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            resolution = TargetResolution.REFLECTIVE,
+            resolution = TargetResolution.REFLECTIVE, returnType = IdentityExpression.class,
             line = 104)
     @EntryPoint(value = {OPA, CPA})
     public static UnaryExpression createUnaryExpressions(
