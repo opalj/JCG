@@ -101,16 +101,16 @@ public class ExpressionPrinter {
     	line = 120)
     @CallSite(name = "incrementAll",
     	resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter")},
-    	parameterTypes = int[].class,
+    	parameterTypes = {int[].class},
     	returnType = Expression[].class,
     	line = 122)
     @CallSite(name = "asList", returnType = List.class,
 		resolvedMethods = {@ResolvedMethod(receiverType = "java/util/Arrays")},
-		parameterTypes = Expression[].class,
+		parameterTypes = {Expression[].class},
 		line = 124)
     @CallSite(name = "toConstant",
 		resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter$ZeroConstant")},
-		parameterTypes = int[].class,
+		parameterTypes = {int[].class},
 		returnType = Expression[].class,
 		line = 126)
     public static void main(final String[] args) {

@@ -36,7 +36,7 @@ public class NativeAddExpression extends BinaryExpression {
 	@Override
 	@CallSite(name = "left", returnType = Object.class, resolvedMethods = { @ResolvedMethod(receiverType = NativeAddExpression.FQN)})
 	@CallSite(name = "right", returnType = Object.class, resolvedMethods = { @ResolvedMethod(receiverType = NativeAddExpression.FQN)})
-	@CallSite(name = "eval", returnType = Constant.class, resolvedMethods = { @ResolvedMethod(receiverType = IncrementExpression.FQN),
+	@CallSite(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, resolvedMethods = { @ResolvedMethod(receiverType = IncrementExpression.FQN),
 			@ResolvedMethod(receiverType = MultExpression.FQN),
 			@ResolvedMethod(receiverType = DecrementExpression.FQN),
 			@ResolvedMethod(receiverType = AddExpression.FQN),

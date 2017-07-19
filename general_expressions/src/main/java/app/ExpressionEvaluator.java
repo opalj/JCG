@@ -83,7 +83,7 @@ public class ExpressionEvaluator {
     @CallSite(name = "evalFirstEntry", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 89)
     @CallSite(name = "evalSecondEntry", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 93)
     @CallSite(name = "evalAll", returnType = int[].class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 99)
-    @CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {@ResolvedMethod(receiverType = "lib/NativeAddExpression")}, line = 102)
+    @CallSite(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, resolvedMethods = {@ResolvedMethod(receiverType = "lib/NativeAddExpression")}, line = 102)
     public static void main(final String[] args) {
     	ExpressionEvaluator evaluatorOne = new ExpressionEvaluator();
     	evaluatorOne.evalFirstEntry();
@@ -178,7 +178,7 @@ public class ExpressionEvaluator {
     @InvokedConstructor(receiverType = ExpressionEvaluator.ParameterizedEvaluator.FQN, line = 180)
     public ParameterizedEvaluator<? extends BinaryExpression> makeParamEvaluator(){
     	return new ParameterizedEvaluator<>();
-    }
+    } parameterTypes = {},
     
     private class ParameterizedEvaluator<T extends Expression>{
     	public static final String FQN = "app/ExpressionEvaluator$ParameterizedEvaluator";
