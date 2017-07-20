@@ -83,7 +83,7 @@ public class ExpressionEvaluator {
     @CallSite(name = "evalFirstEntry", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 89)
     @CallSite(name = "evalSecondEntry", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 93)
     @CallSite(name = "evalAll", returnType = int[].class, resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionEvaluator")}, line = 99)
-    @CallSite(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, resolvedMethods = {@ResolvedMethod(receiverType = "lib/NativeAddExpression")}, line = 102)
+    @CallSite(name = "eval", returnType = lib.Constant.class, parameterTypes = {lib.Map.class}, resolvedMethods = {@ResolvedMethod(receiverType = "lib/NativeAddExpression")}, line = 102)
     public static void main(final String[] args) {
     	ExpressionEvaluator evaluatorOne = new ExpressionEvaluator();
     	evaluatorOne.evalFirstEntry();
@@ -105,10 +105,10 @@ public class ExpressionEvaluator {
     @CGNote( value = NATIVE_CALLBACK,description = "monomorph, intraprocedural case of arraycopy test case.")
     @CallSite(name = "arraycopy", isStatic = true, resolvedMethods = {
     		@ResolvedMethod(receiverType = "java/lang/System")},
-    		parameterTypes = {IncrementExpression[].class, int.class, Expression[].class, int.class, int.class}, line = 114)
-    @CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {
+    		parameterTypes = {lib.IncrementExpression[].class, int.class, lib.Expression[].class, int.class, int.class}, line = 114)
+    @CallSite(name = "eval", returnType = lib.Constant.class, resolvedMethods = {
     		@ResolvedMethod(receiverType = IncrementExpression.FQN)},
-    		parameterTypes = {Map.class}, line = 115)
+    		parameterTypes = {lib.Map.class}, line = 115)
     private int evalFirstEntry(){
     	Expression[] tempArray = new Expression[3];
     	System.arraycopy(coutToThree, 0, tempArray, 0, 3);
@@ -117,7 +117,7 @@ public class ExpressionEvaluator {
 
     @CGNote( value = NATIVE_CALLBACK,description = "monomorph, interprocedural case of arraycopy test case.")
     @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN)},
-    		parameterTypes = {Map.class}, returnType = Constant.class, line = 122)
+    		parameterTypes = {lib.Map.class}, returnType = lib.Constant.class, line = 122)
     private int evalSecondEntry(){
     	return expressionArray[1].eval(new Map<String,Constant>()).getValue();
     }
@@ -126,7 +126,7 @@ public class ExpressionEvaluator {
     @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN),
     		@ResolvedMethod(receiverType = SquareExpression.FQN),
     		@ResolvedMethod(receiverType = AddExpression.FQN)},
-    		parameterTypes = {Map.class}, returnType = Constant.class, line = 133)
+    		parameterTypes = {lib.Map.class}, returnType = lib.Constant.class, line = 133)
     private int[] evalAll(){ //expressionArray manipulated before this method is called (lines 94, 95 and 96)
     	int[] result = new int[3];
     	for(int i = 0; i<expressionArray.length; i++){
@@ -137,7 +137,7 @@ public class ExpressionEvaluator {
 
     @CallSite(name = "arraycopy", isStatic = true, 
     		resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/System")},
-    		parameterTypes = {IncrementExpression[].class, int.class, Expression[].class, int.class, int.class}, line = 143)
+    		parameterTypes = {lib.IncrementExpression[].class, int.class, lib.Expression[].class, int.class, int.class}, line = 143)
     @CGNote( value = NATIVE_CALLBACK,description = "array with well known types is copied into other array.")
     private void copyPrivateArrays() {
     	System.arraycopy(coutToThree, 0, expressionArray, 0, 3);
@@ -178,7 +178,7 @@ public class ExpressionEvaluator {
     @InvokedConstructor(receiverType = ExpressionEvaluator.ParameterizedEvaluator.FQN, line = 180)
     public ParameterizedEvaluator<? extends BinaryExpression> makeParamEvaluator(){
     	return new ParameterizedEvaluator<>();
-    } parameterTypes = {},
+    }
     
     private class ParameterizedEvaluator<T extends Expression>{
     	public static final String FQN = "app/ExpressionEvaluator$ParameterizedEvaluator";

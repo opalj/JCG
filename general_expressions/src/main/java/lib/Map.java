@@ -119,7 +119,7 @@ public class Map<K, V> {
     }
 
     @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 126)
-    @CallSite(name = "getNextEntry", returnType = LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 137)
+    @CallSite(name = "getNextEntry", returnType = lib.Map.LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 137)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
@@ -146,7 +146,7 @@ public class Map<K, V> {
     }
 
     @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)},
-    		parameterTypes = {Map.LinkedEntry.class}, returnType = String.class, line = 152)
+    		parameterTypes = {lib.Map.LinkedEntry.class}, returnType = String.class, line = 152)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";

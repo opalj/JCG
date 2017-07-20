@@ -32,13 +32,11 @@ package app;
 import static lib.annotations.callgraph.AnalysisMode.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
-
 import lib.Constant;
 import lib.DecrementExpression;
 import lib.Expression;
