@@ -95,21 +95,21 @@ public class ExpressionPrinter {
     	line = 118)
     @CallSite(name = "clone",
     	resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/int[]")},
-    	returnType = int[].class,
+    	returnType = int[].class, isDynamic = true,
     	line = 120)
     @CallSite(name = "incrementAll",
     	resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter")},
     	parameterTypes = {int[].class},
-    	returnType = Expression[].class,
+    	returnType = Expression[].class, isDynamic = true,
     	line = 122)
     @CallSite(name = "asList", returnType = List.class,
 		resolvedMethods = {@ResolvedMethod(receiverType = "java/util/Arrays")},
-		parameterTypes = {Expression[].class},
+		parameterTypes = {Expression[].class}, isDynamic = true,
 		line = 124)
     @CallSite(name = "toConstant",
 		resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter$ZeroConstant")},
 		parameterTypes = {int[].class},
-		returnType = Expression[].class,
+		returnType = Expression[].class, isDynamic = true,
 		line = 126)
     public static void main(final String[] args) {
     	Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
@@ -182,7 +182,7 @@ public class ExpressionPrinter {
 	        resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression"),
 	        		@ResolvedMethod(receiverType = "lib/IdentityExpression"),
 	        		@ResolvedMethod(receiverType = "lib/IncrementExpression")},
-	        returnType = Object.class,
+	        returnType = Object.class, isDynamic = true,
 	        parameterTypes = {Function.class},
 	        line = 189)
 		public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {

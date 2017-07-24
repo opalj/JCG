@@ -95,7 +95,7 @@ public class IncrementExpression extends UnaryExpression {
     @CallSite(name = "visit",
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
     	returnType = String.class, parameterTypes = {IncrementExpression.class},
-    	line = 100)
+    	isDynamic = true, line = 100)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }

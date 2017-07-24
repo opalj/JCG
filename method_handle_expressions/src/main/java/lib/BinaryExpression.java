@@ -123,7 +123,7 @@ public abstract class BinaryExpression implements Expression {
     @CallSite(name = "createBinaryExpression",
     		resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
     				@ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)},
-    		returnType = BinaryExpression.class,
+    		returnType = BinaryExpression.class, isDynamic = true,
     		parameterTypes = {String.class, Expression.class, Expression.class},
     		line = 143)
     @EntryPoint(value = {OPA, CPA})

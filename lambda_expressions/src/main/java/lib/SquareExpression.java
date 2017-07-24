@@ -106,7 +106,7 @@ public final class SquareExpression extends UnaryExpression {
     @CallSite(name = "visit",
     resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
     returnType = Object.class, parameterTypes = {SquareExpression.class},
-    line = 111)
+    isDynamic = true, line = 111)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }

@@ -79,11 +79,11 @@ public abstract class UnaryExpression implements Expression {
 
     protected Expression expr;
 
-    @CallSite(name = "<init>", parameterTypes = {Expression.class},
+    @CallSite(name = "<init>", parameterTypes = {Expression.class}, isDynamic = true,
             resolvedMethods = {@ResolvedMethod(receiverType = IdentityExpression.FQN),
             		@ResolvedMethod(receiverType = SquareExpression.FQN)},
             returnType = UnaryExpression.class, line = 98)
-    @CallSite(name = "<init>", parameterTypes = {Expression.class},
+    @CallSite(name = "<init>", parameterTypes = {Expression.class}, isDynamic = true,
             resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
             returnType = IdentityExpression.class, line = 105)
     @EntryPoint(value = {OPA, CPA})
