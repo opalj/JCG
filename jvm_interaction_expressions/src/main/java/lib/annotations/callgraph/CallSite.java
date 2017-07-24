@@ -57,6 +57,8 @@ public @interface CallSite {
 	boolean isStatic() default false;
 
 	boolean isReflective() default false;
+	
+	boolean isDynamic() default false;
 
     ResolvedMethod[] resolvedMethods();
 
