@@ -81,10 +81,10 @@ public class ExpressionPrinter {
 	private static int[] values = {0, 1, 2, 3, 4}; 
 	
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructor(receiverType = "lib/IdentityExpression", line = 115)
-    @InvokedConstructor(receiverType = "lib/SquareExpression", line = 115)
-    @InvokedConstructor(receiverType = "lib/IncrementExpression", line = 115)
-    @InvokedConstructor(receiverType = "lib/Constant", line = 115)
+    @InvokedConstructor(receiverType = "lib/IdentityExpression", parameterTypes = {Expression.class}, line = 115)
+    @InvokedConstructor(receiverType = "lib/SquareExpression", parameterTypes = {Expression.class}, line = 115)
+    @InvokedConstructor(receiverType = "lib/IncrementExpression", parameterTypes = {Expression.class}, line = 115)
+    @InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {Expression.class}, line = 115)
     @InvokedConstructor(receiverType = "app/ExpressionPrinter$ExpressionStringifier", line = 117)
     @CallSite(name = "accept",
     	resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression"),

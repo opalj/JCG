@@ -82,7 +82,7 @@ public class ExpressionEvaluator {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     @InvokedConstructor(receiverType = "lib/Stack", line = 133)
-    @InvokedConstructor(receiverType = "lib/Constant", line = 136)
+    @InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {int.class}, line = 136)
     @CallSite(name = "clone", returnType = String[].class, resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/Object")}, line = 90)
     @CallSite(name = "push", parameterTypes = {Constant.class}, resolvedMethods = {@ResolvedMethod(receiverType = "lib/Stack")}, line = 136)
     public static void main(final String[] args) {

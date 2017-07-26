@@ -81,8 +81,8 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 public class ExpressionSaver {
 
 	@EntryPoint(value = { DESKTOP_APP, OPA, CPA })
-	@InvokedConstructor(receiverType = "lib/SerializableConstant", line = 87)
-	@InvokedConstructor(receiverType = "lib/ExternalizableConstant", line = 88)
+	@InvokedConstructor(receiverType = "lib/SerializableConstant", parameterTypes = {int.class}, line = 87)
+	@InvokedConstructor(receiverType = "lib/ExternalizableConstant", parameterTypes = {int.class}, line = 88)
 	public static void main(final String[] args) {
 		Constant serializableConst = new SerializableConstant(42);
 		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);

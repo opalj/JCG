@@ -70,8 +70,8 @@ public class MasonsExpressions {
             resolution = TargetResolution.REFLECTIVE,
             parameterTypes = {String.class, Expression.class, Expression.class},
             line = 76)
-	@InvokedConstructor(receiverType = "lib/Constant", line = 77)
-	@InvokedConstructor(receiverType = "lib/Constant", line = 78)
+	@InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {int.class}, line = 77)
+	@InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {int.class}, line = 78)
 	public static void main(final String[] args) throws Exception {
 		BinaryExpression masonsAngle = BinaryExpression.createBinaryExpression("Plus", 
 				(Expression) UnaryExpression.createUnaryExpressions(SQUARE, new Constant(3)), 

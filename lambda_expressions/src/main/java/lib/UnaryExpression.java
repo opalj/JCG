@@ -75,11 +75,11 @@ public abstract class UnaryExpression implements Expression {
 
 	public abstract IUnaryOperator operator();
 	
-	@InvokedConstructor(receiverType = DecrementExpression.FQN, parameterTypes = {Object.class, Object.class}, line = 89)
-	@InvokedConstructor(receiverType = IdentityExpression.FQN, parameterTypes = {Object.class, Object.class}, line = 92)
-	@InvokedConstructor(receiverType = IncrementExpression.FQN, parameterTypes = {Object.class, Object.class}, line = 95)
-	@InvokedConstructor(receiverType = SquareExpression.FQN, parameterTypes = {Object.class, Object.class}, line = 98)
-	@InvokedConstructor(receiverType = IdentityExpression.FQN, parameterTypes = {Object.class, Object.class}, line = 106)
+	@InvokedConstructor(receiverType = DecrementExpression.FQN, parameterTypes = {Expression.class}, line = 89)
+	@InvokedConstructor(receiverType = IdentityExpression.FQN, parameterTypes = {Expression.class}, line = 92)
+	@InvokedConstructor(receiverType = IncrementExpression.FQN, parameterTypes = {Expression.class}, line = 95)
+	@InvokedConstructor(receiverType = SquareExpression.FQN, parameterTypes = {Expression.class}, line = 98)
+	@InvokedConstructor(receiverType = IdentityExpression.FQN, parameterTypes = {Expression.class}, line = 106)
 	@EntryPoint(value = { OPA, CPA })
 	public static UnaryExpression createUnaryExpressions(UnaryOperator operator, final Expression expr) {
 		UnaryExpression uExpr = null;

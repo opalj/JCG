@@ -86,7 +86,7 @@ public abstract class BinaryExpression implements Expression {
         return visitor.visit(this);
     }
 
-    @InvokedConstructor(receiverType = BinaryExpression.FQN, line = 97)
+    @InvokedConstructor(receiverType = "lib/BinaryExpression$1", line = 97)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             Operator operator,
