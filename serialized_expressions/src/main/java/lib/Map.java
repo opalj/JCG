@@ -155,7 +155,7 @@ public class Map<K, V> {
     }
 
     @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 167)
-    @CallSite(name = "next", returnType = Object.class, resolvedMethods = {
+    @CallSite(name = "next", returnType = Map.LinkedEntry.class, resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
     	line = 167)
