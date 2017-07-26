@@ -65,6 +65,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  * <p>
  * <p>
  * <p>
+ * <p>
  * -->
  *
  * @author Michael Reif
@@ -95,7 +96,6 @@ public class DecrementExpression extends UnaryExpression {
     		parameterTypes = {Expression.class}, line = 109)
     @CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {
     		@ResolvedMethod(receiverType = AddExpression.FQN),
-    		@ResolvedMethod(receiverType = AltConstant.FQN),
     		@ResolvedMethod(receiverType = Constant.FQN),
     		@ResolvedMethod(receiverType = IdentityExpression.FQN),
     		@ResolvedMethod(receiverType = IncrementExpression.FQN),
