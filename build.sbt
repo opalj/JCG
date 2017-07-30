@@ -1,4 +1,5 @@
 
+javacOptions in ThisBuild ++= Seq("-parameters")
 
 lazy val general_expressions = project
   .settings(
