@@ -59,7 +59,6 @@ import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
  * <p>
  * <p>
  * <p>
- * <p>
  * -->
  *
  * @author Michael Reif
@@ -67,7 +66,8 @@ import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
 public class IncrementExpression extends UnaryExpression {
 
     public static final String FQN = "lib/IncrementExpression";
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public IncrementExpression(Expression expr) {
         super(expr);
     }

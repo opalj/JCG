@@ -58,7 +58,6 @@ import lib.annotations.properties.EntryPoint;
  * <p>
  * <p>
  * <p>
- * <p>
  * -->
  *
  * @author Michael Eichberg
@@ -67,7 +66,8 @@ import lib.annotations.properties.EntryPoint;
 public final class ExpressionPrinter extends ExpressionVisitor<String> {
 	
 	public static final String FQN = "lib/ExpressionPrinter";
-
+	
+	@EntryPoint(value = { OPA, CPA })
     private ExpressionPrinter() {
     }
     

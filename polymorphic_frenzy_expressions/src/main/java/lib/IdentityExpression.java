@@ -65,7 +65,6 @@ import lib.annotations.properties.EntryPoint;
  *
  *
  *
- *
  * -->
  *
  * @author Roberts Kolosovs
@@ -74,7 +73,8 @@ import lib.annotations.properties.EntryPoint;
 public class IdentityExpression extends UnaryExpression {
 
 	private static final long serialVersionUID = 1L;
-
+	
+	@EntryPoint(value = { OPA, CPA })
 	public IdentityExpression(Expression expr) {
 		this.expr = expr;
 		this.operator = new NewIdentityOperator();

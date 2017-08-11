@@ -43,7 +43,6 @@ import lib.annotations.callgraph.ResolvedMethod;
 /**
  *  A enumeration type for all unary operator there are.
  *  
- *  
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
@@ -56,7 +55,8 @@ public enum UnaryOperator {
     EXCEPTION("ForceClassNotFoundExcepiton");
 
     private String name;
-
+    
+    @EntryPoint(value = { OPA })
     /* private */ UnaryOperator(String name){
         this.name = name;
     }

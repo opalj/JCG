@@ -82,7 +82,8 @@ public class Constant implements ArithmeticExpression{
 	}
 	
     private final int value;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public Constant(int value) {
         this.value = value;
     }

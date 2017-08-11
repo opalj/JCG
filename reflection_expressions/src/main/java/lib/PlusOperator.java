@@ -55,8 +55,6 @@ import lib.annotations.properties.EntryPoint;
  *
  *
  *
- *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -65,7 +63,8 @@ import lib.annotations.properties.EntryPoint;
 public class PlusOperator extends Operator {
 
     public static final String FQN = "lib/PlusOperator";
-
+    
+    @EntryPoint(value = { OPA, CPA })
     protected PlusOperator() {}
 
     public final static Operator instance = new PlusOperator();
@@ -76,7 +75,8 @@ public class PlusOperator extends Operator {
     	
         private final Expression right;
         private final Expression left;
-
+        
+        @EntryPoint(value = { OPA, CPA })
         public AddExpression(Expression left, Expression right) {
          this.left = left;
             this.right = right;

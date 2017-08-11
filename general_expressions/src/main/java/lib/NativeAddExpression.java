@@ -27,7 +27,8 @@ public class NativeAddExpression extends BinaryExpression {
 	static {
 		System.loadLibrary("arithmetic_operations");
 	}
-
+	
+	@EntryPoint(value = { OPA, CPA })
 	public NativeAddExpression(Expression left, Expression right) {
 		this.left = left;
 		this.right = right;

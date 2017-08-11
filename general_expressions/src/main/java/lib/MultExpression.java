@@ -26,7 +26,6 @@ import lib.annotations.properties.EntryPoint;
  *
  *
  *
- *
  * -->
  *
  * @author Roberts Kolosovs
@@ -37,7 +36,8 @@ public class MultExpression extends BinaryExpression {
 
         private final Expression right;
         private final Expression left;
-
+        
+        @EntryPoint(value = { OPA, CPA })
         public MultExpression(Expression left , Expression right) {
         	this.left = left;
         	this.right = right;

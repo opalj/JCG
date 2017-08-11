@@ -25,7 +25,6 @@ import lib.*;
 *
 *
 *
-*
 * -->
 * @author Michael Eichberg
 * @author Roberts Kolosovs
@@ -42,7 +41,8 @@ public class MultOperator extends Operator {
 
         private final Expression right;
         private final Expression left;
-
+        
+        @EntryPoint(value = { OPA, CPA })
         public MultExpression(Expression left , Expression right) {
          this.left = left;
             this.right = right;

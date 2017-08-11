@@ -59,7 +59,6 @@ import lib.annotations.properties.EntryPoint;
  *
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -69,7 +68,8 @@ public class Stack<V> {
 
     private V[] data = (V[]) new Object[100];
     private int entries = 0;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public Stack() {}
 
     @EntryPoint(value = {OPA, CPA})
@@ -116,7 +116,7 @@ public class Stack<V> {
         private V[] data;
         private int cur = 0;
 
-
+        @EntryPoint(value = { OPA })
         public StackIterator(V[] data, int top){
             this.data = data;
             cur = top-1;

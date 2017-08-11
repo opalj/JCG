@@ -86,7 +86,8 @@ public class IncrementExpression extends UnaryExpression {
     public IUnaryOperator operator() {
         return (Constant constant) -> new Constant(constant.getValue() + 1);
     }
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public IncrementExpression(Expression expr) {
         super(expr);
     }
@@ -105,7 +106,7 @@ public class IncrementExpression extends UnaryExpression {
             @ResolvedMethod(receiverType = IdentityExpression.FQN),
             @ResolvedMethod(receiverType = SquareExpression.FQN),
             @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
-    }, returnType = String.class, line = 111)
+    }, returnType = String.class, line = 112)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Inc("+ expr.toString() + ")";

@@ -61,7 +61,6 @@ import lib.annotations.callgraph.ResolvedMethod;
  *
  *
  *
- *
  * -->
  * 
  * @author Michael Reif
@@ -78,7 +77,8 @@ public enum UnaryOperator {
     EXCEPTION("ForceClassNotFoundExcepiton");
 
     private String name;
-
+    
+    @EntryPoint(value = { OPA })
     /* private */ UnaryOperator(String name){
         this.name = name;
     }

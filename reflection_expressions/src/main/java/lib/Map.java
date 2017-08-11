@@ -58,7 +58,6 @@ import static lib.annotations.documentation.CGCategory.*;
  *
  *
  *
- *
  * -->
  * @author Michael Eichberg
  * @author Michael Reif
@@ -115,7 +114,8 @@ public class Map<K, V> {
             return null;
         }
     };
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public Map() {
 
     }

@@ -60,7 +60,6 @@ import java.util.function.Function;
  * <p>
  * <p>
  * <p>
- *
  * <p>
  * <p>
  * <p>
@@ -74,7 +73,8 @@ public class IdentityExpression extends UnaryExpression {
     public static final String FQN = "lib/IdentityExpression";
 
     private static /* final */ IUnaryOperator _IDENTITY = IUnaryOperator.identity();
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public IdentityExpression(Expression expr){
         super(expr);
     }

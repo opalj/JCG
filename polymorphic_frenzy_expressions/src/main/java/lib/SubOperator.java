@@ -67,7 +67,8 @@ import lib.annotations.properties.EntryPoint;
 public class SubOperator extends Operator {
 
     public static final String FQN = "lib/SubOperator";
-
+    
+    @EntryPoint(value = { OPA, CPA })
     protected SubOperator() {}
 
     public final static Operator instance = new SubOperator();
@@ -78,7 +79,8 @@ public class SubOperator extends Operator {
     	
         private final Expression right;
         private final Expression left;
-
+        
+        @EntryPoint(value = { OPA, CPA })
         public SubExpression(Expression left , Expression right) {
          this.left = left;
             this.right = right;

@@ -66,7 +66,6 @@ import lib.testutils.CallbackTest;
  *
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -78,7 +77,8 @@ public class AltConstant implements Expression, Runnable {
 	public static final String FQN = "lib/AltConstant";
 
     private int value;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public AltConstant(int value) {
         this.value = value;
     }

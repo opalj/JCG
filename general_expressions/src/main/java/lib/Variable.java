@@ -56,7 +56,6 @@ import lib.annotations.properties.EntryPoint;
  *
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -67,7 +66,8 @@ public class Variable implements Expression {
 	public static final String FQN = "lib/Variable";
 	
     public final String name;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public Variable(String name) {this.name = name;}
 
     @EntryPoint(value = {OPA, CPA})

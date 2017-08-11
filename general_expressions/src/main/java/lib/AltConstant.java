@@ -69,7 +69,6 @@ import java.io.ObjectStreamException;
  *
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -83,7 +82,8 @@ public class AltConstant implements Externalizable{
 	public static final String ObjectInputStreamReceiverType = "java/io/ObjectInputStream";
 
     private int value;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public AltConstant(int value) {
         this.value = value;
     }

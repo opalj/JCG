@@ -68,7 +68,6 @@ import java.util.function.Function;
  * <p>
  * <p>
  * <p>
- * <p>
  * -->
  *
  * @author Michael Reif
@@ -77,6 +76,7 @@ public class DecrementExpression extends UnaryExpression {
 
 	public static final String FQN = "lib/DecrementExpression"; 
 	
+	@EntryPoint(value = { OPA, CPA })
     public DecrementExpression(Expression expr){
         super(expr);
     }

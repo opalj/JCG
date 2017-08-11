@@ -56,7 +56,8 @@ public enum UnaryOperator {
     EXCEPTION("ForceClassNotFoundExcepiton");
 
     private String name;
-
+    
+    @EntryPoint(value = { OPA })
     /* private */ UnaryOperator(String name){
         this.name = name;
     }
@@ -64,7 +65,7 @@ public enum UnaryOperator {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name= "consoleWrite", resolvedMethods = {
     		@ResolvedMethod(receiverType = "lib/UnaryOperator")}, 
-    	parameterTypes = {String.class}, line = 69)
+    	parameterTypes = {String.class}, line = 70)
     public String toString(){
     	consoleWrite("toString transformation of "+ UnaryOperator.class.getName());
         return this.name;

@@ -81,7 +81,8 @@ public class Negation extends UnaryExpression{
 	}
 	
     private final ArithmeticExpression value;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public Negation(ArithmeticExpression value) {
         this.value = value;
     }

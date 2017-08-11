@@ -68,7 +68,8 @@ public class AddExpression extends BinaryExpression {
 
 	private final Expression right;
 	private final Expression left;
-
+	
+	@EntryPoint(value = { OPA, CPA })
 	public AddExpression(Expression left, Expression right) {
 		this.left = left;
 		this.right = right;

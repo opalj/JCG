@@ -60,7 +60,6 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  * CODE (E.G. IMPORTS) CHANGE.
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -74,7 +73,8 @@ public class SerializableConstant extends Constant implements Serializable {
 	public static final String OISReceiverType = "java/io/ObjectInputStream";
 
     private final int value;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public SerializableConstant(int value) {
         this.value = value;
     }

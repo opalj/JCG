@@ -57,7 +57,6 @@ import lib.annotations.properties.EntryPoint;
  *
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -69,7 +68,8 @@ public class Constant implements Expression {
 	public static final String FQN = "lib/Constant";
 
     private final int value;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public Constant(int value) {
         this.value = value;
     }

@@ -68,7 +68,6 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  *
  *
  *
- *
  * -->
  *
  * @author Michael Eichberg
@@ -82,7 +81,8 @@ public class ExternalizableConstant extends AltConstant implements Externalizabl
 	public static final String ObjectInputStreamReceiverType = "java/io/ObjectInputStream";
 
     private int value;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public ExternalizableConstant(int value) {
         this.value = value;
     }

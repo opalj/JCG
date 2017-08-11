@@ -58,7 +58,6 @@ import lib.annotations.properties.EntryPoint;
  * <p>
  * <p>
  * <p>
- * <p>
  * -->
  *
  * @author Michael Reif
@@ -68,7 +67,8 @@ public final class SquareExpression extends UnaryExpression {
 	public static final String FQN = "lib/SquareExpression";
 	
     private Expression square;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public SquareExpression(Expression expr){
         super(expr);
         square = new MultExpression(expr, expr);

@@ -59,7 +59,6 @@ import lib.annotations.properties.EntryPoint;
  * <p>
  * <p>
  * <p>
- * <p>
  * -->
  *
  * @author Michael Reif
@@ -68,7 +67,8 @@ import lib.annotations.properties.EntryPoint;
 public abstract class UnaryExpression implements Expression {
 
     public static final String FQN = "lib/UnaryExpression";
-
+    
+    @EntryPoint(value = { OPA, CPA })
     protected Expression expr;
 
     public UnaryExpression(Expression expr) {

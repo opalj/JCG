@@ -56,7 +56,6 @@ import lib.annotations.properties.EntryPoint;
  * <p>
  * <p>
  * <p>
- * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
@@ -72,7 +71,8 @@ public final class SquareExpression extends UnaryExpression {
 	public static final String FQN = "lib/SquareExpression";
 	
     private Expression operand;
-
+    
+    @EntryPoint(value = { OPA, CPA })
     public SquareExpression(Expression expr){
         super(expr);
         operand = expr;
