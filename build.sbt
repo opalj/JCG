@@ -1,5 +1,5 @@
 
-javacOptions in ThisBuild ++= Seq("-parameters", "-source", "1.7", "-target", "1.7")
+javacOptions in ThisBuild ++= Seq("-parameters")
 
 lazy val general_expressions = project
   .settings(
