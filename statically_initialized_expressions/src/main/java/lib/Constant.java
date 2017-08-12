@@ -64,6 +64,7 @@ import lib.annotations.callgraph.ResolvedMethod;
  *
  *
  *
+ *
  * -->
  *
  * @author Michael Eichberg
@@ -74,7 +75,6 @@ public class Constant implements ArithmeticExpression{
 
 	static String name = init();
 
-	@EntryPoint(value = {OPA, CPA})
 	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 80)
 	private static String init(){
 		StaticInitializerTest.staticCall();

@@ -71,6 +71,7 @@ public abstract class UnaryExpression implements Expression {
     @EntryPoint(value = { OPA, CPA })
     protected Expression expr;
 
+    @EntryPoint(value = { OPA, CPA })
     public UnaryExpression(Expression expr) {
         this.expr = expr;
     }

@@ -67,7 +67,6 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
 	
 	public static final String FQN = "lib/ExpressionPrinter";
 	
-	@EntryPoint(value = { OPA, CPA })
     private ExpressionPrinter() {
     }
     
