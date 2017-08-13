@@ -1,4 +1,4 @@
-This JCG sub-project contains all cases not waranting their own sub-project. The project implements a library modeling simple arithmetic expressions and an app using said library to process arithmetic expressions. 
+This JCG sub-project contains all cases not warranting their own sub-project. The project implements a library modeling simple arithmetic expressions and an app using said library to process arithmetic expressions. 
 Contains following test cases:  
 
 1. Class instantiable only via a factory method.  

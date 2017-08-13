@@ -1,4 +1,4 @@
-This JCG sub-project highlights language constructs which cause JVm callbacks.
+This JCG sub-project highlights language constructs which cause JVM callbacks.
 Contains following test cases:  
 
 1. Finalize method of a class instantiated in the app.  
