@@ -69,7 +69,8 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
 	
     private ExpressionPrinter() {
     }
-    
+
+    @EntryPoint(value = {OPA, CPA})
     public ExpressionPrinter expressionPrinterFactory() {
     	return new ExpressionPrinter();
     }
