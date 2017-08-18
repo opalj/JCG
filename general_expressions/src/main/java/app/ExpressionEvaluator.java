@@ -180,7 +180,7 @@ public class ExpressionEvaluator {
     	return new ParameterizedEvaluator<>();
     }
     
-    private class ParameterizedEvaluator<T extends Expression>{
+    class ParameterizedEvaluator<T extends Expression>{ //should be made private in the future
     	public static final String FQN = "app/ExpressionEvaluator$ParameterizedEvaluator";
     	
     	@CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {
@@ -189,7 +189,8 @@ public class ExpressionEvaluator {
     			@ResolvedMethod(receiverType = SubExpression.FQN)},
         		parameterTypes = {Map.class}, line = 196)
     	/*
-    	 * Due to the way this is instantiated only BinaryExpressions ever make it this far.
+    	 * Due to the way this is instantiated only BinaryExpressions ever make it this far 
+    	 * (once the class is made private).
     	 */
         @EntryPoint(value = {OPA, CPA})
     	public Constant execute(T expression){
@@ -197,7 +198,7 @@ public class ExpressionEvaluator {
     	}
     }
 
-    @InvokedConstructor(receiverType = "java/lang/NullPointerException", line = 203)
+    @InvokedConstructor(receiverType = "java/lang/NullPointerException", line = 204)
     @EntryPoint(value = {OPA, CPA})
     public void getNullPointerException() throws Exception{
     	throw null;
