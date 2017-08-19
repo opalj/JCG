@@ -118,8 +118,6 @@ public class Map<K, V> {
 
     }
 
-    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 126)
-    @CallSite(name = "getNextEntry", returnType = lib.Map.LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 137)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
@@ -145,19 +143,12 @@ public class Map<K, V> {
         }
     }
 
-    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)},
-    		parameterTypes = {lib.Map.LinkedEntry.class}, returnType = String.class, line = 152)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 165)
-    @CallSite(name = "next", returnType = Object.class, resolvedMethods = {
-            @ResolvedMethod(receiverType = MapIterator.FQN),
-            @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 165)
-    @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
+   @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();
         Iterator itr = this.iterator();

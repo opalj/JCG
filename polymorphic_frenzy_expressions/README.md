@@ -15,3 +15,5 @@ Contains following test cases:
   - IdentityExpression$IdentityOperator  
 6. Private inner class looks like it escapes due to deserialization but locks itself in via readResolve.  
   - SquareExpression$SquareOperator  
+7. Reduced number of viable receivers in otherwise highly polymorphic calls  
+  - Map  
