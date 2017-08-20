@@ -65,7 +65,7 @@ import static lib.annotations.documentation.CGCategory.*;
 public class Map<K, V> {
 
     public static final String MapReceiverType = "lib/Map";
-    public static final String linkedEntryRecieverType = "lib/Map$LinkedEntry";
+    public static final String linkedEntryReceiverType = "lib/Map$LinkedEntry";
 
     @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.")
     private class LinkedEntry {
@@ -120,8 +120,8 @@ public class Map<K, V> {
 
     }
 
-    @InvokedConstructor(receiverType = linkedEntryRecieverType, parameterTypes = {Object.class, Object.class}, line = 128)
-    @CallSite(name = "getNextEntry", returnType = Map.LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 139)
+    @InvokedConstructor(receiverType = linkedEntryReceiverType, parameterTypes = {Object.class, Object.class}, line = 128)
+    @CallSite(name = "getNextEntry", returnType = Map.LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 139)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
@@ -154,7 +154,7 @@ public class Map<K, V> {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryRecieverType)}, line = 167)
+    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 167)
     @CallSite(name = "next", returnType = Object.class, resolvedMethods = {
             @ResolvedMethod(receiverType = MapIterator.FQN),
             @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
