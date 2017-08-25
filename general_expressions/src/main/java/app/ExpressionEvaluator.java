@@ -187,7 +187,7 @@ public class ExpressionEvaluator {
     			@ResolvedMethod(receiverType = AddExpression.FQN),
     			@ResolvedMethod(receiverType = MultExpression.FQN),
     			@ResolvedMethod(receiverType = SubExpression.FQN)},
-        		parameterTypes = {Map.class}, line = 196)
+        		parameterTypes = {Map.class}, line = 197)
     	/*
     	 * Due to the way this is instantiated only BinaryExpressions ever make it this far 
     	 * (once the class is made private).

@@ -81,7 +81,6 @@ public final class ExpressionPrinter extends ExpressionVisitor<String> {
     private ExpressionPrinter() {
     }
 
-    @EntryPoint(value = {OPA, CPA})
     public String visit(Constant c) {
         return String.valueOf(c.getValue());
     }
