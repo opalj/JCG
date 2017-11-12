@@ -1,4 +1,5 @@
-This JCG sub-project contains all cases not warranting their own sub-project. The project implements a library modeling simple arithmetic expressions and an app using said library to process arithmetic expressions. 
+This JCG sub-project contains all cases not warranting their own sub-project. The project implements a library modelling simple arithmetic expressions and an app using said library to process arithmetic expressions.
+
 Contains following test cases:  
 
 1. Class instantiable only via a factory method.  
@@ -18,7 +19,7 @@ Contains following test cases:
   - ExpressionEvaluator$ParameterizedEvaluator  
 8. Arrays break type security and prevent further execution.  
   - ExpressionEvaluator  
-9. Classes implementing Serializable without serialization or deserialization in the application class.  
+9. Classes implementing `Serializable` without serialization or deserialization in the application class.  
   - Constant   
-10. Classes implementing Externalizable without serialization or deserialization in the application class.  
+10. Classes implementing `Externalizable` without serialization or deserialization in the application class.  
   - AltConstant  
