@@ -88,7 +88,8 @@ public class IncrementExpression extends UnaryExpression {
     }, returnType = String.class, line = 91)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
-        return "Inc("+ expr.toString() + ")";
+        String exprString = expr.toString();
+        return "Inc("+ exprString + ")";
     }
 
 	@Override
