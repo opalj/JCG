@@ -5,7 +5,8 @@ Contains following test cases:
 1. Class instantiable only via a factory method.  
   - ExpressionPrinter  
 2. Calls to native method arrayCopy affecting the data flow and thus call targets.  
-  - ExpressionEvaluator  
+  - ExpressionEvaluator.evalFirstEntry (Type of input array <: Type of output array)
+  - ExpressionEvaluator.main with copyPrivateArrays (inter-procedural, flow-sensitive invocation after arraycopy)  
 3. Declaration of native methods.  
   - Constant  
 4. Native method implemented in present C code and called.  
@@ -23,3 +24,6 @@ Contains following test cases:
   - Constant   
 10. Classes implementing `Externalizable` without serialization or deserialization in the application class.  
   - AltConstant  
+11. Calls to explicit array indices
+  - ExpressionEvaluator
+12. Calls on interface methods
