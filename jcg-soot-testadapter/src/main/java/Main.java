@@ -19,6 +19,7 @@ public class Main {
     private static final String CHA = "CHA";
     private static final String RTA = "RTA";
     private static final String VTA = "VTA";
+    private static final String Spark = "SPARK";
 
     public static void main(String[] args) {
         String cp = args[0];
@@ -30,7 +31,6 @@ public class Main {
         options.wholeProgramAnalysis();
         options.keepLineNumbers();
         options.allowPhantomReferences();
-        options.prependClasspath(); //TODO
 
         CallGraphPhaseOptions cgOptions = new CallGraphPhaseOptions();
         cgOptions.processAllReachable();//cgOptions.processOnlyEntryPoints();
@@ -46,6 +46,9 @@ public class Main {
                 break;
             case VTA:
                 cgModeOption = new VTAOptions().enableVTA();
+                break;
+            case Spark:
+                cgModeOption = new SparkOptions().enable();
                 break;
         }
         cgOptions.addSubOption(cgModeOption);
