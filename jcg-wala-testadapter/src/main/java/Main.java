@@ -35,7 +35,7 @@ public class Main {
         System.out.println("created CH");
 
         Iterable<Entrypoint> entrypoints = //Util.makeMainEntrypoints(scope, classHierarchy);
-         new AllApplicationEntrypoints(scope, classHierarchy);
+                new AllApplicationEntrypoints(scope, classHierarchy);
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
         options.setReflectionOptions(AnalysisOptions.ReflectionOptions.NO_FLOW_TO_CASTS); // todo major speed up
         System.out.println("created options");
@@ -43,10 +43,16 @@ public class Main {
 
         CallGraph callGraph = null;
         AnalysisCache cache = new AnalysisCacheImpl();
-        if (cgAlgorithm.equals("CFA")) {
-            SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeVanillaZeroOneContainerCFABuilder(options, cache, classHierarchy, scope);
-            // SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeNCFABuilder(1, options, new AnalysisCache(), classHierarchy, scope);
+        if (cgAlgorithm.equals("0-CFA")) {
+            SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(options, cache, classHierarchy, scope);
+            System.out.println("created 0-CFA builder");
             callGraph = ncfaBuilder.makeCallGraph(options);
+        } else if (cgAlgorithm.equals("0-1-CFA")) {
+            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeVanillaZeroOneCFABuilder(options, cache, classHierarchy, scope);
+            callGraph = cfaBuilder.makeCallGraph(options);
+        } else if (cgAlgorithm.equals("1-CFA")) {
+            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeVanillaNCFABuilder(1, options, cache, classHierarchy, scope);
+            callGraph = cfaBuilder.makeCallGraph(options);
         } else if (cgAlgorithm.equals("RTA")) {
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
             System.out.println("created RTA builder");
