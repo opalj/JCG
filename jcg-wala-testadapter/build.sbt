@@ -2,6 +2,8 @@ name := "jcg-wala-testadapter"
 
 version := "0.1"
 
+organization := "de.tu-darmstadt.stg"
+
 scalaVersion := "2.12.4"
 
 resolvers += Resolver.mavenLocal

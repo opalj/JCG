@@ -18,15 +18,17 @@ import com.ibm.wala.util.config.AnalysisScopeReader;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class Main {
+public class WalaJCGAdapter {
 
     public static void main(String[] args) throws IOException, CancelException, ClassHierarchyException {
         String cgAlgorithm = args[0];
         String testfile = args[1];
+        String outputPath = args[2];
 
         AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(testfile, null);
         System.out.println("created scope");
@@ -50,9 +52,11 @@ public class Main {
         } else if (cgAlgorithm.equals("0-1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeVanillaZeroOneCFABuilder(options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
+            System.out.println("created 0-1-CFA builder");
         } else if (cgAlgorithm.equals("1-CFA")) {
-            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeVanillaNCFABuilder(1, options, cache, classHierarchy, scope);
+            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
+            System.out.println("created 1-CFA builder");
         } else if (cgAlgorithm.equals("RTA")) {
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
             System.out.println("created RTA builder");
@@ -113,7 +117,7 @@ public class Main {
 
         callSitesObject.put("callSites", callSites);
 
-        try (FileWriter file = new FileWriter("test.json")) {
+        try (FileWriter file = new FileWriter(outputPath)) {
             file.write(callSitesObject.toJSONString());
             file.flush();
 

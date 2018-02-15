@@ -10,11 +10,12 @@ import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
 import soot.util.backend.ASMBackendUtils;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class Main {
+public class SootJCGAdatper {
 
     private static final String CHA = "CHA";
     private static final String RTA = "RTA";
@@ -22,9 +23,10 @@ public class Main {
     private static final String Spark = "SPARK";
 
     public static void main(String[] args) {
-        String cp = args[0];
+        String cgAlgorithm = args[0];
         String targetJar = args[1];
-        String cgAlgorithm = args[2];
+        String cp = args[2];
+        String outputPath = args[3];
 
 
         FluentOptions options = new FluentOptions();
@@ -102,8 +104,7 @@ public class Main {
         }
         callSitesObject.put("callSites", callSites);
 
-
-        try (FileWriter file = new FileWriter("test.json")) {
+        try (FileWriter file = new FileWriter(outputPath)) {
             file.write(callSitesObject.toJSONString());
             file.flush();
 
