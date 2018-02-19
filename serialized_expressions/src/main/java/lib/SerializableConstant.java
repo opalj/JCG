@@ -76,6 +76,7 @@ public class SerializableConstant extends Constant implements Serializable {
     
     @EntryPoint(value = { OPA, CPA })
     public SerializableConstant(int value) {
+        super(value);
         this.value = value;
     }
 
@@ -84,30 +85,36 @@ public class SerializableConstant extends Constant implements Serializable {
         return value;
     }
 
-    @CallSite(name = "defaultWriteObject", resolvedMethods = {@ResolvedMethod(receiverType = OOSReceiverType)}, line = 90)
+    @CallSite(name = "defaultWriteObject", resolvedMethods = {@ResolvedMethod(receiverType = OOSReceiverType)}, line = 91)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
     }
     
-    @CallSite(name = "defaultReadObject", resolvedMethods = {@ResolvedMethod(receiverType = OISReceiverType)}, line = 96)
+    @CallSite(name = "defaultReadObject", resolvedMethods = {@ResolvedMethod(receiverType = OISReceiverType)}, line = 97)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
     	in.defaultReadObject();
     }
     
     @CallSite(name = "replacementFactory", returnType = SerializableConstant.class, 
-    		resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 103)
+    		resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 104)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object writeReplace() throws ObjectStreamException {
     	return replacementFactory();
     }
     
     @CallSite(name = "replacementFactory", returnType = SerializableConstant.class, 
-    		resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 110)
+    		resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 111)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     private Object readResolve() throws ObjectStreamException {
     	return replacementFactory();
+    }
+    @CallSite(name = "getValue", returnType = SerializableConstant.class,
+            resolvedMethods = {@ResolvedMethod(receiverType = SerializableConstantReceiverType)}, line = 117)
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    private void readObjectNoData() throws ObjectStreamException {
+        getValue();
     }
     
     private Object replacementFactory() {

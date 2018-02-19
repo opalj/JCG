@@ -67,7 +67,7 @@ import lib.annotations.properties.EntryPoint;
  * @author Roberts Kolosovs
  * @param <T>
  */
-public interface Expression<T> extends Serializable {
+public interface Expression<T> {
 
     static final int MajorVersion = 1;
     static final int MinorVersion = 0;
@@ -77,9 +77,9 @@ public interface Expression<T> extends Serializable {
     T accept(ExpressionVisitor <T> visitor);
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name= "makeVersionName", returnType = String.class, resolvedMethods = {
+    /*@CallSite(name= "makeVersionName", returnType = String.class, resolvedMethods = {
     		@ResolvedMethod(receiverType = "lib/Expression")
-    }, line = 84)
+    }, line = 84)*/
     public static String getVersion(){
     	return makeVersionName();
     }

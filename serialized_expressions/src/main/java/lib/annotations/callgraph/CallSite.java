@@ -40,7 +40,7 @@ import static java.lang.annotation.ElementType.*;
  * @author Florian Kuebler
  */
 @Retention(RUNTIME)
-@Target(METHOD)
+@Target({METHOD, CONSTRUCTOR})
 @Repeatable(CallSites.class)
 public @interface CallSite {
 

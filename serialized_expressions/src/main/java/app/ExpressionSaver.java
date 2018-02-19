@@ -88,11 +88,14 @@ public class ExpressionSaver {
 		ExternalizableConstant externalizableConst = new ExternalizableConstant(42);
 
 		try {
-			serializableConst = (Constant) load("const.ser");
-			externalizableConst = (ExternalizableConstant) load("extConst.ser");
-			
 			save(serializableConst, "const.ser");
 			save(externalizableConst, "extConst.ser");
+
+			serializableConst = (Constant) load("const.ser");
+			externalizableConst = (ExternalizableConstant) load("extConst.ser");
+
+			System.out.println(serializableConst);
+			System.out.println(externalizableConst);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

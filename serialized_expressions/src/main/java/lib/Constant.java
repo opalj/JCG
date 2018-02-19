@@ -30,34 +30,52 @@
 
 package lib;
 
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+
 /**
  * This class is a superclass for a serializable implementation of an arithmetic constant.
- *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
  * @author Michael Eichberg
  * @author Michael Reif
  * @author Roberts Kolosovs
+ * @author Florian Kuebler
  */
-public abstract class Constant implements Expression{
+public abstract class Constant implements Expression {
+    private static void log(String msg) {
+        System.out.println(msg);
+    }
+
+    // this constructor is invoked on the de-serialization of a SerializableConstant object
+    @CallSite(name = "log", resolvedMethods = {@ResolvedMethod(receiverType = "lib/Constant")}, line = 73)
+    protected Constant() {
+        log("Called constructor");
+    }
+
+    // this constructor is directly invoked by the constructors of the subclasses
+    public Constant(int value) {
+
+    }
 
 }
