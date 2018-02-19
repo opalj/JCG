@@ -27,6 +27,8 @@ object CGMatcher {
 
     val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/CallSite")
     val callSitesAnnotationType = ObjectType("lib/annotations/callgraph/CallSites")
+    val invokedConstructorType = ObjectType("lib/annotations/callgraph/InvokedConstructor")
+    val invokedConstructorsType = ObjectType("lib/annotations/callgraph/InvokedConstructors")
 
     def main(args: Array[String]): Unit = {
         val p = Project(new File(args(0)))
@@ -45,17 +47,25 @@ object CGMatcher {
                         for (annotation ← method.annotations) {
 
                             val callSiteAnnotations =
-                                if (annotation.annotationType == callSiteAnnotationType)
+                                if (annotation.annotationType == callSiteAnnotationType ||
+                                    annotation.annotationType == invokedConstructorType)
                                     List(annotation)
-                                else if (annotation.annotationType == callSitesAnnotationType)
+                                else if (annotation.annotationType == callSitesAnnotationType ||
+                                    annotation.annotationType == invokedConstructorsType)
                                     getAnnotations(annotation, "value")
                                 else
                                     Nil
 
                             for (callSiteAnnotation ← callSiteAnnotations) {
                                 val line = getLineNumber(callSiteAnnotation)
-                                val name = getString(callSiteAnnotation, "name")
-                                val returnType = getType(callSiteAnnotation, "returnType")
+                                val name =
+                                    if (callSiteAnnotation.annotationType == callSiteAnnotationType)
+                                        getString(callSiteAnnotation, "name")
+                                    else "<init>"
+                                val returnType =
+                                    if (callSiteAnnotation.annotationType == callSiteAnnotationType)
+                                        getType(callSiteAnnotation, "returnType")
+                                    else VoidType
                                 val parameterTypes = getParameterList(callSiteAnnotation)
                                 val annotatedMethod = convertMethod(method)
                                 val tmp = computedCallSites.callSites.filter { cs ⇒
@@ -66,7 +76,11 @@ object CGMatcher {
                                     cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
                                 } match {
                                     case Some(computedCallSite) ⇒
-                                        val annotatedTargets = getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
+                                        val annotatedTargets =
+                                            if (callSiteAnnotation.annotationType == callSiteAnnotationType)
+                                                getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
+                                            else
+                                                List(getString(callSiteAnnotation, "receiverType"))
                                         for (annotatedTgt ← annotatedTargets) {
                                             if (!computedCallSite.targets.contains(annotatedTgt)) {
                                                 println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
