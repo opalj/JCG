@@ -9,6 +9,7 @@ import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
+import com.ibm.wala.ssa.IR;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
@@ -36,8 +37,7 @@ public class WalaJCGAdapter {
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
         System.out.println("created CH");
 
-        Iterable<Entrypoint> entrypoints = //Util.makeMainEntrypoints(scope, classHierarchy);
-                new AllApplicationEntrypoints(scope, classHierarchy);
+        Iterable<Entrypoint> entrypoints = new AllApplicationEntrypoints(scope, classHierarchy);
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
         options.setReflectionOptions(AnalysisOptions.ReflectionOptions.NO_FLOW_TO_CASTS); // todo major speed up
         System.out.println("created options");
@@ -69,18 +69,28 @@ public class WalaJCGAdapter {
 
 
         for (IClass clazz : classHierarchy) {
-            String pck = clazz.getName().getPackage().toString();
+            //String pck = clazz.getName().getPackage().toString();
             if (clazz.getClassLoader().getName().toString().equals("Primordial"))
                 continue;
             System.out.println(clazz);
             for (IMethod method : clazz.getDeclaredMethods()) {
 
-                CGNode cgNode = callGraph.getNode(method, Everywhere.EVERYWHERE);
+                Iterator<CallSiteReference> callSiteIter;
+                CGNode cgNode = null;
+                if (cgAlgorithm.equals("CHA")) {
+                    IR ir = cache.getIR(method);
+                    if (ir == null)
+                        continue;
+                    callSiteIter = ir.iterateCallSites();
+                } else {
+                    cgNode = callGraph.getNode(method, Everywhere.EVERYWHERE);
 
-                if (cgNode == null)
-                    continue;
+                    if (cgNode == null)
+                        continue;
 
-                Iterator<CallSiteReference> callSiteIter = cgNode.iterateCallSites();
+                    callSiteIter = cgNode.iterateCallSites();
+                }
+
                 while (callSiteIter.hasNext()) {
 
                     CallSiteReference csr = callSiteIter.next();
@@ -93,9 +103,9 @@ public class WalaJCGAdapter {
 
                     JSONArray callTargets = new JSONArray();
 
-                    if (cgAlgorithm == "CHA") {
+                    if (cgAlgorithm.equals("CHA")) {
                         for (IMethod tgt : classHierarchy.getPossibleTargets(clazz, csr.getDeclaredTarget())) {
-                            callTargets.add(createMethodObject(tgt.getReference()));
+                            callTargets.add(tgt.getDeclaringClass().getName().toString().substring(1));
                         }
                     } else {
                         for (CGNode tgt : callGraph.getPossibleTargets(cgNode, csr)) {
