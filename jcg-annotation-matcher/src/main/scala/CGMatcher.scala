@@ -30,10 +30,10 @@ object CGMatcher {
     val invokedConstructorType = ObjectType("lib/annotations/callgraph/InvokedConstructor")
     val invokedConstructorsType = ObjectType("lib/annotations/callgraph/InvokedConstructors")
 
-    def main(args: Array[String]): Unit = {
-        val p = Project(new File(args(0)))
+    def matchCallSites(tgtJar: String, jsonPath: String): (Int, Int) = {
+        val p = Project(new File(tgtJar))
 
-        val json = Json.parse(new FileInputStream(new File(args(1))))
+        val json = Json.parse(new FileInputStream(new File(jsonPath)))
         implicit val methodReads: Reads[Method] = Json.reads[Method]
         implicit val callSiteReads: Reads[CallSite] = Json.reads[CallSite]
         implicit val callSitesReads: Reads[CallSites] = Json.reads[CallSites]
@@ -41,7 +41,8 @@ object CGMatcher {
         jsResult match {
             case _: JsSuccess[CallSites] ⇒
                 val computedCallSites = jsResult.get
-
+                var missedTargets = 0
+                var missedCallSites = 0
                 for (clazz ← p.allProjectClassFiles) {
                     for ((method, _) ← clazz.methodsWithBody) {
                         for (annotation ← method.annotations) {
@@ -84,21 +85,27 @@ object CGMatcher {
                                         for (annotatedTgt ← annotatedTargets) {
                                             if (!computedCallSite.targets.contains(annotatedTgt)) {
                                                 println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
+                                                missedTargets += 1
                                             } else {
                                                 println("found it")
                                             }
                                         }
                                     case _ ⇒
                                         println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
+                                        missedCallSites +=1
                                 }
                             }
                         }
                     }
                 }
+                (missedTargets, missedCallSites)
             case _ ⇒
-                println("Unable to parse json")
+                throw new RuntimeException("Unable to parse json")
         }
+    }
 
+    def main(args: Array[String]): Unit = {
+        matchCallSites(args(0), args(1))
     }
 
     def convertMethod(method: org.opalj.br.Method): Method = {

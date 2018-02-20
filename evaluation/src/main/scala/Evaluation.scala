@@ -13,6 +13,8 @@ object Evaluation {
                     println(s"soot $cgAlgo")
                     SootJCGAdatper.main(Array(cgAlgo, tgt.getAbsolutePath, rtJar, s"soot-$cgAlgo-${tgt.getName}.json"))
                     System.gc()
+                    val (x, y) = CGMatcher.matchCallSites(tgt.getAbsolutePath, s"soot-$cgAlgo-${tgt.getName}.json")
+                    println(x + " " + y)
                 }
 
                 //run wala
@@ -20,6 +22,7 @@ object Evaluation {
                     println(s"wala $cgAlgo")
                     WalaJCGAdapter.main(Array(cgAlgo, tgt.getAbsolutePath, s"wala-$cgAlgo-${tgt.getName}.json"))
                     System.gc()
+                    CGMatcher.matchCallSites(tgt.getAbsolutePath, s"wala-$cgAlgo-${tgt.getName}.json")
                 }
             }
         }
