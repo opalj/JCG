@@ -152,7 +152,7 @@ public class WalaJCGAdapter {
 
     //TODO add ; in case of L - test this
     private static String toJVMString(TypeReference type) {
-        if (type.isClassType() || type.isArrayType()) {
+        if (type.isClassType() || (type.isArrayType() && type.getArrayElementType().isClassType())) {
             return type.getName().toString() + ";";
         } else {
             return type.getName().toString();
