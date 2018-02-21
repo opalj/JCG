@@ -81,36 +81,25 @@ public class ExpressionPrinter {
 	private static int[] values = {0, 1, 2, 3, 4}; 
 	
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructor(receiverType = "lib/IdentityExpression", parameterTypes = {Expression.class}, line = 115)
-    @InvokedConstructor(receiverType = "lib/SquareExpression", parameterTypes = {Expression.class}, line = 115)
-    @InvokedConstructor(receiverType = "lib/IncrementExpression", parameterTypes = {Expression.class}, line = 115)
-    @InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {Expression.class}, line = 115)
-    @InvokedConstructor(receiverType = "app/ExpressionPrinter$ExpressionStringifier", line = 117)
-    @CallSite(name = "accept",
-    	resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression"),
-    			@ResolvedMethod(receiverType = "lib/IdentityExpression"),
-    			@ResolvedMethod(receiverType = "lib/IncrementExpression")},
-    	returnType = String.class,
-        parameterTypes = {Function.class},
-    	line = 118)
+    @InvokedConstructor(receiverType = "app/ExpressionPrinter$ExpressionStringifier", line = 106)
     @CallSite(name = "clone",
     	resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/int[]")},
     	returnType = int[].class, isDynamic = true,
-    	line = 120)
+    	line = 109)
     @CallSite(name = "incrementAll",
     	resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter")},
     	parameterTypes = {int[].class},
     	returnType = Expression[].class, isDynamic = true,
-    	line = 122)
+    	line = 111)
     @CallSite(name = "asList", returnType = List.class,
 		resolvedMethods = {@ResolvedMethod(receiverType = "java/util/Arrays")},
 		parameterTypes = {Expression[].class}, isDynamic = true,
-		line = 124)
+		line = 113)
     @CallSite(name = "toConstant",
 		resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter$ZeroConstant")},
 		parameterTypes = {int[].class},
 		returnType = Expression[].class, isDynamic = true,
-		line = 126)
+		line = 115)
     public static void main(final String[] args) {
     	Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
     	Supplier<ExpressionPrinter> instance = ExpressionPrinter::instance;
@@ -126,7 +115,7 @@ public class ExpressionPrinter {
     	Constant zero = constantSupplier.get();
     }
     
-    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 133)
+    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 122)
     @EntryPoint(value = {OPA, CPA})
     static ExpressionPrinter instance() {
     	Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;

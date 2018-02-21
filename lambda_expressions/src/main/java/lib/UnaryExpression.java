@@ -74,12 +74,7 @@ public abstract class UnaryExpression implements Expression {
 	protected Expression expr;
 
 	public abstract IUnaryOperator operator();
-	
-	@InvokedConstructor(receiverType = DecrementExpression.FQN, parameterTypes = {Expression.class}, line = 89)
-	@InvokedConstructor(receiverType = IdentityExpression.FQN, parameterTypes = {Expression.class}, line = 92)
-	@InvokedConstructor(receiverType = IncrementExpression.FQN, parameterTypes = {Expression.class}, line = 95)
-	@InvokedConstructor(receiverType = SquareExpression.FQN, parameterTypes = {Expression.class}, line = 98)
-	@InvokedConstructor(receiverType = IdentityExpression.FQN, parameterTypes = {Expression.class}, line = 106)
+
 	@EntryPoint(value = { OPA, CPA })
 	public static UnaryExpression createUnaryExpressions(UnaryOperator operator, final Expression expr) {
 		UnaryExpression uExpr = null;
@@ -128,10 +123,10 @@ public abstract class UnaryExpression implements Expression {
 	@CallSite(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, resolvedMethods = {
 			@ResolvedMethod(receiverType = UnaryExpression.FQN),
 			@ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)) }, 
-			line = 137)
+			line = 132)
 	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = {Constant.class}, resolvedMethods = {
 			@ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA))}, 
-			line = 137)
+			line = 132)
 	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {
 		return operator().apply(expr.eval(values));

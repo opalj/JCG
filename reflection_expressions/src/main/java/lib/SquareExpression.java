@@ -78,11 +78,6 @@ public final class SquareExpression extends UnaryExpression {
         return expr.toString() + "²";
     }
 
-    @CallSite(name = "eval",
-            returnType = Constant.class,
-            parameterTypes = {Map.class},
-            resolvedMethods = @ResolvedMethod(receiverType = MultOperator.MultExpression.FQN),
-            line = 88)
     @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String, Constant> values) {
         return square.eval(values);

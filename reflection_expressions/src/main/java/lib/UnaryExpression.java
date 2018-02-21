@@ -44,8 +44,8 @@ import static lib.UnaryOperator.IDENTITY;
 /**
  * An abstract unary Expression where the operation has to be implemented
  * via a lambda function.
- *
- * 
+ * <p>
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -79,7 +79,7 @@ public abstract class UnaryExpression implements Expression {
     @CGNote(value = REFLECTION, description = "The first reflective String can be varied by an enumeration but all possible call targets can be found.")
     @CallSite(name = "<init>", parameterTypes = {Expression.class},
             resolvedMethods = {@ResolvedMethod(receiverType = SquareExpression.FQN),
-            		@ResolvedMethod(receiverType = IdentityExpression.FQN, iff = {@ResolvingCondition(mode = {OPA, CPA})})},
+                    @ResolvedMethod(receiverType = IdentityExpression.FQN)},
             resolution = TargetResolution.REFLECTIVE, returnType = UnaryExpression.class,
             line = 98)
     @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
@@ -110,8 +110,8 @@ public abstract class UnaryExpression implements Expression {
 
         return uExpr;
     }
-    
-    @EntryPoint(value = { OPA, CPA })
+
+    @EntryPoint(value = {OPA, CPA})
     public UnaryExpression(Expression expr) {
         this.expr = expr;
     }

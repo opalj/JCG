@@ -87,11 +87,6 @@ public class Constant implements Expression {
         return this;
     }
 
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionVisitor")},
-            returnType = Object.class,
-            parameterTypes = {Constant.class},
-            line = 97)
     @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor) {
         return visitor.visit(this);

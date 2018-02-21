@@ -38,9 +38,9 @@ import static lib.UnaryOperator.*;
 import lib.*;
 
 /**
- * This class defines an application use case of the expression library featuring reflection. 
+ * This class defines an application use case of the expression library featuring reflection.
  * It just creates a binary expression representing the mason's angle (3²+4²=5²) and does nothing with it.
- * <!-- 
+ * <!--
  * <p>
  * <p>
  * <b>NOTE</b><br>
@@ -54,9 +54,8 @@ import lib.*;
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
  * <p>
- * 
+ * <p>
  * -->
- *
  *
  * @author Michael Eichberg
  * @author Michael Reif
@@ -65,16 +64,12 @@ import lib.*;
 public class MasonsExpressions {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-	@CallSite(name = "createBinaryExpression", returnType = BinaryExpression.class,
-            resolvedMethods = {@ResolvedMethod(receiverType = BinaryExpression.FQN)},
-            resolution = TargetResolution.REFLECTIVE,
-            parameterTypes = {String.class, Expression.class, Expression.class},
-            line = 76)
-	@InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {int.class}, line = 77)
-	@InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {int.class}, line = 78)
-	public static void main(final String[] args) throws Exception {
-		BinaryExpression masonsAngle = BinaryExpression.createBinaryExpression("Plus", 
-				(Expression) UnaryExpression.createUnaryExpressions(SQUARE, new Constant(3)), 
-				(Expression) UnaryExpression.createUnaryExpressions(SQUARE, new Constant(4)));
-	}
+    public static void main(final String[] args) throws Exception {
+        Constant c1 = new Constant(3);
+        Constant c2 = new Constant(4);
+        Expression left = UnaryExpression.createUnaryExpressions(SQUARE, c1);
+        Expression right = UnaryExpression.createUnaryExpressions(IDENTITY, c2);
+        BinaryExpression.createBinaryExpression("Plus", left, right);
+        BinaryExpression.createBasicBinaryExpression("Plus", left, right);
+    }
 }

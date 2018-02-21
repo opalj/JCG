@@ -43,11 +43,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class Main {
 
-	@SuppressWarnings("unused")
-	@InvokedConstructor(receiverType = "lib/Negation", parameterTypes = {ArithmeticExpression.class}, line = 51)
-	@InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {int.class}, line = 51)
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
 	public static void main(String[] args) {
-		Negation minusOne = new Negation(new Constant(1));
 	}
 }
