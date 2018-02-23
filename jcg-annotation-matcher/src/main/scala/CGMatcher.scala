@@ -13,6 +13,10 @@ import org.opalj.br.ObjectType
 import org.opalj.br.StringValue
 import org.opalj.br.Type
 import org.opalj.br.VoidType
+import org.opalj.log.GlobalLogContext
+import org.opalj.log.LogContext
+import org.opalj.log.LogMessage
+import org.opalj.log.OPALLogger
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json
 import play.api.libs.json.Reads
@@ -23,6 +27,10 @@ case class CallSite(declaredTarget: Method, line: Int, method: Method, targets: 
 
 case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String])
 
+class DevNullLogger extends OPALLogger {
+    override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
+}
+
 object CGMatcher {
 
     val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/CallSite")
@@ -31,7 +39,9 @@ object CGMatcher {
     val invokedConstructorsType = ObjectType("lib/annotations/callgraph/InvokedConstructors")
 
     def matchCallSites(tgtJar: String, jsonPath: String): (Int, Int) = {
+        OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
         val p = Project(new File(tgtJar))
+
 
         val json = Json.parse(new FileInputStream(new File(jsonPath)))
         implicit val methodReads: Reads[Method] = Json.reads[Method]

@@ -22,6 +22,7 @@ import org.json.simple.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 
 public class WalaJCGAdapter {
@@ -31,35 +32,30 @@ public class WalaJCGAdapter {
         String testfile = args[1];
         String outputPath = args[2];
 
-        AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(testfile, null);
-        System.out.println("created scope");
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        File ex = new File(cl.getResource("exclusions.txt").getFile());
+        AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(testfile, ex);
 
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
-        System.out.println("created CH");
 
-        Iterable<Entrypoint> entrypoints = new AllApplicationEntrypoints(scope, classHierarchy);
+        Iterable<Entrypoint> entrypoints = Util.makeMainEntrypoints(scope, classHierarchy);//new AllSubtypesEntrypoints(scope, classHierarchy);
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
-        options.setReflectionOptions(AnalysisOptions.ReflectionOptions.NO_FLOW_TO_CASTS); // todo major speed up
-        System.out.println("created options");
+        options.setReflectionOptions(AnalysisOptions.ReflectionOptions.FULL); // todo major speed up
 
 
         CallGraph callGraph = null;
         AnalysisCache cache = new AnalysisCacheImpl();
         if (cgAlgorithm.equals("0-CFA")) {
             SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(options, cache, classHierarchy, scope);
-            System.out.println("created 0-CFA builder");
             callGraph = ncfaBuilder.makeCallGraph(options);
         } else if (cgAlgorithm.equals("0-1-CFA")) {
-            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeVanillaZeroOneCFABuilder(options, cache, classHierarchy, scope);
+            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
-            System.out.println("created 0-1-CFA builder");
         } else if (cgAlgorithm.equals("1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
-            System.out.println("created 1-CFA builder");
         } else if (cgAlgorithm.equals("RTA")) {
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
-            System.out.println("created RTA builder");
             callGraph = rtaBuilder.makeCallGraph(options, new NullProgressMonitor());
         }
         System.out.println("created CallGraph");
@@ -72,7 +68,6 @@ public class WalaJCGAdapter {
             //String pck = clazz.getName().getPackage().toString();
             if (clazz.getClassLoader().getName().toString().equals("Primordial"))
                 continue;
-            System.out.println(clazz);
             for (IMethod method : clazz.getDeclaredMethods()) {
 
                 Iterator<CallSiteReference> callSiteIter;
