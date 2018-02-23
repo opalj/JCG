@@ -78,7 +78,7 @@ public class PlusOperator extends Operator {
         
         @EntryPoint(value = { OPA, CPA })
         public AddExpression(Expression left, Expression right) {
-         this.left = left;
+            this.left = left;
             this.right = right;
         }
 
@@ -99,7 +99,7 @@ public class PlusOperator extends Operator {
     }
 
     @EntryPoint(value = {OPA})
-    static BinaryExpression createBinaryExpression(Expression left, Expression right ) {
+    static BinaryExpression createBinaryExpression(Expression left, Expression right) {
         return new AddExpression(left, right);
     }
 

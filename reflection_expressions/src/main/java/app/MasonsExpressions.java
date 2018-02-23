@@ -60,6 +60,7 @@ import lib.*;
  * @author Michael Eichberg
  * @author Michael Reif
  * @author Roberts Kolosovs
+ * @author Florian Kuebler
  */
 public class MasonsExpressions {
 
