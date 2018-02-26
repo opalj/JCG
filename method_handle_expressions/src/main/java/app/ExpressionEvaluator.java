@@ -33,6 +33,7 @@ import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.DESKTOP_APP;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
+import lib.*;
 import lib.annotations.properties.EntryPoint;
 
 /**
@@ -64,7 +65,13 @@ import lib.annotations.properties.EntryPoint;
 public class ExpressionEvaluator {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    public static void main(final String[] args) {
- 
+    public static void main(final String[] args) throws Throwable {
+        Constant c1 = new Constant(1);
+        Constant c2 = new Constant(2);
+        UnaryExpression.createUnaryExpressions(UnaryOperator.IDENTITY, c1);
+        UnaryExpression.createUnaryExpressions(UnaryOperator.SQUARE, c2);
+
+        BinaryExpression.createBinaryExpression("Plus", c1, c2);
+        BinaryExpression.createBinaryExpression("Mult", c1, c2);
     }
 }
