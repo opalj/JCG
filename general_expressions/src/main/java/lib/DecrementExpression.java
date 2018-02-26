@@ -93,17 +93,10 @@ public class DecrementExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "checkIfDecrement", resolvedMethods = {
     		@ResolvedMethod(receiverType = DecrementExpression.FQN)},
-    		parameterTypes = {Expression.class}, line = 109)
-    @CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {
-    		@ResolvedMethod(receiverType = AddExpression.FQN),
+    		parameterTypes = {Expression.class}, line = 102)
+    @CallSite(name = "eval", returnType = Constant.class, resolvedMethods =
     		@ResolvedMethod(receiverType = Constant.FQN),
-    		@ResolvedMethod(receiverType = IdentityExpression.FQN),
-    		@ResolvedMethod(receiverType = IncrementExpression.FQN),
-    		@ResolvedMethod(receiverType = MultExpression.FQN),
-    		@ResolvedMethod(receiverType = SquareExpression.FQN),
-    		@ResolvedMethod(receiverType = SubExpression.FQN),
-    		@ResolvedMethod(receiverType = Variable.FQN)},
-    		parameterTypes = {Map.class}, line = 111)
+    		parameterTypes = {Map.class}, line = 104)
 	public Constant eval(Map<String, Constant> values) {
 		try {
 			checkIfDecrement(this.expr);

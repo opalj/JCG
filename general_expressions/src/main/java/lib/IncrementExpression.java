@@ -77,15 +77,6 @@ public class IncrementExpression extends UnaryExpression {
         return visitor.visit(this);
     }
 
-    @CallSite(name= "toString", resolvedMethods = {
-            @ResolvedMethod(receiverType = IncrementExpression.FQN),
-            @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            @ResolvedMethod(receiverType = SquareExpression.FQN),
-            @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-            @ResolvedMethod(receiverType = AddExpression.FQN),
-            @ResolvedMethod(receiverType = SubExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)),
-            @ResolvedMethod(receiverType = MultExpression.FQN)
-    }, returnType = String.class, line = 91)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         String exprString = expr.toString();
