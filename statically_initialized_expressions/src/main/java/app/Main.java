@@ -45,5 +45,9 @@ public class Main {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
 	public static void main(String[] args) {
+    	Constant c = new Constant(1);
+    	Negation n = new Negation(c);
+    	n.printName();
+    	n.eval(new Map<>());
 	}
 }

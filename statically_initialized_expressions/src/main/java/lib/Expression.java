@@ -74,7 +74,7 @@ public interface Expression {
 	@EntryPoint(value = {OPA, CPA})
 	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 77)
 	static String init() {
-		StaticInitializerTest.staticCall();
+		StaticInitializerTest.staticCall("Expression");
 		return "expression";
 	}
 

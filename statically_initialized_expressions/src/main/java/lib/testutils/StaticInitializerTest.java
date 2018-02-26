@@ -60,7 +60,7 @@ public class StaticInitializerTest {
     public static final String FQN = "lib/testutils/StaticInitializerTest";
 
     @EntryPoint(value = {OPA, CPA})
-    public static void staticCall(){
-        // method stub
+    public static void staticCall(String s){
+        System.out.println("initialized: " + s);
     }
 }

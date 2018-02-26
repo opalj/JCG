@@ -72,11 +72,10 @@ import lib.testutils.StaticInitializerTest;
 public interface ArithmeticExpression extends Expression {
 
 	static String name = init();
-	
-	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 79)
+
     @EntryPoint(value = {OPA, CPA})
 	static String init() {
-		StaticInitializerTest.staticCall();
+		StaticInitializerTest.staticCall("ArithmeticExpression");
 		return "arithmetic expression";
 	}
 

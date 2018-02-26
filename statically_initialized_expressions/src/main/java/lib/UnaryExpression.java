@@ -76,7 +76,7 @@ public class UnaryExpression implements ArithmeticExpression{
 
 	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 79)
 	private static void init(){
-		StaticInitializerTest.staticCall();
+		StaticInitializerTest.staticCall("UnaryExpression");
 		name = "unary expression";
 	}
 

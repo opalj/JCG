@@ -77,7 +77,7 @@ public class Constant implements ArithmeticExpression{
 
 	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 80)
 	private static String init(){
-		StaticInitializerTest.staticCall();
+		StaticInitializerTest.staticCall("Constant");
 		return "constant";
 	}
 	
