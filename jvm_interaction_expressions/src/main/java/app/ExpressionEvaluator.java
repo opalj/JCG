@@ -81,10 +81,6 @@ public class ExpressionEvaluator {
     static {ENV.add("x", new Constant(1));}
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructor(receiverType = "lib/Stack", line = 133)
-    @InvokedConstructor(receiverType = "lib/Constant", parameterTypes = {int.class}, line = 136)
-    @CallSite(name = "clone", returnType = String[].class, resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/Object")}, line = 90)
-    @CallSite(name = "push", parameterTypes = {Constant.class}, resolvedMethods = {@ResolvedMethod(receiverType = "lib/Stack")}, line = 136)
     public static void main(final String[] args) {
 
         String[] expressions = args.clone();
@@ -93,7 +89,7 @@ public class ExpressionEvaluator {
 
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method <Thread>.dispatchUncaughtException is not dead")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 100)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 96)
             @Override
             @EntryPoint(value = {OPA, CPA})
             public void uncaughtException(Thread t, Throwable e) {
@@ -108,7 +104,7 @@ public class ExpressionEvaluator {
             // This is an entry point!
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method<Thread>.run is called by the jvm")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 115)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 111)
             @EntryPoint(value = {OPA, CPA})
             @Override
             public void run() {
@@ -117,6 +113,11 @@ public class ExpressionEvaluator {
                 super.run();
             }
         });
+
+        new AltConstant(1).eval(new Map<>());
+        System.gc();
+
+        new Thread(new AltConstant(2)).start();
 
         synchronized (ExpressionEvaluator.class) {
             // all methods of the class object of ExpressionEvaluatior may be called...
