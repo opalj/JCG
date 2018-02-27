@@ -33,10 +33,13 @@ public class SootJCGAdatper {
         options.wholeProgramAnalysis();
         options.keepLineNumbers();
         options.allowPhantomReferences();
+        options.noBodiesForExcluded();
 
         CallGraphPhaseOptions cgOptions = new CallGraphPhaseOptions();
-        cgOptions.processAllReachable();//cgOptions.processOnlyEntryPoints();
-        cgOptions.libraryMode(); //TODO
+        options.addPhaseOptions(cgOptions);
+
+        cgOptions.processAllReachable();
+        cgOptions.libraryModeSignatureResolution(); //TODO
 
         CallGraphPhaseSubOptions cgModeOption = null;
         switch (cgAlgorithm) {
@@ -55,9 +58,13 @@ public class SootJCGAdatper {
         }
         cgOptions.addSubOption(cgModeOption);
 
+
         AnalysisTarget analysisTarget = new AnalysisTarget();
         analysisTarget.classPath(cp);
         analysisTarget.processPath(targetJar);
+
+        System.out.println(options.toString());
+        System.out.println(analysisTarget);
 
         SootRun run = new SootRun(options, analysisTarget);
         SootResult result = run.perform();
