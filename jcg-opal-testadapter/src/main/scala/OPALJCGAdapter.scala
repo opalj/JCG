@@ -38,8 +38,9 @@ object OPALJCGAdapter {
             cf ← p.allProjectClassFiles
             (m, code) ← cf.methodsWithBody
             (pc, tgts) ← cg.calls(m)
+            line = code.lineNumber(pc).getOrElse(-1)
         } yield Json.obj(
-            "line" → code.lineNumber(pc),
+            "line" → line,
             "method" → createMethodObject(m),
             "declaredTarget" → createMethodObject(code.instructions(pc).asMethodInvocationInstruction),
             "targets" → tgts.map(_.classFile.thisType.fqn)
