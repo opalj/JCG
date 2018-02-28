@@ -29,7 +29,10 @@
  */
 package app;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
+import lib.*;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.properties.EntryPoint;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,18 +40,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import lib.Constant;
-import lib.DecrementExpression;
-import lib.Expression;
-import lib.ExpressionVisitor;
-import lib.IdentityExpression;
-import lib.IncrementExpression;
-import lib.Map;
-import lib.SquareExpression;
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.InvokedConstructor;
-import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.properties.EntryPoint;
+
+import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
  * 
@@ -81,25 +74,25 @@ public class ExpressionPrinter {
 	private static int[] values = {0, 1, 2, 3, 4}; 
 	
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @InvokedConstructor(receiverType = "app/ExpressionPrinter$ExpressionStringifier", line = 106)
+    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "app/ExpressionPrinter$ExpressionStringifier"), line = 99)
     @CallSite(name = "clone",
     	resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/int[]")},
     	returnType = int[].class, isDynamic = true,
-    	line = 109)
+    	line = 102)
     @CallSite(name = "incrementAll",
     	resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter")},
     	parameterTypes = {int[].class},
     	returnType = Expression[].class, isDynamic = true,
-    	line = 111)
+    	line = 104)
     @CallSite(name = "asList", returnType = List.class,
 		resolvedMethods = {@ResolvedMethod(receiverType = "java/util/Arrays")},
 		parameterTypes = {Expression[].class}, isDynamic = true,
-		line = 113)
+		line = 106)
     @CallSite(name = "toConstant",
 		resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter$ZeroConstant")},
 		parameterTypes = {int[].class},
 		returnType = Expression[].class, isDynamic = true,
-		line = 115)
+		line = 108)
     public static void main(final String[] args) {
     	Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
     	Supplier<ExpressionPrinter> instance = ExpressionPrinter::instance;
@@ -114,8 +107,8 @@ public class ExpressionPrinter {
     	Supplier<Constant> constantSupplier = new OneConstant().getSuperToConstant();
     	Constant zero = constantSupplier.get();
     }
-    
-    @InvokedConstructor(receiverType = "app/ExpressionPrinter", line = 122)
+
+	@CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "app/ExpressionPrinter"), line = 122)
     @EntryPoint(value = {OPA, CPA})
     static ExpressionPrinter instance() {
     	Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
@@ -173,7 +166,7 @@ public class ExpressionPrinter {
 	        		@ResolvedMethod(receiverType = "lib/IncrementExpression")},
 	        returnType = Object.class, isDynamic = true,
 	        parameterTypes = {Function.class},
-	        line = 189)
+	        line = 171)
 		public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
 			return func.apply(e, this::visit);
 		}

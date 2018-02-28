@@ -28,19 +28,25 @@
  */
 package lib.annotations.callgraph;
 
-import java.lang.annotation.*;
-import static java.lang.annotation.RetentionPolicy.*;
-import static java.lang.annotation.ElementType.*;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * A concrete call must be resolved if all these conditions are true.
+ * Describes a specific method to which a call site must not resolve.
  *
  * @author Florian Kuebler
  */
 @Retention(RUNTIME)
 @Target(LOCAL_VARIABLE)
-public @interface ResolvingCondition {
+public @interface ProhibitedMethod {
 
-	CallGraphAlgorithm containedInMax() default CallGraphAlgorithm.TOP;
-	AnalysisMode[] mode() default {AnalysisMode.DESKTOP_APP};
+	/*
+	 * The type name of the receiver using JVM notation (e.g.,
+	 * "java/lang/Object").
+	 */
+	String receiverType();
+
 }

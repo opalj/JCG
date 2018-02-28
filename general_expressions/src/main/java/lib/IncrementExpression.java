@@ -30,12 +30,10 @@
 
 package lib;
 
-import lib.annotations.callgraph.*;
 import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
 
 /**
  * A IncrementExpression represents an unary operation that increments a constant.

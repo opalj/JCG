@@ -30,7 +30,6 @@
 package lib;
 
 import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.InvokedConstructor;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
@@ -86,7 +85,7 @@ public abstract class BinaryExpression implements Expression {
         return visitor.visit(this);
     }
 
-    @InvokedConstructor(receiverType = "lib/BinaryExpression$1", line = 97)
+    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "lib/BinaryExpression$1"), line = 97)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             Operator operator,
@@ -127,7 +126,7 @@ public abstract class BinaryExpression implements Expression {
     				@ResolvedMethod(receiverType = "lib/PlusOperator"), 
     				@ResolvedMethod(receiverType = "lib/SubOperator")}, 
     	    parameterTypes = {Expression.class, Expression.class},
-    	    returnType = BinaryExpression.class, line = 136) 
+    	    returnType = BinaryExpression.class, line = 135)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             Operator operator,

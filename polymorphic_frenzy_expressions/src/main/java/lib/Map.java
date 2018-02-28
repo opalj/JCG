@@ -31,14 +31,14 @@
 package lib;
 
 import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.InvokedConstructor;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.*;
+import static lib.annotations.documentation.CGCategory.NOTE;
+import static lib.annotations.documentation.CGCategory.POLYMORPHIC_CALL;
 
 /**
  *
@@ -120,7 +120,7 @@ public class Map<K, V> {
 
     }
 
-    @InvokedConstructor(receiverType = linkedEntryReceiverType, parameterTypes = {Object.class, Object.class}, line = 128)
+    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = linkedEntryReceiverType), parameterTypes = {Object.class, Object.class}, line = 128)
     @CallSite(name = "getNextEntry", returnType = Map.LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 139)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {

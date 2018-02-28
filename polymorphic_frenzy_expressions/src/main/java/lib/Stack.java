@@ -30,11 +30,10 @@
 
 package lib;
 
+import lib.annotations.properties.EntryPoint;
+
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.NATIVE_CALLBACK;
-import lib.annotations.documentation.CGNote;
-import lib.annotations.properties.EntryPoint;
 
 /**
  * A array-based stack implementation.

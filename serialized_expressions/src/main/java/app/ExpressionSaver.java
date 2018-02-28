@@ -29,10 +29,6 @@
  */
 package app;
 
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
-import static lib.annotations.documentation.CGCategory.*;
-
-import lib.annotations.callgraph.InvokedConstructor;
 import lib.annotations.properties.EntryPoint;
 
 import java.io.ObjectOutputStream;
@@ -40,7 +36,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.FileInputStream;
-import java.awt.EventQueue;
 
 import lib.*;
 

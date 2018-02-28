@@ -35,7 +35,6 @@ import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
 
 /**
  * An abstract unary Expression where the operation has to be implemented via a
@@ -121,12 +120,10 @@ public abstract class UnaryExpression implements Expression {
 	public abstract String toString();
 
 	@CallSite(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, resolvedMethods = {
-			@ResolvedMethod(receiverType = UnaryExpression.FQN),
-			@ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA)) }, 
-			line = 132)
-	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = {Constant.class}, resolvedMethods = {
-			@ResolvedMethod(receiverType = DecrementExpression.DecrementOperator.FQN, iff = @ResolvingCondition(containedInMax = CHA))}, 
-			line = 132)
+			@ResolvedMethod(receiverType = UnaryExpression.FQN) },
+			line = 129)
+	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = {Constant.class}, resolvedMethods = { }, //TODO
+			line = 120)
 	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {
 		return operator().apply(expr.eval(values));

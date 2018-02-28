@@ -30,13 +30,11 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.CPA;
-import static lib.annotations.callgraph.AnalysisMode.OPA;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 import lib.testutils.StaticInitializerTest;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
  * This interface extends the general Expression and represents a arithmetic expression 

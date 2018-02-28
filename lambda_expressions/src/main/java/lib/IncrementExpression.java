@@ -38,7 +38,6 @@ import java.util.function.Function;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.callgraph.CallGraphAlgorithm.CHA;
 import static lib.annotations.callgraph.TargetResolution.DYNAMIC;
 import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
 
@@ -105,7 +104,6 @@ public class IncrementExpression extends UnaryExpression {
             @ResolvedMethod(receiverType = IncrementExpression.FQN),
             @ResolvedMethod(receiverType = IdentityExpression.FQN),
             @ResolvedMethod(receiverType = SquareExpression.FQN),
-            @ResolvedMethod(receiverType = DecrementExpression.FQN, iff = @ResolvingCondition(containedInMax = CHA))
     }, returnType = String.class, line = 112)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
