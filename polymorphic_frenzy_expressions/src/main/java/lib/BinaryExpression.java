@@ -85,7 +85,7 @@ public abstract class BinaryExpression implements Expression {
         return visitor.visit(this);
     }
 
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "lib/BinaryExpression$1"), line = 97)
+    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "lib/BinaryExpression$1"), line = 96)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             Operator operator,
