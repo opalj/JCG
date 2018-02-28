@@ -37,10 +37,11 @@ public class WalaJCGAdapter {
         AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(testfile, ex);
 
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
-
-        Iterable<Entrypoint> entrypoints = Util.makeMainEntrypoints(scope, classHierarchy);//new AllSubtypesEntrypoints(scope, classHierarchy);
+        //Iterable<Entrypoint> entrypoints = new AllSubtypesOfApplicationEntrypoints(scope, classHierarchy);
+        //Iterable<Entrypoint> entrypoints = new AllApplicationEntrypoints(scope, classHierarchy);
+        Iterable<Entrypoint> entrypoints = Util.makeMainEntrypoints(scope, classHierarchy);
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
-        options.setReflectionOptions(AnalysisOptions.ReflectionOptions.FULL); // todo major speed up
+        options.setReflectionOptions(AnalysisOptions.ReflectionOptions.FULL);
 
 
         CallGraph callGraph = null;
@@ -58,7 +59,6 @@ public class WalaJCGAdapter {
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
             callGraph = rtaBuilder.makeCallGraph(options, new NullProgressMonitor());
         }
-        System.out.println("created CallGraph");
 
         JSONArray callSites = new JSONArray();
         JSONObject callSitesObject = new JSONObject();
