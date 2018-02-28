@@ -16,6 +16,7 @@ import play.api.libs.json.Json
 object OPALJCGAdapter {
     def main(args: Array[String]): Unit = {
         val tgtPath = args(1)
+        val cp = args(2)
 
         val baseConfig: Config = ConfigFactory.load()
         val configKey = "org.opalj.br.analyses.cg.CallGraphKey.factory"
@@ -30,22 +31,24 @@ object OPALJCGAdapter {
         val logContext = new StandardLogContext
         OPALLogger.register(logContext)
 
-        val p = Project(new File(tgtPath), logContext, config)
+        val p = Project(Array(new File(tgtPath)), Array(new File(cp)), logContext, config)
         val cg = p.get(CallGraphKey)
 
         val callSites = for {
-            m ← p.allMethodsWithBody
-            body = m.body.get
+            cf ← p.allProjectClassFiles
+            (m, code) ← cf.methodsWithBody
             (pc, tgts) ← cg.calls(m)
         } yield Json.obj(
-            "line" → body.lineNumber(pc),
+            "line" → code.lineNumber(pc),
             "method" → createMethodObject(m),
-            "declaredTarget" → createMethodObject(body.instructions(pc).asMethodInvocationInstruction),
+            "declaredTarget" → createMethodObject(code.instructions(pc).asMethodInvocationInstruction),
             "targets" → tgts.map(_.classFile.thisType.fqn)
         )
         val json = Json.obj("callSites" → new JsArray(callSites))
 
-        val pw = new PrintWriter(new File(args(2)))
+        println(Json.prettyPrint(json))
+
+        val pw = new PrintWriter(new File(args(3)))
         pw.write(json.toString())
         pw.close
 
