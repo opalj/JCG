@@ -21,11 +21,11 @@ public class PostfixExprParser implements IExpressionParser{
 
     @CallSite(name = "compute", returnType = int.class,
             resolvedMethods = {
-                    @ResolvedMethod(receiverType = "lib/BinaryExpr$SubOperator"),
-                    @ResolvedMethod(receiverType = "lib/BinaryExpr$SubOperator")},
+                    @ResolvedMethod(receiverType = "lib/BinaryExpr$DivOperator")},
             prohibitedMethods = {
                     @ProhibitedMethod(receiverType = "lib/BinaryExpr$HiddenOperator"),
-                    @ProhibitedMethod(receiverType = "lib/BinaryExpr$MultOperator")}, line =46)
+                    @ProhibitedMethod(receiverType = "lib/BinaryExpr$MultOperator"),
+                    @ProhibitedMethod(receiverType = "lib/BinaryExpr$SubOperator")}, line =46)
     public Expression parseExpression(String expressionString) {
         Stack<Expression> exprStack = new Stack<Expression>();
         int i = 0;

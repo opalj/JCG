@@ -19,7 +19,6 @@ public class BinaryExpr implements Expression {
 
         public static Operator create(char c){
             switch(c) {
-                case '-': return new SubOperator();
                 case '/': return new DivOperator();
                 default: return null;
             }
