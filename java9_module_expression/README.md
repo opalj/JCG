@@ -50,6 +50,11 @@ The __provides…with__ module directive specifies that a module provides a serv
 The provides part of the directive specifies an interface or abstract class listed in a module’s uses directive and
 the with part of the directive specifies the name of the service provider class that implements the interface or extends the abstract class.
 
+| Testcase | Condition|
+|:--------:|----------|
+|1| M1 defines service, M2 provides implementations. M1's Serviceloader should only find service implementations that are provided.|
+|2| M1 defines service with default method, M2 provides impl which uses the default method, call should be correctly resolved.|
+
 #### The ___open, opens, and opens ... to___ directives aka. reflection
 
 Those directives define which modules are accessible or can be accessed by reflection. By default, reflection is disabled.
