@@ -44,7 +44,7 @@ public class ExprParserFactory {
     @CallSite(name = "eval", returnType = int.class,
             resolvedMethods = {
                     @ResolvedMethod(receiverType = "lib/Constant"),
-                    @ResolvedMethod(receiverType = "lib/AddExpr")},
+                    @ResolvedMethod(receiverType = "lib/BinaryExpr")},
             prohibitedMethods = {
                     @ProhibitedMethod(receiverType = "lib/internal/Variable")}, line = 62)
     public static int[] getServiceResults(String expr) {

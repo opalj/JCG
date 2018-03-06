@@ -1,19 +1,31 @@
 package parser.impl;
 
 import lib.AddExpr;
+import lib.BinaryExpr;
 import lib.Constant;
 import lib.Expression;
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ProhibitedMethod;
+import lib.annotations.callgraph.ResolvedMethod;
 import parser.IExpressionParser;
 
 import java.util.Stack;
 
 public class PostfixExprParser implements IExpressionParser{
 
+    public static final boolean DEBUG = false;
+
     public String parsingNotation() {
         return "postfix";
     }
 
-
+    @CallSite(name = "compute", returnType = int.class,
+            resolvedMethods = {
+                    @ResolvedMethod(receiverType = "lib/BinaryExpr$SubOperator"),
+                    @ResolvedMethod(receiverType = "lib/BinaryExpr$SubOperator")},
+            prohibitedMethods = {
+                    @ProhibitedMethod(receiverType = "lib/BinaryExpr$HiddenOperator"),
+                    @ProhibitedMethod(receiverType = "lib/BinaryExpr$MultOperator")}, line =46)
     public Expression parseExpression(String expressionString) {
         Stack<Expression> exprStack = new Stack<Expression>();
         int i = 0;
@@ -26,7 +38,18 @@ public class PostfixExprParser implements IExpressionParser{
             } else if(cur > 47 && cur < 58){
                 exprStack.push(new Constant(cur));
             } else {
-                return null;
+                BinaryExpr.Operator op = BinaryExpr.OperatorFactory.create(cur);
+                if(op != null && exprStack.size() > 1){
+                    Expression left = exprStack.pop();
+                    Expression right = exprStack.pop();
+                    if(DEBUG){
+                        int tmp = op.compute(left, right, null);
+                        System.out.println(tmp);
+                    }
+                    exprStack.push(new BinaryExpr(left, right, op));
+                } else {
+                    return null;
+                }
             }
             i++;
         }
