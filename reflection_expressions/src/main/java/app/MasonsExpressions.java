@@ -29,13 +29,15 @@
  */
 package app;
 
-import lib.annotations.callgraph.*;
+import lib.BinaryExpression;
+import lib.Constant;
+import lib.Expression;
+import lib.UnaryExpression;
 import lib.annotations.properties.EntryPoint;
 
+import static lib.UnaryOperator.IDENTITY;
+import static lib.UnaryOperator.SQUARE;
 import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.UnaryOperator.*;
-
-import lib.*;
 
 /**
  * This class defines an application use case of the expression library featuring reflection.

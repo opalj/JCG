@@ -30,19 +30,12 @@
 
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.InvokedConstructor;
-import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
-import lib.Constant;
-import lib.Expression;
+
+import java.util.function.Function;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.NOTE;
-
-import java.util.function.Function;
 
 /**
  * An unary expression which represents the decrement function.

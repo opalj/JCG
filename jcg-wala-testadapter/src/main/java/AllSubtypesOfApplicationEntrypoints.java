@@ -7,13 +7,9 @@ import com.ibm.wala.ipa.cha.IClassHierarchy;
 
 import java.util.HashSet;
 
-public class AllSubtypesEntrypoints extends HashSet<Entrypoint> {
-    /**
-     * @param scope governing analyais scope
-     * @param cha governing class hierarchy
-     * @throws IllegalArgumentException if cha is null
-     */
-    public AllSubtypesEntrypoints(AnalysisScope scope, final IClassHierarchy cha) {
+public class AllSubtypesOfApplicationEntrypoints extends HashSet<Entrypoint> {
+
+    public AllSubtypesOfApplicationEntrypoints(AnalysisScope scope, final IClassHierarchy cha) {
 
         if (cha == null) {
             throw new IllegalArgumentException("cha is null");
@@ -32,9 +28,6 @@ public class AllSubtypesEntrypoints extends HashSet<Entrypoint> {
 
     }
 
-    /**
-     * @return true iff klass is loaded by the application loader.
-     */
     private static boolean isApplicationClass(AnalysisScope scope, IClass klass) {
         return scope.getApplicationLoader().equals(klass.getClassLoader().getReference());
     }

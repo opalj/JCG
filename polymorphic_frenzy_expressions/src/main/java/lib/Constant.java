@@ -30,15 +30,10 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
  * This class simply wraps an integer value.

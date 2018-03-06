@@ -31,8 +31,6 @@
 package lib;
 
 import lib.annotations.properties.EntryPoint;
-import lib.Expression;
-import lib.ExpressionVisitor;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;

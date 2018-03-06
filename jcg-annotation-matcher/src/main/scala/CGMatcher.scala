@@ -35,13 +35,10 @@ object CGMatcher {
 
     val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/CallSite")
     val callSitesAnnotationType = ObjectType("lib/annotations/callgraph/CallSites")
-    val invokedConstructorType = ObjectType("lib/annotations/callgraph/InvokedConstructor")
-    val invokedConstructorsType = ObjectType("lib/annotations/callgraph/InvokedConstructors")
 
     def matchCallSites(tgtJar: String, jsonPath: String): (Int, Int) = {
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
         val p = Project(new File(tgtJar))
-
 
         val json = Json.parse(new FileInputStream(new File(jsonPath)))
         implicit val methodReads: Reads[Method] = Json.reads[Method]
@@ -52,46 +49,38 @@ object CGMatcher {
             case _: JsSuccess[CallSites] ⇒
                 val computedCallSites = jsResult.get
                 var missedTargets = 0
-                var missedCallSites = 0
+                var calledProhibitedTargets = 0
                 for (clazz ← p.allProjectClassFiles) {
                     for ((method, _) ← clazz.methodsWithBody) {
                         for (annotation ← method.annotations) {
 
                             val callSiteAnnotations =
-                                if (annotation.annotationType == callSiteAnnotationType ||
-                                    annotation.annotationType == invokedConstructorType)
+                                if (annotation.annotationType == callSiteAnnotationType)
                                     List(annotation)
-                                else if (annotation.annotationType == callSitesAnnotationType ||
-                                    annotation.annotationType == invokedConstructorsType)
+                                else if (annotation.annotationType == callSitesAnnotationType)
                                     getAnnotations(annotation, "value")
                                 else
                                     Nil
 
                             for (callSiteAnnotation ← callSiteAnnotations) {
                                 val line = getLineNumber(callSiteAnnotation)
-                                val name =
-                                    if (callSiteAnnotation.annotationType == callSiteAnnotationType)
-                                        getString(callSiteAnnotation, "name")
-                                    else "<init>"
-                                val returnType =
-                                    if (callSiteAnnotation.annotationType == callSiteAnnotationType)
-                                        getType(callSiteAnnotation, "returnType")
-                                    else VoidType
+                                val name = getString(callSiteAnnotation, "name")
+                                val returnType = getType(callSiteAnnotation, "returnType")
                                 val parameterTypes = getParameterList(callSiteAnnotation)
                                 val annotatedMethod = convertMethod(method)
                                 val tmp = computedCallSites.callSites.filter { cs ⇒
                                     cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
                                 }
 
+
+                                val annotatedTargets =
+                                    getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
+
                                 computedCallSites.callSites.find { cs ⇒
                                     cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
                                 } match {
                                     case Some(computedCallSite) ⇒
-                                        val annotatedTargets =
-                                            if (callSiteAnnotation.annotationType == callSiteAnnotationType)
-                                                getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
-                                            else
-                                                List(getString(callSiteAnnotation, "receiverType"))
+
                                         for (annotatedTgt ← annotatedTargets) {
                                             if (!computedCallSite.targets.contains(annotatedTgt)) {
                                                 println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
@@ -100,15 +89,26 @@ object CGMatcher {
                                                 println("found it")
                                             }
                                         }
+
+                                        val prohibitedTargets =
+                                            getAnnotations(callSiteAnnotation, "prohibitedMethods").map(getString(_, "receiverType"))
+                                        for (prohibitedTgt ← prohibitedTargets) {
+                                            if (computedCallSite.targets.contains(prohibitedTgt)) {
+                                                println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
+                                                calledProhibitedTargets += 1
+                                            } else {
+                                                println("no call to prohibited")
+                                            }
+                                        }
                                     case _ ⇒
                                         println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
-                                        missedCallSites +=1
+                                        missedTargets += annotatedTargets.size
                                 }
                             }
                         }
                     }
                 }
-                (missedTargets, missedCallSites)
+                (missedTargets, calledProhibitedTargets)
             case _ ⇒
                 throw new RuntimeException("Unable to parse json")
         }

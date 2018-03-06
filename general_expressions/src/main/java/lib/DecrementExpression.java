@@ -33,9 +33,6 @@ package lib;
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
-import lib.Constant;
-import lib.Expression;
-import lib.ExpressionVisitor;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
@@ -93,10 +90,10 @@ public class DecrementExpression extends UnaryExpression {
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "checkIfDecrement", resolvedMethods = {
     		@ResolvedMethod(receiverType = DecrementExpression.FQN)},
-    		parameterTypes = {Expression.class}, line = 102)
+    		parameterTypes = {Expression.class}, line = 99)
     @CallSite(name = "eval", returnType = Constant.class, resolvedMethods =
     		@ResolvedMethod(receiverType = Constant.FQN),
-    		parameterTypes = {Map.class}, line = 104)
+    		parameterTypes = {Map.class}, line = 101)
 	public Constant eval(Map<String, Constant> values) {
 		try {
 			checkIfDecrement(this.expr);

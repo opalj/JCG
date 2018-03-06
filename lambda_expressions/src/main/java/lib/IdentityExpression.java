@@ -30,15 +30,12 @@
 
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
-import lib.Expression;
+
+import java.util.function.Function;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-
-import java.util.function.Function;
 
 /**
  * An unary expression which represents the identity function. Hence, the encapsulated expression

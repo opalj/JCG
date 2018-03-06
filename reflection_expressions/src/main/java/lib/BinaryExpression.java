@@ -31,7 +31,6 @@ package lib;
 
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.callgraph.ResolvingCondition;
 import lib.annotations.callgraph.TargetResolution;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
@@ -91,7 +90,7 @@ public abstract class BinaryExpression implements Expression {
     @CallSite(name = "<init>", returnType = BinaryExpression.class,
             resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN)},
             resolution = TargetResolution.REFLECTIVE,
-            line = 102)
+            line = 101)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             String operator,
@@ -136,7 +135,7 @@ public abstract class BinaryExpression implements Expression {
             resolution = TargetResolution.REFLECTIVE,
             returnType = BinaryExpression.class,
             parameterTypes = {Operator.class, Expression.class, Expression.class},
-            line = 151)
+            line = 150)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,

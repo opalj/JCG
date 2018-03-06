@@ -5,7 +5,6 @@ import static lib.annotations.callgraph.AnalysisMode.DESKTOP_APP;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 import lib.*;
-import lib.annotations.callgraph.InvokedConstructor;
 import lib.annotations.properties.EntryPoint;
 /**
  * This class is the main class of the application. The app simply makes the expression "-1" 

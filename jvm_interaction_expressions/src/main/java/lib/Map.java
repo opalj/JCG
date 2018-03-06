@@ -30,15 +30,13 @@
 
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.InvokedConstructor;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.*;
+import static lib.annotations.documentation.CGCategory.NOTE;
+import static lib.annotations.documentation.CGCategory.POLYMORPHIC_CALL;
 
 /**
  *

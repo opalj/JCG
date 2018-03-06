@@ -30,8 +30,6 @@
 
 package lib;
 
-import java.io.Serializable;
-
 /**
  * Common superclass of an operator.
  *

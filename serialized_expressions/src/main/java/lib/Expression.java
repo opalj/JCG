@@ -30,13 +30,10 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-
-import java.io.Serializable;
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-
 import lib.annotations.properties.EntryPoint;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
  * Interface at the root of the class hierarchy. Models all expressions.

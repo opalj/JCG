@@ -47,6 +47,4 @@ public @interface ResolvedMethod {
 	 */
 	String receiverType();
 
-	ResolvingCondition[] iff() default { @ResolvingCondition() };
-
 }

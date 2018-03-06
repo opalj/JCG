@@ -37,9 +37,6 @@ import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 import static lib.annotations.documentation.CGCategory.NOTE;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-
 /**
  * A enumeration type for all unary operator there are. * 
  * 
