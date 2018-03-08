@@ -154,12 +154,10 @@ public class Map<K, V> {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 167)
+    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 165)
     @CallSite(name = "next", returnType = Object.class, resolvedMethods = {
-            @ResolvedMethod(receiverType = MapIterator.FQN),
-            @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 167)
-    @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
+            @ResolvedMethod(receiverType = MapIterator.FQN)},
+    line = 165)
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();
         Iterator itr = this.iterator();
