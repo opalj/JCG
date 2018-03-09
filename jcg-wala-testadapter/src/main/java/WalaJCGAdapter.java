@@ -1,21 +1,31 @@
+import com.ibm.wala.analysis.reflection.ReflectionContextInterpreter;
+import com.ibm.wala.analysis.reflection.ReflectionContextSelector;
 import com.ibm.wala.classLoader.CallSiteReference;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.classLoader.ShrikeCTMethod;
+import com.ibm.wala.examples.drivers.PDFTypeHierarchy;
+import com.ibm.wala.examples.properties.WalaExamplesProperties;
 import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.impl.AllApplicationEntrypoints;
 import com.ibm.wala.ipa.callgraph.impl.Everywhere;
 import com.ibm.wala.ipa.callgraph.impl.Util;
-import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
+import com.ibm.wala.ipa.callgraph.propagation.*;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
+import com.ibm.wala.properties.WalaProperties;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.NullProgressMonitor;
+import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.config.AnalysisScopeReader;
+import com.ibm.wala.util.debug.Assertions;
+import com.ibm.wala.viz.DotUtil;
+import com.ibm.wala.viz.PDFViewUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -24,10 +34,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+import java.util.Properties;
 
 public class WalaJCGAdapter {
 
-    public static void main(String[] args) throws IOException, CancelException, ClassHierarchyException {
+    public static void main(String[] args) throws IOException, CancelException, WalaException {
         String cgAlgorithm = args[0];
         String testfile = args[1];
         String outputPath = args[2];
@@ -46,6 +57,7 @@ public class WalaJCGAdapter {
 
         CallGraph callGraph = null;
         AnalysisCache cache = new AnalysisCacheImpl();
+
         if (cgAlgorithm.equals("0-CFA")) {
             SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(options, cache, classHierarchy, scope);
             callGraph = ncfaBuilder.makeCallGraph(options);
@@ -53,16 +65,17 @@ public class WalaJCGAdapter {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
         } else if (cgAlgorithm.equals("1-CFA")) {
+            // TODO
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
         } else if (cgAlgorithm.equals("RTA")) {
+            //TODO
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
             callGraph = rtaBuilder.makeCallGraph(options, new NullProgressMonitor());
         }
 
         JSONArray callSites = new JSONArray();
         JSONObject callSitesObject = new JSONObject();
-
 
         for (IClass clazz : classHierarchy) {
             //String pck = clazz.getName().getPackage().toString();
@@ -105,7 +118,32 @@ public class WalaJCGAdapter {
                     } else {
                         for (CGNode tgt : callGraph.getPossibleTargets(cgNode, csr)) {
                             callTargets.add(tgt.getMethod().getDeclaringClass().getName().toString().substring(1));
-                            //callTargets.add(createMethodObject(tgt.getMethod()));
+
+
+                            // handle reflective calls that occur one stage later
+                            String tgtM = tgt.getMethod().getName().toString();
+                            String tgtC = tgt.getMethod().getDeclaringClass().getName().toString();
+                            if ((tgtC.equals("Ljava/lang/Class") && tgtM.equals("newInstance")) ||
+                                    (tgtC.equals("Ljava/lang/reflect/Method") && tgtM.equals("invoke"))) {
+                                Iterator<CallSiteReference> csi = tgt.iterateCallSites();
+                                while (csi.hasNext()) {
+                                    CallSiteReference reflectiveCsR = csi.next();
+
+                                    JSONObject reflectiveCallSite = new JSONObject();
+                                    reflectiveCallSite.put("declaredTarget", createMethodObject(reflectiveCsR.getDeclaredTarget()));
+                                    reflectiveCallSite.put("line", method.getLineNumber(csr.getProgramCounter())); // use line of invoke/newInstance
+                                    reflectiveCallSite.put("method", createMethodObject(method.getReference()));
+
+
+                                    JSONArray reflectiveCallTargets = new JSONArray();
+                                    for (CGNode reflectiveTgt : callGraph.getPossibleTargets(tgt, reflectiveCsR)) {
+                                        reflectiveCallTargets.add(reflectiveTgt.getMethod().getDeclaringClass().getName().toString().substring(1));
+                                    }
+
+                                    reflectiveCallSite.put("targets", reflectiveCallTargets);
+                                    callSites.add(reflectiveCallSite);
+                                }
+                            }
                         }
                     }
 
@@ -129,6 +167,19 @@ public class WalaJCGAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Properties p = null;
+        try {
+            p = WalaExamplesProperties.loadProperties();
+            p.putAll(WalaProperties.loadProperties());
+        } catch (WalaException e) {
+            e.printStackTrace();
+            Assertions.UNREACHABLE();
+        }
+        String pdfFile = "cg.pdf";
+
+        String dotExe = p.getProperty(WalaExamplesProperties.DOT_EXE);
+        DotUtil.dotify(callGraph, null, PDFTypeHierarchy.DOT_FILE, pdfFile, dotExe);
     }
 
     private static JSONObject createMethodObject(MethodReference method) {

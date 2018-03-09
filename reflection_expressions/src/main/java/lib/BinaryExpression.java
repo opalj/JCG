@@ -38,6 +38,7 @@ import lib.annotations.properties.EntryPoint;
 import static lib.annotations.callgraph.AnalysisMode.*;
 import static lib.annotations.documentation.CGCategory.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -87,17 +88,16 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote(value = REFLECTION, description = "a new instance is created by Java Reflection")
-    @CallSite(name = "<init>", returnType = BinaryExpression.class,
+    @CallSite(name = "<init>",
             resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN)},
             resolution = TargetResolution.REFLECTIVE,
-            line = 101)
+            line = 100)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             String operator,
             final Expression left,
             final Expression right) throws Exception {
-        String className = "lib." + operator + "Operator";
-        Class<?> operatorClass = Class.forName(className);
+        Class<?> operatorClass = Class.forName(operator);
         final Operator op = (Operator) operatorClass.newInstance();
 
         return new BinaryExpression() {
@@ -130,12 +130,11 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @CallSite(name = "createBinaryExpression",
-            resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-                    @ResolvedMethod(receiverType = MultOperator.FQN)},
+            resolvedMethods = @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
             resolution = TargetResolution.REFLECTIVE,
             returnType = BinaryExpression.class,
-            parameterTypes = {Operator.class, Expression.class, Expression.class},
-            line = 150)
+            parameterTypes = {Expression.class, Expression.class},
+            line = 147)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,
@@ -143,15 +142,29 @@ public abstract class BinaryExpression implements Expression {
             final Expression right) throws Exception {
         Class<?> operatorClass = null;
         try {
-            String className = "lib." + operator + "Operator";
-            operatorClass = Class.forName(className);
+            operatorClass = Class.forName("lib.PlusOperator");
             Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
-            m.setAccessible(true);
             return (BinaryExpression) m.invoke(null, left, right);
         } catch (ClassNotFoundException cnfe) {
             throw cnfe;
-            //operatorClass = Class.forName(operator);
         }
+    }
+
+
+    public static BinaryExpression createRandomBinaryExpression(
+            final Expression left,
+            final Expression right
+    ) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String operator;
+        if (System.currentTimeMillis() % 2 == 0)
+            operator = "lib.PlusOperator";
+        else
+            operator = "lib.MultOperator";
+
+
+        Class operatorClass = Class.forName(operator);
+        Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
+        return (BinaryExpression) m.invoke(null, left, right);
     }
 }
 

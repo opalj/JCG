@@ -72,7 +72,8 @@ public class MasonsExpressions {
         Constant c2 = new Constant(4);
         Expression left = UnaryExpression.createUnaryExpressions(SQUARE, c1);
         Expression right = UnaryExpression.createUnaryExpressions(IDENTITY, c2);
-        BinaryExpression.createBinaryExpression("Plus", left, right);
-        BinaryExpression.createBasicBinaryExpression("Plus", left, right);
+        BinaryExpression.createBinaryExpression("lib.PlusOperator", left, right);
+        BinaryExpression.createBasicBinaryExpression("lib.PlusOperator", left, right);
+        BinaryExpression.createRandomBinaryExpression(left, right);
     }
 }

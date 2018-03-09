@@ -35,6 +35,7 @@ import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
@@ -81,34 +82,16 @@ public abstract class UnaryExpression implements Expression {
             resolvedMethods = {@ResolvedMethod(receiverType = SquareExpression.FQN),
                     @ResolvedMethod(receiverType = IdentityExpression.FQN)},
             resolution = TargetResolution.REFLECTIVE, returnType = UnaryExpression.class,
-            line = 98)
+            line = 94)
     @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
-    @CallSite(name = "<init>", parameterTypes = {Expression.class},
-            resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            resolution = TargetResolution.REFLECTIVE, returnType = IdentityExpression.class,
-            line = 104)
+
     @EntryPoint(value = {OPA, CPA})
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
-            final Expression expr) {
-        UnaryExpression uExpr = null;
-        try {
-            Class<?> clazz = Class.forName(operator.toString());
-            Constructor<?> constructor = clazz.getConstructor(Expression.class);
-            uExpr = (UnaryExpression) constructor.newInstance(expr);
-        } catch (Exception e) {
-            if (uExpr == null) {
-                try {
-                    Class<?> clazz = Class.forName(IDENTITY.toString());
-                    Constructor<?> constructor = clazz.getConstructor(Expression.class);
-                    uExpr = (UnaryExpression) constructor.newInstance(expr);
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-            }
-        }
-
-        return uExpr;
+            final Expression expr) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        Class<?> clazz = Class.forName(operator.toString());
+        Constructor<?> constructor = clazz.getConstructor(Expression.class);
+        return (UnaryExpression) constructor.newInstance(expr);
     }
 
     @EntryPoint(value = {OPA, CPA})
