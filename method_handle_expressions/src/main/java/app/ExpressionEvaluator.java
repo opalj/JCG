@@ -72,6 +72,5 @@ public class ExpressionEvaluator {
         UnaryExpression.createUnaryExpressions(UnaryOperator.SQUARE, c2);
 
         BinaryExpression.createBinaryExpression("Plus", c1, c2);
-        BinaryExpression.createBinaryExpression("Mult", c1, c2);
     }
 }

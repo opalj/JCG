@@ -33,7 +33,12 @@ package lib;
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.documentation.CGCategory;
+import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
+import lib.testutils.CallbackTest;
 
 /**
  * A plus operator that creates a binary add expression.
@@ -101,7 +106,10 @@ public class PlusOperator extends Operator {
     }
 
     @EntryPoint(value = {OPA})
+    @CallSite(name = "callback", line = 112, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
+    @CGNote(value = CGCategory.REFLECTION, description = "The method is called using findVirtual")
     static BinaryExpression createBinaryExpression(Expression left, Expression right ) {
+        CallbackTest.callback();
         return new AddExpression(left, right);
     }
 

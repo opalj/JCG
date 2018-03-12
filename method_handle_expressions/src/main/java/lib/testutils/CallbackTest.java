@@ -28,70 +28,43 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-package lib;
+package lib.testutils;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.documentation.CGCategory;
-import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
-import lib.testutils.CallbackTest;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
- * A SquareExpression represents an unary operation that squares an expression.
+ * This class can be called to test static initializers.
  *
- * 
- * <!--
- * <b>NOTE</b><br>
- * This class is not meant to be (automatically) recompiled; it just serves documentation
- * purposes.
- * <p>
- * <p>
- * <p>
- * <p>
- * <p>
- * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
- * CODE (E.G. IMPORTS) CHANGE.
- * <p>
- * <p>
- * <p>
- * <p>
- * <p>
- * -->
+ * E.g.: {{{
+ *     class Foo{
+ *
+ *          // Annotate the call site here.
+ *         private static void clinit(){
+ *              testutils.StaticInitializerTest.staticCall();
+ *             // doSomething ...
+ *         }
+ *
+ *         static {
+ *              clinit();
+ *         }
+ *     }
+ * }}}
  *
  * @author Michael Reif
+ * @author Roberts Kolosovs
  */
-public final class SquareExpression extends UnaryExpression {
+public class CallbackTest {
 
-	public static final String FQN = "lib/SquareExpression";
-	
-    private Expression square;
+    public static final String FQN = "lib/testutils/CallbackTest";
 
-    @EntryPoint(value = { OPA, CPA })
-    @CallSite(name = "callback", line = 79, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
-    @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using findConstructor")
-    public SquareExpression(Expression expr){
-        super(expr);
-        square = new MultOperator.MultExpression(expr, expr);
-        CallbackTest.callback();
-    }
-
+    /**
+     * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.
+     */
     @EntryPoint(value = {OPA, CPA})
-    public String toString() {
-        return expr.toString() + "²";
-    }
-
-    @EntryPoint(value = {OPA, CPA})
-    public Constant eval(Map<String, Constant> values) {
-        return square.eval(values);
-    }
-
-    @Override
-    @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor<T> visitor) {
-        return visitor.visit(this);
+    public static void callback(){
+        // do nothing
     }
 }
