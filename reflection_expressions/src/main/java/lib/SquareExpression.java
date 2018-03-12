@@ -71,11 +71,12 @@ public final class SquareExpression extends UnaryExpression {
     private Expression square;
     
     @EntryPoint(value = { OPA, CPA })
-    @CallSite(name = "callback", line = 78, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
+    @CallSite(name = "callback", line = 79, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
     @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using reflection")
     public SquareExpression(Expression expr){
         super(expr);
         square = new MultOperator.MultExpression(expr, expr);
+        CallbackTest.callback();
     }
 
     @EntryPoint(value = {OPA, CPA})

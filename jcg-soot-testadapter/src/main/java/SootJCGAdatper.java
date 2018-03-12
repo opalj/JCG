@@ -38,8 +38,9 @@ public class SootJCGAdatper {
         CallGraphPhaseOptions cgOptions = new CallGraphPhaseOptions();
         options.addPhaseOptions(cgOptions);
 
-        cgOptions.processAllReachable();
-        cgOptions.libraryModeSignatureResolution(); //TODO
+        //TODO we should use these two options only on the library project
+        //cgOptions.processAllReachable();
+        //cgOptions.libraryModeSignatureResolution();
 
         CallGraphPhaseSubOptions cgModeOption = null;
         switch (cgAlgorithm) {

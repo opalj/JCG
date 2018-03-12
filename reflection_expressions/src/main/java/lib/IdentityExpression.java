@@ -73,7 +73,7 @@ public class IdentityExpression extends UnaryExpression {
     public static final String FQN = "lib/IdentityExpression";
     
     @EntryPoint(value = { OPA, CPA })
-    @CallSite(name = "callback", line = 77, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
+    @CallSite(name = "callback", line = 80, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
     @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using reflection")
     public IdentityExpression(Expression expr){
         super(expr);
