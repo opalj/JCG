@@ -65,11 +65,9 @@ public class WalaJCGAdapter {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
         } else if (cgAlgorithm.equals("1-CFA")) {
-            // TODO
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
         } else if (cgAlgorithm.equals("RTA")) {
-            //TODO
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
             callGraph = rtaBuilder.makeCallGraph(options, new NullProgressMonitor());
         }
@@ -118,32 +116,6 @@ public class WalaJCGAdapter {
                     } else {
                         for (CGNode tgt : callGraph.getPossibleTargets(cgNode, csr)) {
                             callTargets.add(tgt.getMethod().getDeclaringClass().getName().toString().substring(1));
-
-
-                            // handle reflective calls that occur one stage later
-                            String tgtM = tgt.getMethod().getName().toString();
-                            String tgtC = tgt.getMethod().getDeclaringClass().getName().toString();
-                            if ((tgtC.equals("Ljava/lang/Class") && tgtM.equals("newInstance")) ||
-                                    (tgtC.equals("Ljava/lang/reflect/Method") && tgtM.equals("invoke"))) {
-                                Iterator<CallSiteReference> csi = tgt.iterateCallSites();
-                                while (csi.hasNext()) {
-                                    CallSiteReference reflectiveCsR = csi.next();
-
-                                    JSONObject reflectiveCallSite = new JSONObject();
-                                    reflectiveCallSite.put("declaredTarget", createMethodObject(reflectiveCsR.getDeclaredTarget()));
-                                    reflectiveCallSite.put("line", method.getLineNumber(csr.getProgramCounter())); // use line of invoke/newInstance
-                                    reflectiveCallSite.put("method", createMethodObject(method.getReference()));
-
-
-                                    JSONArray reflectiveCallTargets = new JSONArray();
-                                    for (CGNode reflectiveTgt : callGraph.getPossibleTargets(tgt, reflectiveCsR)) {
-                                        reflectiveCallTargets.add(reflectiveTgt.getMethod().getDeclaringClass().getName().toString().substring(1));
-                                    }
-
-                                    reflectiveCallSite.put("targets", reflectiveCallTargets);
-                                    callSites.add(reflectiveCallSite);
-                                }
-                            }
                         }
                     }
 

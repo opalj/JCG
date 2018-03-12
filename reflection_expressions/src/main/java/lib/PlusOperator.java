@@ -33,7 +33,12 @@ package lib;
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.documentation.CGCategory;
+import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
+import lib.testutils.CallbackTest;
 
 /**
  * A plus operator that creates a binary add expression.
@@ -65,9 +70,11 @@ public class PlusOperator extends Operator {
     public static final String FQN = "lib/PlusOperator";
     
     @EntryPoint(value = { OPA, CPA })
-    protected PlusOperator() {}
-
-    public final static Operator instance = new PlusOperator();
+    @CallSite(name = "callback", line = 76, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
+    @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using reflection")
+    protected PlusOperator() {
+        CallbackTest.callback();
+    }
 
     public static class AddExpression extends BinaryExpression {
 
@@ -89,7 +96,7 @@ public class PlusOperator extends Operator {
         public Expression right(){return this.right;}
 
         @EntryPoint(value = {OPA, CPA})
-        public Operator operator(){return PlusOperator.instance;}
+        public Operator operator(){return new PlusOperator();}
 
         @Override
         @EntryPoint(value = {OPA, CPA})
@@ -99,7 +106,10 @@ public class PlusOperator extends Operator {
     }
 
     @EntryPoint(value = {OPA})
+    @CallSite(name = "callback", line = 112, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
+    @CGNote(value = CGCategory.REFLECTION, description = "Invoked using reflection")
     public static BinaryExpression createBinaryExpression(Expression left, Expression right) {
+        CallbackTest.callback();
         return new AddExpression(left, right);
     }
 

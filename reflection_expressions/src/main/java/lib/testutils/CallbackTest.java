@@ -67,21 +67,4 @@ public class CallbackTest {
     public static void callback(){
         // do nothing
     }
-
-    /**
-     * This method is defined to document garbade collector calls.
-     */
-    @EntryPoint(value = {OPA, CPA})
-    public static void garbageCollectorCall(){
-        // do nothing
-    }
-    
-
-    /**
-     * This method is defined to document calls to run method of Runnable.
-     */
-    @EntryPoint(value = {OPA, CPA})
-    public static void runnableRunCall(){
-        // do nothing
-    }
 }

@@ -30,8 +30,6 @@
 
 package lib;
 
-import lib.annotations.callgraph.*;
-import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import java.lang.reflect.Constructor;
@@ -39,8 +37,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.REFLECTION;
-import static lib.UnaryOperator.IDENTITY;
 
 /**
  * An abstract unary Expression where the operation has to be implemented
@@ -76,14 +72,6 @@ public abstract class UnaryExpression implements Expression {
     public static final String FQN = "lib/UnaryExpression";
 
     protected Expression expr;
-
-    @CGNote(value = REFLECTION, description = "The first reflective String can be varied by an enumeration but all possible call targets can be found.")
-    @CallSite(name = "<init>", parameterTypes = {Expression.class},
-            resolvedMethods = {@ResolvedMethod(receiverType = SquareExpression.FQN),
-                    @ResolvedMethod(receiverType = IdentityExpression.FQN)},
-            resolution = TargetResolution.REFLECTIVE, returnType = UnaryExpression.class,
-            line = 94)
-    @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
 
     @EntryPoint(value = {OPA, CPA})
     public static UnaryExpression createUnaryExpressions(

@@ -29,17 +29,15 @@
  */
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.callgraph.TargetResolution;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.annotations.documentation.CGCategory.*;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.REFLECTION;
 
 /**
  * This abstract class models a binary arithmetic expression. It contains factory methods
@@ -88,10 +86,6 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote(value = REFLECTION, description = "a new instance is created by Java Reflection")
-    @CallSite(name = "<init>",
-            resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN)},
-            resolution = TargetResolution.REFLECTIVE,
-            line = 100)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             String operator,
@@ -129,12 +123,6 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
-    @CallSite(name = "createBinaryExpression",
-            resolvedMethods = @ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-            resolution = TargetResolution.REFLECTIVE,
-            returnType = BinaryExpression.class,
-            parameterTypes = {Expression.class, Expression.class},
-            line = 147)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             String operator,
@@ -150,7 +138,8 @@ public abstract class BinaryExpression implements Expression {
         }
     }
 
-
+    @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
+    @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createRandomBinaryExpression(
             final Expression left,
             final Expression right
@@ -162,7 +151,7 @@ public abstract class BinaryExpression implements Expression {
             operator = "lib.MultOperator";
 
 
-        Class operatorClass = Class.forName(operator);
+        Class<?> operatorClass = Class.forName(operator);
         Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
         return (BinaryExpression) m.invoke(null, left, right);
     }
