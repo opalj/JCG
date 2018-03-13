@@ -69,7 +69,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public class DecrementExpression extends UnaryExpression {
 
-	public static final String FQN = "lib/DecrementExpression"; 
+	public static final String FQN = "Llib/DecrementExpression;";
 	
 	@EntryPoint(value = { OPA, CPA })
     public DecrementExpression(Expression expr){

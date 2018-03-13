@@ -66,7 +66,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public final class ExpressionPrinter extends ExpressionVisitor<String> {
 	
-	public static final String FQN = "lib/ExpressionPrinter";
+	public static final String FQN = "Llib/ExpressionPrinter;";
 
     @CGNote(value = STATIC_INITIALIZERS,
             description = "static initializers are called by the jvm;" +

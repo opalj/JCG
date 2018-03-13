@@ -58,7 +58,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public class CallbackTest {
 
-    public static final String FQN = "lib/testutils/CallbackTest";
+    public static final String FQN = "Llib/testutils/CallbackTest;";
 
     /**
      * We need this class to annotate callbacks. We have no other opportunity to annotate the this call back edges.

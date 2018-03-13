@@ -64,13 +64,13 @@ import lib.testutils.CallbackTest;
 */
 public class MultOperator extends Operator {
 	
-    public static final String FQN = "lib/MultOperator";
+    public static final String FQN = "Llib/MultOperator;";
 
     public final static Operator instance = new MultOperator();
 
     public static class MultExpression extends BinaryExpression {
 
-        public static final String FQN = "lib/MultOperator$MultExpression";
+        public static final String FQN = "Llib/MultOperator$MultExpression;";
 
         private final Expression right;
         private final Expression left;

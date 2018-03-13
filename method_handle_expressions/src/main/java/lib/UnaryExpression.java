@@ -30,7 +30,6 @@
 
 package lib;
 
-import lib.annotations.callgraph.*;
 import lib.annotations.documentation.CGCategory;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
@@ -41,7 +40,6 @@ import java.lang.invoke.MethodType;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.UnaryOperator.IDENTITY;
 
 /**
  * An abstract unary Expression where the constructor is accessed via a MethodHandle.
@@ -77,7 +75,7 @@ import static lib.UnaryOperator.IDENTITY;
 
 public abstract class UnaryExpression implements Expression {
 
-    public static final String FQN = "lib/UnaryExpression";
+    public static final String FQN = "Llib/UnaryExpression;";
 
     protected Expression expr;
 

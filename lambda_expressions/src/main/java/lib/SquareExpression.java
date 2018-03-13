@@ -68,7 +68,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public final class SquareExpression extends UnaryExpression {
 
-	public static final String FQN = "lib/SquareExpression";
+	public static final String FQN = "Llib/SquareExpression;";
 	
     private Expression operand;
     
@@ -83,7 +83,7 @@ public final class SquareExpression extends UnaryExpression {
             name="lambda$operator$0",
             returnType = Constant.class,
             parameterTypes = {Constant.class},
-            resolvedMethods = @ResolvedMethod(receiverType = "lib/IncrementExpression"),
+            resolvedMethods = @ResolvedMethod(receiverType = "Llib/IncrementExpression;"),
             line = 90)
     @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
@@ -104,7 +104,7 @@ public final class SquareExpression extends UnaryExpression {
     @Override
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "visit",
-    resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
+    resolvedMethods = {@ResolvedMethod(receiverType = "Llib/ExpressionPrinter$ExpressionStringifier;")},
     returnType = Object.class, parameterTypes = {SquareExpression.class},
     isDynamic = true, line = 111)
     public <T> T accept(Function<Expression, T> visit) {

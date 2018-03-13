@@ -68,28 +68,28 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  * @author Roberts Kolosovs
  */
 public class ExpressionPrinter {
-	
+    public static final String FQN = "Lapp/ExpressionPrinter;";
 	private ExpressionPrinter(){}
 	
 	private static int[] values = {0, 1, 2, 3, 4}; 
 	
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "app/ExpressionPrinter$ExpressionStringifier"), line = 99)
+    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = ExpressionStringifier.FQN), line = 99)
     @CallSite(name = "clone",
-    	resolvedMethods = {@ResolvedMethod(receiverType = "java/lang/int[]")},
+    	resolvedMethods = {@ResolvedMethod(receiverType = "[I")},
     	returnType = int[].class, isDynamic = true,
     	line = 102)
     @CallSite(name = "incrementAll",
-    	resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter")},
+    	resolvedMethods = {@ResolvedMethod(receiverType = FQN)},
     	parameterTypes = {int[].class},
     	returnType = Expression[].class, isDynamic = true,
     	line = 104)
     @CallSite(name = "asList", returnType = List.class,
-		resolvedMethods = {@ResolvedMethod(receiverType = "java/util/Arrays")},
+		resolvedMethods = {@ResolvedMethod(receiverType = "Ljava/util/Arrays;")},
 		parameterTypes = {Expression[].class}, isDynamic = true,
 		line = 106)
     @CallSite(name = "toConstant",
-		resolvedMethods = {@ResolvedMethod(receiverType = "app/ExpressionPrinter$ZeroConstant")},
+		resolvedMethods = {@ResolvedMethod(receiverType = ZeroConstant.FQN)},
 		parameterTypes = {int[].class},
 		returnType = Expression[].class, isDynamic = true,
 		line = 108)
@@ -108,7 +108,7 @@ public class ExpressionPrinter {
     	Constant zero = constantSupplier.get();
     }
 
-	@CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "app/ExpressionPrinter"), line = 122)
+	@CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = FQN), line = 115)
     @EntryPoint(value = {OPA, CPA})
     static ExpressionPrinter instance() {
     	Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
@@ -143,6 +143,8 @@ public class ExpressionPrinter {
     
     private class ExpressionStringifier extends ExpressionVisitor<String> {
 
+    	public static final String FQN = "Lapp/ExpressionPrinter$ExpressionStringifier;";
+
 		@Override
 		public String visit(Expression e) {
 			if (e instanceof DecrementExpression) {
@@ -161,24 +163,28 @@ public class ExpressionPrinter {
 		}
 
 	    @CallSite(name = "accept",
-	        resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression"),
-	        		@ResolvedMethod(receiverType = "lib/IdentityExpression"),
-	        		@ResolvedMethod(receiverType = "lib/IncrementExpression")},
+	        resolvedMethods = {@ResolvedMethod(receiverType = SquareExpression.FQN),
+	        		@ResolvedMethod(receiverType = IdentityExpression.FQN),
+	        		@ResolvedMethod(receiverType = IncrementExpression.FQN)},
 	        returnType = Object.class, isDynamic = true,
 	        parameterTypes = {Function.class},
-	        line = 171)
+	        line = 173)
 		public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
 			return func.apply(e, this::visit);
 		}
     }
     
     private static class ZeroConstant {
+		public static final String FQN = "Lapp/ExpressionPrinter$ZeroConstant;";
+
     	public Constant toConstant() {
     		return new Constant(0);
 		}
 	}
 
 	private static class OneConstant extends ZeroConstant {
+		public static final String FQN = "Lapp/ExpressionPrinter$OneConstant;";
+
     	public java.util.function.Supplier<Constant> getSuperToConstant() {
     		return super::toConstant;
 		}

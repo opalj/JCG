@@ -72,7 +72,7 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  */
 public abstract class BinaryExpression implements Expression {
 
-    public static final String FQN = "lib/BinaryExpression";
+    public static final String FQN = "Llib/BinaryExpression;";
 
     abstract protected Expression left();
 
@@ -85,7 +85,7 @@ public abstract class BinaryExpression implements Expression {
         return visitor.visit(this);
     }
 
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "lib/BinaryExpression$1"), line = 96)
+    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "Llib/BinaryExpression$1;"), line = 96)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             Operator operator,
@@ -122,9 +122,9 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CallSite(name = "createBinaryExpression", 
-    		resolvedMethods = {@ResolvedMethod(receiverType = "lib/MultOperator"), 
-    				@ResolvedMethod(receiverType = "lib/PlusOperator"), 
-    				@ResolvedMethod(receiverType = "lib/SubOperator")}, 
+    		resolvedMethods = {@ResolvedMethod(receiverType = MultOperator.FQN),
+    				@ResolvedMethod(receiverType = PlusOperator.FQN),
+    				@ResolvedMethod(receiverType = SubOperator.FQN)},
     	    parameterTypes = {Expression.class, Expression.class},
     	    returnType = BinaryExpression.class, line = 135)
     @EntryPoint(value = {OPA, CPA})

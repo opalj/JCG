@@ -60,7 +60,7 @@ package lib;
  */
 public interface Expression {
 
-	public static final String FQN = "lib/Expression";
+	public static final String FQN = "Llib/Expression;";
 	
     static final int MajorVersion = 1;
     static final int MinorVersion = 0;

@@ -58,7 +58,7 @@ import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
 @FunctionalInterface
 public interface IUnaryOperator extends Function<Constant, Constant> {
 
-    String FQN = "lib/IUnaryOperator";
+    String FQN = "Llib/IUnaryOperator;";
 
     @CGNote(value = INVOKEDYNAMIC, description = "Lambda expressions are invoked over invokedynamic instructions.")
     @CallSite(resolution = DYNAMIC,

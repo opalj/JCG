@@ -82,8 +82,8 @@ public class IdentityExpression extends UnaryExpression {
 
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "apply", returnType = Expression.class, 
-    	resolvedMethods = {@ResolvedMethod(receiverType = "lib/IdentityExpression$IdentityOperator"),
-    			@ResolvedMethod(receiverType = "lib/IdentityExpression$NewIdentityOperator")}, 
+    	resolvedMethods = {@ResolvedMethod(receiverType = IdentityExpression.IdentityOperator.FQN),
+    			@ResolvedMethod(receiverType = IdentityExpression.NewIdentityOperator.FQN)},
         parameterTypes = {Expression.class, Map.class},
     	line = 91)
 	@Override
@@ -98,6 +98,8 @@ public class IdentityExpression extends UnaryExpression {
 	}
 	
 	private class IdentityOperator extends UnaryOperator {
+
+		public static final String FQN = "Llib.IdentityExpression$IdentityOperator;";
 
 		private static final long serialVersionUID = 2L;
 		
@@ -119,6 +121,8 @@ public class IdentityExpression extends UnaryExpression {
 	}
 	
 	private class NewIdentityOperator extends UnaryOperator {
+
+		public static final String FQN = "Llib.IdentityExpression$NewIdentityOperator;";
 		
 		private static final long serialVersionUID = 1L;
 		

@@ -72,7 +72,7 @@ import static lib.annotations.documentation.CGCategory.REFLECTION;
  */
 public abstract class BinaryExpression implements Expression {
 
-    public static final String FQN = "lib/BinaryExpression";
+    public static final String FQN = "Llib/BinaryExpression;";
 
     abstract protected Expression left();
 

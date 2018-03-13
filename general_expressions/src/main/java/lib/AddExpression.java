@@ -64,7 +64,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class AddExpression extends BinaryExpression {
 
-	public static final String FQN = "lib/AddExpression";
+	public static final String FQN = "Llib/AddExpression;";
 
 	private final Expression right;
 	private final Expression left;

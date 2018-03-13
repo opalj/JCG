@@ -69,7 +69,7 @@ import lib.testutils.CallbackTest;
  */
 public class PlusOperator extends Operator {
 
-    public static final String FQN = "lib/PlusOperator";
+    public static final String FQN = "Llib/PlusOperator;";
     
     @EntryPoint(value = { OPA, CPA })
     protected PlusOperator() {}
@@ -78,7 +78,7 @@ public class PlusOperator extends Operator {
 
     public static class AddExpression extends BinaryExpression {
 
-    	public static final String FQN = "lib/PlusOperator$AddExpression";
+    	public static final String FQN = "Llib/PlusOperator$AddExpression;";
     	
         private final Expression right;
         private final Expression left;

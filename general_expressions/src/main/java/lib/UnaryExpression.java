@@ -66,7 +66,7 @@ import lib.annotations.properties.EntryPoint;
 
 public abstract class UnaryExpression implements Expression {
 
-    public static final String FQN = "lib/UnaryExpression";
+    public static final String FQN = "Llib/UnaryExpression;";
     
     @EntryPoint(value = { OPA, CPA })
     protected Expression expr;

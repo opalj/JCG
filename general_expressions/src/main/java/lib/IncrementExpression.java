@@ -63,7 +63,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public class IncrementExpression extends UnaryExpression {
 
-    public static final String FQN = "lib/IncrementExpression";
+    public static final String FQN = "Llib/IncrementExpression;";
     
     @EntryPoint(value = { OPA, CPA })
     public IncrementExpression(Expression expr) {

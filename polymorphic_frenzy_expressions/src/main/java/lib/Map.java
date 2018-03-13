@@ -64,8 +64,8 @@ import static lib.annotations.documentation.CGCategory.POLYMORPHIC_CALL;
  */
 public class Map<K, V> {
 
-    public static final String MapReceiverType = "lib/Map";
-    public static final String linkedEntryReceiverType = "lib/Map$LinkedEntry";
+    public static final String MapReceiverType = "Llib/Map;";
+    public static final String linkedEntryReceiverType = "Llib/Map$LinkedEntry;";
 
     @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.")
     private class LinkedEntry {
@@ -190,7 +190,7 @@ public class Map<K, V> {
 
     private class MapIterator implements Iterator<LinkedEntry>{
 
-        private static final String FQN = "lib/Map$MapIterator";
+        private static final String FQN = "Llib/Map$MapIterator;";
 
         private LinkedEntry cur;
 

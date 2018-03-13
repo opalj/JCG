@@ -63,7 +63,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class Variable implements Expression {
 	
-	public static final String FQN = "lib/Variable";
+	public static final String FQN = "Llib/Variable;";
 	
     public final String name;
     

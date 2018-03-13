@@ -67,7 +67,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public class IdentityExpression extends UnaryExpression {
 
-    public static final String FQN = "lib/IdentityExpression";
+    public static final String FQN = "Llib/IdentityExpression;";
     
     @EntryPoint(value = { OPA, CPA })
     public IdentityExpression(Expression expr){

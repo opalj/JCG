@@ -57,7 +57,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class StaticInitializerTest {
 
-    public static final String FQN = "lib/testutils/StaticInitializerTest";
+    public static final String FQN = "Llib/testutils/StaticInitializerTest;";
 
     @EntryPoint(value = {OPA, CPA})
     public static void staticCall(String s){

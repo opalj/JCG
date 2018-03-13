@@ -66,7 +66,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public class Constant implements Expression {
 	
-	public static final String FQN = "lib/Constant";
+	public static final String FQN = "Llib/Constant;";
 
     private final int value;
     

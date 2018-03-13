@@ -72,7 +72,7 @@ import java.lang.invoke.MethodType;
  */
 public abstract class BinaryExpression implements Expression {
 
-    public static final String FQN = "lib/BinaryExpression";
+    public static final String FQN = "Llib/BinaryExpression;";
 
     abstract protected Expression left();
 

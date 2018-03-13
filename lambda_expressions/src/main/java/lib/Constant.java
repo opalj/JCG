@@ -65,7 +65,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public class Constant implements Expression {
 	
-	public static final String FQN = "lib/Constant";
+	public static final String FQN = "Llib/Constant;";
 
     private final int value;
     
@@ -85,7 +85,7 @@ public class Constant implements Expression {
     }
 
     @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
+            resolvedMethods = {@ResolvedMethod(receiverType = "Llib/ExpressionPrinter$ExpressionStringifier;")},
             returnType = String.class, isDynamic = true,
             parameterTypes = {Constant.class},
             line = 95

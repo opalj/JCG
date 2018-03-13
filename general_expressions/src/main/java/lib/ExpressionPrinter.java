@@ -65,7 +65,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public final class ExpressionPrinter extends ExpressionVisitor<String> {
 	
-	public static final String FQN = "lib/ExpressionPrinter";
+	public static final String FQN = "Llib/ExpressionPrinter;";
 	
     private ExpressionPrinter() {
     }

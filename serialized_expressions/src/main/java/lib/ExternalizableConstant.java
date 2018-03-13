@@ -77,13 +77,13 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  */
 public class ExternalizableConstant extends AltConstant implements Externalizable {
 
-	public static final String ExternalizableConstantReceiverType = "lib/ExternalizableConstant";
-	public static final String ObjectOutputStreamReceiverType = "java/io/ObjectOutputStream";
-	public static final String ObjectInputStreamReceiverType = "java/io/ObjectInputStream";
+	public static final String ExternalizableConstantReceiverType = "Llib/ExternalizableConstant;";
+	public static final String ObjectOutputStreamReceiverType = "Ljava/io/ObjectOutputStream;";
+	public static final String ObjectInputStreamReceiverType = "Ljava/io/ObjectInputStream;";
 
     private int value;
 
-    @CallSite(name = "println", resolvedMethods = {@ResolvedMethod(receiverType = "java/io/PrintStream")}, line = 88)
+    @CallSite(name = "println", resolvedMethods = {@ResolvedMethod(receiverType = "Ljava/io/PrintStream;")}, line = 88)
     ExternalizableConstant() {
         System.out.println("asd");
     }

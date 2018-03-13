@@ -72,14 +72,14 @@ import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
  */
 public class IncrementExpression extends UnaryExpression {
 
-    public static final String FQN = "lib/IncrementExpression";
+    public static final String FQN = "Llib/IncrementExpression;";
 
     @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
     @CallSite(resolution = DYNAMIC,
             name="lambda$operator$0",
             returnType = Constant.class,
             parameterTypes = {Constant.class},
-            resolvedMethods = @ResolvedMethod(receiverType = "lib/IncrementExpression"),
+            resolvedMethods = @ResolvedMethod(receiverType = IncrementExpression.FQN),
             line = 87)
     @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
@@ -93,7 +93,7 @@ public class IncrementExpression extends UnaryExpression {
 
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "visit",
-    	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
+    	resolvedMethods = {@ResolvedMethod(receiverType = "Llib/ExpressionPrinter$ExpressionStringifier;")},
     	returnType = String.class, parameterTypes = {IncrementExpression.class},
     	isDynamic = true, line = 100)
     public <T> T accept(Function<Expression, T> visit) {
