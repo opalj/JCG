@@ -111,11 +111,11 @@ public class WalaJCGAdapter {
 
                     if (cgAlgorithm.equals("CHA")) {
                         for (IMethod tgt : classHierarchy.getPossibleTargets(clazz, csr.getDeclaredTarget())) {
-                            callTargets.add(tgt.getDeclaringClass().getName().toString().substring(1));
+                            callTargets.add(createMethodObject(tgt.getReference()));
                         }
                     } else {
                         for (CGNode tgt : callGraph.getPossibleTargets(cgNode, csr)) {
-                            callTargets.add(tgt.getMethod().getDeclaringClass().getName().toString().substring(1));
+                            callTargets.add(createMethodObject(tgt.getMethod().getReference()));
                         }
                     }
 

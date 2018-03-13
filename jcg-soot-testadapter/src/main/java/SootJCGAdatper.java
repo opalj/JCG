@@ -10,7 +10,6 @@ import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
 import soot.util.backend.ASMBackendUtils;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
@@ -97,9 +96,7 @@ public class SootJCGAdatper {
                             while (edges.hasNext()) {
                                 Edge edge = edges.next();
                                 SootMethod tgt = edge.tgt();
-                                callTargets.add(ASMBackendUtils.slashify(tgt.getDeclaringClass().toString()));
-
-                                //callTargets.add(createMethodObject(tgt));
+                                callTargets.add(createMethodObject(tgt));
                             }
 
                             callSite.put("targets", callTargets);

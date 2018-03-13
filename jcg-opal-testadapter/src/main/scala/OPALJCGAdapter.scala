@@ -43,7 +43,7 @@ object OPALJCGAdapter {
             "line" → line,
             "method" → createMethodObject(m),
             "declaredTarget" → createMethodObject(code.instructions(pc).asMethodInvocationInstruction),
-            "targets" → tgts.map(_.classFile.thisType.fqn)
+            "targets" → tgts.map(createMethodObject(_))
         )
         val json = Json.obj("callSites" → new JsArray(callSites))
 

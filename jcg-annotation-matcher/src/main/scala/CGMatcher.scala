@@ -23,7 +23,7 @@ import play.api.libs.json.Reads
 
 case class CallSites(callSites: Set[CallSite])
 
-case class CallSite(declaredTarget: Method, line: Int, method: Method, targets: Set[String])
+case class CallSite(declaredTarget: Method, line: Int, method: Method, targets: Set[Method])
 
 case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String])
 
@@ -72,7 +72,6 @@ object CGMatcher {
                                     cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
                                 }
 
-
                                 val annotatedTargets =
                                     getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
 
@@ -81,8 +80,13 @@ object CGMatcher {
                                 } match {
                                     case Some(computedCallSite) ⇒
 
+                                        val computedTargets = computedCallSite.targets.map { tgt ⇒
+                                            val declaringClass = tgt.declaringClass
+                                            declaringClass.substring(1, declaringClass.length - 1)
+                                        }
+
                                         for (annotatedTgt ← annotatedTargets) {
-                                            if (!computedCallSite.targets.contains(annotatedTgt)) {
+                                            if (!computedTargets.contains(annotatedTgt)) {
                                                 println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
                                                 missedTargets += 1
                                             } else {
@@ -93,7 +97,7 @@ object CGMatcher {
                                         val prohibitedTargets =
                                             getAnnotations(callSiteAnnotation, "prohibitedMethods").map(getString(_, "receiverType"))
                                         for (prohibitedTgt ← prohibitedTargets) {
-                                            if (computedCallSite.targets.contains(prohibitedTgt)) {
+                                            if (computedTargets.contains(prohibitedTgt)) {
                                                 println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
                                                 calledProhibitedTargets += 1
                                             } else {
