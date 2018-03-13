@@ -70,6 +70,8 @@ public class WalaJCGAdapter {
         } else if (cgAlgorithm.equals("RTA")) {
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
             callGraph = rtaBuilder.makeCallGraph(options, new NullProgressMonitor());
+        } else {
+            throw new IllegalArgumentException();
         }
 
         JSONArray callSites = new JSONArray();
@@ -77,54 +79,43 @@ public class WalaJCGAdapter {
 
         for (IClass clazz : classHierarchy) {
             //String pck = clazz.getName().getPackage().toString();
-            if (clazz.getClassLoader().getName().toString().equals("Primordial"))
-                continue;
+            /*if (clazz.getClassLoader().getName().toString().equals("Primordial"))
+                continue;*/
             for (IMethod method : clazz.getDeclaredMethods()) {
 
                 Iterator<CallSiteReference> callSiteIter;
-                CGNode cgNode = null;
-                if (cgAlgorithm.equals("CHA")) {
-                    IR ir = cache.getIR(method);
-                    if (ir == null)
-                        continue;
-                    callSiteIter = ir.iterateCallSites();
-                } else {
-                    cgNode = callGraph.getNode(method, Everywhere.EVERYWHERE);
+                for (CGNode cgNode : callGraph.getNodes(method.getReference())) {
 
                     if (cgNode == null)
                         continue;
 
                     callSiteIter = cgNode.iterateCallSites();
-                }
-
-                while (callSiteIter.hasNext()) {
-
-                    CallSiteReference csr = callSiteIter.next();
 
 
-                    JSONObject callSite = new JSONObject();
-                    callSite.put("declaredTarget", createMethodObject(csr.getDeclaredTarget()));
-                    callSite.put("line", method.getLineNumber(csr.getProgramCounter()));
-                    callSite.put("method", createMethodObject(method.getReference()));
+                    while (callSiteIter.hasNext()) {
 
-                    JSONArray callTargets = new JSONArray();
+                        CallSiteReference csr = callSiteIter.next();
 
-                    if (cgAlgorithm.equals("CHA")) {
-                        for (IMethod tgt : classHierarchy.getPossibleTargets(clazz, csr.getDeclaredTarget())) {
-                            callTargets.add(createMethodObject(tgt.getReference()));
-                        }
-                    } else {
+
+                        JSONObject callSite = new JSONObject();
+                        callSite.put("declaredTarget", createMethodObject(csr.getDeclaredTarget()));
+                        callSite.put("line", method.getLineNumber(csr.getProgramCounter()));
+                        callSite.put("method", createMethodObject(method.getReference()));
+
+                        JSONArray callTargets = new JSONArray();
+
+
                         for (CGNode tgt : callGraph.getPossibleTargets(cgNode, csr)) {
                             callTargets.add(createMethodObject(tgt.getMethod().getReference()));
                         }
+
+
+                        callSite.put("targets", callTargets);
+
+                        callSites.add(callSite);
+
                     }
-
-                    callSite.put("targets", callTargets);
-
-                    callSites.add(callSite);
-
                 }
-
                 //}
             }
         }

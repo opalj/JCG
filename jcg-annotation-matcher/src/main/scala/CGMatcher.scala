@@ -1,6 +1,7 @@
 import java.io.File
 import java.io.FileInputStream
 
+import org.opalj.br
 import org.opalj.br.analyses.Project
 import org.opalj.br.Annotation
 import org.opalj.br.AnnotationValue
@@ -31,10 +32,17 @@ class DevNullLogger extends OPALLogger {
     override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
 }
 
+class MatchResult() {
+    var missedTargets = 0
+    var calledProhibitedTargets = 0
+}
+
 object CGMatcher {
 
     val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/CallSite")
     val callSitesAnnotationType = ObjectType("lib/annotations/callgraph/CallSites")
+    val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
+    val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
 
     def matchCallSites(tgtJar: String, jsonPath: String): (Int, Int) = {
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
@@ -48,74 +56,123 @@ object CGMatcher {
         jsResult match {
             case _: JsSuccess[CallSites] ⇒
                 val computedCallSites = jsResult.get
-                var missedTargets = 0
-                var calledProhibitedTargets = 0
+                val matchResult = new MatchResult()
                 for (clazz ← p.allProjectClassFiles) {
                     for ((method, _) ← clazz.methodsWithBody) {
                         for (annotation ← method.annotations) {
 
                             val callSiteAnnotations =
                                 if (annotation.annotationType == callSiteAnnotationType)
-                                    List(annotation)
+                                    Seq(annotation)
                                 else if (annotation.annotationType == callSitesAnnotationType)
                                     getAnnotations(annotation, "value")
                                 else
-                                    Nil
+                                    Seq.empty
 
-                            for (callSiteAnnotation ← callSiteAnnotations) {
-                                val line = getLineNumber(callSiteAnnotation)
-                                val name = getString(callSiteAnnotation, "name")
-                                val returnType = getType(callSiteAnnotation, "returnType")
-                                val parameterTypes = getParameterList(callSiteAnnotation)
-                                val annotatedMethod = convertMethod(method)
-                                val tmp = computedCallSites.callSites.filter { cs ⇒
-                                    cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
-                                }
+                            handleCallSiteAnnotations(computedCallSites.callSites, method, callSiteAnnotations, matchResult)
 
-                                val annotatedTargets =
-                                    getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
+                            val indirectCallAnnotations =
+                                if (annotation.annotationType == indirectCallAnnotationType)
+                                    Seq(annotation)
+                                else if (annotation.annotationType == indirectCallsAnnotationType)
+                                    getAnnotations(annotation, "value")
+                                else
+                                    Seq.empty
 
-                                computedCallSites.callSites.find { cs ⇒
-                                    cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
-                                } match {
-                                    case Some(computedCallSite) ⇒
-
-                                        val computedTargets = computedCallSite.targets.map { tgt ⇒
-                                            val declaringClass = tgt.declaringClass
-                                            declaringClass.substring(1, declaringClass.length - 1)
-                                        }
-
-                                        for (annotatedTgt ← annotatedTargets) {
-                                            if (!computedTargets.contains(annotatedTgt)) {
-                                                println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
-                                                missedTargets += 1
-                                            } else {
-                                                println("found it")
-                                            }
-                                        }
-
-                                        val prohibitedTargets =
-                                            getAnnotations(callSiteAnnotation, "prohibitedMethods").map(getString(_, "receiverType"))
-                                        for (prohibitedTgt ← prohibitedTargets) {
-                                            if (computedTargets.contains(prohibitedTgt)) {
-                                                println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
-                                                calledProhibitedTargets += 1
-                                            } else {
-                                                println("no call to prohibited")
-                                            }
-                                        }
-                                    case _ ⇒
-                                        println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
-                                        missedTargets += annotatedTargets.size
-                                }
-                            }
+                            bar(computedCallSites.callSites, method, indirectCallAnnotations)
                         }
                     }
                 }
-                (missedTargets, calledProhibitedTargets)
+                (matchResult.missedTargets, matchResult.calledProhibitedTargets)
             case _ ⇒
                 throw new RuntimeException("Unable to parse json")
         }
+    }
+
+    private def handleCallSiteAnnotations(computedCallSites: Set[CallSite], method: br.Method, callSiteAnnotations: Seq[Annotation], matchResult: MatchResult): Unit = {
+        for (callSiteAnnotation ← callSiteAnnotations) {
+            val line = getLineNumber(callSiteAnnotation)
+            val name = getString(callSiteAnnotation, "name")
+            val returnType = getType(callSiteAnnotation, "returnType")
+            val parameterTypes = getParameterList(callSiteAnnotation)
+            val annotatedMethod = convertMethod(method)
+            val tmp = computedCallSites.filter { cs ⇒
+                cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
+            }
+
+            val annotatedTargets =
+                getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
+
+            computedCallSites.find { cs ⇒
+                cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
+            } match {
+                case Some(computedCallSite) ⇒
+
+                    val computedTargets = computedCallSite.targets.map(_.declaringClass)
+
+                    for (annotatedTgt ← annotatedTargets) {
+                        if (!computedTargets.contains(annotatedTgt)) {
+                            println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
+                            matchResult.missedTargets += 1
+                        } else {
+                            println("found it")
+                        }
+                    }
+
+                    val prohibitedTargets =
+                        getAnnotations(callSiteAnnotation, "prohibitedMethods").map(getString(_, "receiverType"))
+                    for (prohibitedTgt ← prohibitedTargets) {
+                        if (computedTargets.contains(prohibitedTgt)) {
+                            println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
+                            matchResult.calledProhibitedTargets += 1
+                        } else {
+                            println("no call to prohibited")
+                        }
+                    }
+                case _ ⇒
+                    println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
+                    matchResult.missedTargets += annotatedTargets.size
+            }
+        }
+    }
+
+    private def bar(computedCallSites: Set[CallSite], source: br.Method, inderectCallAnnotations: Seq[Annotation]): Unit = {
+        for (annotation <- inderectCallAnnotations) {
+            val name = getString(annotation, "name")
+            val returnType = getReturnType(annotation).toJVMTypeName
+            val parameterTypes = getParameterList(annotation).map(_.toJVMTypeName)
+            val declaringClass = getString(annotation, "declaringClass")
+            val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
+            val annotatedSource = convertMethod(source)
+            foo(computedCallSites, annotatedSource, annotatedTarget)
+        }
+
+    }
+
+    private def foo(computedCallSites: Set[CallSite], source: Method, annotatedTarget: Method): Boolean = {
+        var visited: Set[Method] = Set(source)
+        var workset: Set[Method] = Set(source)
+
+        while (workset.nonEmpty) {
+            val currentSource = workset.head
+            workset = workset.tail
+
+            for (tgt ← computedCallSites.filter(_.method == currentSource).flatMap(_.targets)) {
+                if (tgt == annotatedTarget) {
+                    println("FOUND CALL TRANSITIVE")
+                    return true
+                }
+
+                if (!visited.contains(tgt)) {
+                    visited += tgt
+                    workset += tgt
+                }
+            }
+        }
+
+        println(s"Missed transitive call $source -> $annotatedTarget")
+
+        false
     }
 
     def main(args: Array[String]): Unit = {

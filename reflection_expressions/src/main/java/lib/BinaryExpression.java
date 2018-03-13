@@ -29,6 +29,7 @@
  */
 package lib;
 
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
@@ -86,6 +87,7 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote(value = REFLECTION, description = "a new instance is created by Java Reflection")
+    @IndirectCall(name = "<init>", declaringClass = PlusOperator.FQN)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             String operator,
@@ -124,6 +126,7 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = PlusOperator.FQN)
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,
@@ -140,6 +143,8 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = PlusOperator.FQN)
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = MultOperator.FQN)
     public static BinaryExpression createRandomBinaryExpression(
             final Expression left,
             final Expression right
