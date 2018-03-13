@@ -76,7 +76,7 @@ public class SootJCGAdatper {
         JSONArray callSites = new JSONArray();
 
         // all application classes
-        for (SootClass clazz : scene.getApplicationClasses()) {
+        for (SootClass clazz : scene.getClasses()) {
             // all methods defined in that class
             for (SootMethod method : clazz.getMethods()) {
                 if (method.hasActiveBody()) {

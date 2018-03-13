@@ -35,7 +35,7 @@ object OPALJCGAdapter {
         val cg = p.get(CallGraphKey)
 
         val callSites = for {
-            cf ← p.allProjectClassFiles
+            cf ← p.allClassFiles
             (m, code) ← cf.methodsWithBody
             (pc, tgts) ← cg.calls(m)
             line = code.lineNumber(pc).getOrElse(-1)
@@ -45,7 +45,7 @@ object OPALJCGAdapter {
             "declaredTarget" → createMethodObject(code.instructions(pc).asMethodInvocationInstruction),
             "targets" → tgts.map(createMethodObject(_))
         )
-        val json = Json.obj("callSites" → new JsArray(callSites))
+        val json = Json.obj("callSites" → new JsArray(callSites.toIndexedSeq))
 
         println(Json.prettyPrint(json))
 
