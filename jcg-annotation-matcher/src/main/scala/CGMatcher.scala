@@ -69,7 +69,9 @@ object CGMatcher {
                                 else
                                     Seq.empty
 
-                            handleCallSiteAnnotations(computedCallSites.callSites, method, callSiteAnnotations, matchResult)
+                            handleCallSiteAnnotations(
+                                computedCallSites.callSites, method, callSiteAnnotations, matchResult
+                            )
 
                             val indirectCallAnnotations =
                                 if (annotation.annotationType == indirectCallAnnotationType)
@@ -79,7 +81,9 @@ object CGMatcher {
                                 else
                                     Seq.empty
 
-                            bar(computedCallSites.callSites, method, indirectCallAnnotations)
+                            handleIndirectCallAnnotations(
+                                computedCallSites.callSites, method, indirectCallAnnotations
+                            )
                         }
                     }
                 }
@@ -136,20 +140,22 @@ object CGMatcher {
         }
     }
 
-    private def bar(computedCallSites: Set[CallSite], source: br.Method, inderectCallAnnotations: Seq[Annotation]): Unit = {
-        for (annotation <- inderectCallAnnotations) {
+    private def handleIndirectCallAnnotations(
+        computedCallSites: Set[CallSite], source: br.Method, indirectCallAnnotations: Seq[Annotation]
+    ): Unit = {
+        for (annotation ← indirectCallAnnotations) {
             val name = getString(annotation, "name")
             val returnType = getReturnType(annotation).toJVMTypeName
             val parameterTypes = getParameterList(annotation).map(_.toJVMTypeName)
             val declaringClass = getString(annotation, "declaringClass")
             val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
             val annotatedSource = convertMethod(source)
-            foo(computedCallSites, annotatedSource, annotatedTarget)
+            callsIndirectly(computedCallSites, annotatedSource, annotatedTarget)
         }
 
     }
 
-    private def foo(computedCallSites: Set[CallSite], source: Method, annotatedTarget: Method): Boolean = {
+    private def callsIndirectly(computedCallSites: Set[CallSite], source: Method, annotatedTarget: Method): Boolean = {
         var visited: Set[Method] = Set(source)
         var workset: Set[Method] = Set(source)
 
