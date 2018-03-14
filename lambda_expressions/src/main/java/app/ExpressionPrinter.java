@@ -30,8 +30,7 @@
 package app;
 
 import lib.*;
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.properties.EntryPoint;
 
 import java.util.Arrays;
@@ -44,154 +43,138 @@ import java.util.function.Supplier;
 import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
- * 
  * <!--
- * 
+ * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * 
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
  * @author Roberts Kolosovs
  */
 public class ExpressionPrinter {
     public static final String FQN = "Lapp/ExpressionPrinter;";
-	private ExpressionPrinter(){}
-	
-	private static int[] values = {0, 1, 2, 3, 4}; 
-	
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = ExpressionStringifier.FQN), line = 99)
-    @CallSite(name = "clone",
-    	resolvedMethods = {@ResolvedMethod(receiverType = "[I")},
-    	returnType = int[].class, isDynamic = true,
-    	line = 102)
-    @CallSite(name = "incrementAll",
-    	resolvedMethods = {@ResolvedMethod(receiverType = FQN)},
-    	parameterTypes = {int[].class},
-    	returnType = Expression[].class, isDynamic = true,
-    	line = 104)
-    @CallSite(name = "asList", returnType = List.class,
-		resolvedMethods = {@ResolvedMethod(receiverType = "Ljava/util/Arrays;")},
-		parameterTypes = {Expression[].class}, isDynamic = true,
-		line = 106)
-    @CallSite(name = "toConstant",
-		resolvedMethods = {@ResolvedMethod(receiverType = ZeroConstant.FQN)},
-		parameterTypes = {int[].class},
-		returnType = Expression[].class, isDynamic = true,
-		line = 108)
-    public static void main(final String[] args) {
-    	Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
-    	Supplier<ExpressionPrinter> instance = ExpressionPrinter::instance;
-    	ExpressionStringifier stringifier = instance.get().new ExpressionStringifier();
-    	System.out.println(expr.accept(stringifier::visit));
-    	Supplier<int[]> valuesProvider = values::clone;
-    	int[] clonedValues = valuesProvider.get();
-    	Function<int[], Expression[]> incrementArrayFunc = ExpressionPrinter::incrementAll;
-    	Expression[] incrementArray = incrementArrayFunc.apply(clonedValues);
-    	Consumer<Expression[]> toList = Arrays::<Expression[]>asList;
-    	toList.accept(incrementArray);
-    	Supplier<Constant> constantSupplier = new OneConstant().getSuperToConstant();
-    	Constant zero = constantSupplier.get();
+
+    private ExpressionPrinter() {
     }
 
-	@CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = FQN), line = 115)
+    private static int[] values = {0, 1, 2, 3, 4};
+
+    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    @IndirectCall(name = "<init>", declaringClass = ExpressionStringifier.FQN, parameterTypes = {ExpressionPrinter.class /*TODO $1*/})
+    @IndirectCall(name = "clone", declaringClass = "Ljava/lang/Object;", returnType = Object.class)
+    @IndirectCall(name = "incrementAll", declaringClass = FQN, returnType = Expression[].class, parameterTypes = int[].class)
+    @IndirectCall(name = "asList", returnType = List.class, declaringClass = "Ljava/util/Arrays;", parameterTypes = {Object[].class})
+    @IndirectCall(name = "toConstant", returnType = Constant.class, declaringClass = ZeroConstant.FQN)
+    public static void main(final String[] args) {
+        Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
+        Supplier<ExpressionPrinter> instance = ExpressionPrinter::instance;
+        ExpressionStringifier stringifier = instance.get().new ExpressionStringifier();
+        System.out.println(expr.accept(stringifier::visit));
+        Supplier<int[]> valuesProvider = values::clone;
+        int[] clonedValues = valuesProvider.get();
+        Function<int[], Expression[]> incrementArrayFunc = ExpressionPrinter::incrementAll;
+        Expression[] incrementArray = incrementArrayFunc.apply(clonedValues);
+        Consumer<Expression[]> toList = Arrays::<Expression[]>asList;
+        toList.accept(incrementArray);
+        Supplier<Constant> constantSupplier = new OneConstant().getSuperToConstant();
+        Constant zero = constantSupplier.get();
+    }
+
+    @IndirectCall(name = "<init>", declaringClass = FQN)
     @EntryPoint(value = {OPA, CPA})
     static ExpressionPrinter instance() {
-    	Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
-    	return printerConstructor.get();
-    }
-    
-    private static Expression[] incrementAll(int[] vals){
-    	if (vals.length == 0){
-    		Expression[] res = {new Constant(0)};
-    		return res;
-    	} else {
-    		Expression[] res = new Expression[vals.length];
-    		for(int i = 0; i<vals.length; i++){
-    			res[i] = new IncrementExpression(new Constant(vals[i]));
-    		}
-    		return res;
-    	}
+        Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
+        return printerConstructor.get();
     }
 
-    private static Expression[] incrementAll(double[] vals){
-    	if (vals.length == 0){
-    		Expression[] res = {new Constant(0)};
-    		return res;
-    	} else {
-    		Expression[] res = new Expression[vals.length];
-    		for(int i = 0; i<vals.length; i++){
-    			res[i] = new IncrementExpression(new Constant((int) vals[i]));
-    		}
-    		return res;
-    	}
+    private static Expression[] incrementAll(int[] vals) {
+        if (vals.length == 0) {
+            Expression[] res = {new Constant(0)};
+            return res;
+        } else {
+            Expression[] res = new Expression[vals.length];
+            for (int i = 0; i < vals.length; i++) {
+                res[i] = new IncrementExpression(new Constant(vals[i]));
+            }
+            return res;
+        }
     }
-    
+
+    private static Expression[] incrementAll(double[] vals) {
+        if (vals.length == 0) {
+            Expression[] res = {new Constant(0)};
+            return res;
+        } else {
+            Expression[] res = new Expression[vals.length];
+            for (int i = 0; i < vals.length; i++) {
+                res[i] = new IncrementExpression(new Constant((int) vals[i]));
+            }
+            return res;
+        }
+    }
+
     private class ExpressionStringifier extends ExpressionVisitor<String> {
 
-    	public static final String FQN = "Lapp/ExpressionPrinter$ExpressionStringifier;";
+        public static final String FQN = "Lapp/ExpressionPrinter$ExpressionStringifier;";
 
-		@Override
-		public String visit(Expression e) {
-			if (e instanceof DecrementExpression) {
-				return "(" + recursiveAccept(((DecrementExpression)e).getExpr(), Expression::accept) + ")--";
-			} else if (e instanceof IncrementExpression) {
-				return "(" + recursiveAccept(((IncrementExpression)e).getExpr(), Expression::accept) + ")++";
-			} else if (e instanceof IdentityExpression) {
-				return "Id(" + recursiveAccept(((IdentityExpression)e).getExpr(), Expression::accept) + ")";
-			} else if (e instanceof SquareExpression) {
-				return "(" + recursiveAccept(((SquareExpression)e).getExpr(), Expression::accept) + ")²";
-			} else if (e instanceof Constant) {
-				return String.valueOf(((Constant)e).getValue());
-			} else {
-				return "unknown expression";
-			}
-		}
+        @Override
+        public String visit(Expression e) {
+            if (e instanceof DecrementExpression) {
+                return "(" + recursiveAccept(((DecrementExpression) e).getExpr(), Expression::accept) + ")--";
+            } else if (e instanceof IncrementExpression) {
+                return "(" + recursiveAccept(((IncrementExpression) e).getExpr(), Expression::accept) + ")++";
+            } else if (e instanceof IdentityExpression) {
+                return "Id(" + recursiveAccept(((IdentityExpression) e).getExpr(), Expression::accept) + ")";
+            } else if (e instanceof SquareExpression) {
+                return "(" + recursiveAccept(((SquareExpression) e).getExpr(), Expression::accept) + ")²";
+            } else if (e instanceof Constant) {
+                return String.valueOf(((Constant) e).getValue());
+            } else {
+                return "unknown expression";
+            }
+        }
 
-	    @CallSite(name = "accept",
-	        resolvedMethods = {@ResolvedMethod(receiverType = SquareExpression.FQN),
-	        		@ResolvedMethod(receiverType = IdentityExpression.FQN),
-	        		@ResolvedMethod(receiverType = IncrementExpression.FQN)},
-	        returnType = Object.class, isDynamic = true,
-	        parameterTypes = {Function.class},
-	        line = 173)
-		public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
-			return func.apply(e, this::visit);
-		}
+        //TODO check if they are all called at runtime
+        @IndirectCall(name = "accept", returnType = Object.class, parameterTypes = Function.class, declaringClass = SquareExpression.FQN)
+        @IndirectCall(name = "accept", returnType = Object.class, parameterTypes = Function.class, declaringClass = IdentityExpression.FQN)
+        @IndirectCall(name = "accept", returnType = Object.class, parameterTypes = Function.class, declaringClass = IncrementExpression.FQN)
+        public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
+            return func.apply(e, this::visit);
+        }
     }
-    
+
     private static class ZeroConstant {
-		public static final String FQN = "Lapp/ExpressionPrinter$ZeroConstant;";
+        public static final String FQN = "Lapp/ExpressionPrinter$ZeroConstant;";
 
-    	public Constant toConstant() {
-    		return new Constant(0);
-		}
-	}
+        public Constant toConstant() {
+            return new Constant(0);
+        }
+    }
 
-	private static class OneConstant extends ZeroConstant {
-		public static final String FQN = "Lapp/ExpressionPrinter$OneConstant;";
+    private static class OneConstant extends ZeroConstant {
+        public static final String FQN = "Lapp/ExpressionPrinter$OneConstant;";
 
-    	public java.util.function.Supplier<Constant> getSuperToConstant() {
-    		return super::toConstant;
-		}
+        public java.util.function.Supplier<Constant> getSuperToConstant() {
+            return super::toConstant;
+        }
 
-		@Override
-		public Constant toConstant() {
-    		return new Constant(1);
-		}
-	}
+        @Override
+        public Constant toConstant() {
+            return new Constant(1);
+        }
+    }
 }

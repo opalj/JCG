@@ -38,16 +38,17 @@ import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
 import java.util.function.Function;
 
 import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 /**
  * A SquareExpression represents an unary operation that squares an expression.
- * 
+ * <p>
  * Has a method returning an instance of a FunctionalInterface with a lambda expression.
- *
- * 
+ * <p>
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -68,19 +69,19 @@ import lib.annotations.properties.EntryPoint;
  */
 public final class SquareExpression extends UnaryExpression {
 
-	public static final String FQN = "Llib/SquareExpression;";
-	
+    public static final String FQN = "Llib/SquareExpression;";
+
     private Expression operand;
-    
-    @EntryPoint(value = { OPA, CPA })
-    public SquareExpression(Expression expr){
+
+    @EntryPoint(value = {OPA, CPA})
+    public SquareExpression(Expression expr) {
         super(expr);
         operand = expr;
     }
-    
+
     @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
     @CallSite(resolution = DYNAMIC,
-            name="lambda$operator$0",
+            name = "lambda$operator$0",
             returnType = Constant.class,
             parameterTypes = {Constant.class},
             resolvedMethods = @ResolvedMethod(receiverType = "Llib/IncrementExpression;"),
@@ -97,16 +98,14 @@ public final class SquareExpression extends UnaryExpression {
 
     @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String, Constant> values) {
-    	int opVal = operand.eval(values).getValue();
+        int opVal = operand.eval(values).getValue();
         return new Constant(opVal * opVal);
     }
 
     @Override
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "visit",
-    resolvedMethods = {@ResolvedMethod(receiverType = "Llib/ExpressionPrinter$ExpressionStringifier;")},
-    returnType = Object.class, parameterTypes = {SquareExpression.class},
-    isDynamic = true, line = 111)
+    @IndirectCall(name = "visit", declaringClass = "Llib/ExpressionPrinter$ExpressionStringifier;",
+            returnType = Object.class, parameterTypes = {SquareExpression.class})
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }

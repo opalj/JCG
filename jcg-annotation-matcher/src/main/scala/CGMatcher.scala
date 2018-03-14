@@ -161,6 +161,8 @@ object CGMatcher {
 
         while (workset.nonEmpty) {
             val currentSource = workset.head
+            if (source.name == "eval" && source.declaringClass == "Llib/UnaryExpression;")
+                println()
             workset = workset.tail
 
             for (tgt ← computedCallSites.filter(_.method == currentSource).flatMap(_.targets)) {

@@ -92,19 +92,12 @@ public class IncrementExpression extends UnaryExpression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "visit",
-    	resolvedMethods = {@ResolvedMethod(receiverType = "Llib/ExpressionPrinter$ExpressionStringifier;")},
-    	returnType = String.class, parameterTypes = {IncrementExpression.class},
-    	isDynamic = true, line = 100)
+    @IndirectCall(name = "visit", parameterTypes = IncrementExpression.class, returnType = String.class,
+    declaringClass = "Llib/ExpressionPrinter$ExpressionStringifier;")
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }
 
-    @CallSite(name= "toString", resolvedMethods = {
-            @ResolvedMethod(receiverType = IncrementExpression.FQN),
-            @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            @ResolvedMethod(receiverType = SquareExpression.FQN),
-    }, returnType = String.class, line = 112)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Inc("+ expr.toString() + ")";

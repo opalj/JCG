@@ -30,13 +30,13 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
+import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.properties.EntryPoint;
 
 import java.util.function.Function;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.properties.EntryPoint;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
  * This class models a mathematical constant by simply wrapping an integer value.
@@ -84,12 +84,7 @@ public class Constant implements Expression {
         return this;
     }
 
-    @CallSite(name = "visit",
-            resolvedMethods = {@ResolvedMethod(receiverType = "Llib/ExpressionPrinter$ExpressionStringifier;")},
-            returnType = String.class, isDynamic = true,
-            parameterTypes = {Constant.class},
-            line = 95
-    )
+    @IndirectCall(name = "visit",  declaringClass = "Llib/ExpressionPrinter$ExpressionStringifier;", returnType = String.class, parameterTypes = Constant.class)
     @EntryPoint(value = {OPA, CPA})
     public <T> T accept(Function<Expression, T> visit) {
     	return visit.apply(this);
