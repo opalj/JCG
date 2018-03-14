@@ -121,7 +121,7 @@ public class WalaJCGAdapter {
             e.printStackTrace();
         }
 
-        Properties p = null;
+        /*Properties p = null;
         try {
             p = WalaExamplesProperties.loadProperties();
             p.putAll(WalaProperties.loadProperties());
@@ -132,7 +132,7 @@ public class WalaJCGAdapter {
         String pdfFile = "cg.pdf";
 
         String dotExe = p.getProperty(WalaExamplesProperties.DOT_EXE);
-        DotUtil.dotify(callGraph, null, PDFTypeHierarchy.DOT_FILE, pdfFile, dotExe);
+        DotUtil.dotify(callGraph, null, PDFTypeHierarchy.DOT_FILE, pdfFile, dotExe); */
     }
 
     private static JSONObject createMethodObject(MethodReference method) {

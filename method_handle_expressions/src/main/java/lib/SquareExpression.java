@@ -30,12 +30,9 @@
 
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.documentation.CGCategory;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
-import lib.testutils.CallbackTest;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
@@ -71,12 +68,10 @@ public final class SquareExpression extends UnaryExpression {
     private Expression square;
 
     @EntryPoint(value = { OPA, CPA })
-    @CallSite(name = "callback", line = 79, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
     @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using findConstructor")
     public SquareExpression(Expression expr){
         super(expr);
         square = new MultOperator.MultExpression(expr, expr);
-        CallbackTest.callback();
     }
 
     @EntryPoint(value = {OPA, CPA})

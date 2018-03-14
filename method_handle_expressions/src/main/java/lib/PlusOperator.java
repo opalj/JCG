@@ -106,10 +106,8 @@ public class PlusOperator extends Operator {
     }
 
     @EntryPoint(value = {OPA})
-    @CallSite(name = "callback", line = 112, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
     @CGNote(value = CGCategory.REFLECTION, description = "The method is called using findVirtual")
     static BinaryExpression createBinaryExpression(Expression left, Expression right ) {
-        CallbackTest.callback();
         return new AddExpression(left, right);
     }
 

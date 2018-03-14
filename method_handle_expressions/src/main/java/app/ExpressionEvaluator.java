@@ -34,6 +34,7 @@ import static lib.annotations.callgraph.AnalysisMode.DESKTOP_APP;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 import lib.*;
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.properties.EntryPoint;
 
 /**
@@ -65,6 +66,9 @@ import lib.annotations.properties.EntryPoint;
 public class ExpressionEvaluator {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    @IndirectCall(name = "<init>", parameterTypes = Expression.class, declaringClass = IdentityExpression.FQN)
+    @IndirectCall(name = "<init>", parameterTypes = Expression.class, declaringClass = SquareExpression.FQN)
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, declaringClass = PlusOperator.FQN, returnType = BinaryExpression.class)
     public static void main(final String[] args) throws Throwable {
         Constant c1 = new Constant(1);
         Constant c2 = new Constant(2);
