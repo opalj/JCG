@@ -29,15 +29,14 @@
  */
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.*;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
  * This abstract class models a binary arithmetic expression. It contains factory methods
@@ -128,7 +127,7 @@ public abstract class BinaryExpression implements Expression {
         Class<?> operatorClass = Class.forName(operator);
 
         MethodType methodType = MethodType.methodType(BinaryExpression.class, Expression.class, Expression.class);
-        MethodHandle createBinaryHandle = MethodHandles.lookup().findVirtual(operatorClass,
+        MethodHandle createBinaryHandle = MethodHandles.lookup().findStatic(operatorClass,
                 "createBinaryExpression", methodType);
         return (BinaryExpression) createBinaryHandle.invokeExact(left, right);
     }

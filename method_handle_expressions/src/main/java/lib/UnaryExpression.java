@@ -87,7 +87,7 @@ public abstract class UnaryExpression implements Expression {
         Class<?> clazz = Class.forName(operator.toString());
         MethodType methodType = MethodType.methodType(void.class, Expression.class);
         MethodHandle createUnaryHandle = MethodHandles.lookup().findConstructor(clazz, methodType);
-        UnaryExpression uExpr = (UnaryExpression) createUnaryHandle.invokeExact(expr);
+        UnaryExpression uExpr = (UnaryExpression) createUnaryHandle.invoke(expr);
 
         return uExpr;
     }

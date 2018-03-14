@@ -71,6 +71,6 @@ public class ExpressionEvaluator {
         UnaryExpression.createUnaryExpressions(UnaryOperator.IDENTITY, c1);
         UnaryExpression.createUnaryExpressions(UnaryOperator.SQUARE, c2);
 
-        BinaryExpression.createBinaryExpression("Plus", c1, c2);
+        BinaryExpression.createBinaryExpression("lib.PlusOperator", c1, c2);
     }
 }
