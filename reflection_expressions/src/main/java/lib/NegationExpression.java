@@ -27,27 +27,25 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-package app;
 
-import lib.BinaryExpression;
-import lib.Constant;
-import lib.Expression;
-import lib.UnaryExpression;
+package lib;
+
+import lib.annotations.documentation.CGCategory;
+import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
-import static lib.UnaryOperator.IDENTITY;
-import static lib.UnaryOperator.SQUARE;
-import static lib.annotations.callgraph.AnalysisMode.*;
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
- * This class defines an application use case of the expression library featuring reflection.
- * It just creates a binary expression representing the mason's angle (3²+4²=5²) and does nothing with it.
+ * A SquareExpression represents an unary operation that squares an expression.
+ *
+ * 
  * <!--
- * <p>
- * <p>
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
+ * <p>
  * <p>
  * <p>
  * <p>
@@ -57,29 +55,38 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  * <p>
  * <p>
  * <p>
+ * <p>
+ * <p>
  * -->
  *
- * @author Michael Eichberg
  * @author Michael Reif
- * @author Roberts Kolosovs
- * @author Florian Kuebler
  */
-public class MasonsExpressions {
+public final class NegationExpression extends UnaryExpression {
 
-    @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    public static void main(final String[] args) throws Exception {
-        Constant c1 = new Constant(3);
-        Constant c2 = new Constant(4);
+	public static final String FQN = "Llib/NegationExpression;";
 
-        Expression left = UnaryExpression.createUnaryExpressions(SQUARE, c1);
-        Expression right = UnaryExpression.createIdentityExpression(c1);
-        UnaryExpression.createUnaryExpressions("lib.NegationExpression", c2);
+    private Expression negation;
 
-        BinaryExpression.createBinaryExpression("lib.PlusOperator", left, right);
-        BinaryExpression.createMultExpression(left, right);
-        BinaryExpression.createRandomBinaryExpression(left, right);
+    @EntryPoint(value = { OPA, CPA })
+    @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using reflection")
+    public NegationExpression(Expression expr){
+        super(expr);
+        negation = new MultOperator.MultExpression(new Constant(-1), expr);
+    }
 
-        BinaryExpression.createBasicBinaryExpression("lib.PlusOperator", left, right);
-        BinaryExpression.createBasicMultExpression(left, right);
+    @EntryPoint(value = {OPA, CPA})
+    public String toString() {
+        return "-" + expr.toString();
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    public Constant eval(Map<String, Constant> values) {
+        return negation.eval(values);
+    }
+
+    @Override
+    @EntryPoint(value = {OPA, CPA})
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

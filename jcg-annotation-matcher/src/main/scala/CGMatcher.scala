@@ -165,7 +165,7 @@ object CGMatcher {
 
             for (tgt ← computedCallSites.filter(_.method == currentSource).flatMap(_.targets)) {
                 if (tgt == annotatedTarget) {
-                    println("FOUND CALL TRANSITIVE")
+                    println(s"Found transitive call $source -> $annotatedTarget")
                     return true
                 }
 

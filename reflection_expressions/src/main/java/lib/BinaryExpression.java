@@ -174,17 +174,17 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = PlusOperator.FQN)
-    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = MultOperator.FQN)
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = MinusOperator.FQN)
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = DivOperator.FQN)
     public static BinaryExpression createRandomBinaryExpression(
             final Expression left,
             final Expression right
     ) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String operator;
         if (System.currentTimeMillis() % 2 == 0)
-            operator = "lib.PlusOperator";
+            operator = "lib.MinusOperator";
         else
-            operator = "lib.MultOperator";
+            operator = "lib.DivOperator";
 
 
         Class<?> operatorClass = Class.forName(operator);

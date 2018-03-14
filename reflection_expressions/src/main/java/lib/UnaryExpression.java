@@ -76,7 +76,6 @@ public abstract class UnaryExpression implements Expression {
 
     @EntryPoint(value = {OPA, CPA})
     @IndirectCall(name = "<init>", declaringClass = SquareExpression.FQN, parameterTypes = Expression.class)
-    @IndirectCall(name = "<init>", declaringClass = IdentityExpression.FQN, parameterTypes = Expression.class)
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
             final Expression expr) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
@@ -86,7 +85,7 @@ public abstract class UnaryExpression implements Expression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "<init>", declaringClass = IdentityExpression.FQN, parameterTypes = Expression.class)
+    @IndirectCall(name = "<init>", declaringClass = NegationExpression.FQN, parameterTypes = Expression.class)
     public static UnaryExpression createUnaryExpressions(
             String operator,
             final Expression expr) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
