@@ -124,6 +124,37 @@ public abstract class BinaryExpression implements Expression {
         };
     }
 
+
+    @IndirectCall(name = "<init>", declaringClass = MultOperator.FQN)
+    public static BinaryExpression createBasicMultExpression(
+            final Expression left,
+            final Expression right) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+        Class<?> operatorClass = Class.forName("lib.MultOperator");
+        final Operator operator = (Operator) operatorClass.newInstance();
+        return new BinaryExpression() {
+            @Override
+            protected Expression left() {
+                return left;
+            }
+
+            @Override
+            protected Expression right() {
+                return right;
+            }
+
+            @Override
+            protected Operator operator() {
+                return operator;
+            }
+
+            @Override
+            public Constant eval(Map<String, Constant> values) {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @EntryPoint(value = {OPA, CPA})
     @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = PlusOperator.FQN)
@@ -133,7 +164,7 @@ public abstract class BinaryExpression implements Expression {
             final Expression right) throws Exception {
         Class<?> operatorClass = null;
         try {
-            operatorClass = Class.forName("lib.PlusOperator");
+            operatorClass = Class.forName(operator);
             Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
             return (BinaryExpression) m.invoke(null, left, right);
         } catch (ClassNotFoundException cnfe) {
@@ -157,6 +188,18 @@ public abstract class BinaryExpression implements Expression {
 
 
         Class<?> operatorClass = Class.forName(operator);
+        Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
+        return (BinaryExpression) m.invoke(null, left, right);
+    }
+
+
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = MultOperator.FQN)
+    public static BinaryExpression createMultExpression(
+            final Expression left,
+            final Expression right
+    ) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> operatorClass = Class.forName("lib.MultOperator");
+
         Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
         return (BinaryExpression) m.invoke(null, left, right);
     }

@@ -29,15 +29,12 @@
  */
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.CPA;
-import static lib.annotations.callgraph.AnalysisMode.OPA;
-
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.documentation.CGCategory;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
-import lib.testutils.CallbackTest;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
 *
@@ -97,10 +94,8 @@ public class MultOperator extends Operator {
     }
 
     @EntryPoint(value = {OPA})
-    @CallSite(name = "callback", line = 103, resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN))
     @CGNote(value = CGCategory.REFLECTION, description = "Invoked using reflection")
     static BinaryExpression createBinaryExpression(Expression left,Expression right ) {
-        CallbackTest.callback();
         return new MultExpression(left,right);
     }
 
