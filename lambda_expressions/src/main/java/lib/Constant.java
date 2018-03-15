@@ -84,7 +84,7 @@ public class Constant implements Expression {
         return this;
     }
 
-    @IndirectCall(name = "visit",  declaringClass = "Llib/ExpressionPrinter$ExpressionStringifier;", returnType = String.class, parameterTypes = Constant.class)
+    @IndirectCall(name = "visit",  declaringClass = "Lapp/ExpressionPrinter$ExpressionStringifier;", returnType = String.class, parameterTypes = Expression.class)
     @EntryPoint(value = {OPA, CPA})
     public <T> T accept(Function<Expression, T> visit) {
     	return visit.apply(this);

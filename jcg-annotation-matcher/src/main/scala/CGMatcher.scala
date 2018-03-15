@@ -100,9 +100,6 @@ object CGMatcher {
             val returnType = getType(callSiteAnnotation, "returnType")
             val parameterTypes = getParameterList(callSiteAnnotation)
             val annotatedMethod = convertMethod(method)
-            val tmp = computedCallSites.filter { cs ⇒
-                cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
-            }
 
             val annotatedTargets =
                 getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
@@ -161,8 +158,6 @@ object CGMatcher {
 
         while (workset.nonEmpty) {
             val currentSource = workset.head
-            if (source.name == "eval" && source.declaringClass == "Llib/UnaryExpression;")
-                println()
             workset = workset.tail
 
             for (tgt ← computedCallSites.filter(_.method == currentSource).flatMap(_.targets)) {

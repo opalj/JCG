@@ -85,7 +85,7 @@ public final class SquareExpression extends UnaryExpression {
             returnType = Constant.class,
             parameterTypes = {Constant.class},
             resolvedMethods = @ResolvedMethod(receiverType = "Llib/IncrementExpression;"),
-            line = 90)
+            line = 91)
     @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
         return (Constant c) -> new Constant(c.getValue() * c.getValue());
@@ -103,9 +103,6 @@ public final class SquareExpression extends UnaryExpression {
     }
 
     @Override
-    @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "visit", declaringClass = "Llib/ExpressionPrinter$ExpressionStringifier;",
-            returnType = Object.class, parameterTypes = {SquareExpression.class})
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }

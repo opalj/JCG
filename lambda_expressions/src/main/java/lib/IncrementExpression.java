@@ -80,7 +80,7 @@ public class IncrementExpression extends UnaryExpression {
             returnType = Constant.class,
             parameterTypes = {Constant.class},
             resolvedMethods = @ResolvedMethod(receiverType = IncrementExpression.FQN),
-            line = 87)
+            line = 86)
     @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
         return (Constant constant) -> new Constant(constant.getValue() + 1);
@@ -91,9 +91,6 @@ public class IncrementExpression extends UnaryExpression {
         super(expr);
     }
 
-    @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "visit", parameterTypes = IncrementExpression.class, returnType = String.class,
-    declaringClass = "Llib/ExpressionPrinter$ExpressionStringifier;")
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }

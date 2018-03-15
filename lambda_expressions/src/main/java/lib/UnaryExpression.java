@@ -121,7 +121,7 @@ public abstract class UnaryExpression implements Expression {
 
 	@IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, declaringClass = UnaryExpression.FQN)
 	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = {Constant.class}, resolvedMethods = { }, //TODO
-			line = 120)
+			line = 127)
 	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {
 		return operator().apply(expr.eval(values));

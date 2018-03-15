@@ -92,6 +92,10 @@ public class ExpressionPrinter {
         toList.accept(incrementArray);
         Supplier<Constant> constantSupplier = new OneConstant().getSuperToConstant();
         Constant zero = constantSupplier.get();
+        zero.accept(stringifier);
+        Expression stillZero = UnaryExpression.createUnaryExpressions(UnaryOperator.IDENTITY, zero);
+        Expression alsoZero = UnaryExpression.createUnaryExpressions(UnaryOperator.SQUARE, stillZero);
+        alsoZero.eval(new Map<>());
     }
 
     @IndirectCall(name = "<init>", declaringClass = FQN)
