@@ -69,6 +69,7 @@ public class MasonsExpressions {
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
     @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = MultOperator.MultExpression.FQN)
     @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = PlusOperator.AddExpression.FQN)
+    @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = Constant.FQN)
     public static void main(final String[] args) throws Exception {
         Constant c1 = new Constant(3);
         Constant c2 = new Constant(4);
@@ -94,6 +95,10 @@ public class MasonsExpressions {
         Class<?> plusClass = Class.forName("lib.PlusOperator$AddExpression");
         Method evalPlusMethod = plusClass.getMethod("eval", Map.class);
         evalPlusMethod.invoke(add, new Map<>());
+
+        Class<?> constantClass = Class.forName("lib.Constant");
+        Method evalConstantMethod = constantClass.getMethod("eval", Map.class);
+        evalConstantMethod.invoke(c1, new Map<>());
 
 
     }
