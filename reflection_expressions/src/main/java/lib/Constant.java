@@ -90,6 +90,11 @@ public class Constant implements Expression {
         return visitor.visit(this);
     }
 
+    @Override
+    public String toString() {
+        return "Constant(" + value + ")";
+    }
+
     @EntryPoint(value = {OPA, CPA})
     public native float toFloat();
 }
