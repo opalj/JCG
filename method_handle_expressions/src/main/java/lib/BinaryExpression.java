@@ -29,6 +29,7 @@
  */
 package lib;
 
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.properties.EntryPoint;
 
 import java.lang.invoke.MethodHandle;
@@ -68,6 +69,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  *
  * @author Michael Eichberg
  * @author Michael Reif
+ * @author Florian Kuebler
  */
 public abstract class BinaryExpression implements Expression {
 
@@ -85,41 +87,7 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public static BinaryExpression createBasicBinaryExpression(
-            Operator operator,
-            final Expression left,
-            final Expression right) {
-        final Operator op = operator;
-
-        return new BinaryExpression() {
-
-            @Override
-            @EntryPoint(value = {OPA, CPA})
-            public Constant eval(Map<String, Constant> values) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            @EntryPoint(value = {OPA, CPA})
-            protected Expression left() {
-                return left;
-            }
-
-            @Override
-            @EntryPoint(value = {OPA, CPA})
-            protected Expression right() {
-                return right;
-            }
-
-            @Override
-            @EntryPoint(value = {OPA, CPA})
-            protected Operator operator() {
-                return op;
-            }
-        };
-    }
-
-    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, declaringClass = MultOperator.FQN, returnType = BinaryExpression.class)
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,
@@ -128,6 +96,16 @@ public abstract class BinaryExpression implements Expression {
 
         MethodType methodType = MethodType.methodType(BinaryExpression.class, Expression.class, Expression.class);
         MethodHandle createBinaryHandle = MethodHandles.lookup().findStatic(operatorClass,
+                "createBinaryExpression", methodType);
+        return (BinaryExpression) createBinaryHandle.invokeExact(left, right);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, declaringClass = PlusOperator.FQN, returnType = BinaryExpression.class)
+    public static BinaryExpression createPlusExpression(Expression left, Expression right) throws Throwable {
+        Class<?> plusClass = Class.forName("lib.PlusOperator");
+        MethodType methodType = MethodType.methodType(BinaryExpression.class, Expression.class, Expression.class);
+        MethodHandle createBinaryHandle = MethodHandles.lookup().findStatic(plusClass,
                 "createBinaryExpression", methodType);
         return (BinaryExpression) createBinaryHandle.invokeExact(left, right);
     }

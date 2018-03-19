@@ -30,6 +30,7 @@
 
 package lib;
 
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.documentation.CGCategory;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
@@ -81,10 +82,24 @@ public abstract class UnaryExpression implements Expression {
 
     @CGNote(value = CGCategory.REFLECTION, description = "the constructor is invoked using findConstructor")
     @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "<init>", parameterTypes = Expression.class, declaringClass = IdentityExpression.FQN)
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
             final Expression expr) throws Throwable {
         Class<?> clazz = Class.forName(operator.toString());
+        MethodType methodType = MethodType.methodType(void.class, Expression.class);
+        MethodHandle createUnaryHandle = MethodHandles.lookup().findConstructor(clazz, methodType);
+        UnaryExpression uExpr = (UnaryExpression) createUnaryHandle.invoke(expr);
+
+        return uExpr;
+    }
+
+    @CGNote(value = CGCategory.REFLECTION, description = "the constructor is invoked using findConstructor")
+    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "<init>", parameterTypes = Expression.class, declaringClass = SquareExpression.FQN)
+    public static UnaryExpression createSquareExpressions(
+            final Expression expr) throws Throwable {
+        Class<?> clazz = Class.forName("lib.SquareExpression");
         MethodType methodType = MethodType.methodType(void.class, Expression.class);
         MethodHandle createUnaryHandle = MethodHandles.lookup().findConstructor(clazz, methodType);
         UnaryExpression uExpr = (UnaryExpression) createUnaryHandle.invoke(expr);
