@@ -1,4 +1,5 @@
 import de.tud.cs.peaks.sootconfig.*;
+import options.CGOptionsWithReflection;
 import options.CHAOptions;
 import options.RTAOptions;
 import options.VTAOptions;
@@ -34,8 +35,10 @@ public class SootJCGAdatper {
         options.allowPhantomReferences();
         options.noBodiesForExcluded();
 
-        CallGraphPhaseOptions cgOptions = new CallGraphPhaseOptions();
+        CGOptionsWithReflection cgOptions = new CGOptionsWithReflection();
         options.addPhaseOptions(cgOptions);
+
+        cgOptions.handleForNameSafe().handleNewInstanceSafe().useTypesForInvoke();
 
         //TODO we should use these two options only on the library project
         //cgOptions.processAllReachable();
