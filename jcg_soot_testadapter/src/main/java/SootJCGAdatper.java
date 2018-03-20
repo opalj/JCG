@@ -15,20 +15,26 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class SootJCGAdatper {
+public class SootJCGAdatper implements JCGTestAdapter {
 
     private static final String CHA = "CHA";
     private static final String RTA = "RTA";
     private static final String VTA = "VTA";
     private static final String Spark = "SPARK";
 
-    public static void main(String[] args) {
-        String cgAlgorithm = args[0];
-        String targetJar = args[1];
-        String cp = args[2];
-        String outputPath = args[3];
 
+    @Override
+    public String[] possibleAlgorithms() {
+        return new String[] {CHA, RTA, VTA, Spark};
+    }
 
+    @Override
+    public String frameworkName() {
+        return "Soot";
+    }
+
+    @Override
+    public void serializeCG(String algorithm, String target, String classPath, String outputFile) {
         FluentOptions options = new FluentOptions();
         options.wholeProgramAnalysis();
         options.keepLineNumbers();
@@ -45,7 +51,7 @@ public class SootJCGAdatper {
         //cgOptions.libraryModeSignatureResolution();
 
         CallGraphPhaseSubOptions cgModeOption = null;
-        switch (cgAlgorithm) {
+        switch (algorithm) {
             case CHA:
                 cgModeOption = new CHAOptions().enable();
                 break;
@@ -63,11 +69,8 @@ public class SootJCGAdatper {
 
 
         AnalysisTarget analysisTarget = new AnalysisTarget();
-        analysisTarget.classPath(cp);
-        analysisTarget.processPath(targetJar);
-
-        System.out.println(options.toString());
-        System.out.println(analysisTarget);
+        analysisTarget.classPath(classPath);
+        analysisTarget.processPath(target);
 
         SootRun run = new SootRun(options, analysisTarget);
         SootResult result = run.perform();
@@ -112,13 +115,22 @@ public class SootJCGAdatper {
         }
         callSitesObject.put("callSites", callSites);
 
-        try (FileWriter file = new FileWriter(outputPath)) {
+        try (FileWriter file = new FileWriter(outputFile)) {
             file.write(callSitesObject.toJSONString());
             file.flush();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        String cgAlgorithm = args[0];
+        String targetJar = args[1];
+        String cp = args[2];
+        String outputPath = args[3];
+
+        new SootJCGAdatper().serializeCG(cgAlgorithm, targetJar, cp, outputPath);
     }
 
     private static JSONObject createMethodObject(SootMethod method) {

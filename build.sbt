@@ -12,17 +12,21 @@ lazy val jcg_annotations = project.settings(
 
 lazy val jcg_annotation_matcher = project.settings(
     commonSettings
-)
+).dependsOn(jcg_annotations, jcg_testadapter_commons)
 
 lazy val jcg_wala_testadapter = project.settings(
     commonSettings
-)
+).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_soot_testadapter = project.settings(
     commonSettings
-)
+).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_opal_testadapter = project.settings(
+    commonSettings
+).dependsOn(jcg_testadapter_commons)
+
+lazy val jcg_testadapter_commons = project.settings(
     commonSettings
 )
 

@@ -1,6 +1,7 @@
 import java.io.File
 import java.io.FileInputStream
 
+import lib.annotations.documentation.CGFeature
 import org.opalj.br
 import org.opalj.br.analyses.Project
 import org.opalj.br.Annotation
@@ -9,6 +10,7 @@ import org.opalj.br.ArrayValue
 import org.opalj.br.BooleanValue
 import org.opalj.br.ClassValue
 import org.opalj.br.ElementValuePair
+import org.opalj.br.EnumValue
 import org.opalj.br.IntValue
 import org.opalj.br.ObjectType
 import org.opalj.br.StringValue
@@ -35,6 +37,7 @@ class DevNullLogger extends OPALLogger {
 class MatchResult() {
     var missedTargets = 0
     var calledProhibitedTargets = 0
+    var failedFeatures: Set[CGFeature] = Set.empty
 }
 
 object CGMatcher {
@@ -44,7 +47,7 @@ object CGMatcher {
     val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
     val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
 
-    def matchCallSites(tgtJar: String, jsonPath: String): (Int, Int) = {
+    def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): (Int, Int, Set[CGFeature]) = {
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
         val p = Project(new File(tgtJar))
 
@@ -70,7 +73,11 @@ object CGMatcher {
                                     Seq.empty
 
                             handleCallSiteAnnotations(
-                                computedCallSites.callSites, method, callSiteAnnotations, matchResult
+                                computedCallSites.callSites,
+                                method,
+                                callSiteAnnotations,
+                                matchResult,
+                                verbose
                             )
 
                             val indirectCallAnnotations =
@@ -82,23 +89,34 @@ object CGMatcher {
                                     Seq.empty
 
                             handleIndirectCallAnnotations(
-                                computedCallSites.callSites, method, indirectCallAnnotations
+                                computedCallSites.callSites,
+                                method,
+                                indirectCallAnnotations,
+                                matchResult,
+                                verbose
                             )
                         }
                     }
                 }
-                (matchResult.missedTargets, matchResult.calledProhibitedTargets)
+                (matchResult.missedTargets, matchResult.calledProhibitedTargets, matchResult.failedFeatures)
             case _ ⇒
                 throw new RuntimeException("Unable to parse json")
         }
     }
 
-    private def handleCallSiteAnnotations(computedCallSites: Set[CallSite], method: br.Method, callSiteAnnotations: Seq[Annotation], matchResult: MatchResult): Unit = {
+    private def handleCallSiteAnnotations(
+        computedCallSites:   Set[CallSite],
+        method:              br.Method,
+        callSiteAnnotations: Seq[Annotation],
+        matchResult:         MatchResult,
+        verbose:             Boolean
+    ): Unit = {
         for (callSiteAnnotation ← callSiteAnnotations) {
             val line = getLineNumber(callSiteAnnotation)
             val name = getString(callSiteAnnotation, "name")
             val returnType = getType(callSiteAnnotation, "returnType")
             val parameterTypes = getParameterList(callSiteAnnotation)
+            val feature = getFeatureEnum(callSiteAnnotation)
             val annotatedMethod = convertMethod(method)
 
             val annotatedTargets =
@@ -113,10 +131,11 @@ object CGMatcher {
 
                     for (annotatedTgt ← annotatedTargets) {
                         if (!computedTargets.contains(annotatedTgt)) {
-                            println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
+                            if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
                             matchResult.missedTargets += 1
+                            matchResult.failedFeatures += feature
                         } else {
-                            println("found it")
+                            if (verbose) println("found it")
                         }
                     }
 
@@ -124,21 +143,27 @@ object CGMatcher {
                         getAnnotations(callSiteAnnotation, "prohibitedMethods").map(getString(_, "receiverType"))
                     for (prohibitedTgt ← prohibitedTargets) {
                         if (computedTargets.contains(prohibitedTgt)) {
-                            println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
+                            if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
                             matchResult.calledProhibitedTargets += 1
+                            matchResult.failedFeatures += feature
                         } else {
-                            println("no call to prohibited")
+                            if (verbose) println("no call to prohibited")
                         }
                     }
                 case _ ⇒
-                    println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
+                    if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
                     matchResult.missedTargets += annotatedTargets.size
+                    matchResult.failedFeatures += feature
             }
         }
     }
 
     private def handleIndirectCallAnnotations(
-        computedCallSites: Set[CallSite], source: br.Method, indirectCallAnnotations: Seq[Annotation]
+        computedCallSites:       Set[CallSite],
+        source:                  br.Method,
+        indirectCallAnnotations: Seq[Annotation],
+        matchResult:             MatchResult,
+        verbose:                 Boolean
     ): Unit = {
         for (annotation ← indirectCallAnnotations) {
             val name = getString(annotation, "name")
@@ -147,12 +172,19 @@ object CGMatcher {
             val declaringClass = getString(annotation, "declaringClass")
             val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
             val annotatedSource = convertMethod(source)
-            callsIndirectly(computedCallSites, annotatedSource, annotatedTarget)
+            val feature = getFeatureEnum(annotation)
+            if (!callsIndirectly(computedCallSites, annotatedSource, annotatedTarget, verbose))
+                matchResult.failedFeatures += feature
         }
 
     }
 
-    private def callsIndirectly(computedCallSites: Set[CallSite], source: Method, annotatedTarget: Method): Boolean = {
+    private def callsIndirectly(
+        computedCallSites: Set[CallSite],
+        source:            Method,
+        annotatedTarget:   Method,
+        verbose:           Boolean
+    ): Boolean = {
         var visited: Set[Method] = Set(source)
         var workset: Set[Method] = Set(source)
 
@@ -162,7 +194,7 @@ object CGMatcher {
 
             for (tgt ← computedCallSites.filter(_.method == currentSource).flatMap(_.targets)) {
                 if (tgt == annotatedTarget) {
-                    println(s"Found transitive call $source -> $annotatedTarget")
+                    if (verbose) println(s"Found transitive call $source -> $annotatedTarget")
                     return true
                 }
 
@@ -173,13 +205,13 @@ object CGMatcher {
             }
         }
 
-        println(s"Missed transitive call $source -> $annotatedTarget")
+        if (verbose) println(s"Missed transitive call $source -> $annotatedTarget")
 
         false
     }
 
     def main(args: Array[String]): Unit = {
-        matchCallSites(args(0), args(1))
+        matchCallSites(args(0), args(1), true)
     }
 
     def convertMethod(method: org.opalj.br.Method): Method = {
@@ -240,5 +272,13 @@ object CGMatcher {
                     ev.asInstanceOf[ClassValue].value)
         }
         av.getOrElse(List()).toList
+    }
+
+    def getFeatureEnum(callSite: Annotation): CGFeature = {
+        val feature = callSite.elementValuePairs collectFirst {
+            case ElementValuePair("feature", EnumValue(_, constName)) ⇒
+                constName
+        }
+        CGFeature.valueOf(feature.getOrElse("Misc"))
     }
 }

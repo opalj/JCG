@@ -26,20 +26,33 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
 
-public class WalaJCGAdapter {
+public class WalaJCGAdapter implements JCGTestAdapter {
 
-    public static void main(String[] args) throws IOException, CancelException, WalaException {
+    @Override
+    public String[] possibleAlgorithms() {
+        return new String[] {"RTA", "0-CFA", "1-CFA", "0-1-CFA"};
+    }
+
+    @Override
+    public String frameworkName() {
+        return "WALA";
+    }
+
+    public static void main(String[] args) throws Exception {
         String cgAlgorithm = args[0];
         String testfile = args[1];
         String outputPath = args[2];
 
+        new WalaJCGAdapter().serializeCG(cgAlgorithm, testfile, null, outputPath);
+    }
+
+    @Override
+    public void serializeCG(String algorithm, String target, String classPath, String outputFile) throws Exception{
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         File ex = new File(cl.getResource("exclusions.txt").getFile());
-        AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(testfile, ex);
+        AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(target, ex);
 
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
-        //Iterable<Entrypoint> entrypoints = new AllSubtypesOfApplicationEntrypoints(scope, classHierarchy);
-        //Iterable<Entrypoint> entrypoints = new AllApplicationEntrypoints(scope, classHierarchy);
         Iterable<Entrypoint> entrypoints = Util.makeMainEntrypoints(scope, classHierarchy);
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
         options.setReflectionOptions(AnalysisOptions.ReflectionOptions.FULL);
@@ -48,16 +61,16 @@ public class WalaJCGAdapter {
         CallGraph callGraph = null;
         AnalysisCache cache = new AnalysisCacheImpl();
 
-        if (cgAlgorithm.equals("0-CFA")) {
+        if (algorithm.equals("0-CFA")) {
             SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(options, cache, classHierarchy, scope);
             callGraph = ncfaBuilder.makeCallGraph(options);
-        } else if (cgAlgorithm.equals("0-1-CFA")) {
+        } else if (algorithm.equals("0-1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
-        } else if (cgAlgorithm.equals("1-CFA")) {
+        } else if (algorithm.equals("1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
-        } else if (cgAlgorithm.equals("RTA")) {
+        } else if (algorithm.equals("RTA")) {
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
             callGraph = rtaBuilder.makeCallGraph(options, new NullProgressMonitor());
         } else {
@@ -113,7 +126,7 @@ public class WalaJCGAdapter {
 
         callSitesObject.put("callSites", callSites);
 
-        try (FileWriter file = new FileWriter(outputPath)) {
+        try (FileWriter file = new FileWriter(outputFile)) {
             file.write(callSitesObject.toJSONString());
             file.flush();
 
@@ -157,5 +170,4 @@ public class WalaJCGAdapter {
             return type.getName().toString();
         }
     }
-
 }
