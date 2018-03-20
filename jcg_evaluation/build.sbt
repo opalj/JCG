@@ -1,15 +1,4 @@
-name := "evaluation"
-
-version := "0.1"
-
-scalaVersion := "2.12.4"
-
-libraryDependencies += "de.tu-darmstadt.stg" %% "jcg-soot-testadapter" % "0.1"
-
-libraryDependencies += "de.tu-darmstadt.stg" %% "jcg-wala-testadapter" % "0.1"
-
-libraryDependencies += "de.tu-darmstadt.stg" %% "jcg-annotation-matcher" % "0.1"
-
+name := "Evaluation"
 
 resolvers += "soot snapshot" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-snapshot/"
 
