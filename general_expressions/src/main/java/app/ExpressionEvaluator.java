@@ -122,7 +122,7 @@ public class ExpressionEvaluator {
     }
 
     @CGNote(value = NATIVE_CALLBACK, description = "monomorph, intraprocedural case of arraycopy test case.")
-    @CallSite(name = "arraycopy", isStatic = true, resolvedMethods = {
+    @CallSite(name = "arraycopy", resolvedMethods = {
             @ResolvedMethod(receiverType = "Ljava/lang/System;")},
             parameterTypes = {lib.IncrementExpression[].class, int.class, lib.Expression[].class, int.class, int.class}, line = 133)
     @CallSite(name = "eval", returnType = lib.Constant.class, resolvedMethods = {
@@ -154,7 +154,7 @@ public class ExpressionEvaluator {
         return result;
     }
 
-    @CallSite(name = "arraycopy", isStatic = true,
+    @CallSite(name = "arraycopy",
             resolvedMethods = {@ResolvedMethod(receiverType = "Ljava/lang/System;")},
             parameterTypes = {lib.IncrementExpression[].class, int.class, lib.Expression[].class, int.class, int.class}, line = 162)
     @CGNote(value = NATIVE_CALLBACK, description = "array with well known types is copied into other array.")
