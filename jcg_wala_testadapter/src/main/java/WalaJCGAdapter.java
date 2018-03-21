@@ -1,22 +1,16 @@
 import com.ibm.wala.classLoader.CallSiteReference;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
-import com.ibm.wala.examples.drivers.PDFTypeHierarchy;
-import com.ibm.wala.examples.properties.WalaExamplesProperties;
+import com.ibm.wala.classLoader.Language;
 import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
-import com.ibm.wala.properties.WalaProperties;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeReference;
-import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.NullProgressMonitor;
-import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.config.AnalysisScopeReader;
-import com.ibm.wala.util.debug.Assertions;
-import com.ibm.wala.viz.DotUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -24,7 +18,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Properties;
 
 public class WalaJCGAdapter implements JCGTestAdapter {
 
@@ -59,13 +52,13 @@ public class WalaJCGAdapter implements JCGTestAdapter {
 
 
         CallGraph callGraph = null;
-        AnalysisCache cache = new AnalysisCacheImpl();
+        IAnalysisCacheView cache = new AnalysisCacheImpl();
 
         if (algorithm.equals("0-CFA")) {
-            SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(options, cache, classHierarchy, scope);
+            SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
             callGraph = ncfaBuilder.makeCallGraph(options);
         } else if (algorithm.equals("0-1-CFA")) {
-            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(options, cache, classHierarchy, scope);
+            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
         } else if (algorithm.equals("1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
