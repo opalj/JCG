@@ -34,6 +34,7 @@ import static lib.annotations.callgraph.AnalysisMode.DESKTOP_APP;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 import lib.*;
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.properties.EntryPoint;
 
 /**
@@ -55,7 +56,7 @@ import lib.annotations.properties.EntryPoint;
  * CODE (E.G. IMPORTS) CHANGE.
  * 
  * 
- * 
+ *
  * -->
  *
  * @author Michael Eichberg
@@ -65,13 +66,14 @@ import lib.annotations.properties.EntryPoint;
 public class ExpressionEvaluator {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    @IndirectCall(name = "<init>", parameterTypes = Expression.class, declaringClass = SquareExpression.FQN)
     public static void main(final String[] args) throws Throwable {
         Constant c1 = new Constant(1);
         Constant c2 = new Constant(2);
         UnaryExpression.createUnaryExpressions(UnaryOperator.IDENTITY, c1);
-        UnaryExpression.createUnaryExpressions(UnaryOperator.SQUARE, c2);
+        UnaryExpression.createSquareExpressions(c2);
 
-        BinaryExpression.createBinaryExpression("Plus", c1, c2);
-        BinaryExpression.createBinaryExpression("Mult", c1, c2);
+        BinaryExpression.createBinaryExpression("lib.MultOperator", c1, c2);
+        BinaryExpression.createPlusExpression(c1, c2);
     }
 }

@@ -64,7 +64,7 @@ import lib.annotations.properties.EntryPoint;
  */
 public final class SquareExpression extends UnaryExpression {
 
-	public static final String FQN = "lib/SquareExpression";
+	public static final String FQN = "Llib/SquareExpression;";
 	
     private Expression square;
     

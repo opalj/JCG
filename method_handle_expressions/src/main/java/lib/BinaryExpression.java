@@ -29,50 +29,51 @@
  */
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.properties.EntryPoint;
-
-import static lib.annotations.callgraph.AnalysisMode.*;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+
 /**
- * This abstract class models a binary arithmetic expression. It contains factory methods 
+ * This abstract class models a binary arithmetic expression. It contains factory methods
  * for creating new binary expressions.
- * 
- * This class uses a MethodHandle to fetch the createBinaryExpression method of the correct 
+ * <p>
+ * This class uses a MethodHandle to fetch the createBinaryExpression method of the correct
  * class and call it via the invokeExact method of the MethodHandle class.
- *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
  * @author Michael Eichberg
  * @author Michael Reif
+ * @author Florian Kuebler
  */
 public abstract class BinaryExpression implements Expression {
 
-    public static final String FQN = "lib/BinaryExpression";
+    public static final String FQN = "Llib/BinaryExpression;";
 
     abstract protected Expression left();
 
@@ -81,66 +82,32 @@ public abstract class BinaryExpression implements Expression {
     abstract protected Operator operator();
 
     @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor <T> visitor){
+    public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public static BinaryExpression createBasicBinaryExpression(
-            Operator operator,
-            final Expression left,
-            final Expression right) {
-        final Operator op = operator;
-
-        return new BinaryExpression(){
-
-            @Override
-            @EntryPoint(value = {OPA, CPA})
-            public Constant eval(Map<String, Constant> values) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            @EntryPoint(value = {OPA, CPA})
-            protected Expression left() {
-                return left;
-            }
-
-            @Override
-            @EntryPoint(value = {OPA, CPA})
-            protected Expression right() {
-                return right;
-            }
-
-            @Override
-            @EntryPoint(value = {OPA, CPA})
-            protected Operator operator() {
-                return op;
-            }
-        };
-    }
-
-    @CallSite(name = "createBinaryExpression",
-    		resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-    				@ResolvedMethod(receiverType = MultOperator.MultExpression.FQN)},
-    		returnType = BinaryExpression.class, isDynamic = true,
-    		parameterTypes = {String.class, Expression.class, Expression.class},
-    		line = 143)
-    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, declaringClass = MultOperator.FQN, returnType = BinaryExpression.class)
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,
-            final Expression right) throws Throwable{
-        Class<?> operatorClass = null;
-        try {
-            operatorClass = Class.forName("lib." + operator + "Operator");
-        } catch (ClassNotFoundException cnfe) {
-            operatorClass = Class.forName(operator);
-        }
+            final Expression right) throws Throwable {
+        Class<?> operatorClass = Class.forName(operator);
+
         MethodType methodType = MethodType.methodType(BinaryExpression.class, Expression.class, Expression.class);
-        MethodHandle createBinaryHandle = MethodHandles.lookup().findVirtual(operatorClass,
-        		  "createBinaryExpression", methodType);
-		return (BinaryExpression) createBinaryHandle.invokeExact(left, right);
+        MethodHandle createBinaryHandle = MethodHandles.lookup().findStatic(operatorClass,
+                "createBinaryExpression", methodType);
+        return (BinaryExpression) createBinaryHandle.invokeExact(left, right);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, declaringClass = PlusOperator.FQN, returnType = BinaryExpression.class)
+    public static BinaryExpression createPlusExpression(Expression left, Expression right) throws Throwable {
+        Class<?> plusClass = Class.forName("lib.PlusOperator");
+        MethodType methodType = MethodType.methodType(BinaryExpression.class, Expression.class, Expression.class);
+        MethodHandle createBinaryHandle = MethodHandles.lookup().findStatic(plusClass,
+                "createBinaryExpression", methodType);
+        return (BinaryExpression) createBinaryHandle.invokeExact(left, right);
     }
 }
 

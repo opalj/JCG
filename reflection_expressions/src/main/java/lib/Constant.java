@@ -66,7 +66,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public class Constant implements Expression {
 	
-	public static final String FQN = "lib/Constant";
+	public static final String FQN = "Llib/Constant;";
 
     private final int value;
     
@@ -88,6 +88,11 @@ public class Constant implements Expression {
     @EntryPoint(value = {OPA, CPA})
     public <T> T accept(ExpressionVisitor <T> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Constant(" + value + ")";
     }
 
     @EntryPoint(value = {OPA, CPA})

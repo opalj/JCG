@@ -30,10 +30,12 @@
 
 package lib;
 
+import lib.annotations.documentation.CGCategory;
+import lib.annotations.documentation.CGNote;
+import lib.annotations.properties.EntryPoint;
+
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-
-import lib.annotations.properties.EntryPoint;
 
 /**
  * A plus operator that creates a binary add expression.
@@ -62,16 +64,16 @@ import lib.annotations.properties.EntryPoint;
  */
 public class PlusOperator extends Operator {
 
-    public static final String FQN = "lib/PlusOperator";
+    public static final String FQN = "Llib/PlusOperator;";
     
     @EntryPoint(value = { OPA, CPA })
-    protected PlusOperator() {}
-
-    public final static Operator instance = new PlusOperator();
+    @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using reflection")
+    protected PlusOperator() {
+    }
 
     public static class AddExpression extends BinaryExpression {
 
-    	public static final String FQN = "lib/PlusOperator$AddExpression";
+    	public static final String FQN = "Llib/PlusOperator$AddExpression;";
     	
         private final Expression right;
         private final Expression left;
@@ -89,7 +91,7 @@ public class PlusOperator extends Operator {
         public Expression right(){return this.right;}
 
         @EntryPoint(value = {OPA, CPA})
-        public Operator operator(){return PlusOperator.instance;}
+        public Operator operator(){return new PlusOperator();}
 
         @Override
         @EntryPoint(value = {OPA, CPA})
@@ -99,7 +101,8 @@ public class PlusOperator extends Operator {
     }
 
     @EntryPoint(value = {OPA})
-    static BinaryExpression createBinaryExpression(Expression left, Expression right) {
+    @CGNote(value = CGCategory.REFLECTION, description = "Invoked using reflection")
+    public static BinaryExpression createBinaryExpression(Expression left, Expression right) {
         return new AddExpression(left, right);
     }
 

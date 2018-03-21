@@ -73,7 +73,7 @@ import lib.testutils.CallbackTest;
  */
 public class Constant implements Expression {
 	
-	public static final String FQN = "lib/Constant";
+	public static final String FQN = "Llib/Constant;";
 
     private int value;
     

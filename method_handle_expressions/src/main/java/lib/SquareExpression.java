@@ -30,6 +30,8 @@
 
 package lib;
 
+import lib.annotations.documentation.CGCategory;
+import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
@@ -61,11 +63,12 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public final class SquareExpression extends UnaryExpression {
 
-	public static final String FQN = "lib/SquareExpression";
+	public static final String FQN = "Llib/SquareExpression;";
 	
     private Expression square;
-    
+
     @EntryPoint(value = { OPA, CPA })
+    @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using findConstructor")
     public SquareExpression(Expression expr){
         super(expr);
         square = new MultOperator.MultExpression(expr, expr);

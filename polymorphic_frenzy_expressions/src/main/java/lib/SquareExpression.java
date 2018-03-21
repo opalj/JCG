@@ -82,7 +82,7 @@ public class SquareExpression extends UnaryExpression {
 
     @EntryPoint(value = {OPA, CPA})
     @CallSite(name = "apply", 
-    	resolvedMethods = {@ResolvedMethod(receiverType = "lib/SquareExpression$NewSquareOperator")}, 
+    	resolvedMethods = {@ResolvedMethod(receiverType = NewSquareOperator.FQN)},
     	parameterTypes ={Expression.class, Map.class}, returnType = Expression.class,
     	line = 90)
 	@Override
@@ -97,6 +97,8 @@ public class SquareExpression extends UnaryExpression {
 	}
 	
 	private class SquareOperator extends UnaryOperator {
+
+		public final static String FQN = "Llib/SquareExpression$SquareOperator;";
 
 		private static final long serialVersionUID = 2L;
 		
@@ -116,6 +118,8 @@ public class SquareExpression extends UnaryExpression {
 	}
 	
 	private class NewSquareOperator extends UnaryOperator {
+
+		public final static String FQN = "Llib/SquareExpression$SquareOperator;";
 		
 		private static final long serialVersionUID = 1L;
 		

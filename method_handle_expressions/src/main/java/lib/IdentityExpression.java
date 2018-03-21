@@ -30,6 +30,8 @@
 
 package lib;
 
+import lib.annotations.documentation.CGCategory;
+import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
@@ -65,9 +67,10 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public class IdentityExpression extends UnaryExpression {
 
-    public static final String FQN = "lib/IdentityExpression";
+    public static final String FQN = "Llib/IdentityExpression;";
     
     @EntryPoint(value = { OPA, CPA })
+    @CGNote(value = CGCategory.REFLECTION, description = "The constructor is called using findConstructor")
     public IdentityExpression(Expression expr){
         super(expr);
     }

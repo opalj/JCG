@@ -67,7 +67,7 @@ import java.io.Serializable;
  */
 public class Constant implements Expression, Serializable{
 	
-	public static final String FQN = "lib/Constant";
+	public static final String FQN = "Llib/Constant;";
 
     private final int value;
     

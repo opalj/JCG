@@ -68,7 +68,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 public abstract class UnaryExpression implements Expression {
 
-	public static final String FQN = "lib/UnaryExpression";
+	public static final String FQN = "Llib/UnaryExpression;";
 
 	protected Expression expr;
 
@@ -119,11 +119,9 @@ public abstract class UnaryExpression implements Expression {
 	
 	public abstract String toString();
 
-	@CallSite(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, resolvedMethods = {
-			@ResolvedMethod(receiverType = UnaryExpression.FQN) },
-			line = 129)
+	@IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, declaringClass = UnaryExpression.FQN)
 	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = {Constant.class}, resolvedMethods = { }, //TODO
-			line = 120)
+			line = 127)
 	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {
 		return operator().apply(expr.eval(values));

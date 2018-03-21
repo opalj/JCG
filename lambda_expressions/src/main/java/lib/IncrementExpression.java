@@ -72,15 +72,15 @@ import static lib.annotations.documentation.CGCategory.INVOKEDYNAMIC;
  */
 public class IncrementExpression extends UnaryExpression {
 
-    public static final String FQN = "lib/IncrementExpression";
+    public static final String FQN = "Llib/IncrementExpression;";
 
     @CGNote(value = INVOKEDYNAMIC, description = "The following lambda expression is compiled to an invokedynamic instruction.")
     @CallSite(resolution = DYNAMIC,
             name="lambda$operator$0",
             returnType = Constant.class,
             parameterTypes = {Constant.class},
-            resolvedMethods = @ResolvedMethod(receiverType = "lib/IncrementExpression"),
-            line = 87)
+            resolvedMethods = @ResolvedMethod(receiverType = IncrementExpression.FQN),
+            line = 86)
     @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {
         return (Constant constant) -> new Constant(constant.getValue() + 1);
@@ -91,20 +91,10 @@ public class IncrementExpression extends UnaryExpression {
         super(expr);
     }
 
-    @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "visit",
-    	resolvedMethods = {@ResolvedMethod(receiverType = "lib/ExpressionPrinter$ExpressionStringifier")},
-    	returnType = String.class, parameterTypes = {IncrementExpression.class},
-    	isDynamic = true, line = 100)
     public <T> T accept(Function<Expression, T> visit) {
         return visit.apply(this);
     }
 
-    @CallSite(name= "toString", resolvedMethods = {
-            @ResolvedMethod(receiverType = IncrementExpression.FQN),
-            @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            @ResolvedMethod(receiverType = SquareExpression.FQN),
-    }, returnType = String.class, line = 112)
     @EntryPoint(value = {OPA, CPA})
     public String toString(){
         return "Inc("+ expr.toString() + ")";

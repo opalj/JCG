@@ -30,7 +30,9 @@
 
 package lib;
 
-import lib.annotations.callgraph.*;
+import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.documentation.CGCategory;
+import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
 import java.lang.invoke.MethodHandle;
@@ -39,12 +41,11 @@ import java.lang.invoke.MethodType;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.UnaryOperator.IDENTITY;
 
 /**
  * An abstract unary Expression where the constructor is accessed via a MethodHandle.
- *
- * 
+ * <p>
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -75,44 +76,38 @@ import static lib.UnaryOperator.IDENTITY;
 
 public abstract class UnaryExpression implements Expression {
 
-    public static final String FQN = "lib/UnaryExpression";
+    public static final String FQN = "Llib/UnaryExpression;";
 
     protected Expression expr;
 
-    @CallSite(name = "<init>", parameterTypes = {Expression.class}, isDynamic = true,
-            resolvedMethods = {@ResolvedMethod(receiverType = IdentityExpression.FQN),
-            		@ResolvedMethod(receiverType = SquareExpression.FQN)},
-            returnType = UnaryExpression.class, line = 98)
-    @CallSite(name = "<init>", parameterTypes = {Expression.class}, isDynamic = true,
-            resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            returnType = IdentityExpression.class, line = 105)
+    @CGNote(value = CGCategory.REFLECTION, description = "the constructor is invoked using findConstructor")
     @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "<init>", parameterTypes = Expression.class, declaringClass = IdentityExpression.FQN)
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
             final Expression expr) throws Throwable {
-        UnaryExpression uExpr = null;
-        try {
-            Class<?> clazz = Class.forName(operator.toString());
-            MethodType methodType = MethodType.methodType(void.class, Expression.class);
-            MethodHandle createUnaryHandle = MethodHandles.lookup().findConstructor(clazz, methodType);
-            uExpr = (UnaryExpression) createUnaryHandle.invokeExact(expr);
-        } catch (Exception e) {
-            if (uExpr == null) {
-                try {
-                    Class<?> clazz = Class.forName(IDENTITY.toString());
-                    MethodType methodType = MethodType.methodType(void.class, Expression.class);
-                    MethodHandle createUnaryHandle = MethodHandles.lookup().findConstructor(clazz, methodType);
-                    uExpr = (UnaryExpression) createUnaryHandle.invokeExact(expr);
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-            }
-        }
+        Class<?> clazz = Class.forName(operator.toString());
+        MethodType methodType = MethodType.methodType(void.class, Expression.class);
+        MethodHandle createUnaryHandle = MethodHandles.lookup().findConstructor(clazz, methodType);
+        UnaryExpression uExpr = (UnaryExpression) createUnaryHandle.invoke(expr);
 
         return uExpr;
     }
-    
-    @EntryPoint(value = { OPA, CPA })
+
+    @CGNote(value = CGCategory.REFLECTION, description = "the constructor is invoked using findConstructor")
+    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "<init>", parameterTypes = Expression.class, declaringClass = SquareExpression.FQN)
+    public static UnaryExpression createSquareExpressions(
+            final Expression expr) throws Throwable {
+        Class<?> clazz = Class.forName("lib.SquareExpression");
+        MethodType methodType = MethodType.methodType(void.class, Expression.class);
+        MethodHandle createUnaryHandle = MethodHandles.lookup().findConstructor(clazz, methodType);
+        UnaryExpression uExpr = (UnaryExpression) createUnaryHandle.invoke(expr);
+
+        return uExpr;
+    }
+
+    @EntryPoint(value = {OPA, CPA})
     public UnaryExpression(Expression expr) {
         this.expr = expr;
     }

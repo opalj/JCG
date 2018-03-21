@@ -64,8 +64,8 @@ import static lib.annotations.documentation.CGCategory.POLYMORPHIC_CALL;
  */
 public class Map<K, V> {
 
-    public static final String MapReceiverType = "lib/Map";
-    public static final String linkedEntryReceiverType = "lib/Map$LinkedEntry";
+    public static final String MapReceiverType = "Llib/Map;";
+    public static final String linkedEntryReceiverType = "Llib/Map$LinkedEntry;";
 
     @CGNote(value = NOTE, description = "LinkedEntry escapes the class local scope, when an iterator is created.")
     private class LinkedEntry {
@@ -154,12 +154,10 @@ public class Map<K, V> {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 167)
+    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 165)
     @CallSite(name = "next", returnType = Object.class, resolvedMethods = {
-            @ResolvedMethod(receiverType = MapIterator.FQN),
-            @ResolvedMethod(receiverType = Stack.StackIterator.FQN)},
-    line = 167)
-    @CGNote(value = NOTE, description = "Advanced analysis could recognize, that the iterator method always returns a MapIterator.")
+            @ResolvedMethod(receiverType = MapIterator.FQN)},
+    line = 165)
     private String contentAsString(LinkedEntry entry){
         StringBuffer sb = new StringBuffer();
         Iterator itr = this.iterator();
@@ -192,7 +190,7 @@ public class Map<K, V> {
 
     private class MapIterator implements Iterator<LinkedEntry>{
 
-        private static final String FQN = "lib/Map$MapIterator";
+        private static final String FQN = "Llib/Map$MapIterator;";
 
         private LinkedEntry cur;
 

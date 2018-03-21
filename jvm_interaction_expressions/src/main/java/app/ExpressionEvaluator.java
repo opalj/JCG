@@ -39,6 +39,7 @@ import lib.annotations.properties.EntryPoint;
 import static lib.annotations.callgraph.AnalysisMode.*;
 
 import lib.*;
+import lib.testutils.CallbackTest;
 
 import java.util.Arrays;
 
@@ -61,8 +62,7 @@ import static lib.testutils.CallbackTest.callback;
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * 
- * 
- * 
+ *
  * 
  * 
  * 
@@ -89,7 +89,7 @@ public class ExpressionEvaluator {
 
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method <Thread>.dispatchUncaughtException is not dead")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 96)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = CallbackTest.FQN)}, line = 96)
             @Override
             @EntryPoint(value = {OPA, CPA})
             public void uncaughtException(Thread t, Throwable e) {
@@ -104,7 +104,7 @@ public class ExpressionEvaluator {
             // This is an entry point!
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method<Thread>.run is called by the jvm")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = "lib/testutils/CallbackTest")}, line = 111)
+            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = CallbackTest.FQN)}, line = 111)
             @EntryPoint(value = {OPA, CPA})
             @Override
             public void run() {
@@ -120,7 +120,7 @@ public class ExpressionEvaluator {
         new Thread(new AltConstant(2)).start();
 
         synchronized (ExpressionEvaluator.class) {
-            // all methods of the class object of ExpressionEvaluatior may be called...
+            // all methods of the class object of ExpressionEvaluator may be called...
             // unless we analyze the "JVM" internal implementation
             @CGNote(value = NATIVE_CALLBACK, description = "potential callback because native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the native code may call any of the methods declared at the class object of ExpressionEvaluation")

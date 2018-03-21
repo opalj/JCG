@@ -30,16 +30,14 @@
 
 package lib;
 
-import lib.annotations.callgraph.*;
-import lib.annotations.documentation.CGNote;
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.properties.EntryPoint;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static lib.annotations.callgraph.AnalysisMode.CPA;
 import static lib.annotations.callgraph.AnalysisMode.OPA;
-import static lib.annotations.documentation.CGCategory.REFLECTION;
-import static lib.UnaryOperator.IDENTITY;
 
 /**
  * An abstract unary Expression where the operation has to be implemented
@@ -72,43 +70,36 @@ import static lib.UnaryOperator.IDENTITY;
 
 public abstract class UnaryExpression implements Expression {
 
-    public static final String FQN = "lib/UnaryExpression";
+    public static final String FQN = "Llib/UnaryExpression;";
 
     protected Expression expr;
 
-    @CGNote(value = REFLECTION, description = "The first reflective String can be varied by an enumeration but all possible call targets can be found.")
-    @CallSite(name = "<init>", parameterTypes = {Expression.class},
-            resolvedMethods = {@ResolvedMethod(receiverType = SquareExpression.FQN),
-                    @ResolvedMethod(receiverType = IdentityExpression.FQN)},
-            resolution = TargetResolution.REFLECTIVE, returnType = UnaryExpression.class,
-            line = 98)
-    @CGNote(value = REFLECTION, description = "The second reflective String is known at compile time. The exact call target can be determined.")
-    @CallSite(name = "<init>", parameterTypes = {Expression.class},
-            resolvedMethods = @ResolvedMethod(receiverType = IdentityExpression.FQN),
-            resolution = TargetResolution.REFLECTIVE, returnType = IdentityExpression.class,
-            line = 104)
     @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "<init>", declaringClass = SquareExpression.FQN, parameterTypes = Expression.class)
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
-            final Expression expr) {
-        UnaryExpression uExpr = null;
-        try {
-            Class<?> clazz = Class.forName(operator.toString());
-            Constructor<?> constructor = clazz.getConstructor(Expression.class);
-            uExpr = (UnaryExpression) constructor.newInstance(expr);
-        } catch (Exception e) {
-            if (uExpr == null) {
-                try {
-                    Class<?> clazz = Class.forName(IDENTITY.toString());
-                    Constructor<?> constructor = clazz.getConstructor(Expression.class);
-                    uExpr = (UnaryExpression) constructor.newInstance(expr);
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-            }
-        }
+            final Expression expr) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        Class<?> clazz = Class.forName(operator.toString());
+        Constructor<?> constructor = clazz.getConstructor(Expression.class);
+        return (UnaryExpression) constructor.newInstance(expr);
+    }
 
-        return uExpr;
+    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "<init>", declaringClass = NegationExpression.FQN, parameterTypes = Expression.class)
+    public static UnaryExpression createUnaryExpressions(
+            String operator,
+            final Expression expr) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        Class<?> clazz = Class.forName(operator);
+        Constructor<?> constructor = clazz.getConstructor(Expression.class);
+        return (UnaryExpression) constructor.newInstance(expr);
+    }
+
+    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "<init>", declaringClass = IdentityExpression.FQN, parameterTypes = Expression.class)
+    public static UnaryExpression createIdentityExpression(final Expression expr) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Class<?> clazz = Class.forName("lib.IdentityExpression");
+        Constructor<?> constructor = clazz.getConstructor(Expression.class);
+        return (UnaryExpression) constructor.newInstance(expr);
     }
 
     @EntryPoint(value = {OPA, CPA})

@@ -29,16 +29,16 @@
  */
 package lib;
 
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
-import lib.annotations.callgraph.TargetResolution;
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-import static lib.annotations.documentation.CGCategory.*;
-
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
+import static lib.annotations.documentation.CGCategory.REFLECTION;
 
 /**
  * This abstract class models a binary arithmetic expression. It contains factory methods
@@ -73,7 +73,7 @@ import java.lang.reflect.Method;
  */
 public abstract class BinaryExpression implements Expression {
 
-    public static final String FQN = "lib/BinaryExpression";
+    public static final String FQN = "Llib/BinaryExpression;";
 
     abstract protected Expression left();
 
@@ -87,17 +87,13 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote(value = REFLECTION, description = "a new instance is created by Java Reflection")
-    @CallSite(name = "<init>", returnType = BinaryExpression.class,
-            resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.FQN)},
-            resolution = TargetResolution.REFLECTIVE,
-            line = 101)
+    @IndirectCall(name = "<init>", declaringClass = PlusOperator.FQN)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             String operator,
             final Expression left,
             final Expression right) throws Exception {
-        String className = "lib." + operator + "Operator";
-        Class<?> operatorClass = Class.forName(className);
+        Class<?> operatorClass = Class.forName(operator);
         final Operator op = (Operator) operatorClass.newInstance();
 
         return new BinaryExpression() {
@@ -128,30 +124,84 @@ public abstract class BinaryExpression implements Expression {
         };
     }
 
+
+    @IndirectCall(name = "<init>", declaringClass = MultOperator.FQN)
+    public static BinaryExpression createBasicMultExpression(
+            final Expression left,
+            final Expression right) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+        Class<?> operatorClass = Class.forName("lib.MultOperator");
+        final Operator operator = (Operator) operatorClass.newInstance();
+        return new BinaryExpression() {
+            @Override
+            protected Expression left() {
+                return left;
+            }
+
+            @Override
+            protected Expression right() {
+                return right;
+            }
+
+            @Override
+            protected Operator operator() {
+                return operator;
+            }
+
+            @Override
+            public Constant eval(Map<String, Constant> values) {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
-    @CallSite(name = "createBinaryExpression",
-            resolvedMethods = {@ResolvedMethod(receiverType = PlusOperator.AddExpression.FQN),
-                    @ResolvedMethod(receiverType = MultOperator.FQN)},
-            resolution = TargetResolution.REFLECTIVE,
-            returnType = BinaryExpression.class,
-            parameterTypes = {Operator.class, Expression.class, Expression.class},
-            line = 150)
     @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = PlusOperator.FQN)
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,
             final Expression right) throws Exception {
         Class<?> operatorClass = null;
         try {
-            String className = "lib." + operator + "Operator";
-            operatorClass = Class.forName(className);
+            operatorClass = Class.forName(operator);
             Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
-            m.setAccessible(true);
             return (BinaryExpression) m.invoke(null, left, right);
         } catch (ClassNotFoundException cnfe) {
             throw cnfe;
-            //operatorClass = Class.forName(operator);
         }
+    }
+
+    @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
+    @EntryPoint(value = {OPA, CPA})
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = MinusOperator.FQN)
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = DivOperator.FQN)
+    public static BinaryExpression createRandomBinaryExpression(
+            final Expression left,
+            final Expression right
+    ) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String operator;
+        if (System.currentTimeMillis() % 2 == 0)
+            operator = "lib.MinusOperator";
+        else
+            operator = "lib.DivOperator";
+
+
+        Class<?> operatorClass = Class.forName(operator);
+        Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
+        return (BinaryExpression) m.invoke(null, left, right);
+    }
+
+
+    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = MultOperator.FQN)
+    public static MultOperator.MultExpression createMultExpression(
+            final Expression left,
+            final Expression right
+    ) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> operatorClass = Class.forName("lib.MultOperator");
+
+        Method m = operatorClass.getDeclaredMethod("createBinaryExpression", Expression.class, Expression.class);
+        return (MultOperator.MultExpression) m.invoke(null, left, right);
     }
 }
 

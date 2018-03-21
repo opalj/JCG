@@ -30,6 +30,8 @@
 
 package lib;
 
+import java.util.function.Function;
+
 /**
  * This abstract class is a visitor for expressions.
  * 
@@ -60,7 +62,13 @@ package lib;
  * @author Michael Reif
  * @author Roberts Kolosovs
  */
-public abstract class ExpressionVisitor<T> {
+public abstract class ExpressionVisitor<T> implements Function<Expression, T> {
+
 
 	public abstract T visit(Expression e);
+
+	@Override
+	public T apply(Expression expression) {
+		return visit(expression);
+	}
 }

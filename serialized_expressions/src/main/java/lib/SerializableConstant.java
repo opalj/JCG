@@ -68,9 +68,9 @@ import static lib.annotations.callgraph.AnalysisMode.*;
  */
 public class SerializableConstant extends Constant implements Serializable {
 	
-	public static final String SerializableConstantReceiverType = "lib/SerializableConstant";
-	public static final String OOSReceiverType = "java/io/ObjectOutputStream";
-	public static final String OISReceiverType = "java/io/ObjectInputStream";
+	public static final String SerializableConstantReceiverType = "Llib/SerializableConstant;";
+	public static final String OOSReceiverType = "Ljava/io/ObjectOutputStream;";
+	public static final String OISReceiverType = "Ljava/io/ObjectInputStream;";
 
     private final int value;
     

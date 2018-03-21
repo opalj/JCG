@@ -18,7 +18,7 @@ public class NativeAddExpression extends BinaryExpression {
 
 	private static final long serialVersionUID = 1010267344516507320L;
 	
-	public static final String FQN = "lib/NativeAddExpression";
+	public static final String FQN = "Llib/NativeAddExpression;";
 	
 	private final Object left;
 

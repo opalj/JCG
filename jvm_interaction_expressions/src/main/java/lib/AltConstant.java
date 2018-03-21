@@ -74,7 +74,7 @@ import lib.testutils.CallbackTest;
  */
 public class AltConstant implements Expression, Runnable {
 	
-	public static final String FQN = "lib/AltConstant";
+	public static final String FQN = "Llib/AltConstant;";
 
     private int value;
     

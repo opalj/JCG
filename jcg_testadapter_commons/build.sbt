@@ -1,0 +1,1 @@
+name := "JCG Test Adapter Commons"

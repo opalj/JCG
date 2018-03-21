@@ -47,6 +47,7 @@ public enum UnaryOperator {
 
     IDENTITY(IdentityExpression.class.getName()),
     SQUARE(SquareExpression.class.getName()),
+    NEGATION(NegationExpression.class.getName()),
 
     @CGNote(value = NOTE, description = "This enum value is just to deliberately forces a ClassNotFoundException.")
     EXCEPTION("ForceClassNotFoundExcepiton");

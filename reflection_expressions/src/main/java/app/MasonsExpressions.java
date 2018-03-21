@@ -29,11 +29,11 @@
  */
 package app;
 
-import lib.BinaryExpression;
-import lib.Constant;
-import lib.Expression;
-import lib.UnaryExpression;
+import lib.*;
+import lib.annotations.callgraph.IndirectCall;
 import lib.annotations.properties.EntryPoint;
+
+import java.lang.reflect.Method;
 
 import static lib.UnaryOperator.IDENTITY;
 import static lib.UnaryOperator.SQUARE;
@@ -67,12 +67,39 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 public class MasonsExpressions {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
+    @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = MultOperator.MultExpression.FQN)
+    @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = PlusOperator.AddExpression.FQN)
+    @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = Constant.FQN)
     public static void main(final String[] args) throws Exception {
         Constant c1 = new Constant(3);
         Constant c2 = new Constant(4);
+
         Expression left = UnaryExpression.createUnaryExpressions(SQUARE, c1);
-        Expression right = UnaryExpression.createUnaryExpressions(IDENTITY, c2);
-        BinaryExpression.createBinaryExpression("Plus", left, right);
-        BinaryExpression.createBasicBinaryExpression("Plus", left, right);
+        Expression right = UnaryExpression.createIdentityExpression(c1);
+        UnaryExpression.createUnaryExpressions("lib.NegationExpression", c2);
+
+
+        MultOperator.MultExpression mult = BinaryExpression.createMultExpression(left, right);
+        PlusOperator.AddExpression add = (PlusOperator.AddExpression) PlusOperator.createBinaryExpression(left, right);
+
+        BinaryExpression.createBinaryExpression("lib.PlusOperator", left, right);
+        BinaryExpression.createRandomBinaryExpression(left, right);
+
+        BinaryExpression.createBasicBinaryExpression("lib.PlusOperator", left, right);
+        BinaryExpression.createBasicMultExpression(left, right);
+
+        Class<?> multClass = Class.forName("lib.MultOperator$MultExpression");
+        Method evalMultMethod = multClass.getMethod("eval", Map.class);
+        evalMultMethod.invoke(mult, new Map<>());
+
+        Class<?> plusClass = Class.forName("lib.PlusOperator$AddExpression");
+        Method evalPlusMethod = plusClass.getMethod("eval", Map.class);
+        evalPlusMethod.invoke(add, new Map<>());
+
+        Class<?> constantClass = Class.forName("lib.Constant");
+        Method evalConstantMethod = constantClass.getMethod("eval", Map.class);
+        evalConstantMethod.invoke(c1, new Map<>());
+
+
     }
 }
