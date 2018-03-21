@@ -7,27 +7,33 @@ lazy val commonSettings = Seq(
 )
 
 lazy val jcg_annotations = project.settings(
-    commonSettings
+    commonSettings,
+    aggregate in assembly := false
 )
 
 lazy val jcg_annotation_matcher = project.settings(
-    commonSettings
+    commonSettings,
+    aggregate in assembly := false
 ).dependsOn(jcg_annotations, jcg_testadapter_commons)
 
 lazy val jcg_wala_testadapter = project.settings(
-    commonSettings
+    commonSettings,
+    aggregate in assembly := false
 ).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_soot_testadapter = project.settings(
-    commonSettings
+    commonSettings,
+    aggregate in assembly := false
 ).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_opal_testadapter = project.settings(
-    commonSettings
+    commonSettings,
+    aggregate in assembly := false
 ).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_testadapter_commons = project.settings(
-    commonSettings
+    commonSettings,
+    aggregate in assembly := false
 )
 
 lazy val jcg_evaluation = project.settings(
