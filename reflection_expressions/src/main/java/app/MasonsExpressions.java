@@ -31,6 +31,7 @@ package app;
 
 import lib.*;
 import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.documentation.CGFeature;
 import lib.annotations.properties.EntryPoint;
 
 import java.lang.reflect.Method;
@@ -67,9 +68,25 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 public class MasonsExpressions {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = MultOperator.MultExpression.FQN)
-    @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = PlusOperator.AddExpression.FQN)
-    @IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = Map.class, declaringClass = Constant.FQN)
+    @IndirectCall(
+            name = "eval",
+            returnType = Constant.class,
+            parameterTypes = Map.class,
+            declaringClass = MultOperator.MultExpression.FQN
+    )
+    @IndirectCall(
+            name = "eval",
+            returnType = Constant.class,
+            parameterTypes = Map.class,
+            declaringClass = PlusOperator.AddExpression.FQN
+    )
+    @IndirectCall(
+            name = "eval",
+            returnType = Constant.class,
+            parameterTypes = Map.class,
+            declaringClass = Constant.FQN,
+            feature = CGFeature.TrivialReflection
+    )
     public static void main(final String[] args) throws Exception {
         Constant c1 = new Constant(3);
         Constant c2 = new Constant(4);

@@ -30,6 +30,7 @@
 package lib;
 
 import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.documentation.CGFeature;
 import lib.annotations.documentation.CGNote;
 import lib.annotations.properties.EntryPoint;
 
@@ -87,7 +88,7 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote(value = REFLECTION, description = "a new instance is created by Java Reflection")
-    @IndirectCall(name = "<init>", declaringClass = PlusOperator.FQN)
+    @IndirectCall(name = "<init>", declaringClass = PlusOperator.FQN, feature = CGFeature.ContextSensitiveModernReflection)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             String operator,
@@ -125,7 +126,7 @@ public abstract class BinaryExpression implements Expression {
     }
 
 
-    @IndirectCall(name = "<init>", declaringClass = MultOperator.FQN)
+    @IndirectCall(name = "<init>", declaringClass = MultOperator.FQN, feature = CGFeature.TrivialReflection)
     public static BinaryExpression createBasicMultExpression(
             final Expression left,
             final Expression right) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
@@ -157,7 +158,12 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = PlusOperator.FQN)
+    @IndirectCall(
+            name = "createBinaryExpression",
+            parameterTypes = {Expression.class, Expression.class},
+            returnType = BinaryExpression.class,
+            declaringClass = PlusOperator.FQN,
+            feature = CGFeature.ContextSensitiveReflection)
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,
@@ -174,8 +180,19 @@ public abstract class BinaryExpression implements Expression {
 
     @CGNote(value = REFLECTION, description = "a (static) method is invoked by Java's reflection mechanism; the call graph has to handle reflection")
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = MinusOperator.FQN)
-    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = DivOperator.FQN)
+    @IndirectCall(
+            name = "createBinaryExpression",
+            parameterTypes = {Expression.class, Expression.class},
+            returnType = BinaryExpression.class,
+            declaringClass = MinusOperator.FQN,
+            feature = CGFeature.FlowSensitiveReflection
+    )
+    @IndirectCall(
+            name = "createBinaryExpression",
+            parameterTypes = {Expression.class, Expression.class},
+            returnType = BinaryExpression.class,
+            declaringClass = DivOperator.FQN,
+            feature = CGFeature.FlowSensitiveReflection)
     public static BinaryExpression createRandomBinaryExpression(
             final Expression left,
             final Expression right
@@ -193,7 +210,12 @@ public abstract class BinaryExpression implements Expression {
     }
 
 
-    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, returnType = BinaryExpression.class, declaringClass = MultOperator.FQN)
+    @IndirectCall(
+            name = "createBinaryExpression",
+            parameterTypes = {Expression.class, Expression.class},
+            returnType = BinaryExpression.class,
+            declaringClass = MultOperator.FQN,
+            feature = CGFeature.FlowSensitiveReflection)
     public static MultOperator.MultExpression createMultExpression(
             final Expression left,
             final Expression right

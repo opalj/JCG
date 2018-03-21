@@ -37,21 +37,25 @@ import static lib.annotations.documentation.CGCategory.*;
  * Describes a concrete feature to be handled by a call graph algorithm.
  */
 public enum CGFeature {
-    Misc(0, null),
-    TrivialReflection(1, REFLECTION),
-    ContextSensitiveReflection(2, REFLECTION),
-    FlowSensitiveReflection(3, REFLECTION),
-    UnknownStringReflection(4, REFLECTION);
+    Misc(null),
 
-    private final int id;
+    TrivialReflection(REFLECTION),
+    ContextSensitiveReflection(REFLECTION),
+    FlowSensitiveReflection(REFLECTION),
+    ComplexReflection(REFLECTION),
+    UnknownStringReflection(REFLECTION),
+
+    TrivialModernReflection(REFLECTION),
+    ContextSensitiveModernReflection(REFLECTION),
+    FlowSensitiveModernReflection(REFLECTION),
+    UnknownStringModernReflection(REFLECTION),
+
+    StaticInitializer(STATIC_INITIALIZERS),
+    ;
+
     private final CGCategory category;
 
-    CGFeature(int id, CGCategory category) {
-        this.id = id;
+    CGFeature(CGCategory category) {
         this.category = category;
-    }
-
-    public static CGFeature findFeature(int id) throws NoSuchElementException {
-        return Arrays.stream(CGFeature.values()).filter(feature -> feature.id == id).findFirst().get();
     }
 }
