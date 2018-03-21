@@ -9,6 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <dependency>
+        <groupId></groupId>
+        <artifactId>java.base</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+
     <artifactId>lib</artifactId>
     <packaging>jar</packaging>
 </project>

@@ -1,7 +1,5 @@
 package lib;
 
-import java.time.temporal.ValueRange;
-
 public class VarBinding {
     private char varName;
     private int value;

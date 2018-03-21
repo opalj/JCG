@@ -1,4 +1,4 @@
-package parser.impl;
+package impl;
 
 import lib.Expression;
 import parser.IExpressionParser;
