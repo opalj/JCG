@@ -1,5 +1,5 @@
-import parser.impl.InfixExprParser;
-import parser.impl.PostfixExprParser;
+import impl.InfixExprParser;
+import impl.PostfixExprParser;
 import parser.IExpressionParser;
 
 module parserimpl {

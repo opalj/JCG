@@ -1,5 +1,5 @@
 module expressions {
     requires java.base;
     exports lib;
-    //ßexports lib.internal to ;
+    exports lib.internal to parserimpl;
 }
