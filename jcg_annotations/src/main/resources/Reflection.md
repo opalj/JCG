@@ -3,7 +3,7 @@ The strings are directly available. No control- or data-flow analysis is require
 ##TR1
 Test reflection with respect to static methods.
 ```java
-// tr1/Foo.jar
+// tr1/Foo.java
 package tr1;
 
 import lib.annotations.callgraph.IndirectCall;
@@ -20,12 +20,12 @@ class Foo {
 ##TR2
 Test reflection with respect to instance methods.
 ```java
-// tr2/Foo.jar
+// tr2/Foo.java
 package tr2;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo { 
-    String toString() { return "Foo"; }
+    public String toString() { return "Foo"; }
     
     @IndirectCall(name = "toString", declaringClass = "Ltr2/Foo;", returnType = String.class)
     void m() throws Exception {
@@ -39,7 +39,7 @@ class Foo {
 ##TR3
 Test reflection with respect to constructors.
 ```java
-// tr3/Foo.jar
+// tr3/Foo.java
 package tr3;
 
 import lib.annotations.callgraph.IndirectCall;
@@ -48,7 +48,7 @@ class Foo {
     
     @IndirectCall(name = "<init>", declaringClass = "Ltr3/Foo;", parameterTypes = String.class)
     public static void main(String[] args) throws Exception {
-        Class.forName("tr3.Foo").getConstructor(String.class).invoke(); 
+        Class.forName("tr3.Foo").getConstructor(String.class).newInstance("ASD");
     }
 }
 ```
