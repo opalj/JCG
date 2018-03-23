@@ -143,27 +143,141 @@ class Foo {
 }
 ```
 
+#ContextSensitiveReflection
+The concrete strings require information about the context.
 
-TODO
-Here newInstance could call every default constructor
+## CSR1
+The method name is passed as an argument.
 ```java
-class Foo { 
-    String toString() { return ""; }
+// csr1/Foo.java
+package csr1;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString1() { return "1"; }
+    static String staticToString2() { return "2"; }
     
-    static void m(String s) {
-        Foo f = (Foo) Class.forName(s).newInstance();
-        f.toString();
+    
+    @IndirectCall(name = "staticToString1", declaringClass = "Lcsr1/Foo;", returnType = String.class) 
+    static void m(String methodName) throws Exception {
+        Class.forName("csr1.Foo").getDeclaredMethod(methodName).invoke(null);
+    }
+    
+    public static void main(String[] args) throws Exception {
+        m("staticToString1");
     }
 }
 ```
 
+## CSR2
+The class name is passed as an argument.
+```java
+// csr2/Foo.java
+package csr2;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString() { return "Foo"; }
+    
+    
+    @IndirectCall(name = "staticToString", declaringClass = "Lcsr2/Foo;", returnType = String.class) 
+    static void m(String className) throws Exception {
+        Class.forName(className).getDeclaredMethod("staticToString").invoke(null);
+    }
+    
+    public static void main(String[] args) throws Exception {
+        m("Foo");
+    }
+}
+
+class Bar {
+    static String staticToString() { return "Bar"; }
+}
+```
+
+## CSR3
+The method name is unknown.
+```java
+// csr3/Foo.java
+package csr3;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString1() { return "1"; }
+    static String staticToString2() { return "2"; }
+    
+    
+    @IndirectCall(name = "staticToString1", declaringClass = "Lcsr3/Foo;", returnType = String.class)
+    @IndirectCall(name = "staticToString2", declaringClass = "Lcsr3/Foo;", returnType = String.class)
+    static void m(String methodName) throws Exception {
+        Class.forName("csr1.Foo").getDeclaredMethod(methodName).invoke(null);
+    }
+    
+    public static void main(String[] args) throws Exception {
+        m(args[0]);
+    }
+}
+```
+
+## CSR4
+The class name is passed as an argument.
+```java
+// csr4/Foo.java
+package csr2;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString() { return "Foo"; }
+    
+    
+    @IndirectCall(name = "staticToString", declaringClass = "Lcsr4/Foo;", returnType = String.class) 
+    @IndirectCall(name = "staticToString", declaringClass = "Lcsr4/Bar;", returnType = String.class) 
+    static void m(String className) throws Exception {
+        Class.forName(className).getDeclaredMethod("staticToString").invoke(null);
+    }
+    
+    public static void main(String[] args) throws Exception {
+        m(args[0]);
+    }
+}
+
+class Bar {
+    static String staticToString() { return "Bar"; }
+}
+```
+
+
+TODO
+Here newInstance could call every default constructor
+```java
+// todo1/Foo.java
+package todo1;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    @IndirectCall(name = "<init>", declaringClass = "Ltodo1/Foo;")
+    @IndirectCall(name = "<init>", declaringClass = "Ltodo1/Bar;")
+    static void main(String[] args) throws Exception {
+        Foo f = (Foo) Class.forName(args[0]).newInstance();
+        f.toString();
+    }
+}
+class Bar {
+    
+}
+
+```
+
 
 ```java
-package tr1;
+// todo2/Foo.java
+package todo2;
+
+import lib.annotations.callgraph.IndirectCall;
 class Foo { 
-    String toString() { return ""; }
+    public String toString() { return ""; }
     
-    static void m(String s) {
+    static void m(String s) throws Exception {
         Object o = Class.forName(s).newInstance();
         if (o instanceof Foo) 
             o.toString();
