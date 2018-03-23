@@ -20,43 +20,46 @@ object Test {
             FileUtils.deleteDirectory(result)
         result.mkdirs()
 
-        val source = Source.fromResource("Reflection.md")
-        val lines = try source.mkString finally source.close()
+        val resources = new File(getClass.getResource("/").getPath).listFiles(_.getPath.endsWith(".md"))
+        resources.foreach { sourceFile ⇒
+            println(sourceFile)
+            val source = Source.fromFile(sourceFile)
+            val lines = try source.mkString finally source.close()
 
-        val re = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
+            val re = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
 
-        re.findAllIn(lines).matchData.foreach { matchResult ⇒
-            val projectName = matchResult.group(2)
-            val fileName = s"$projectName/src/$projectName"+matchResult.group(3)
-            val codeSnippet = matchResult.group(4)
+            re.findAllIn(lines).matchData.foreach { matchResult ⇒
+                val projectName = matchResult.group(2)
+                val fileName = s"$projectName/src/$projectName"+matchResult.group(3)
+                val codeSnippet = matchResult.group(4)
 
-            val file = new File(tmp.getPath, fileName)
-            file.getParentFile.mkdirs()
-            file.createNewFile()
+                val file = new File(tmp.getPath, fileName)
+                file.getParentFile.mkdirs()
+                file.createNewFile()
 
-            val pw = new PrintWriter(file)
-            pw.write(codeSnippet)
-            pw.close()
+                val pw = new PrintWriter(file)
+                pw.write(codeSnippet)
+                pw.close()
 
-            val compiler = ToolProvider.getSystemJavaCompiler
+                val compiler = ToolProvider.getSystemJavaCompiler
 
+                val bin = new File(tmp.getPath, s"$projectName/bin/")
+                bin.mkdirs()
+                compiler.run(null, null, null, file.getPath, "-d", bin.getPath)
 
-            val bin =  new File(tmp.getPath, s"$projectName/bin/")
-            bin.mkdirs()
-            compiler.run(null, null, null, file.getPath, "-d", bin.getPath)
-
-            val allFiles = recursiveListFiles(bin)
-            val allFileNames = allFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
-            val args = Seq("jar", "cf", s"../../../${result.getPath}/$projectName.jar") ++ allFileNames
-            sys.process.Process(args, bin).!
-
-            FileUtils.deleteDirectory(tmp)
-
+                val allFiles = recursiveListFiles(bin)
+                val allFileNames = allFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
+                val args = Seq("jar", "cf", s"../../../${result.getPath}/$projectName.jar") ++ allFileNames
+                sys.process.Process(args, bin).!
+            }
         }
+
+        FileUtils.deleteDirectory(tmp)
+
     }
 
     def recursiveListFiles(f: File): Array[File] = {
-        val these = f.listFiles((_, fil) => fil.endsWith(".class"))
+        val these = f.listFiles((_, fil) ⇒ fil.endsWith(".class"))
         these ++ f.listFiles.filter(_.isDirectory).flatMap(recursiveListFiles)
     }
 }
