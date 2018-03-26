@@ -26,36 +26,45 @@ object Test {
             val source = Source.fromFile(sourceFile)
             val lines = try source.mkString finally source.close()
 
+            val reHeaders = """(?s)\#\#([^\n]*)(.*?)\[//\]: \# \(END\)""".r
             val re = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
 
-            re.findAllIn(lines).matchData.foreach { matchResult ⇒
-                val projectName = matchResult.group(2)
-                val fileName = s"$projectName/src/$projectName"+matchResult.group(3)
-                val codeSnippet = matchResult.group(4)
+            reHeaders.findAllIn(lines).matchData.foreach { projectMatchResult ⇒
+                val projectName = projectMatchResult.group(1)
+                val srcFiles = re.findAllIn(projectMatchResult.group(2)).matchData.map { matchResult ⇒
+                    val packageName = matchResult.group(2)
+                    val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
+                    val codeSnippet = matchResult.group(4)
 
-                val file = new File(tmp.getPath, fileName)
-                file.getParentFile.mkdirs()
-                file.createNewFile()
+                    val file = new File(tmp.getPath, fileName)
+                    file.getParentFile.mkdirs()
+                    file.createNewFile()
 
-                val pw = new PrintWriter(file)
-                pw.write(codeSnippet)
-                pw.close()
+                    val pw = new PrintWriter(file)
+                    pw.write(codeSnippet)
+                    pw.close()
+                    file.getPath
+                }
 
                 val compiler = ToolProvider.getSystemJavaCompiler
 
                 val bin = new File(tmp.getPath, s"$projectName/bin/")
                 bin.mkdirs()
-                compiler.run(null, null, null, file.getPath, "-d", bin.getPath)
 
-                val allFiles = recursiveListFiles(bin)
-                val allFileNames = allFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
-                val args = Seq("jar", "cf", s"../../../${result.getPath}/$projectName.jar") ++ allFileNames
+
+                val compilerArgs = (srcFiles ++ Seq("-d", bin.getPath)).toSeq
+
+                compiler.run(null, null, null, compilerArgs: _*)
+
+                val allClassFiles = recursiveListFiles(bin)
+                val allClassFileNames = allClassFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
+                val args = Seq("jar", "cf", s"../../../${result.getPath}/$projectName.jar") ++ allClassFileNames
                 sys.process.Process(args, bin).!
+
             }
         }
 
         FileUtils.deleteDirectory(tmp)
-
     }
 
     def recursiveListFiles(f: File): Array[File] = {

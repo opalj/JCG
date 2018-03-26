@@ -16,6 +16,7 @@ class Foo {
     }
 }
 ```
+[//]: # (END)
 
 ##TR2
 Test reflection with respect to instance methods.
@@ -35,6 +36,7 @@ class Foo {
     public static void main(String[] args) throws Exception { new Foo().m(); }
 }
 ```
+[//]: # (END)
 
 ##TR3
 Test reflection with respect to constructors.
@@ -52,6 +54,7 @@ class Foo {
     }
 }
 ```
+[//]: # (END)
 
 ##TR4
 Test reflection with respect to the default constructor
@@ -69,7 +72,7 @@ class Foo {
     }
 }
 ```
-
+[//]: # (END)
 
 #LocallyResolvableReflection
 The complete information is locally (intra-procedurally) available.
@@ -96,6 +99,7 @@ class Foo {
     }
 }
 ```
+[//]: # (END)
 
 ##LRR2
 ```java
@@ -120,6 +124,7 @@ class Foo2 {
     static String staticToString() { return "2"; }
 }
 ```
+[//]: # (END)
 
 ##LRR3
 ```java
@@ -142,6 +147,7 @@ class Foo {
     }
 }
 ```
+[//]: # (END)
 
 #ContextSensitiveReflection
 The concrete strings require information about the context.
@@ -168,6 +174,7 @@ class Foo {
     }
 }
 ```
+[//]: # (END)
 
 ## CSR2
 The class name is passed as an argument.
@@ -194,6 +201,7 @@ class Bar {
     static String staticToString() { return "Bar"; }
 }
 ```
+[//]: # (END)
 
 ## CSR3
 The method name is unknown.
@@ -218,12 +226,13 @@ class Foo {
     }
 }
 ```
+[//]: # (END)
 
 ## CSR4
 The class name is passed as an argument.
 ```java
 // csr4/Foo.java
-package csr2;
+package csr4;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
@@ -245,7 +254,7 @@ class Bar {
     static String staticToString() { return "Bar"; }
 }
 ```
-
+[//]: # (END)
 
 TODO
 Here newInstance could call every default constructor
@@ -267,6 +276,7 @@ class Bar {
 }
 
 ```
+[//]: # (END)
 
 
 ```java
@@ -284,4 +294,5 @@ class Foo {
     }
 }
 ```
+[//]: # (END)
 
