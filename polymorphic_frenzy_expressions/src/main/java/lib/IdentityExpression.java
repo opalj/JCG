@@ -41,30 +41,30 @@ import lib.annotations.properties.EntryPoint;
 
 /**
  * Class modeling a identity expression.
- * 
- * This class declares two inner private classes but uses only one of them. However the other 
- * class still can have instances after a older version of this class is deserialized. Thus 
+ * <p>
+ * This class declares two inner private classes but uses only one of them. However the other
+ * class still can have instances after a older version of this class is deserialized. Thus
  * the private class is not dead and escapes the local scope.
- *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
  * @author Roberts Kolosovs
@@ -72,75 +72,75 @@ import lib.annotations.properties.EntryPoint;
 
 public class IdentityExpression extends UnaryExpression {
 
-	private static final long serialVersionUID = 1L;
-	
-	@EntryPoint(value = { OPA, CPA })
-	public IdentityExpression(Expression expr) {
-		this.expr = expr;
-		this.operator = new NewIdentityOperator();
-	}
+    private static final long serialVersionUID = 1L;
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "apply", returnType = Expression.class, 
-    	resolvedMethods = {@ResolvedMethod(receiverType = IdentityExpression.IdentityOperator.FQN),
-    			@ResolvedMethod(receiverType = IdentityExpression.NewIdentityOperator.FQN)},
-        parameterTypes = {Expression.class, Map.class},
-    	line = 91)
-	@Override
-	public Constant eval(Map<String, Constant> values) {
-		return (Constant) operator.apply(expr, values);
-	}
+    public IdentityExpression(Expression expr) {
+        this.expr = expr;
+        this.operator = new NewIdentityOperator();
+    }
 
     @EntryPoint(value = {OPA, CPA})
-	@Override
-	public <T> T accept(ExpressionVisitor<T> visitor) {
-		return visitor.visit(this);
-	}
-	
-	private class IdentityOperator extends UnaryOperator {
+    @CallSite(name = "apply", returnType = Expression.class,
+            resolvedTargets = {IdentityExpression.IdentityOperator.FQN,
+                    IdentityExpression.NewIdentityOperator.FQN},
+            parameterTypes = {Expression.class, Map.class},
+            line = 91)
+    @Override
+    public Constant eval(Map<String, Constant> values) {
+        return (Constant) operator.apply(expr, values);
+    }
 
-		public static final String FQN = "Llib.IdentityExpression$IdentityOperator;";
+    @EntryPoint(value = {OPA, CPA})
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 
-		private static final long serialVersionUID = 2L;
-		
-	    @EntryPoint(value = {OPA, CPA})
-	    private Object readResolve() throws ObjectStreamException {
-	    	return this;
-	    }
-		
-	    @EntryPoint(value = {OPA, CPA})
-		public String toString() {
-			return "Id";
-		}
-		
-	    @EntryPoint(value = {OPA, CPA})
-		@Override
-		public Expression apply(Expression expr, Map<String, Constant> values) {
-			return expr;
-		}
-	}
-	
-	private class NewIdentityOperator extends UnaryOperator {
+    private class IdentityOperator extends UnaryOperator {
 
-		public static final String FQN = "Llib.IdentityExpression$NewIdentityOperator;";
-		
-		private static final long serialVersionUID = 1L;
-		
-	    @EntryPoint(value = {OPA, CPA})
-	    private Object readResolve() throws ObjectStreamException {
-	    	return this;
-	    }
+        public static final String FQN = "Llib.IdentityExpression$IdentityOperator;";
 
-	    @EntryPoint(value = {OPA, CPA})
-		public String toString() {
-			return "id";
-		}
+        private static final long serialVersionUID = 2L;
 
-	    @EntryPoint(value = {OPA, CPA})
-		@Override
-		public Expression apply(Expression expr, Map<String, Constant> values) {
-			return expr.eval(values);
-		}
-	}
+        @EntryPoint(value = {OPA, CPA})
+        private Object readResolve() throws ObjectStreamException {
+            return this;
+        }
+
+        @EntryPoint(value = {OPA, CPA})
+        public String toString() {
+            return "Id";
+        }
+
+        @EntryPoint(value = {OPA, CPA})
+        @Override
+        public Expression apply(Expression expr, Map<String, Constant> values) {
+            return expr;
+        }
+    }
+
+    private class NewIdentityOperator extends UnaryOperator {
+
+        public static final String FQN = "Llib.IdentityExpression$NewIdentityOperator;";
+
+        private static final long serialVersionUID = 1L;
+
+        @EntryPoint(value = {OPA, CPA})
+        private Object readResolve() throws ObjectStreamException {
+            return this;
+        }
+
+        @EntryPoint(value = {OPA, CPA})
+        public String toString() {
+            return "id";
+        }
+
+        @EntryPoint(value = {OPA, CPA})
+        @Override
+        public Expression apply(Expression expr, Map<String, Constant> values) {
+            return expr.eval(values);
+        }
+    }
 
 }

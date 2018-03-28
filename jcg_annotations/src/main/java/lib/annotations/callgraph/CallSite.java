@@ -28,12 +28,13 @@
  */
 package lib.annotations.callgraph;
 
-import lib.annotations.documentation.CGFeature;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-import java.lang.annotation.*;
-
-import static java.lang.annotation.RetentionPolicy.*;
-import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Describes a method call as call site with different {@link ResolvedMethod}s.
@@ -56,9 +57,7 @@ public @interface CallSite {
 
     int line() default -1;
 
-    ResolvedMethod[] resolvedMethods();
+    String[] resolvedTargets();
 
-    ProhibitedMethod[] prohibitedMethods() default {};
-
-    CGFeature feature() default CGFeature.Misc;
+    String[] prohibitedTargets() default {};
 }

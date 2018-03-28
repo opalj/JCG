@@ -119,8 +119,8 @@ public abstract class UnaryExpression implements Expression {
 	
 	public abstract String toString();
 
-	@IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, declaringClass = UnaryExpression.FQN)
-	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = {Constant.class}, resolvedMethods = { }, //TODO
+	@IndirectCall(name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, resolvedTargets = UnaryExpression.FQN)
+	@CallSite(name = "apply", returnType = Constant.class, parameterTypes = {Constant.class}, resolvedTargets = { }, //TODO
 			line = 127)
 	@EntryPoint(value = { OPA, CPA })
 	public Constant eval(Map<String, Constant> values) {

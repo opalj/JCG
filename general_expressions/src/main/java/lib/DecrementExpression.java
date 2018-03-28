@@ -39,10 +39,10 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
  * An unary expression which represents the decrement function.
- *
+ * <p>
  * THIS CLASS IS INTENTIONALLY UNUSED WITHIN THE APPLICATION SCENARIO. (CLASS IS NEVER INSTANTIATED)
- *
- * 
+ * <p>
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
@@ -69,16 +69,16 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  */
 public class DecrementExpression extends UnaryExpression {
 
-	public static final String FQN = "Llib/DecrementExpression;";
-	
-	@EntryPoint(value = { OPA, CPA })
-    public DecrementExpression(Expression expr){
+    public static final String FQN = "Llib/DecrementExpression;";
+
+    @EntryPoint(value = {OPA, CPA})
+    public DecrementExpression(Expression expr) {
         super(expr);
     }
 
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
-        return "Dec("+expr.toString()+")";
+        return "Dec(" + expr.toString() + ")";
     }
 
     @EntryPoint(value = {OPA, CPA})
@@ -86,28 +86,29 @@ public class DecrementExpression extends UnaryExpression {
         return visitor.visit(this);
     }
 
-	@Override
+    @Override
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "checkIfDecrement", resolvedMethods = {
-    		@ResolvedMethod(receiverType = DecrementExpression.FQN)},
-    		parameterTypes = {Expression.class}, line = 99)
-    @CallSite(name = "eval", returnType = Constant.class, resolvedMethods =
-    		@ResolvedMethod(receiverType = Constant.FQN),
-    		parameterTypes = {Map.class}, line = 101)
-	public Constant eval(Map<String, Constant> values) {
-		try {
-			checkIfDecrement(this.expr);
-		} catch (Exception e) {
-			return new Constant(expr.eval(values).getValue() - 1);
-		}
-		return new Constant( ((UnaryExpression) expr).expr.eval(values).getValue() - 2);
-	}
-	
-	private void checkIfDecrement(Object vals) throws Exception{
-		if(!(vals instanceof DecrementExpression)){
-			//do nothing
-		} else {
-			throw new Exception();
-		}
-	}
+    @CallSite(name = "checkIfDecrement", parameterTypes = {Expression.class}, line = 100,
+            resolvedTargets = DecrementExpression.FQN
+    )
+    @CallSite(
+            name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, line = 102,
+            resolvedTargets = Constant.FQN
+    )
+    public Constant eval(Map<String, Constant> values) {
+        try {
+            checkIfDecrement(this.expr);
+        } catch (Exception e) {
+            return new Constant(expr.eval(values).getValue() - 1);
+        }
+        return new Constant(((UnaryExpression) expr).expr.eval(values).getValue() - 2);
+    }
+
+    private void checkIfDecrement(Object vals) throws Exception {
+        if (!(vals instanceof DecrementExpression)) {
+            //do nothing
+        } else {
+            throw new Exception();
+        }
+    }
 }

@@ -82,7 +82,7 @@ public final class SquareExpression extends UnaryExpression {
     @CallSite(name = "eval",
             returnType = Constant.class,
             parameterTypes = {Map.class},
-            resolvedMethods = @ResolvedMethod(receiverType = MultExpression.FQN),
+            resolvedTargets = MultExpression.FQN,
             line = 89)
     @EntryPoint(value = {OPA, CPA})
     public Constant eval(Map<String, Constant> values) {

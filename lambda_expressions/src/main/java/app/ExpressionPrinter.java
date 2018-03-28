@@ -31,6 +31,7 @@ package app;
 
 import lib.*;
 import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
 import java.util.Arrays;
@@ -44,7 +45,7 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
  * <!--
- * <p>
+ *
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
@@ -74,11 +75,26 @@ public class ExpressionPrinter {
     private static int[] values = {0, 1, 2, 3, 4};
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @IndirectCall(name = "<init>", declaringClass = ExpressionStringifier.FQN, parameterTypes = {ExpressionPrinter.class /*TODO $1*/})
-    @IndirectCall(name = "clone", declaringClass = "Ljava/lang/Object;", returnType = Object.class)
-    @IndirectCall(name = "incrementAll", declaringClass = FQN, returnType = Expression[].class, parameterTypes = int[].class)
-    @IndirectCall(name = "asList", returnType = List.class, declaringClass = "Ljava/util/Arrays;", parameterTypes = {Object[].class})
-    @IndirectCall(name = "toConstant", returnType = Constant.class, declaringClass = ZeroConstant.FQN)
+    @IndirectCall(
+            name = "<init>", parameterTypes = {ExpressionPrinter.class /*TODO $1*/},
+            resolvedTargets = ExpressionStringifier.FQN
+    )
+    @IndirectCall(
+            name = "clone", returnType = Object.class,
+            resolvedTargets = "Ljava/lang/Object;"
+    )
+    @IndirectCall(
+            name = "incrementAll", returnType = Expression[].class, parameterTypes = int[].class,
+            resolvedTargets = ExpressionPrinter.FQN
+    )
+    @IndirectCall(
+            name = "asList", returnType = List.class, parameterTypes = {Object[].class},
+            resolvedTargets = "Ljava/util/Arrays;"
+    )
+    @IndirectCall(
+            name = "toConstant", returnType = Constant.class,
+            resolvedTargets = ZeroConstant.FQN
+    )
     public static void main(final String[] args) {
         Expression expr = new IdentityExpression(new SquareExpression(new IncrementExpression(new Constant(1))));
         Supplier<ExpressionPrinter> instance = ExpressionPrinter::instance;
@@ -98,7 +114,7 @@ public class ExpressionPrinter {
         alsoZero.eval(new Map<>());
     }
 
-    @IndirectCall(name = "<init>", declaringClass = FQN)
+    @IndirectCall(name = "<init>", resolvedTargets = FQN)
     @EntryPoint(value = {OPA, CPA})
     static ExpressionPrinter instance() {
         Supplier<ExpressionPrinter> printerConstructor = ExpressionPrinter::new;
@@ -153,9 +169,10 @@ public class ExpressionPrinter {
         }
 
         //TODO check if they are all called at runtime
-        @IndirectCall(name = "accept", returnType = Object.class, parameterTypes = Function.class, declaringClass = SquareExpression.FQN)
-        @IndirectCall(name = "accept", returnType = Object.class, parameterTypes = Function.class, declaringClass = IdentityExpression.FQN)
-        @IndirectCall(name = "accept", returnType = Object.class, parameterTypes = Function.class, declaringClass = IncrementExpression.FQN)
+        @IndirectCall(
+                name = "accept", returnType = Object.class, parameterTypes = Function.class, line = 177,
+                resolvedTargets = {SquareExpression.FQN, IdentityExpression.FQN, IncrementExpression.FQN}
+                )
         public String recursiveAccept(Expression e, BiFunction<Expression, Function<Expression, String>, String> func) {
             return func.apply(e, this::visit);
         }

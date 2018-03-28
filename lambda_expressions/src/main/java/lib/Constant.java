@@ -40,23 +40,23 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
  * This class models a mathematical constant by simply wrapping an integer value.
- *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
  * @author Michael Eichberg
@@ -64,12 +64,12 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
  * @author Roberts Kolosovs
  */
 public class Constant implements Expression {
-	
-	public static final String FQN = "Llib/Constant;";
+
+    public static final String FQN = "Llib/Constant;";
 
     private final int value;
-    
-    @EntryPoint(value = { OPA, CPA })
+
+    @EntryPoint(value = {OPA, CPA})
     public Constant(int value) {
         this.value = value;
     }
@@ -80,13 +80,16 @@ public class Constant implements Expression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public Constant eval(Map<String,Constant> values) {
+    public Constant eval(Map<String, Constant> values) {
         return this;
     }
 
-    @IndirectCall(name = "visit",  declaringClass = "Lapp/ExpressionPrinter$ExpressionStringifier;", returnType = String.class, parameterTypes = Expression.class)
+    @IndirectCall(
+            name = "visit", returnType = String.class, parameterTypes = Expression.class, line = 89,
+            resolvedTargets = "Lapp/ExpressionPrinter$ExpressionStringifier;"
+    )
     @EntryPoint(value = {OPA, CPA})
     public <T> T accept(Function<Expression, T> visit) {
-    	return visit.apply(this);
+        return visit.apply(this);
     }
 }

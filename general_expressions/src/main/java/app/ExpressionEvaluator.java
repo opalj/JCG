@@ -50,17 +50,17 @@ import static lib.testutils.CallbackTest.callback;
  * <p>
  * <!--
  * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
  * <p>
  * -->
- *
- *
- *
- *
- *
- *
- *
  *
  * @author Michael Eichberg
  * @author Michael Reif
@@ -77,13 +77,13 @@ public class ExpressionEvaluator {
             new MultExpression(new Constant(2), new Constant(1)), null};
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @CallSite(name = "evalFirstEntry", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = FQN)}, line = 89)
-    @CallSite(name = "evalSecondEntry", returnType = int.class, resolvedMethods = {@ResolvedMethod(receiverType = FQN)}, line = 93)
-    @CallSite(name = "evalAll", returnType = int[].class, resolvedMethods = {@ResolvedMethod(receiverType = FQN)}, line = 99)
-    @CallSite(name = "eval", returnType = lib.Constant.class, parameterTypes = {lib.Map.class}, resolvedMethods = {@ResolvedMethod(receiverType = NativeAddExpression.FQN)}, line = 102)
-    @CallSite(name = "runAltEvaluation", resolvedMethods = {@ResolvedMethod(receiverType = FQN)}, line = 106)
-    @CallSite(name = "execute", returnType = lib.Constant.class, parameterTypes = {lib.Expression.class}, resolvedMethods = {@ResolvedMethod(receiverType = ParameterizedEvaluator.FQN)}, line = 101)
-    @CallSite(name = "getNullPointerException", resolvedMethods = {@ResolvedMethod(receiverType = FQN)}, line = 115)
+    @CallSite(name = "evalFirstEntry", returnType = int.class, resolvedTargets = FQN, line = 89)
+    @CallSite(name = "evalSecondEntry", returnType = int.class, resolvedTargets = FQN, line = 93)
+    @CallSite(name = "evalAll", returnType = int[].class, resolvedTargets = FQN, line = 99)
+    @CallSite(name = "eval", returnType = lib.Constant.class, parameterTypes = {lib.Map.class}, resolvedTargets = NativeAddExpression.FQN, line = 102)
+    @CallSite(name = "runAltEvaluation", resolvedTargets = FQN, line = 106)
+    @CallSite(name = "execute", returnType = lib.Constant.class, parameterTypes = {lib.Expression.class}, resolvedTargets = ParameterizedEvaluator.FQN, line = 101)
+    @CallSite(name = "getNullPointerException", resolvedTargets = FQN, line = 115)
     public static void main(final String[] args) {
         ExpressionEvaluator evaluatorOne = new ExpressionEvaluator();
         evaluatorOne.evalFirstEntry();
@@ -122,12 +122,10 @@ public class ExpressionEvaluator {
     }
 
     @CGNote(value = NATIVE_CALLBACK, description = "monomorph, intraprocedural case of arraycopy test case.")
-    @CallSite(name = "arraycopy", resolvedMethods = {
-            @ResolvedMethod(receiverType = "Ljava/lang/System;")},
-            parameterTypes = {lib.IncrementExpression[].class, int.class, lib.Expression[].class, int.class, int.class}, line = 133)
-    @CallSite(name = "eval", returnType = lib.Constant.class, resolvedMethods = {
-            @ResolvedMethod(receiverType = IncrementExpression.FQN)},
-            parameterTypes = {lib.Map.class}, line = 134)
+    @CallSite(name = "arraycopy", resolvedTargets = "Ljava/lang/System;",
+            parameterTypes = {lib.IncrementExpression[].class, int.class, lib.Expression[].class, int.class, int.class}, line = 131)
+    @CallSite(name = "eval", returnType = lib.Constant.class, resolvedTargets = IncrementExpression.FQN,
+            parameterTypes = {lib.Map.class}, line = 132)
     private int evalFirstEntry() {
         Expression[] tempArray = new Expression[3];
         System.arraycopy(coutToThree, 0, tempArray, 0, 3);
@@ -135,17 +133,16 @@ public class ExpressionEvaluator {
     }
 
     @CGNote(value = NATIVE_CALLBACK, description = "monomorph, interprocedural case of arraycopy test case.")
-    @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN)},
-            parameterTypes = {lib.Map.class}, returnType = lib.Constant.class, line = 141)
+    @CallSite(name = "eval", resolvedTargets = IncrementExpression.FQN,
+            parameterTypes = {lib.Map.class}, returnType = lib.Constant.class, line = 139)
     private int evalSecondEntry() {
         return expressionArray[1].eval(new Map<String, Constant>()).getValue();
     }
 
     @CGNote(value = NATIVE_CALLBACK, description = "polymorph, interprocedural case of arraycopy test case.")
-    @CallSite(name = "eval", resolvedMethods = {@ResolvedMethod(receiverType = IncrementExpression.FQN),
-            @ResolvedMethod(receiverType = SquareExpression.FQN),
-            @ResolvedMethod(receiverType = AddExpression.FQN)},
-            parameterTypes = {lib.Map.class}, returnType = lib.Constant.class, line = 152)
+    @CallSite(name = "eval", parameterTypes = {lib.Map.class}, returnType = lib.Constant.class, line = 149,
+            resolvedTargets = {IncrementExpression.FQN, SquareExpression.FQN, AddExpression.FQN}
+    )
     private int[] evalAll() { //expressionArray manipulated before this method is called (lines 94, 95 and 96)
         int[] result = new int[3];
         for (int i = 0; i < expressionArray.length; i++) {
@@ -155,8 +152,8 @@ public class ExpressionEvaluator {
     }
 
     @CallSite(name = "arraycopy",
-            resolvedMethods = {@ResolvedMethod(receiverType = "Ljava/lang/System;")},
-            parameterTypes = {lib.IncrementExpression[].class, int.class, lib.Expression[].class, int.class, int.class}, line = 162)
+            resolvedTargets = "Ljava/lang/System;",
+            parameterTypes = {lib.IncrementExpression[].class, int.class, lib.Expression[].class, int.class, int.class}, line = 159)
     @CGNote(value = NATIVE_CALLBACK, description = "array with well known types is copied into other array.")
     private void copyPrivateArrays() {
         System.arraycopy(coutToThree, 0, expressionArray, 0, 3);
@@ -167,7 +164,7 @@ public class ExpressionEvaluator {
      * The ExpressionEvaluator.class is passed to a native method with an ´Object´ type
      * as parameter. The native method can (potentially) call any visible method on the passed object, i.e. toString().
      */
-    @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = CallbackTest.FQN)}, line = 173)
+    @CallSite(name = "callback", resolvedTargets = CallbackTest.FQN, line = 170)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         callback();
@@ -175,7 +172,7 @@ public class ExpressionEvaluator {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "Ljava/lang/ArrayStoreException;"), line = 182)
+    @CallSite(name = "<init>", resolvedTargets = "Ljava/lang/ArrayStoreException;", line = 179)
     public Constant altEvaluateFirst() {
         this.expressionArray = this.coutToThree; //deliberate misuse of array co-variance
         IdentityExpression i = new IdentityExpression(expressionArray[0]);
@@ -194,7 +191,7 @@ public class ExpressionEvaluator {
      * This is the only way to obtain an instance of ParameterizedEvaluator.
      */
     @EntryPoint(value = {OPA, CPA})
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = ExpressionEvaluator.ParameterizedEvaluator.FQN), line = 199)
+    @CallSite(name = "<init>", resolvedTargets = ExpressionEvaluator.ParameterizedEvaluator.FQN, line = 196)
     public ParameterizedEvaluator<? extends BinaryExpression> makeParamEvaluator() {
         return new ParameterizedEvaluator<>();
     }
@@ -202,9 +199,10 @@ public class ExpressionEvaluator {
     class ParameterizedEvaluator<T extends Expression> { //should be made private in the future
         public static final String FQN = "Lapp/ExpressionEvaluator$ParameterizedEvaluator;";
 
-        @CallSite(name = "eval", returnType = Constant.class, resolvedMethods = {
-                @ResolvedMethod(receiverType = AddExpression.FQN)},
-                parameterTypes = {Map.class}, line = 214)
+        @CallSite(
+                name = "eval", returnType = Constant.class, parameterTypes = {Map.class}, line = 212,
+                resolvedTargets = AddExpression.FQN
+        )
         /*
          * Due to the way this is instantiated only BinaryExpressions ever make it this far
          * (once the class is made private).
@@ -215,7 +213,7 @@ public class ExpressionEvaluator {
         }
     }
 
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "Ljava/lang/NullPointerException;"), line = 221)
+    @CallSite(name = "<init>", resolvedTargets = "Ljava/lang/NullPointerException;", line = 219)
     @EntryPoint(value = {OPA, CPA})
     public void getNullPointerException() throws Exception {
         throw null;

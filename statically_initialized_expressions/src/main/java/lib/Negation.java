@@ -74,7 +74,7 @@ public class Negation extends UnaryExpression{
 		init();
 	}
 
-	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 79)
+	@CallSite(name = "staticCall", resolvedTargets = StaticInitializerTest.FQN, line = 79)
 	private static void init(){
 		StaticInitializerTest.staticCall("Negation");
 		name = "negation";

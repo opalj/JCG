@@ -79,7 +79,7 @@ public class IncrementExpression extends UnaryExpression {
             name="lambda$operator$0",
             returnType = Constant.class,
             parameterTypes = {Constant.class},
-            resolvedMethods = @ResolvedMethod(receiverType = IncrementExpression.FQN),
+            resolvedTargets =IncrementExpression.FQN,
             line = 86)
     @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {

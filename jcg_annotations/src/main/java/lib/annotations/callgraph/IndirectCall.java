@@ -28,8 +28,6 @@
  */
 package lib.annotations.callgraph;
 
-import lib.annotations.documentation.CGFeature;
-
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -51,11 +49,13 @@ public @interface IndirectCall {
 
     String name();
 
-    String declaringClass();
+    int line() default -1;
+
+    String[] resolvedTargets() default {};
+    String[] prohibitedTargets() default {};
 
     Class<?> returnType() default Void.class;
 
     Class<?>[] parameterTypes() default {};
 
-    CGFeature feature() default CGFeature.Misc;
 }

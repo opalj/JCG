@@ -41,24 +41,24 @@ import static lib.annotations.documentation.CGCategory.NOTE;
 import static lib.annotations.documentation.CGCategory.POLYMORPHIC_CALL;
 
 /**
- *
  * Simple map implementation which maintains a linked list of key-value pairs.
- *
+ * <p>
  * <!--
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * SPACE LEFT INTENTIONALLY FREE TO HANDLE FUTURE ADAPTIONS
- *
- *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
+ *
  * @author Michael Eichberg
  * @author Michael Reif
  */
@@ -91,7 +91,7 @@ public class Map<K, V> {
         }
 
         @EntryPoint(value = {OPA, CPA})
-        public String toString(){
+        public String toString() {
             return key.toString() + " -> " + value.toString();
         }
     }
@@ -100,7 +100,7 @@ public class Map<K, V> {
     LinkedEntry last;
 
     @CGNote(value = POLYMORPHIC_CALL, description = "an anonymous class is created; the methods of this class become potential call targets.")
-    public static final Map<?,?> EMPTY = new Map<Object,Object>(){
+    public static final Map<?, ?> EMPTY = new Map<Object, Object>() {
 
         @Override
         @EntryPoint(value = {OPA, CPA})
@@ -114,14 +114,14 @@ public class Map<K, V> {
             return null;
         }
     };
-    
-    @EntryPoint(value = { OPA, CPA })
+
+    @EntryPoint(value = {OPA, CPA})
     public Map() {
 
     }
 
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = linkedEntryReceiverType), parameterTypes = {Object.class, Object.class}, line = 128)
-    @CallSite(name = "getNextEntry", returnType = Map.LinkedEntry.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 139)
+    @CallSite(name = "<init>", resolvedTargets = linkedEntryReceiverType, parameterTypes = {Object.class, Object.class}, line = 128)
+    @CallSite(name = "getNextEntry", returnType = Map.LinkedEntry.class, resolvedTargets = linkedEntryReceiverType, line = 139)
     @EntryPoint(value = {OPA, CPA})
     public void add(K k, V v) {
         if (root == null) {
@@ -147,23 +147,21 @@ public class Map<K, V> {
         }
     }
 
-    @CallSite(name = "contentAsString", resolvedMethods = {@ResolvedMethod(receiverType = MapReceiverType)},
-    		parameterTypes = {Map.LinkedEntry.class}, returnType = String.class, line = 154)
+    @CallSite(name = "contentAsString", resolvedTargets = MapReceiverType,
+            parameterTypes = {Map.LinkedEntry.class}, returnType = String.class, line = 154)
     @EntryPoint(value = {OPA, CPA})
     public String toString() {
         return "Map(" + contentAsString(root) + ")";
     }
 
-    @CallSite(name = "toString", returnType = String.class, resolvedMethods = {@ResolvedMethod(receiverType = linkedEntryReceiverType)}, line = 165)
-    @CallSite(name = "next", returnType = Object.class, resolvedMethods = {
-            @ResolvedMethod(receiverType = MapIterator.FQN)},
-    line = 165)
-    private String contentAsString(LinkedEntry entry){
+    @CallSite(name = "toString", returnType = String.class, resolvedTargets = linkedEntryReceiverType, line = 163)
+    @CallSite(name = "next", returnType = Object.class, resolvedTargets = MapIterator.FQN, line = 163)
+    private String contentAsString(LinkedEntry entry) {
         StringBuffer sb = new StringBuffer();
         Iterator itr = this.iterator();
-        while(itr.hasNext()){
+        while (itr.hasNext()) {
             sb.append(itr.next().toString());
-            if(itr.hasNext())
+            if (itr.hasNext())
                 sb.append(", ");
         }
 
@@ -173,8 +171,8 @@ public class Map<K, V> {
     @EntryPoint(value = {OPA, CPA})
     public V get(K name) {
         LinkedEntry cur = root;
-        while(cur != null){
-            if(cur.key.equals(name))
+        while (cur != null) {
+            if (cur.key.equals(name))
                 return cur.value;
 
             cur = cur.getNextEntry();
@@ -184,17 +182,17 @@ public class Map<K, V> {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    public Iterator iterator(){
+    public Iterator iterator() {
         return new MapIterator(root);
     }
 
-    private class MapIterator implements Iterator<LinkedEntry>{
+    private class MapIterator implements Iterator<LinkedEntry> {
 
         private static final String FQN = "Llib/Map$MapIterator;";
 
         private LinkedEntry cur;
 
-        public MapIterator(LinkedEntry head){
+        public MapIterator(LinkedEntry head) {
             cur = head;
         }
 

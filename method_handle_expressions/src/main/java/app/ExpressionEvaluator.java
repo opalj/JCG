@@ -35,6 +35,7 @@ import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 import lib.*;
 import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
 /**
@@ -42,21 +43,21 @@ import lib.annotations.properties.EntryPoint;
  * wrt. call graph construction. It covers ( inlc. the library) serveral Java language features to test whether
  * a given call graph implementation can handle these features.
  * <!--
- * 
+ *
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- * 
- * 
- * 
- * 
- * 
- * 
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- * 
- * 
- *
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
  * @author Michael Eichberg
@@ -66,7 +67,9 @@ import lib.annotations.properties.EntryPoint;
 public class ExpressionEvaluator {
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-    @IndirectCall(name = "<init>", parameterTypes = Expression.class, declaringClass = SquareExpression.FQN)
+    @IndirectCall(
+            name = "<init>", parameterTypes = Expression.class,
+            resolvedTargets = SquareExpression.FQN)
     public static void main(final String[] args) throws Throwable {
         Constant c1 = new Constant(1);
         Constant c2 = new Constant(2);

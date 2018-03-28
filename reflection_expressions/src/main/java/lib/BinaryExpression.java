@@ -88,7 +88,7 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @CGNote(value = REFLECTION, description = "a new instance is created by Java Reflection")
-    @IndirectCall(name = "<init>", declaringClass = PlusOperator.FQN, feature = CGFeature.ContextSensitiveModernReflection)
+    @IndirectCall(name = "<init>", resolvedTargets = PlusOperator.FQN)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             String operator,
@@ -126,7 +126,7 @@ public abstract class BinaryExpression implements Expression {
     }
 
 
-    @IndirectCall(name = "<init>", declaringClass = MultOperator.FQN, feature = CGFeature.TrivialReflection)
+    @IndirectCall(name = "<init>", resolvedTargets = MultOperator.FQN)
     public static BinaryExpression createBasicMultExpression(
             final Expression left,
             final Expression right) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
@@ -162,8 +162,7 @@ public abstract class BinaryExpression implements Expression {
             name = "createBinaryExpression",
             parameterTypes = {Expression.class, Expression.class},
             returnType = BinaryExpression.class,
-            declaringClass = PlusOperator.FQN,
-            feature = CGFeature.ContextSensitiveReflection)
+            resolvedTargets = PlusOperator.FQN)
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,
@@ -184,15 +183,14 @@ public abstract class BinaryExpression implements Expression {
             name = "createBinaryExpression",
             parameterTypes = {Expression.class, Expression.class},
             returnType = BinaryExpression.class,
-            declaringClass = MinusOperator.FQN,
-            feature = CGFeature.FlowSensitiveReflection
+            resolvedTargets = MinusOperator.FQN
     )
     @IndirectCall(
             name = "createBinaryExpression",
             parameterTypes = {Expression.class, Expression.class},
             returnType = BinaryExpression.class,
-            declaringClass = DivOperator.FQN,
-            feature = CGFeature.FlowSensitiveReflection)
+            resolvedTargets = DivOperator.FQN
+    )
     public static BinaryExpression createRandomBinaryExpression(
             final Expression left,
             final Expression right
@@ -214,8 +212,8 @@ public abstract class BinaryExpression implements Expression {
             name = "createBinaryExpression",
             parameterTypes = {Expression.class, Expression.class},
             returnType = BinaryExpression.class,
-            declaringClass = MultOperator.FQN,
-            feature = CGFeature.FlowSensitiveReflection)
+            resolvedTargets = MultOperator.FQN
+    )
     public static MultOperator.MultExpression createMultExpression(
             final Expression left,
             final Expression right

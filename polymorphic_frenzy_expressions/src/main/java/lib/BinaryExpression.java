@@ -37,34 +37,34 @@ import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
  * This abstract class models a binary mathematical expression.
- *
+ * <p>
  * <!--
  * <b>NOTE</b><br>
  * This class is not meant to be (automatically) recompiled; it just serves documentation
  * purposes.
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * INTENTIONALLY LEFT EMPTY TO MAKE SURE THAT THE SPECIFIED LINE NUMBERS ARE STABLE IF THE
  * CODE (E.G. IMPORTS) CHANGE.
- *
- *
- *
- *
- *
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * -->
  *
  * @author Michael Eichberg
@@ -81,27 +81,27 @@ public abstract class BinaryExpression implements Expression {
     abstract protected Operator operator();
 
     @EntryPoint(value = {OPA, CPA})
-    public <T> T accept(ExpressionVisitor <T> visitor){
+    public <T> T accept(ExpressionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    @CallSite(name = "<init>", resolvedMethods = @ResolvedMethod(receiverType = "Llib/BinaryExpression$1;"), line = 96)
+    @CallSite(name = "<init>", resolvedTargets = "Llib/BinaryExpression$1;", line = 96)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBasicBinaryExpression(
             Operator operator,
             final Expression left,
-            final Expression right) throws Exception{
+            final Expression right) throws Exception {
         final Operator op = operator;
 
-        return new BinaryExpression(){
+        return new BinaryExpression() {
 
-            @Override 
+            @Override
             @EntryPoint(value = {OPA, CPA})
             public Constant eval(Map<String, Constant> values) {
                 throw new UnsupportedOperationException();
             }
 
-            @Override 
+            @Override
             @EntryPoint(value = {OPA, CPA})
             protected Expression left() {
                 return left;
@@ -121,17 +121,15 @@ public abstract class BinaryExpression implements Expression {
         };
     }
 
-    @CallSite(name = "createBinaryExpression", 
-    		resolvedMethods = {@ResolvedMethod(receiverType = MultOperator.FQN),
-    				@ResolvedMethod(receiverType = PlusOperator.FQN),
-    				@ResolvedMethod(receiverType = SubOperator.FQN)},
-    	    parameterTypes = {Expression.class, Expression.class},
-    	    returnType = BinaryExpression.class, line = 135)
+    @CallSite(name = "createBinaryExpression",
+            resolvedTargets = {MultOperator.FQN, PlusOperator.FQN, SubOperator.FQN},
+            parameterTypes = {Expression.class, Expression.class},
+            returnType = BinaryExpression.class, line = 133)
     @EntryPoint(value = {OPA, CPA})
     public static BinaryExpression createBinaryExpression(
             Operator operator,
             final Expression left,
-            final Expression right) throws Exception{
+            final Expression right) throws Exception {
         return operator.createBinaryExpression(left, right);
     }
 }

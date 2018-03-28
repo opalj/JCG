@@ -14,7 +14,10 @@ import lib.annotations.callgraph.IndirectCall;
 class Foo { 
     static String staticToString() { return "Foo"; }
     
-    @IndirectCall(name = "staticToString", declaringClass = "Ltmr1/Foo;", returnType = String.class)
+    @IndirectCall(
+        name = "staticToString", returnType = String.class, line = 23,
+        resolvedTargets = "Ltmr1/Foo;"
+    )
     public static void main(String[] args) throws Throwable {
         Class<?> clazz = Class.forName("tmr1.Foo");
         MethodType methodType = MethodType.methodType(String.class);
@@ -39,7 +42,10 @@ import lib.annotations.callgraph.IndirectCall;
 class Foo {
     public String toString() { return "Foo"; }
     
-    @IndirectCall(name = "toString", declaringClass = "Ltmr2/Foo;", returnType = String.class)
+    @IndirectCall(
+        name = "toString", returnType = String.class, line = 23,
+        resolvedTargets = "Ltmr2/Foo;"
+    )
     public static void main(String[] args) throws Throwable {
         Class<?> clazz = Class.forName("tmr2.Foo");
         MethodType methodType = java.lang.invoke.MethodType.methodType(String.class);
@@ -64,11 +70,13 @@ import lib.annotations.callgraph.IndirectCall;
 class Foo {
     public String toString() { return "Foo"; }
 
-    @IndirectCall(name = "<init>", declaringClass = "Ltmr3/Foo;", returnType = String.class)
+    @IndirectCall(
+        name = "<init>", returnType = String.class, line = 23,
+        resolvedTargets = "Ltmr3/Foo;"
+    )
     public static void main(String[] args) throws Throwable {
         Class<?> clazz = Class.forName("Foo");
         MethodType methodType = java.lang.invoke.MethodType.methodType(void.class);
-
         MethodHandle handle = MethodHandles.lookup().findConstructor(clazz, methodType);
         handle.invoke().toString();
     }

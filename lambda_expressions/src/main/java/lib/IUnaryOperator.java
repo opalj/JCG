@@ -65,7 +65,7 @@ public interface IUnaryOperator extends Function<Constant, Constant> {
             name = "lambda$identity$0",
             returnType = Constant.class,
             parameterTypes = {Constant.class},
-            resolvedMethods = @ResolvedMethod(receiverType = IUnaryOperator.FQN),
+            resolvedTargets = IUnaryOperator.FQN,
             line = 72)
     @EntryPoint(value = {OPA})
     static IUnaryOperator identity() {

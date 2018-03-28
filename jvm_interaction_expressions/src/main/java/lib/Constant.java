@@ -30,12 +30,11 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-
 import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 import lib.testutils.CallbackTest;
+
+import static lib.annotations.callgraph.AnalysisMode.*;
 
 /**
  * This class simply wraps an integer value.
@@ -93,7 +92,7 @@ public class Constant implements Expression {
     }
 
     @EntryPoint(value = {DESKTOP_APP, OPA, CPA})
-	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 98)
+	@CallSite(name = "garbageCollectorCall", resolvedTargets = CallbackTest.FQN, line = 97)
     public void finalize () {
 		CallbackTest.garbageCollectorCall();
     	System.out.println("Constant object destroyed.");

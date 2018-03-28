@@ -72,20 +72,19 @@ public class MasonsExpressions {
             name = "eval",
             returnType = Constant.class,
             parameterTypes = Map.class,
-            declaringClass = MultOperator.MultExpression.FQN
+            resolvedTargets = MultOperator.MultExpression.FQN
     )
     @IndirectCall(
             name = "eval",
             returnType = Constant.class,
             parameterTypes = Map.class,
-            declaringClass = PlusOperator.AddExpression.FQN
+            resolvedTargets = PlusOperator.AddExpression.FQN
     )
     @IndirectCall(
             name = "eval",
             returnType = Constant.class,
             parameterTypes = Map.class,
-            declaringClass = Constant.FQN,
-            feature = CGFeature.TrivialReflection
+            resolvedTargets = Constant.FQN
     )
     public static void main(final String[] args) throws Exception {
         Constant c1 = new Constant(3);

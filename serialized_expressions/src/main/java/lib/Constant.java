@@ -70,7 +70,7 @@ public abstract class Constant implements Expression {
     public static final String FQN = "Llib/Constant;";
 
     // this constructor is invoked on the de-serialization of a SerializableConstant object
-    @CallSite(name = "log", resolvedMethods = {@ResolvedMethod(receiverType = Constant.FQN)}, line = 75)
+    @CallSite(name = "log", resolvedTargets = Constant.FQN, line = 75)
     protected Constant() {
         log("Called constructor");
     }

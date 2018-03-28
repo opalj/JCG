@@ -76,7 +76,7 @@ public abstract class UnaryExpression implements Expression {
     protected Expression expr;
 
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "<init>", declaringClass = SquareExpression.FQN, parameterTypes = Expression.class, feature = CGFeature.ComplexReflection)
+    @IndirectCall(name = "<init>", resolvedTargets = SquareExpression.FQN, parameterTypes = Expression.class)
     public static UnaryExpression createUnaryExpressions(
             UnaryOperator operator,
             final Expression expr) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
@@ -86,7 +86,7 @@ public abstract class UnaryExpression implements Expression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "<init>", declaringClass = NegationExpression.FQN, parameterTypes = Expression.class, feature = CGFeature.ContextSensitiveReflection)
+    @IndirectCall(name = "<init>", resolvedTargets = NegationExpression.FQN, parameterTypes = Expression.class)
     public static UnaryExpression createUnaryExpressions(
             String operator,
             final Expression expr) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
@@ -96,7 +96,7 @@ public abstract class UnaryExpression implements Expression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "<init>", declaringClass = IdentityExpression.FQN, parameterTypes = Expression.class, feature = CGFeature.TrivialReflection)
+    @IndirectCall(name = "<init>", resolvedTargets = IdentityExpression.FQN, parameterTypes = Expression.class)
     public static UnaryExpression createIdentityExpression(final Expression expr) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class<?> clazz = Class.forName("lib.IdentityExpression");
         Constructor<?> constructor = clazz.getConstructor(Expression.class);

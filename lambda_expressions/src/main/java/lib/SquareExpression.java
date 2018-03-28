@@ -84,7 +84,7 @@ public final class SquareExpression extends UnaryExpression {
             name = "lambda$operator$0",
             returnType = Constant.class,
             parameterTypes = {Constant.class},
-            resolvedMethods = @ResolvedMethod(receiverType = "Llib/IncrementExpression;"),
+            resolvedTargets = "Llib/IncrementExpression;",
             line = 91)
     @EntryPoint(value = {OPA, CPA})
     public IUnaryOperator operator() {

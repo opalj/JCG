@@ -30,12 +30,12 @@
 
 package lib;
 
-import static lib.annotations.callgraph.AnalysisMode.*;
-
 import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 import lib.testutils.CallbackTest;
+
+import static lib.annotations.callgraph.AnalysisMode.CPA;
+import static lib.annotations.callgraph.AnalysisMode.OPA;
 
 /**
  * This class simply wraps an integer value.
@@ -89,14 +89,14 @@ public class AltConstant implements Expression, Runnable {
     }
 
     @EntryPoint(value = {OPA, CPA})
-	@CallSite(name = "garbageCollectorCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 94)
+	@CallSite(name = "garbageCollectorCall", resolvedTargets = CallbackTest.FQN, line = 94)
     public void finalize () {
 		CallbackTest.garbageCollectorCall();
     	System.out.println("AltConstant object destroyed.");
     }
 
     @EntryPoint(value = {OPA, CPA})
-	@CallSite(name = "runnableRunCall", resolvedMethods = @ResolvedMethod(receiverType = CallbackTest.FQN), line = 101)
+	@CallSite(name = "runnableRunCall", resolvedTargets = CallbackTest.FQN, line = 101)
     public void run() {
     	CallbackTest.runnableRunCall();
     }

@@ -72,7 +72,7 @@ public interface Expression {
 	static String name = init();
 	
 	@EntryPoint(value = {OPA, CPA})
-	@CallSite(name = "staticCall", resolvedMethods = @ResolvedMethod(receiverType = StaticInitializerTest.FQN), line = 77)
+	@CallSite(name = "staticCall", resolvedTargets = StaticInitializerTest.FQN, line = 77)
 	static String init() {
 		StaticInitializerTest.staticCall("Expression");
 		return "expression";

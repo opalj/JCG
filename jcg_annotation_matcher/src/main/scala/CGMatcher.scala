@@ -3,7 +3,6 @@ import java.io.FileInputStream
 
 import lib.annotations.documentation.CGFeature
 import org.opalj.br
-import org.opalj.br.analyses.Project
 import org.opalj.br.Annotation
 import org.opalj.br.AnnotationValue
 import org.opalj.br.ArrayValue
@@ -16,6 +15,7 @@ import org.opalj.br.ObjectType
 import org.opalj.br.StringValue
 import org.opalj.br.Type
 import org.opalj.br.VoidType
+import org.opalj.br.analyses.Project
 import org.opalj.log.GlobalLogContext
 import org.opalj.log.LogContext
 import org.opalj.log.LogMessage
@@ -34,12 +34,6 @@ class DevNullLogger extends OPALLogger {
     override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
 }
 
-class MatchResult() {
-    var missedTargets = 0
-    var calledProhibitedTargets = 0
-    var failedFeatures: Set[CGFeature] = Set.empty
-}
-
 object CGMatcher {
 
     val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/CallSite")
@@ -47,7 +41,7 @@ object CGMatcher {
     val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
     val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
 
-    def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): (Int, Int, Set[CGFeature]) = {
+    def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): Boolean = {
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
         val p = Project(new File(tgtJar))
 
@@ -59,9 +53,26 @@ object CGMatcher {
         jsResult match {
             case _: JsSuccess[CallSites] ⇒
                 val computedCallSites = jsResult.get
-                val matchResult = new MatchResult()
                 for (clazz ← p.allProjectClassFiles) {
                     for ((method, _) ← clazz.methodsWithBody) {
+                        // check if the call site might not be ambiguous
+                        if (method.annotations.exists { a ⇒
+                            a.annotationType == callSiteAnnotationType ||
+                                a.annotationType == callSitesAnnotationType ||
+                                a.annotationType == indirectCallAnnotationType ||
+                                a.annotationType == indirectCallsAnnotationType
+                        }) {
+                            val body = method.body.get
+                            val invokations = body.instructions.filter(instr ⇒ instr != null && instr.isInvocationInstruction)
+                            val lines = invokations.zipWithIndex.map {
+                                case (instr, pc) ⇒
+                                    (body.lineNumber(pc), instr.asInvocationInstruction.name)
+                            }.toSet
+                            if (lines.size != invokations.length) {
+                                throw new RuntimeException(s"Multiple call sites with same name in the same line $tgtJar, ${method.name}")
+                            }
+                        }
+
                         for (annotation ← method.annotations) {
 
                             val callSiteAnnotations =
@@ -72,13 +83,13 @@ object CGMatcher {
                                 else
                                     Seq.empty
 
-                            handleCallSiteAnnotations(
+                            if (!handleCallSiteAnnotations(
                                 computedCallSites.callSites,
                                 method,
                                 callSiteAnnotations,
-                                matchResult,
                                 verbose
-                            )
+                            ))
+                                return false;
 
                             val indirectCallAnnotations =
                                 if (annotation.annotationType == indirectCallAnnotationType)
@@ -88,34 +99,47 @@ object CGMatcher {
                                 else
                                     Seq.empty
 
-                            handleIndirectCallAnnotations(
+                            if (!handleIndirectCallAnnotations(
                                 computedCallSites.callSites,
                                 method,
                                 indirectCallAnnotations,
-                                matchResult,
                                 verbose
-                            )
+                            ))
+                                return false;
                         }
                     }
                 }
-                (matchResult.missedTargets, matchResult.calledProhibitedTargets, matchResult.failedFeatures)
+
+                true
             case _ ⇒
                 throw new RuntimeException("Unable to parse json")
         }
+    }
+
+    private def verifyCallSite(annotatedLineNumber: Int, src: br.Method, tgtName: String): Unit = {
+        val body = src.body.get
+        val existsInstruction = body.instructions.zipWithIndex.exists {
+            case (instr, pc) if instr.isInvocationInstruction ⇒
+                val lineNumber = body.lineNumber(pc)
+                // todo parameter types
+                lineNumber.isDefined && annotatedLineNumber == lineNumber.get && tgtName == instr.asInvocationInstruction.name
+        }
+        if (!existsInstruction)
+            throw new RuntimeException(s"There is no call to $tgtName in line $annotatedLineNumber")
     }
 
     private def handleCallSiteAnnotations(
         computedCallSites:   Set[CallSite],
         method:              br.Method,
         callSiteAnnotations: Seq[Annotation],
-        matchResult:         MatchResult,
         verbose:             Boolean
-    ): Unit = {
+    ): Boolean = {
         for (callSiteAnnotation ← callSiteAnnotations) {
             val line = getLineNumber(callSiteAnnotation)
             val name = getString(callSiteAnnotation, "name")
             val returnType = getType(callSiteAnnotation, "returnType")
             val parameterTypes = getParameterList(callSiteAnnotation)
+            verifyCallSite(line, method, name)
             val feature = getFeatureEnum(callSiteAnnotation)
             val annotatedMethod = convertMethod(method)
 
@@ -132,8 +156,7 @@ object CGMatcher {
                     for (annotatedTgt ← annotatedTargets) {
                         if (!computedTargets.contains(annotatedTgt)) {
                             if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
-                            matchResult.missedTargets += 1
-                            matchResult.failedFeatures += feature
+                                return false;
                         } else {
                             if (verbose) println("found it")
                         }
@@ -144,17 +167,25 @@ object CGMatcher {
                     for (prohibitedTgt ← prohibitedTargets) {
                         if (computedTargets.contains(prohibitedTgt)) {
                             if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
-                            matchResult.calledProhibitedTargets += 1
-                            matchResult.failedFeatures += feature
+                            return false;
                         } else {
                             if (verbose) println("no call to prohibited")
                         }
                     }
                 case _ ⇒
-                    if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
-                    matchResult.missedTargets += annotatedTargets.size
-                    matchResult.failedFeatures += feature
+                    throw new RuntimeException(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
             }
+        }
+
+        true
+    }
+
+    private def verifyCallExistance(annotatedLineNumber: Int, method: br.Method): Unit = {
+        val body = method.body.get
+        body.instructions.zipWithIndex.exists {
+            case (instr, pc) ⇒
+                val lineNumber = body.lineNumber(pc)
+                instr != null && instr.isInvocationInstruction && lineNumber.isDefined && lineNumber.get == annotatedLineNumber
         }
     }
 
@@ -162,10 +193,11 @@ object CGMatcher {
         computedCallSites:       Set[CallSite],
         source:                  br.Method,
         indirectCallAnnotations: Seq[Annotation],
-        matchResult:             MatchResult,
         verbose:                 Boolean
-    ): Unit = {
+    ): Boolean = {
         for (annotation ← indirectCallAnnotations) {
+            val line = getLineNumber(annotation)
+            verifyCallExistance(line, source)
             val name = getString(annotation, "name")
             val returnType = getReturnType(annotation).toJVMTypeName
             val parameterTypes = getParameterList(annotation).map(_.toJVMTypeName)
@@ -174,9 +206,9 @@ object CGMatcher {
             val annotatedSource = convertMethod(source)
             val feature = getFeatureEnum(annotation)
             if (!callsIndirectly(computedCallSites, annotatedSource, annotatedTarget, verbose))
-                matchResult.failedFeatures += feature
+                return false;
         }
-
+        true
     }
 
     private def callsIndirectly(
@@ -195,7 +227,7 @@ object CGMatcher {
             for (tgt ← computedCallSites.filter(_.method == currentSource).flatMap(_.targets)) {
                 if (tgt == annotatedTarget) {
                     if (verbose) println(s"Found transitive call $source -> $annotatedTarget")
-                    return true
+                    return true;
                 }
 
                 if (!visited.contains(tgt)) {
@@ -211,7 +243,7 @@ object CGMatcher {
     }
 
     def main(args: Array[String]): Unit = {
-        matchCallSites(args(0), args(1), true)
+        matchCallSites(args(0), args(1), verbose = true)
     }
 
     def convertMethod(method: org.opalj.br.Method): Method = {

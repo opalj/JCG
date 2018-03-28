@@ -49,7 +49,4 @@ public @interface ProhibitedMethod {
 	 * "java/lang/Object").
 	 */
 	String receiverType();
-
-	CGFeature feature() default CGFeature.Misc;
-
 }

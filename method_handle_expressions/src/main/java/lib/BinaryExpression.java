@@ -30,6 +30,7 @@
 package lib;
 
 import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.ResolvedMethod;
 import lib.annotations.properties.EntryPoint;
 
 import java.lang.invoke.MethodHandle;
@@ -87,7 +88,12 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, declaringClass = MultOperator.FQN, returnType = BinaryExpression.class)
+    @IndirectCall(
+            name = "createBinaryExpression",
+            parameterTypes = {Expression.class, Expression.class},
+            returnType = BinaryExpression.class,
+            resolvedTargets = MultOperator.FQN
+    )
     public static BinaryExpression createBinaryExpression(
             String operator,
             final Expression left,
@@ -101,7 +107,12 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @EntryPoint(value = {OPA, CPA})
-    @IndirectCall(name = "createBinaryExpression", parameterTypes = {Expression.class, Expression.class}, declaringClass = PlusOperator.FQN, returnType = BinaryExpression.class)
+    @IndirectCall(
+            name = "createBinaryExpression",
+            parameterTypes = {Expression.class, Expression.class},
+            returnType = BinaryExpression.class,
+            resolvedTargets = PlusOperator.FQN
+    )
     public static BinaryExpression createPlusExpression(Expression left, Expression right) throws Throwable {
         Class<?> plusClass = Class.forName("lib.PlusOperator");
         MethodType methodType = MethodType.methodType(BinaryExpression.class, Expression.class, Expression.class);

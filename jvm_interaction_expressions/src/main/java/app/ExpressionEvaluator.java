@@ -89,7 +89,7 @@ public class ExpressionEvaluator {
 
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method <Thread>.dispatchUncaughtException is not dead")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = CallbackTest.FQN)}, line = 96)
+            @CallSite(name = "callback", resolvedTargets = CallbackTest.FQN, line = 96)
             @Override
             @EntryPoint(value = {OPA, CPA})
             public void uncaughtException(Thread t, Throwable e) {
@@ -104,7 +104,7 @@ public class ExpressionEvaluator {
             // This is an entry point!
             @CGNote(value = JVM_CALLBACK, description = "invisible callback because no native code is involved; the call graph seems to be complete")
             @CGNote(value = NOTE, description = "the related method<Thread>.run is called by the jvm")
-            @CallSite(name = "callback", resolvedMethods = {@ResolvedMethod(receiverType = CallbackTest.FQN)}, line = 111)
+            @CallSite(name = "callback", resolvedTargets = CallbackTest.FQN, line = 111)
             @EntryPoint(value = {OPA, CPA})
             @Override
             public void run() {
