@@ -177,7 +177,7 @@ class Foo {
 #ContextSensitiveReflection
 The concrete strings require information about the context.
 
-## CSR1
+##CSR1
 The method name is passed as an argument.
 ```java
 // csr1/Foo.java
@@ -203,7 +203,7 @@ class Foo {
 ```
 [//]: # (END)
 
-## CSR2
+##CSR2
 The class name is passed as an argument.
 ```java
 // csr2/Foo.java
@@ -232,7 +232,7 @@ class Bar {
 ```
 [//]: # (END)
 
-## CSR3
+##CSR3
 The method name is unknown.
 ```java
 // csr3/Foo.java
@@ -262,7 +262,7 @@ class Foo {
 ```
 [//]: # (END)
 
-## CSR4
+##CSR4
 The class name is passed as an argument.
 ```java
 // csr4/Foo.java
