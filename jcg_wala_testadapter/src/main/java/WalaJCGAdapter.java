@@ -1,7 +1,6 @@
 import com.ibm.wala.classLoader.CallSiteReference;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
-import com.ibm.wala.classLoader.Language;
 import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
@@ -52,13 +51,13 @@ public class WalaJCGAdapter implements JCGTestAdapter {
 
 
         CallGraph callGraph = null;
-        IAnalysisCacheView cache = new AnalysisCacheImpl();
+        AnalysisCache cache = new AnalysisCacheImpl();
 
         if (algorithm.equals("0-CFA")) {
-            SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
+            SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(options, cache, classHierarchy, scope);
             callGraph = ncfaBuilder.makeCallGraph(options);
         } else if (algorithm.equals("0-1-CFA")) {
-            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
+            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
         } else if (algorithm.equals("1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
@@ -126,19 +125,6 @@ public class WalaJCGAdapter implements JCGTestAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        /*Properties p = null;
-        try {
-            p = WalaExamplesProperties.loadProperties();
-            p.putAll(WalaProperties.loadProperties());
-        } catch (WalaException e) {
-            e.printStackTrace();
-            Assertions.UNREACHABLE();
-        }
-        String pdfFile = "cg.pdf";
-
-        String dotExe = p.getProperty(WalaExamplesProperties.DOT_EXE);
-        DotUtil.dotify(callGraph, null, PDFTypeHierarchy.DOT_FILE, pdfFile, dotExe); */
     }
 
     private static JSONObject createMethodObject(MethodReference method) {
