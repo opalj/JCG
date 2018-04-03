@@ -119,10 +119,12 @@ object CGMatcher {
     private def verifyCallSite(annotatedLineNumber: Int, src: br.Method, tgtName: String): Unit = {
         val body = src.body.get
         val existsInstruction = body.instructions.zipWithIndex.exists {
+            case (null, _) ⇒ false
             case (instr, pc) if instr.isInvocationInstruction ⇒
                 val lineNumber = body.lineNumber(pc)
                 // todo parameter types
                 lineNumber.isDefined && annotatedLineNumber == lineNumber.get && tgtName == instr.asInvocationInstruction.name
+            case _ ⇒ false
         }
         if (!existsInstruction)
             throw new RuntimeException(s"There is no call to $tgtName in line $annotatedLineNumber")
@@ -136,15 +138,11 @@ object CGMatcher {
     ): Boolean = {
         for (callSiteAnnotation ← callSiteAnnotations) {
             val line = getLineNumber(callSiteAnnotation)
-            val name = getString(callSiteAnnotation, "name")
+            val name = getName(callSiteAnnotation)
             val returnType = getType(callSiteAnnotation, "returnType")
             val parameterTypes = getParameterList(callSiteAnnotation)
             verifyCallSite(line, method, name)
-            val feature = getFeatureEnum(callSiteAnnotation)
             val annotatedMethod = convertMethod(method)
-
-            val annotatedTargets =
-                getAnnotations(callSiteAnnotation, "resolvedMethods").map(getString(_, "receiverType"))
 
             computedCallSites.find { cs ⇒
                 cs.line == line && cs.method == annotatedMethod && cs.declaredTarget.name == name
@@ -153,18 +151,16 @@ object CGMatcher {
 
                     val computedTargets = computedCallSite.targets.map(_.declaringClass)
 
-                    for (annotatedTgt ← annotatedTargets) {
+                    for (annotatedTgt ← getResolvedTargets(callSiteAnnotation)) {
                         if (!computedTargets.contains(annotatedTgt)) {
                             if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
-                                return false;
+                            return false;
                         } else {
                             if (verbose) println("found it")
                         }
                     }
 
-                    val prohibitedTargets =
-                        getAnnotations(callSiteAnnotation, "prohibitedMethods").map(getString(_, "receiverType"))
-                    for (prohibitedTgt ← prohibitedTargets) {
+                    for (prohibitedTgt ← getProhibitedTargets(callSiteAnnotation)) {
                         if (computedTargets.contains(prohibitedTgt)) {
                             if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
                             return false;
@@ -198,15 +194,15 @@ object CGMatcher {
         for (annotation ← indirectCallAnnotations) {
             val line = getLineNumber(annotation)
             verifyCallExistance(line, source)
-            val name = getString(annotation, "name")
+            val name = getName(annotation)
             val returnType = getReturnType(annotation).toJVMTypeName
             val parameterTypes = getParameterList(annotation).map(_.toJVMTypeName)
-            val declaringClass = getString(annotation, "declaringClass")
-            val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
-            val annotatedSource = convertMethod(source)
-            val feature = getFeatureEnum(annotation)
-            if (!callsIndirectly(computedCallSites, annotatedSource, annotatedTarget, verbose))
-                return false;
+            for (declaringClass ← getResolvedTargets(annotation)) {
+                val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
+                val annotatedSource = convertMethod(source)
+                if (!callsIndirectly(computedCallSites, annotatedSource, annotatedTarget, verbose))
+                    return false;
+            }
         }
         true
     }
@@ -265,11 +261,11 @@ object CGMatcher {
         avs.getOrElse(IndexedSeq.empty).map { cs ⇒ cs.asInstanceOf[AnnotationValue].annotation }
     }
 
-    def getString(callSite: Annotation, label: String): String = { //@CallSite -> String
+    def getName(callSite: Annotation): String = { //@CallSite -> String
         val sv = callSite.elementValuePairs collectFirst {
-            case ElementValuePair(`label`, StringValue(string)) ⇒ string
+            case ElementValuePair("name", StringValue(string)) ⇒ string
         }
-        sv.getOrElse("")
+        sv.get
     }
 
     def getLineNumber(callSite: Annotation): Int = { //@CallSite -> int
@@ -277,13 +273,6 @@ object CGMatcher {
             case ElementValuePair("line", IntValue(int)) ⇒ int
         }
         iv.getOrElse(-1)
-    }
-
-    def getBoolean(callSite: Annotation, label: String): Boolean = { //@CallSite -> boolean
-        val bv = callSite.elementValuePairs collectFirst {
-            case ElementValuePair(`label`, BooleanValue(bool)) ⇒ bool
-        }
-        bv.getOrElse(false)
     }
 
     def getType(annotation: Annotation, label: String): Type = { //@CallSite -> Type
@@ -306,11 +295,19 @@ object CGMatcher {
         av.getOrElse(List()).toList
     }
 
-    def getFeatureEnum(callSite: Annotation): CGFeature = {
-        val feature = callSite.elementValuePairs collectFirst {
-            case ElementValuePair("feature", EnumValue(_, constName)) ⇒
-                constName
+    def getResolvedTargets(annotation: Annotation): List[String] = {
+        val av = annotation.elementValuePairs collectFirst {
+            case ElementValuePair("resolvedTargets", ArrayValue(ab)) ⇒
+                ab.toIndexedSeq.map(_.asInstanceOf[StringValue].value)
         }
-        CGFeature.valueOf(feature.getOrElse("Misc"))
+        av.getOrElse(List()).toList
+    }
+
+    def getProhibitedTargets(annotation: Annotation): List[String] = {
+        val av = annotation.elementValuePairs collectFirst {
+            case ElementValuePair("prohibitedTargets", ArrayValue(ab)) ⇒
+                ab.toIndexedSeq.map(_.asInstanceOf[StringValue].value)
+        }
+        av.getOrElse(List()).toList
     }
 }
