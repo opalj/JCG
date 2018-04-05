@@ -7,15 +7,15 @@ Test reflection with respect to static methods.
 package tr1;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo { 
+class Foo {
     static String staticToString() { return "Foo"; }
-    
+
     @IndirectCall(
         name = "staticToString", returnType = String.class, line = 13,
         resolvedTargets = "Ltr1/Foo;"
     )
-    public static void main(String[] args) throws Exception { 
-        Class.forName("tr1.Foo").getDeclaredMethod("staticToString").invoke(null); 
+    public static void main(String[] args) throws Exception {
+        Class.forName("tr1.Foo").getDeclaredMethod("staticToString").invoke(null);
     }
 }
 ```
@@ -28,7 +28,7 @@ Test reflection with respect to instance methods.
 package tr2;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo { 
+class Foo {
     public String toString() { return "Foo"; }
 
     @IndirectCall(
@@ -38,7 +38,7 @@ class Foo {
     void m() throws Exception {
         Class.forName("Foo").getDeclaredMethod("toString").invoke(this);
     }
-    
+
     public static void main(String[] args) throws Exception { new Foo().m(); }
 }
 ```
@@ -51,9 +51,9 @@ Test reflection with respect to constructors.
 package tr3;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo { 
+class Foo {
     public Foo(String s) {    }
-    
+
     @IndirectCall(
         name = "<init>", parameterTypes = String.class, line = 13,
         resolvedTargets = "Ltr3/Foo;"
@@ -72,16 +72,22 @@ Test reflection with respect to the default constructor
 package tr4;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo { 
+class Foo {
     public Foo() {    }
-    
+
     @IndirectCall(name = "<init>", line = 10, resolvedTargets = "Ltr3/Foo;")
-    static void main(String[] args) throws Exception { 
-        Class.forName("tr4.Foo").newInstance(); 
+    static void main(String[] args) throws Exception {
+        Class.forName("tr4.Foo").newInstance();
     }
 }
 ```
 [//]: # (END)
+
+TODO parameter types for invoke/constructor
+TODO autoboxing/unboxing
+TODO forName(String name, boolean initialize, ClassLoader loader)
+TODO fieldAccess
+
 
 #LocallyResolvableReflection
 The complete information is locally (intra-procedurally) available.
@@ -95,19 +101,19 @@ import lib.annotations.callgraph.IndirectCall;
 class Bar {
     static String staticToString() { return "bar"; }
 }
-class Foo { 
+class Foo {
     static String staticToString() { return "foo"; }
-    
+
     public static void main(String[] args) throws Exception {
         m(args.length % 2 == 0);
     }
-    
+
     @IndirectCall(
         name = "staticToString", returnType = String.class, line = 20,
         resolvedTargets = "Llrr1/Foo;"
     )
-    static void m(boolean b) throws Exception { 
-        Class.forName(b ? "lrr1.Foo" : "lrr1.Bar").getDeclaredMethod("staticToString").invoke(null); 
+    static void m(boolean b) throws Exception {
+        Class.forName(b ? "lrr1.Foo" : "lrr1.Bar").getDeclaredMethod("staticToString").invoke(null);
     }
 }
 ```
@@ -119,9 +125,9 @@ class Foo {
 package lrr2;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo1 { 
+class Foo1 {
     static String staticToString() { return "1"; }
-    
+
     @IndirectCall(
         name = "staticToString", returnType = String.class, line = 17,
         resolvedTargets = { "Llrr2/Foo1;", "Llrr2/Foo2;" }
@@ -134,12 +140,12 @@ class Foo1 {
             className = "lrr2.Foo" + 2;
         Class.forName(className).getDeclaredMethod("staticToString").invoke(null);
     }
-    
-    public static void main(String[] args) throws Exception { 
+
+    public static void main(String[] args) throws Exception {
         m(args.length % 2 == 0);
     }
 }
-class Foo2 { 
+class Foo2 {
     static String staticToString() { return "2"; }
 }
 ```
@@ -151,10 +157,10 @@ class Foo2 {
 package lrr3;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo { 
+class Foo {
     static String staticToString1() { return "1"; }
     static String staticToString2() { return "2"; }
-    
+
     @IndirectCall(
         name = "staticToString1", returnType = String.class, line = 18,
         resolvedTargets = "Llrr2/Foo;"
@@ -164,10 +170,10 @@ class Foo {
         resolvedTargets = "Llrr2/Foo;"
     )
     static void m(boolean b) throws Exception {
-        Class.forName("lrr3.Foo").getDeclaredMethod(b ? "staticToString1" : "staticToString2").invoke(null); 
+        Class.forName("lrr3.Foo").getDeclaredMethod(b ? "staticToString1" : "staticToString2").invoke(null);
     }
-    
-    public static void main(String[] args) throws Exception { 
+
+    public static void main(String[] args) throws Exception {
         m(args.length % 2 == 0);
     }
 }
@@ -195,7 +201,7 @@ class Foo {
     static void m(String methodName) throws Exception {
         Class.forName("csr1.Foo").getDeclaredMethod(methodName).invoke(null);
     }
-    
+
     public static void main(String[] args) throws Exception {
         m("staticToString1");
     }
@@ -212,7 +218,7 @@ package csr2;
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
     static String staticToString() { return "Foo"; }
-    
+
     @IndirectCall(
         name = "staticToString", returnType = String.class, line = 13,
         resolvedTargets = "Lcsr2/Foo;"
@@ -220,7 +226,7 @@ class Foo {
     static void m(String className) throws Exception {
         Class.forName(className).getDeclaredMethod("staticToString").invoke(null);
     }
-    
+
     public static void main(String[] args) throws Exception {
         m("Foo");
     }
@@ -239,10 +245,10 @@ The method name is unknown.
 package csr3;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo {
+public class Foo {
     static String staticToString1() { return "1"; }
     static String staticToString2() { return "2"; }
-    
+
     @IndirectCall(
         name = "staticToString1", returnType = String.class, line = 18,
         resolvedTargets = "Lcsr3/Foo;"
@@ -254,7 +260,7 @@ class Foo {
     static void m(String methodName) throws Exception {
         Class.forName("csr1.Foo").getDeclaredMethod(methodName).invoke(null);
     }
-    
+
     public static void main(String[] args) throws Exception {
         m(args[0]);
     }
@@ -269,7 +275,7 @@ The class name is passed as an argument.
 package csr4;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo {
+public class Foo {
     static String staticToString() { return "Foo"; }
 
     @IndirectCall(
@@ -279,7 +285,7 @@ class Foo {
     static void m(String className) throws Exception {
         Class.forName(className).getDeclaredMethod("staticToString").invoke(null);
     }
-    
+
     public static void main(String[] args) throws Exception {
         m(args[0]);
     }
@@ -294,20 +300,21 @@ class Bar {
 TODO
 Here newInstance could call every default constructor
 ```java
-// todo1/Foo.java
-package todo1;
+// csr5/Foo.java
+package csr5;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
-    @IndirectCall(name = "<init>", resolvedTargets = "Ltodo1/Foo;")
-    @IndirectCall(name = "<init>", resolvedTargets = "Ltodo1/Bar;")
+    @IndirectCall(name = "<init>", line = 8, resolvedTargets = "csr5/Foo;")
+    @IndirectCall(name = "<init>", line = 8, resolvedTargets = "csr5/Bar;")
     static void main(String[] args) throws Exception {
-        Foo f = (Foo) Class.forName(args[0]).newInstance();
-        f.toString();
+        Object o = Class.forName(args[0]).newInstance();
+        Bar.m((Foo) o);
+        o.toString();
     }
 }
 class Bar {
-    
+  static m(Foo f) { }
 }
 
 ```
@@ -319,15 +326,14 @@ class Bar {
 package todo2;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo { 
+class Foo {
     public String toString() { return ""; }
-    
+
     static void m(String s) throws Exception {
         Object o = Class.forName(s).newInstance();
-        if (o instanceof Foo) 
+        if (o instanceof Foo)
             o.toString();
     }
 }
 ```
 [//]: # (END)
-
