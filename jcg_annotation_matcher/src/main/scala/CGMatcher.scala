@@ -16,6 +16,7 @@ import org.opalj.br.StringValue
 import org.opalj.br.Type
 import org.opalj.br.VoidType
 import org.opalj.br.analyses.Project
+import org.opalj.br.analyses.SomeProject
 import org.opalj.log.GlobalLogContext
 import org.opalj.log.LogContext
 import org.opalj.log.LogMessage
@@ -43,7 +44,7 @@ object CGMatcher {
 
     def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): Boolean = {
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
-        val p = Project(new File(tgtJar))
+        implicit val p: SomeProject = Project(new File(tgtJar))
 
         val json = Json.parse(new FileInputStream(new File(jsonPath)))
         implicit val methodReads: Reads[Method] = Json.reads[Method]
@@ -135,7 +136,7 @@ object CGMatcher {
         method:              br.Method,
         callSiteAnnotations: Seq[Annotation],
         verbose:             Boolean
-    ): Boolean = {
+    )(implicit p: SomeProject): Boolean = {
         for (callSiteAnnotation ← callSiteAnnotations) {
             val line = getLineNumber(callSiteAnnotation)
             val name = getName(callSiteAnnotation)
@@ -178,11 +179,13 @@ object CGMatcher {
 
     private def verifyCallExistance(annotatedLineNumber: Int, method: br.Method): Unit = {
         val body = method.body.get
-        body.instructions.zipWithIndex.exists {
+        val existsCall = body.instructions.zipWithIndex.exists {
             case (instr, pc) ⇒
                 val lineNumber = body.lineNumber(pc)
                 instr != null && instr.isInvocationInstruction && lineNumber.isDefined && lineNumber.get == annotatedLineNumber
         }
+        if (!existsCall)
+            throw new RuntimeException(s"There is no call in line $annotatedLineNumber")
     }
 
     private def handleIndirectCallAnnotations(
@@ -190,7 +193,7 @@ object CGMatcher {
         source:                  br.Method,
         indirectCallAnnotations: Seq[Annotation],
         verbose:                 Boolean
-    ): Boolean = {
+    )(implicit p: SomeProject): Boolean = {
         for (annotation ← indirectCallAnnotations) {
             val line = getLineNumber(annotation)
             verifyCallExistance(line, source)
@@ -295,19 +298,35 @@ object CGMatcher {
         av.getOrElse(List()).toList
     }
 
-    def getResolvedTargets(annotation: Annotation): List[String] = {
+    def getResolvedTargets(annotation: Annotation)(implicit p: SomeProject): List[String] = {
         val av = annotation.elementValuePairs collectFirst {
             case ElementValuePair("resolvedTargets", ArrayValue(ab)) ⇒
                 ab.toIndexedSeq.map(_.asInstanceOf[StringValue].value)
         }
-        av.getOrElse(List()).toList
+        val callTargets = av.getOrElse(List()).toList
+        checkJVMTypeString(callTargets)
+        callTargets
     }
 
-    def getProhibitedTargets(annotation: Annotation): List[String] = {
+    def getProhibitedTargets(annotation: Annotation)(implicit p: SomeProject): List[String] = {
         val av = annotation.elementValuePairs collectFirst {
             case ElementValuePair("prohibitedTargets", ArrayValue(ab)) ⇒
                 ab.toIndexedSeq.map(_.asInstanceOf[StringValue].value)
         }
-        av.getOrElse(List()).toList
+        val callTargets = av.getOrElse(List()).toList
+        checkJVMTypeString(callTargets)
+        callTargets
+    }
+
+    def checkJVMTypeString(callTargets: List[String])(implicit p: SomeProject): Unit = {
+        if (!callTargets.forall { ct ⇒
+            val re = "L([^;]*);".r
+            re findFirstMatchIn ct match {
+                case Some(m) ⇒ p.classHierarchy.isKnown(ObjectType(m.group(1)))
+                case None    ⇒ false
+            }
+        }) {
+            throw new RuntimeException("Call targets must be given in JVM notation and the type must exist")
+        }
     }
 }

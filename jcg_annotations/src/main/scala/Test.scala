@@ -26,12 +26,13 @@ object Test {
             val source = Source.fromFile(sourceFile)
             val lines = try source.mkString finally source.close()
 
-            val reHeaders = """(?s)\#\#([^\n]*)(.*?)\[//\]: \# \(END\)""".r
+            val reHeaders = """(?s)\#\#([^\n]*)\n\[//\]: \# \(MAIN: ([^\n]*)\)\n(.*?)\[//\]: \# \(END\)""".r
             val re = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
 
             reHeaders.findAllIn(lines).matchData.foreach { projectMatchResult ⇒
                 val projectName = projectMatchResult.group(1)
-                val srcFiles = re.findAllIn(projectMatchResult.group(2)).matchData.map { matchResult ⇒
+                val main = projectMatchResult.group(2)
+                val srcFiles = re.findAllIn(projectMatchResult.group(3)).matchData.map { matchResult ⇒
                     val packageName = matchResult.group(2)
                     val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
                     val codeSnippet = matchResult.group(4)
@@ -58,8 +59,10 @@ object Test {
 
                 val allClassFiles = recursiveListFiles(bin)
                 val allClassFileNames = allClassFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
-                val args = Seq("jar", "cf", s"../../../${result.getPath}/$projectName.jar") ++ allClassFileNames
+                val args = Seq("jar", "cfe", s"../../../${result.getPath}/$projectName.jar", main) ++ allClassFileNames
                 sys.process.Process(args, bin).!
+                println(s"running $projectName.jar")
+                sys.process.Process(Seq("java", "-jar", s"$projectName.jar"), result).!
 
             }
         }

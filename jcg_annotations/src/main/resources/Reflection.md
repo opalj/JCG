@@ -1,6 +1,7 @@
 #TrivialReflection
 The strings are directly available. No control- or data-flow analysis is required.
 ##TR1
+[//]: # (MAIN: tr1.Foo)
 Test reflection with respect to static methods.
 ```java
 // tr1/Foo.java
@@ -11,7 +12,7 @@ class Foo {
     static String staticToString() { return "Foo"; }
 
     @IndirectCall(
-        name = "staticToString", returnType = String.class, line = 13,
+        name = "staticToString", returnType = String.class, line = 12,
         resolvedTargets = "Ltr1/Foo;"
     )
     public static void main(String[] args) throws Exception {
@@ -22,6 +23,7 @@ class Foo {
 [//]: # (END)
 
 ##TR2
+[//]: # (MAIN: tr2.Foo)
 Test reflection with respect to instance methods.
 ```java
 // tr2/Foo.java
@@ -32,11 +34,11 @@ class Foo {
     public String toString() { return "Foo"; }
 
     @IndirectCall(
-        name = "toString", returnType = String.class, line = 13,
+        name = "toString", returnType = String.class, line = 12,
         resolvedTargets = "Ltr2/Foo;"
     )
     void m() throws Exception {
-        Class.forName("Foo").getDeclaredMethod("toString").invoke(this);
+        Class.forName("tr2.Foo").getDeclaredMethod("toString").invoke(this);
     }
 
     public static void main(String[] args) throws Exception { new Foo().m(); }
@@ -45,6 +47,7 @@ class Foo {
 [//]: # (END)
 
 ##TR3
+[//]: # (MAIN: tr3.Foo)
 Test reflection with respect to constructors.
 ```java
 // tr3/Foo.java
@@ -55,7 +58,7 @@ class Foo {
     public Foo(String s) {    }
 
     @IndirectCall(
-        name = "<init>", parameterTypes = String.class, line = 13,
+        name = "<init>", parameterTypes = String.class, line = 12,
         resolvedTargets = "Ltr3/Foo;"
     )
     public static void main(String[] args) throws Exception {
@@ -66,6 +69,7 @@ class Foo {
 [//]: # (END)
 
 ##TR4
+[//]: # (MAIN: tr4.Foo)
 Test reflection with respect to the default constructor
 ```java
 // tr4/Foo.java
@@ -75,8 +79,8 @@ import lib.annotations.callgraph.IndirectCall;
 class Foo {
     public Foo() {    }
 
-    @IndirectCall(name = "<init>", line = 10, resolvedTargets = "Ltr3/Foo;")
-    static void main(String[] args) throws Exception {
+    @IndirectCall(name = "<init>", line = 9, resolvedTargets = "Ltr4/Foo;")
+    public static void main(String[] args) throws Exception {
         Class.forName("tr4.Foo").newInstance();
     }
 }
@@ -92,6 +96,7 @@ TODO fieldAccess
 #LocallyResolvableReflection
 The complete information is locally (intra-procedurally) available.
 ##LRR1
+[//]: # (MAIN: lrr1.Foo)
 Test reflection with respect to static methods where the target class is dynamically decided
 ```java
 // lrr1/Foo.java
@@ -109,7 +114,7 @@ class Foo {
     }
 
     @IndirectCall(
-        name = "staticToString", returnType = String.class, line = 20,
+        name = "staticToString", returnType = String.class, line = 19,
         resolvedTargets = "Llrr1/Foo;"
     )
     static void m(boolean b) throws Exception {
@@ -120,6 +125,7 @@ class Foo {
 [//]: # (END)
 
 ##LRR2
+[//]: # (MAIN: lrr2.Foo1)
 ```java
 // lrr2/Foo1.java
 package lrr2;
@@ -152,6 +158,7 @@ class Foo2 {
 [//]: # (END)
 
 ##LRR3
+[//]: # (MAIN: lrr3.Foo)
 ```java
 // lrr3/Foo.java
 package lrr3;
@@ -162,12 +169,12 @@ class Foo {
     static String staticToString2() { return "2"; }
 
     @IndirectCall(
-        name = "staticToString1", returnType = String.class, line = 18,
-        resolvedTargets = "Llrr2/Foo;"
+        name = "staticToString1", returnType = String.class, line = 17,
+        resolvedTargets = "Llrr3/Foo;"
     )
     @IndirectCall(
-        name = "staticToString2", returnType = String.class, line = 18,
-        resolvedTargets = "Llrr2/Foo;"
+        name = "staticToString2", returnType = String.class, line = 17,
+        resolvedTargets = "Llrr3/Foo;"
     )
     static void m(boolean b) throws Exception {
         Class.forName("lrr3.Foo").getDeclaredMethod(b ? "staticToString1" : "staticToString2").invoke(null);
@@ -184,6 +191,7 @@ class Foo {
 The concrete strings require information about the context.
 
 ##CSR1
+[//]: # (MAIN: csr1.Foo)
 The method name is passed as an argument.
 ```java
 // csr1/Foo.java
@@ -195,7 +203,7 @@ class Foo {
     static String staticToString2() { return "2"; }
 
     @IndirectCall(
-        name = "staticToString1", returnType = String.class, line = 14,
+        name = "staticToString1", returnType = String.class, line = 13,
         resolvedTargets = "Lcsr1/Foo;"
     )
     static void m(String methodName) throws Exception {
@@ -210,6 +218,7 @@ class Foo {
 [//]: # (END)
 
 ##CSR2
+[//]: # (MAIN: csr2.Foo)
 The class name is passed as an argument.
 ```java
 // csr2/Foo.java
@@ -220,7 +229,7 @@ class Foo {
     static String staticToString() { return "Foo"; }
 
     @IndirectCall(
-        name = "staticToString", returnType = String.class, line = 13,
+        name = "staticToString", returnType = String.class, line = 12,
         resolvedTargets = "Lcsr2/Foo;"
     )
     static void m(String className) throws Exception {
@@ -228,7 +237,7 @@ class Foo {
     }
 
     public static void main(String[] args) throws Exception {
-        m("Foo");
+        m("csr2.Foo");
     }
 }
 
@@ -239,6 +248,7 @@ class Bar {
 [//]: # (END)
 
 ##CSR3
+[//]: # (MAIN: csr3.Foo)
 The method name is unknown.
 ```java
 // csr3/Foo.java
@@ -250,11 +260,11 @@ public class Foo {
     static String staticToString2() { return "2"; }
 
     @IndirectCall(
-        name = "staticToString1", returnType = String.class, line = 18,
+        name = "staticToString1", returnType = String.class, line = 17,
         resolvedTargets = "Lcsr3/Foo;"
         )
     @IndirectCall(
-        name = "staticToString2", returnType = String.class, line = 18,
+        name = "staticToString2", returnType = String.class, line = 17,
         resolvedTargets = "Lcsr3/Foo;"
     )
     static void m(String methodName) throws Exception {
@@ -269,6 +279,7 @@ public class Foo {
 [//]: # (END)
 
 ##CSR4
+[//]: # (MAIN: csr4.Foo)
 The class name is passed as an argument.
 ```java
 // csr4/Foo.java
@@ -279,7 +290,7 @@ public class Foo {
     static String staticToString() { return "Foo"; }
 
     @IndirectCall(
-        name = "staticToString", returnType = String.class, line = 17,
+        name = "staticToString", returnType = String.class, line = 12,
         resolvedTargets = { "Lcsr4/Foo;", "Lcsr4/Bar;" }
     )
     static void m(String className) throws Exception {
