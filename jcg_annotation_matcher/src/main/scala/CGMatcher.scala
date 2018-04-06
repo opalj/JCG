@@ -1,15 +1,12 @@
 import java.io.File
 import java.io.FileInputStream
 
-import lib.annotations.documentation.CGFeature
 import org.opalj.br
 import org.opalj.br.Annotation
 import org.opalj.br.AnnotationValue
 import org.opalj.br.ArrayValue
-import org.opalj.br.BooleanValue
 import org.opalj.br.ClassValue
 import org.opalj.br.ElementValuePair
-import org.opalj.br.EnumValue
 import org.opalj.br.IntValue
 import org.opalj.br.ObjectType
 import org.opalj.br.StringValue
@@ -44,7 +41,7 @@ object CGMatcher {
 
     def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): Boolean = {
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
-        implicit val p: SomeProject = Project(new File(tgtJar))
+        implicit val p: SomeProject = Project(new File(tgtJar), org.opalj.bytecode.RTJar)
 
         val json = Json.parse(new FileInputStream(new File(jsonPath)))
         implicit val methodReads: Reads[Method] = Json.reads[Method]
