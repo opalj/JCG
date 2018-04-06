@@ -308,40 +308,49 @@ class Bar {
 ```
 [//]: # (END)
 
-TODO
-Here newInstance could call every default constructor
+##CSR5
+[//]: # (MAIN: csr5.Foo)
+Here newInstance could call every default constructor.
 ```java
 // csr5/Foo.java
 package csr5;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
-    @IndirectCall(name = "<init>", line = 8, resolvedTargets = "csr5/Foo;")
-    @IndirectCall(name = "<init>", line = 8, resolvedTargets = "csr5/Bar;")
-    static void main(String[] args) throws Exception {
+    @IndirectCall(
+        name = "<init>", line = 10, 
+        resolvedTargets = { "Lcsr5/Foo;", "Lcsr5/Bar;"}
+    )
+    public static void main(String[] args) throws Exception {
         Object o = Class.forName(args[0]).newInstance();
         Bar.m((Foo) o);
         o.toString();
     }
 }
 class Bar {
-  static m(Foo f) { }
+  static void m(Foo f) { }
 }
 
 ```
 [//]: # (END)
 
-
+##CSR6
+[//]: # (MAIN: csr6.Foo)
+TODO
 ```java
-// todo2/Foo.java
-package todo2;
+// csr6/Foo.java
+package csr6;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
     public String toString() { return ""; }
 
-    static void m(String s) throws Exception {
-        Object o = Class.forName(s).newInstance();
+    @CallSite(
+        name = "toString", returnType = String.class, line = 14,
+        resolvedTargets = "Lcsr6/Foo;"
+    )
+    public static void main(String[] args) throws Exception {
+        Object o = Class.forName(args[0]).newInstance();
         if (o instanceof Foo)
             o.toString();
     }

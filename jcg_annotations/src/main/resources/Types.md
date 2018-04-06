@@ -1,6 +1,5 @@
+#TypeNarrowing
 Using local information to get better type information
-#TODO1
-
 ##SimpleCast
 [//]: # (MAIN: simplecast.Foo)
 Type narrowing due to previous cast
@@ -173,4 +172,37 @@ class Bar {
 ```
 [//]: # (END)
 
-//TODO isAssignable(Class obj)
+
+##IsAssignable
+[//]: # (MAIN: isssignable.Foo)
+Type narrowing due to previous is assignable.
+```java
+// isssignable/Foo.java
+package isssignable;
+
+import lib.annotations.callgraph.CallSite;
+class Foo{ 
+    public static void main(String[] args) throws Exception {
+        if (args.length == 0) 
+          m(new Bar());
+        else 
+          m(new Foo());
+    }
+
+    @CallSite(
+        name = "toString", returnType = String.class, line = 18,
+        resolvedTargets = "Lisssignable/Bar;"
+    )
+    static void m(Object o) {
+      if (Bar.class.isAssignableFrom(o.getClass()))
+        o.toString();
+    }
+
+    public String toString() { return "Foo"; }
+}
+class Bar {
+  public String toString() { return "Bar"; }
+}
+
+```
+[//]: # (END)
