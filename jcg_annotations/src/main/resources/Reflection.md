@@ -16,7 +16,7 @@ class Foo {
         resolvedTargets = "Ltr1/Foo;"
     )
     public static void main(String[] args) throws Exception {
-        Class.forName("tr1.Foo").getDeclaredMethod("staticToString").invoke(null);
+        Foo.class.getDeclaredMethod("staticToString").invoke(null);
     }
 }
 ```
@@ -38,7 +38,7 @@ class Foo {
         resolvedTargets = "Ltr2/Foo;"
     )
     void m() throws Exception {
-        Class.forName("tr2.Foo").getDeclaredMethod("toString").invoke(this);
+        Foo.class.getDeclaredMethod("toString").invoke(this);
     }
 
     public static void main(String[] args) throws Exception { new Foo().m(); }
@@ -62,7 +62,7 @@ class Foo {
         resolvedTargets = "Ltr3/Foo;"
     )
     public static void main(String[] args) throws Exception {
-        Class.forName("tr3.Foo").getConstructor(String.class).newInstance("ASD");
+        Foo.class.getConstructor(String.class).newInstance("ASD");
     }
 }
 ```
@@ -81,17 +81,172 @@ class Foo {
 
     @IndirectCall(name = "<init>", line = 9, resolvedTargets = "Ltr4/Foo;")
     public static void main(String[] args) throws Exception {
-        Class.forName("tr4.Foo").newInstance();
+        Foo.class.newInstance();
     }
 }
 ```
 [//]: # (END)
 
-TODO parameter types for invoke/constructor
-TODO autoboxing/unboxing
-TODO forName(String name, boolean initialize, ClassLoader loader)
-TODO fieldAccess
+##TR5
+[//]: # (MAIN: tr5.Foo)
+Test reflection with respect to instance methods having parameters.
+```java
+// tr5/Foo.java
+package tr5;
 
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    public String m(String parameter) { return "Foo" + parameter; }
+
+    @IndirectCall(
+        name = "toString", returnType = String.class, parameterTypes = String.class, line = 12,
+        resolvedTargets = "Ltr5/Foo;"
+    )
+    void m() throws Exception {
+        Foo.class.getDeclaredMethod("m", String.class).invoke(this, "Bar");
+    }
+
+    public static void main(String[] args) throws Exception { new Foo().m(); }
+}
+```
+[//]: # (END)
+
+##TR6
+[//]: # (MAIN: tr6.Foo)
+Test reflection with respect to instance methods retrieved via getMethod.
+```java
+// tr6/Foo.java
+package tr6;
+
+import lib.annotations.callgraph.IndirectCall;
+public class Foo {
+    public String toString() { return "Foo"; }
+
+    @IndirectCall(
+        name = "toString", returnType = String.class, line = 12,
+        resolvedTargets = "Ltr6/Foo;"
+    )
+    void m() throws Exception {
+        Foo.class.getMethod("toString").invoke(this);
+    }
+
+    public static void main(String[] args) throws Exception { new Foo().m(); }
+}
+```
+[//]: # (END)
+
+##TR7
+[//]: # (MAIN: tr7.Foo)
+Test reflection used to retrieve a field.
+```java
+// tr7/Foo.java
+package tr7;
+
+import java.lang.reflect.Field;
+import lib.annotations.callgraph.IndirectCall;
+public class Foo {
+    private Object field;
+
+    @IndirectCall(
+        name = "toString", returnType = String.class, line = 18,
+        resolvedTargets = "Ltr7/Foo;"
+    )
+    public static void main(String[] args) throws Exception {
+        Foo foo = new Foo();
+        foo.field = new Foo();
+
+        Field field = Foo.class.getDeclaredField("field");
+        Object o = field.get(foo);
+        o.toString();
+    }
+
+    public String toString() {
+        return "Foo";
+    }
+}
+```
+[//]: # (END)
+
+##TR8
+[//]: # (MAIN: tr8.Foo)
+Test reflection used to retrieve a field.
+```java
+// tr8/Foo.java
+package tr8;
+
+import java.lang.reflect.Field;
+import lib.annotations.callgraph.IndirectCall;
+public class Foo {
+    public Object field;
+
+    @IndirectCall(
+        name = "toString", returnType = String.class, line = 18,
+        resolvedTargets = "Ltr8/Foo;"
+    )
+    public static void main(String[] args) throws Exception {
+        Foo foo = new Foo();
+        foo.field = new Foo();
+
+        Field field = Foo.class.getField("field");
+        Object o = field.get(foo);
+        o.toString();
+    }
+
+    public String toString() {
+        return "Foo";
+    }
+}
+```
+[//]: # (END)
+
+##TR9
+[//]: # (MAIN: tr9.Foo)
+Test reflection with respect to static methods (class retrieved via forName).
+```java
+// tr9/Foo.java
+package tr9;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString() { return "Foo"; }
+
+    @IndirectCall(
+        name = "staticToString", returnType = String.class, line = 12,
+        resolvedTargets = "Ltr9/Foo;"
+    )
+    public static void main(String[] args) throws Exception {
+        Class.forName("tr9.Foo").getDeclaredMethod("staticToString").invoke(null);
+    }
+}
+```
+[//]: # (END)
+
+##TR10
+[//]: # (MAIN: tr10.Foo)
+Test reflection with respect to instance methods (class retrieved via forName).
+```java
+// tr10/Foo.java
+package tr10;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    public String toString() { return "Foo"; }
+
+    @IndirectCall(
+        name = "toString", returnType = String.class, line = 12,
+        resolvedTargets = "Ltr10/Foo;"
+    )
+    void m() throws Exception {
+        Class.forName("tr10.Foo").getDeclaredMethod("toString").invoke(this);
+    }
+
+    public static void main(String[] args) throws Exception { new Foo().m(); }
+}
+```
+[//]: # (END)
+
+
+TODO forName(String name, boolean initialize, ClassLoader loader)
 
 #LocallyResolvableReflection
 The complete information is locally (intra-procedurally) available.
@@ -177,7 +332,7 @@ class Foo {
         resolvedTargets = "Llrr3/Foo;"
     )
     static void m(boolean b) throws Exception {
-        Class.forName("lrr3.Foo").getDeclaredMethod(b ? "staticToString1" : "staticToString2").invoke(null);
+        Foo.class.getDeclaredMethod(b ? "staticToString1" : "staticToString2").invoke(null);
     }
 
     public static void main(String[] args) throws Exception {
@@ -207,7 +362,7 @@ class Foo {
         resolvedTargets = "Lcsr1/Foo;"
     )
     static void m(String methodName) throws Exception {
-        Class.forName("csr1.Foo").getDeclaredMethod(methodName).invoke(null);
+        Foo.class.getDeclaredMethod(methodName).invoke(null);
     }
 
     public static void main(String[] args) throws Exception {
@@ -268,7 +423,7 @@ public class Foo {
         resolvedTargets = "Lcsr3/Foo;"
     )
     static void m(String methodName) throws Exception {
-        Class.forName("csr1.Foo").getDeclaredMethod(methodName).invoke(null);
+        Foo.class.getDeclaredMethod(methodName).invoke(null);
     }
 
     public static void main(String[] args) throws Exception {
