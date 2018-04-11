@@ -2,18 +2,18 @@
 Tests the correct method resolution in the presence of Java 8
 interfaces, i.e. default methods.
 ##J8PC1
-[//]: # (MAIN: j8pc/Class)
+[//]: # (MAIN: j8pc1/Class)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and 
 inherits the method from the inherited interface.
 ```java
-// j8pc/Class.java
-package j8pc;
+// j8pc1/Class.java
+package j8pc1;
 
 import lib.annotations.callgraph.CallSite;
 
 class Class implements Interface {
     
-    @CallSite(name = "method", line = 16, resolvedTargets = "Lj8pc/Interface;")
+    @CallSite(name = "method", line = 10, resolvedTargets = "Lj8pc1/Interface;")
     public static void main(String[] args){ 
         Interface i = new Class();
         i.method();
@@ -29,15 +29,15 @@ class Interface {
 [//]: # (END)
 
 ##J8PC2
-[//]: # (MAIN: j8pc/SuperClass)
+[//]: # (MAIN: j8pc2/SuperClass)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
 where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
-define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method. 
+define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
+called on the interface**. 
 ```java
-// j8pc/SuperClass.java
-package j8pc;
+// j8pc2/SuperClass.java
+package j8pc2;
 
-import lib.annotations.callgraph.CallSites;
 import lib.annotations.callgraph.CallSite;
 import lib.annotations.callgraph.ProhibitedMethod;
 
@@ -46,26 +46,59 @@ class SuperClass {
     public void method(){
         // do something
     }
-    
-    @CallSites({
-        @CallSite(
-                name = "method",
-                line = 67,
-                resolvedTargets = "Lj8pc/SuperClass;",
-                prohibitedTargets = { 
-                    @ProhibitedMethod(receiverType = "Lj8pc/Interface;")}),
-        @CallSite(
-                name = "method",
-                line = 68,
-                resolvedTargets = "Lj8pc/SuperClass;",
-                prohibitedTargets = { 
-                    @ProhibitedMethod(receiverType = "Lj8pc/Interface;")})
-    })
+
+    @CallSite(
+            name = "method",
+            line = 20,
+            resolvedTargets = "Lj8pc2/SuperClass;",
+            prohibitedTargets = {@ProhibitedMethod(receiverType = "Lj8pc2/Interface;")}
+    )
     public static void main(String[] args){ 
         Interface i = new SubClass();
-        SubClass subClass = new SubClass();
         i.method();
-        subClass.method();
+    }
+}
+
+class Interface { 
+    default void method() {
+        // do something
+    }
+}
+
+class SubClass extends SuperClass implements Interface {
+    
+}
+```
+[//]: # (END)
+
+##J8PC3
+[//]: # (MAIN: j8pc3/SuperClass)
+Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
+where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
+define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
+called on the class**. 
+```java
+// j8pc3/SuperClass.java
+package j8pc3;
+
+import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.ProhibitedMethod;
+
+class SuperClass {
+    
+    public void method(){
+        // do something
+    }
+
+    @CallSite(
+            name = "method",
+            line = 20,
+            resolvedTargets = "Lj8pc3/SuperClass;",
+            prohibitedTargets = {@ProhibitedMethod(receiverType = "Lj8pc3/Interface;")}
+    )
+    public static void main(String[] args){ 
+        SuperClass superClass = new SubClass();
+        superClass.method();
     }
 }
 
