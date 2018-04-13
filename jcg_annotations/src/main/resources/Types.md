@@ -34,7 +34,6 @@ class Bar {
 ```
 [//]: # (END)
 
-
 ##CastClassAPI
 [//]: # (MAIN: castclassapi.Foo)
 Type narrowing due to previous cast using java class API.
@@ -206,3 +205,5 @@ class Bar {
 
 ```
 [//]: # (END)
+
+//TODO GENERICS and intersection types
