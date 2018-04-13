@@ -251,11 +251,160 @@ import java.util.function.Function;
 class Class {
     @IndirectCall(
        name = "lambda$main$0", returnType = String.class, line = 13,
-       resolvedTargets = "lambda1/Class;")
+       resolvedTargets = "Llambda1/Class;")
     public static void main(String[] args){
         Function<Integer, Boolean> isEven = (Integer a) -> a % 2 == 0;
         isEven.apply(2);
     }
+}
+```
+[//]: # (END)
+
+##Lambda2
+[//]: # (MAIN: lambda2/Class)
+Tests the invocation of a higher-order lambda predicate.
+```java
+// lambda2/Class.java
+package lambda2;
+
+import java.util.function.Predicate;
+import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.IndirectCalls;
+
+class Class {
+    @IndirectCalls({
+        @IndirectCall(
+           name = "lambda$main$0", returnType = String.class, line = 16, resolvedTargets = "Llambda2/Class;"),
+       @IndirectCall(
+           name = "lambda$main$1", returnType = String.class, line = 16, resolvedTargets = "Llambda2/Class;")
+       })
+    public static void main(String[] args){
+        Predicate<Predicate<String>> acceptsEmptyString = (Predicate<String> p) -> p.test("");
+        acceptsEmptyString.test((String s) -> s.isEmpty());
+    }
+}
+```
+[//]: # (END)
+
+##Lambda3
+[//]: # (MAIN: lambda3/Class)
+Tests the invocation of nested lambda.
+```java
+// lambda3/Class.java
+package lambda3;
+
+import java.util.function.Predicate;
+import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.IndirectCalls;
+
+class Class {
+    @IndirectCalls({
+        @IndirectCall(
+           name = "lambda$main$0", returnType = String.class, line = 18, resolvedTargets = "Llambda3/Class;"),
+       @IndirectCall(
+           name = "lambda$main$1", returnType = String.class, line = 22, resolvedTargets = "Llambda3/Class;")
+       })
+    public static void main(String[] args){
+        Predicate<String> outer = (String s) -> {
+            Predicate<Character> inner = (Character c) -> c > 31;
+            for(char c : s.toCharArray()){
+                if(!inner.test(c)) return false;
+            }
+            return true;
+        };
+        outer.test("NestedLambdas");
+    }
+}
+```
+[//]: # (END)
+
+##Lambda4
+[//]: # (MAIN: lambda4/Class)
+Tests the invocation on an object receiver captured in a lambda.
+```java
+// lambda4/Class.java
+package lambda4;
+
+import lib.annotations.callgraph.IndirectCalls;
+import lib.annotations.callgraph.IndirectCall;
+
+class Class {
+    
+    @FunctionalInterface interface Runnable {
+        void run();
+    }
+    
+    public static final Class cls = new SubClass();
+    public static Class pCls = new SubClass();
+    
+    @IndirectCalls({
+        @IndirectCall(name = "lambda$main$0", line = 25, resolvedTargets = "Llambda4/Class;"),
+        @IndirectCall(name = "lambda$main$1", line = 26, resolvedTargets = "Llambda4/Class;"),
+        @IndirectCall(name = "lambda$main$2", line = 27, resolvedTargets = "Llambda4/Class;")
+    })
+    public static void main(String[] args){
+        Class lCls = new SubClass();
+        Runnable psfField = () -> cls.doSomething();
+        Runnable psField = () -> pCls.doSomething();
+        Runnable localVar = () -> lCls.doSomething();
+        
+        psfField.run();
+        psField.run();
+        localVar.run();
+    }
+    
+    public void doSomething(){ }
+}
+
+class SubClass extends Class {
+    public void doSomething(){ }
+}
+
+class SubSubClass extends SubClass {
+    public void doSomething(){ }
+}
+```
+[//]: # (END)
+
+##Lambda5
+[//]: # (MAIN: lambda5/Class)
+Tests the invocation on an object receiver captured in a lambda.
+```java
+// lambda5/Class.java
+package lambda5;
+
+import lib.annotations.callgraph.CallSites;
+import lib.annotations.callgraph.CallSite;
+
+class Class {
+    
+    @FunctionalInterface interface Runnable {
+        void run();
+    }
+    
+    public static void doSomething(){ }
+    
+    @CallSites({
+        @CallSite(name = "equals", line = 26, resolvedTargets = "Ljava/lang/Object;"),
+        @CallSite(name = "getClass", line = 27, resolvedTargets = "Ljava/lang/Object;"),
+        @CallSite(name = "hashCode", line = 28, resolvedTargets = "Ljava/lang/Object;"),
+        @CallSite(name = "notify", line = 29, resolvedTargets = "Ljava/lang/Object;"),
+        @CallSite(name = "notifyAll", line = 30, resolvedTargets = "Ljava/lang/Object;"),
+        @CallSite(name = "toString", line = 31, resolvedTargets = "Ljava/lang/Object;"),
+        @CallSite(name = "wait", line = 32, resolvedTargets = "Ljava/lang/Object;")
+    })
+    public static void main(String[] args) throws InterruptedException {
+        Runnable lambda = () -> doSomething();
+        Object o = new Object();
+        lambda.equals(o);
+        lambda.getClass();
+        lambda.hashCode();
+        lambda.notify();
+        lambda.notifyAll();
+        lambda.toString();
+        lambda.wait();
+    }
+    
 }
 ```
 [//]: # (END)
