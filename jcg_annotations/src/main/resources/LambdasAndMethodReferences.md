@@ -157,25 +157,24 @@ class Class {
 [//]: # (END)
 
 ##MR6
-[//]:  # (MAIN: mr6/Class)
-Tests a method reference that is a constructor.
+[//]: # (MAIN: mr6/Class)
+Tests method reference that result in a constructor call.
 ```java
 // mr6/Class.java
 package mr6;
 
+import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
     
-    public Class(){
-        // init
-    }
+    public Class(){}
     
     @IndirectCall(
-       name = "<init>", returnType = String.class, line = 18,
+       name = "<init>", returnType = String.class, line = 15,
        resolvedTargets = "Lmr6/Class;")
     public static void main(String[] args){     
-        java.util.function.Supplier<Class> classSupplier = Class::new;
+        Supplier<Class> classSupplier = Class::new;
         classSupplier.get();
     }
 }
@@ -183,8 +182,8 @@ class Class {
 [//]: # (END)
 
 ##MR7
-[//]:  # (MAIN: mr7/Class)
-Tests method reference where the method is defined in a super class.
+[//]: # (MAIN: mr7/Class)
+Tests method reference that result in a method invocation where the method is defined in a super class.
 ```java
 // mr7/Class.java
 package mr7;
@@ -198,7 +197,7 @@ class Class extends SuperClass{
        resolvedTargets = "Lmr7/SuperClass;")
     public static void main(String[] args){
         Class cls = new Class();
-        java.util.function.Supplier<String> classSupplier = Class::version;
+        java.util.function.Supplier<String> classSupplier = cls::version;
         classSupplier.get();
     }
 }
@@ -210,7 +209,7 @@ class SuperClass {
 [//]: # (END)
 
 ##MR8
-[//]:  # (MAIN: mr8/Class)
+[//]: # (MAIN: mr8/Class)
 Tests method reference where the method is defined in a super interface.
 ```java
 // mr8/Class.java
@@ -225,7 +224,7 @@ class Class implements Interface {
        resolvedTargets = "Lmr8/Interface;")
     public static void main(String[] args){
         Class cls = new Class();
-        java.util.function.Supplier<String> classSupplier = Class::version;
+        java.util.function.Supplier<String> classSupplier = cls::version;
         classSupplier.get();
     }
 }
@@ -240,7 +239,7 @@ interface Interface{
 Test cases in the presence of lambdas.
 
 ##Lambda1
-[//]:  # (MAIN: lambda1/Class)
+[//]: # (MAIN: lambda1/Class)
 Tests the invocation of a lambda with a integer boxing.
 ```java
 // lambda1/Class.java
