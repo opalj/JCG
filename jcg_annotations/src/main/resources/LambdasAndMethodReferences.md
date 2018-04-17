@@ -404,7 +404,6 @@ class Class {
         lambda.toString();
         lambda.wait();
     }
-    
 }
 ```
 [//]: # (END)
