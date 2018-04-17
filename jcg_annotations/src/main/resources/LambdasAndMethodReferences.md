@@ -250,7 +250,7 @@ import java.util.function.Function;
 
 class Class {
     @IndirectCall(
-       name = "lambda$main$0", returnType = String.class, line = 13,
+       name = "lambda$main$0", returnType = String.class, line = 12,
        resolvedTargets = "Llambda1/Class;")
     public static void main(String[] args){
         Function<Integer, Boolean> isEven = (Integer a) -> a % 2 == 0;
