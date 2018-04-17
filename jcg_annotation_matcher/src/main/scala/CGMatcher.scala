@@ -61,8 +61,8 @@ object CGMatcher {
                                 a.annotationType == indirectCallsAnnotationType
                         }) {
                             val body = method.body.get
-                            val invokations = body.instructions.filter(instr ⇒ instr != null && instr.isInvocationInstruction)
-                            val lines = invokations.zipWithIndex.map {
+                            val invokations = body.instructions.zipWithIndex.filter { case (instr, pc) ⇒ instr != null && instr.isInvocationInstruction }
+                            val lines = invokations.map {
                                 case (instr, pc) ⇒
                                     (body.lineNumber(pc), instr.asInvocationInstruction.name)
                             }.toSet
