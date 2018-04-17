@@ -18,3 +18,4 @@ src/lib/out
 out/
 doc/src/document.log
 result/
+*.jar.json
