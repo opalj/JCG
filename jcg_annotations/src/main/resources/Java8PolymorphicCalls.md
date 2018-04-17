@@ -29,18 +29,18 @@ interface Interface {
 [//]: # (END)
 
 ##J8PC2
-[//]: # (MAIN: j8pc2/Class)
+[//]: # (MAIN: j8pc2/SuperClass)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
 where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
 define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
 called on the interface**. 
 ```java
-// j8pc2/Class.java
+// j8pc2/SuperClass.java
 package j8pc2;
 
 import lib.annotations.callgraph.CallSite;
 
-class Class {
+class SuperClass {
     
     public void method(){
         // do something
