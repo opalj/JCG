@@ -126,9 +126,8 @@ class SuperClass {
 
     @CallSite(
             name = "method",
-            line = 15,
-            resolvedTargets = "Lj8pc4/SuperClass;",
-            prohibitedTargets = {"Lj8pc4/Interface;"}
+            line = 14,
+            resolvedTargets = "Lj8pc4/Interface;"
     )
     public static void main(String[] args){ 
         SubClass subClass = new SubClass();
