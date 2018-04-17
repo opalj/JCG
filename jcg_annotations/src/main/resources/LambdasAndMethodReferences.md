@@ -18,7 +18,7 @@ class Class implements Interface {
     
     @IndirectCall(
            name = "method", returnType = boolean.class, line = 17,
-           resolvedTargets = "Lmr1/method;"
+           resolvedTargets = "Lmr1/Class;"
     )
     public static boolean callWithMethodHandle(Interface i) {
         FIBoolean bc = i::method;
@@ -302,13 +302,14 @@ class Class {
         @IndirectCall(
            name = "lambda$main$0", returnType = String.class, line = 18, resolvedTargets = "Llambda3/Class;"),
        @IndirectCall(
-           name = "lambda$main$1", returnType = String.class, line = 22, resolvedTargets = "Llambda3/Class;")
+           name = "lambda$main$1", returnType = String.class, line = 23, resolvedTargets = "Llambda3/Class;")
        })
     public static void main(String[] args){
         Predicate<String> outer = (String s) -> {
             Predicate<Character> inner = (Character c) -> c > 31;
             for(char c : s.toCharArray()){
-                if(!inner.test(c)) return false;
+                boolean test = inner.test(c);
+                if(!test) return false;
             }
             return true;
         };
@@ -338,9 +339,9 @@ class Class {
     public static Class pCls = new SubClass();
     
     @IndirectCalls({
-        @IndirectCall(name = "lambda$main$0", line = 25, resolvedTargets = "Llambda4/Class;"),
-        @IndirectCall(name = "lambda$main$1", line = 26, resolvedTargets = "Llambda4/Class;"),
-        @IndirectCall(name = "lambda$main$2", line = 27, resolvedTargets = "Llambda4/Class;")
+        @IndirectCall(name = "lambda$main$0", line = 26, resolvedTargets = "Llambda4/Class;"),
+        @IndirectCall(name = "lambda$main$1", line = 27, resolvedTargets = "Llambda4/Class;"),
+        @IndirectCall(name = "lambda$main$2", line = 28, resolvedTargets = "Llambda4/Class;")
     })
     public static void main(String[] args){
         Class lCls = new SubClass();
