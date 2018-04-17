@@ -167,7 +167,8 @@ object CGMatcher {
                         }
                     }
                 case _ ⇒
-                    throw new RuntimeException(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
+                    return false
+                    //throw new RuntimeException(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
             }
         }
 
@@ -182,7 +183,7 @@ object CGMatcher {
                 instr != null && instr.isInvocationInstruction && lineNumber.isDefined && lineNumber.get == annotatedLineNumber
         }
         if (!existsCall)
-            throw new RuntimeException(s"There is no call in line $annotatedLineNumber")
+            System.err.println(s"There is no call in line $annotatedLineNumber")
     }
 
     private def handleIndirectCallAnnotations(

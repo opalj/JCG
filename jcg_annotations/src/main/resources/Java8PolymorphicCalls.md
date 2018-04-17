@@ -126,7 +126,7 @@ class SuperClass {
 
     @CallSite(
             name = "method",
-            line = 14,
+            line = 15,
             resolvedTargets = "Lj8pc4/SuperClass;",
             prohibitedTargets = {"Lj8pc4/Interface;"}
     )
@@ -223,7 +223,7 @@ import lib.annotations.callgraph.CallSite;
 
 class Class {
     
-    @CallSite(name = "method", line = 9, resolvedTargets = "Lj8pc1/Interface;")
+    @CallSite(name = "method", line = 9, resolvedTargets = "Lj8pc6/Interface;")
     public static void main(String[] args){ 
         Interface.method();
     }
