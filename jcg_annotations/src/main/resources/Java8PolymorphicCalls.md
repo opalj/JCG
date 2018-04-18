@@ -49,7 +49,7 @@ class SuperClass {
     @CallSite(
             name = "method",
             line = 19,
-            resolvedTargets = "Lj8pc2/Class;",
+            resolvedTargets = "Lj8pc2/SuperClass;",
             prohibitedTargets = {"Lj8pc2/Interface;"}
     )
     public static void main(String[] args){ 
