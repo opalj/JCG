@@ -250,11 +250,17 @@ import java.util.function.Function;
 
 class Class {
     @IndirectCall(
-       name = "lambda$main$0", returnType = String.class, line = 12,
-       resolvedTargets = "Llambda1/Class;")
+       name = "doSomething", line = 11, resolvedTargets = "Llambda1/Class;")
     public static void main(String[] args){
-        Function<Integer, Boolean> isEven = (Integer a) -> a % 2 == 0;
+        Function<Integer, Boolean> isEven = (Integer a) -> {
+            doSomething();
+            return a % 2 == 0;
+        };
         isEven.apply(2);
+    }
+    
+    private static void doSomething(){
+        // call in lambda
     }
 }
 ```
@@ -274,13 +280,23 @@ import lib.annotations.callgraph.IndirectCalls;
 class Class {
     @IndirectCalls({
         @IndirectCall(
-           name = "lambda$main$0", returnType = String.class, line = 16, resolvedTargets = "Llambda2/Class;"),
+           name = "doSomething", returnType = String.class, line = 16, resolvedTargets = "Llambda2/Class;"),
        @IndirectCall(
-           name = "lambda$main$1", returnType = String.class, line = 16, resolvedTargets = "Llambda2/Class;")
+           name = "doSomething", returnType = String.class, line = 20, resolvedTargets = "Llambda2/Class;")
        })
     public static void main(String[] args){
-        Predicate<Predicate<String>> acceptsEmptyString = (Predicate<String> p) -> p.test("");
-        acceptsEmptyString.test((String s) -> s.isEmpty());
+        Predicate<Predicate<String>> acceptsEmptyString = ((Predicate<String> p) -> {
+            doSomething();
+            return p.test("");
+        });
+        acceptsEmptyString.test((String s) -> {
+            doSomething();
+            return s.isEmpty();
+        });
+    }
+    
+    private static void doSomething(){ 
+        // call in lamdba
     }
 }
 ```
@@ -300,21 +316,27 @@ import lib.annotations.callgraph.IndirectCalls;
 class Class {
     @IndirectCalls({
         @IndirectCall(
-           name = "lambda$main$0", returnType = String.class, line = 18, resolvedTargets = "Llambda3/Class;"),
+           name = "doSomething", returnType = String.class, line = 19, resolvedTargets = "Llambda3/Class;"),
        @IndirectCall(
-           name = "lambda$main$1", returnType = String.class, line = 23, resolvedTargets = "Llambda3/Class;")
+           name = "doSomething", returnType = String.class, line = 22, resolvedTargets = "Llambda3/Class;")
        })
     public static void main(String[] args){
         Predicate<String> outer = (String s) -> {
             Predicate<Character> inner = (Character c) -> c > 31;
             for(char c : s.toCharArray()){
                 boolean test = inner.test(c);
+                doSomething();
                 if(!test) return false;
             }
+            doSomething();
             return true;
         };
         outer.test("NestedLambdas");
     }
+    
+    private static void doSomething(){ 
+        // call in lambda
+    } 
 }
 ```
 [//]: # (END)
@@ -339,9 +361,9 @@ class Class {
     public static Class pCls = new SubClass();
     
     @IndirectCalls({
-        @IndirectCall(name = "lambda$main$0", line = 26, resolvedTargets = "Llambda4/Class;"),
-        @IndirectCall(name = "lambda$main$1", line = 27, resolvedTargets = "Llambda4/Class;"),
-        @IndirectCall(name = "lambda$main$2", line = 28, resolvedTargets = "Llambda4/Class;")
+        @IndirectCall(name = "doSomething", line = 22, resolvedTargets = "Llambda4/SubClass;"),
+        @IndirectCall(name = "doSomething", line = 23, resolvedTargets = "Llambda4/SubClass;"),
+        @IndirectCall(name = "doSomething", line = 24, resolvedTargets = "Llambda4/SubClass;")
     })
     public static void main(String[] args){
         Class lCls = new SubClass();
