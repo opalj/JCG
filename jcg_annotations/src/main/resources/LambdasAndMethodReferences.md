@@ -18,7 +18,7 @@ class Class implements Interface {
     
     @IndirectCall(
            name = "method", returnType = boolean.class, line = 17,
-           resolvedTargets = "Lmr1/Class;"
+           resolvedTargets = "Lmr1/Interface;"
     )
     public static boolean callWithMethodHandle(Interface i) {
         FIBoolean bc = i::method;
@@ -146,7 +146,7 @@ class Class {
     }
     
     @IndirectCall(
-       name = "sum", returnType = String.class, line = 18,
+       name = "sum", returnType = double.class, line = 19,
        resolvedTargets = "Lmr5/Class;")
     public static void main(String[] args){     
         FIDoubleDouble fidd = Class::sum;
@@ -171,8 +171,7 @@ class Class {
     public Class(){}
     
     @IndirectCall(
-       name = "<init>", returnType = String.class, line = 15,
-       resolvedTargets = "Lmr6/Class;")
+       name = "<init>", line = 14, resolvedTargets = "Lmr6/Class;")
     public static void main(String[] args){     
         Supplier<Class> classSupplier = Class::new;
         classSupplier.get();
