@@ -280,9 +280,9 @@ import lib.annotations.callgraph.IndirectCalls;
 class Class {
     @IndirectCalls({
         @IndirectCall(
-           name = "doSomething", returnType = String.class, line = 16, resolvedTargets = "Llambda2/Class;"),
+           name = "doSomething", line = 16, resolvedTargets = "Llambda2/Class;"),
        @IndirectCall(
-           name = "doSomething", returnType = String.class, line = 20, resolvedTargets = "Llambda2/Class;")
+           name = "doSomething", line = 20, resolvedTargets = "Llambda2/Class;")
        })
     public static void main(String[] args){
         Predicate<Predicate<String>> acceptsEmptyString = ((Predicate<String> p) -> {
@@ -316,9 +316,9 @@ import lib.annotations.callgraph.IndirectCalls;
 class Class {
     @IndirectCalls({
         @IndirectCall(
-           name = "doSomething", returnType = String.class, line = 19, resolvedTargets = "Llambda3/Class;"),
+           name = "doSomething", line = 19, resolvedTargets = "Llambda3/Class;"),
        @IndirectCall(
-           name = "doSomething", returnType = String.class, line = 22, resolvedTargets = "Llambda3/Class;")
+           name = "doSomething", line = 22, resolvedTargets = "Llambda3/Class;")
        })
     public static void main(String[] args){
         Predicate<String> outer = (String s) -> {
