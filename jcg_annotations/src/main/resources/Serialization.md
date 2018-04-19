@@ -2,8 +2,8 @@
 Callbacks related to java.io.Serializable classes.
 
 ##SC1
-Tests the writeObject/readObject callback methhods.
 [//]: # (MAIN: sc1.Foo)
+Tests the writeObject/readObject callback methhods.
 ```java
 // sc1/Foo.java
 package sc1;
@@ -79,11 +79,11 @@ public class Foo implements Serializable {
     	return replace();
     }
 
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
     }
     
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     	in.defaultReadObject();
     }
 
@@ -106,8 +106,8 @@ public class Foo implements Serializable {
 #ExternalizableClasses
 Callback methods related to java.io.Externalizable classes.
 ##EC1
-Tests the writeExternal/readExternal methods.
 [//]: # (MAIN: ec1.Foo)
+Tests the writeExternal/readExternal methods.
 ```java
 // ec1/Foo.java
 package ec1;
@@ -123,12 +123,12 @@ public class Foo implements Serializable {
     public static String callback() { return ""; }
 
     @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 15)
-    public void writeExternal(ObjectOutput out) throws IOException {
+    public void writeExternal(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
     }
     
     @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 20)
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
 
