@@ -3,6 +3,7 @@ Static initializers have to be treated as entry points.
 ##SI1
 [//]: # (MAIN: si1.Bar)
 A static initializer should be triggered when a non-constant field is referenced.
+
 ```java
 // si1/Foo.java
 package si1;
@@ -30,7 +31,8 @@ class Bar implements Foo {
 
 ##SI2
 [//]: # (MAIN: si2.Bar)
-Static initializer of an interface with a default method. 
+Static initializer of an interface with a default method.
+
 ```java
 // si2/Foo.java
 package si2;
@@ -62,6 +64,7 @@ class Bar implements Foo {
 [//]: # (MAIN: si3.Class)
 An interface static initializer should be triggered when a static field with a non-primitive type
 and non-String type is referenced.
+
 ```java
 // si3/Class.java
 package si3;
@@ -93,6 +96,7 @@ interface Interface {
 ##SI4
 [//]: # (MAIN: si4.Foo)
 Static initializer block of a class.
+
 ```java
 // si4/Foo.java
 package si4;
@@ -120,7 +124,8 @@ public class Foo {
 
 ##SI5
 [//]: # (MAIN: si5.Foo)
-Static initializer method call in declaration of a class.  
+Static initializer method call in declaration of a class.
+
 ```java
 // si5/Foo.java
 package si5;
@@ -148,6 +153,7 @@ public class Foo {
 ##SI6
 [//]: # (MAIN: si6.Class)
 When a class is initialized, its super classes are also initialized.
+
 ```java
 // si6/Class.java
 package si6;

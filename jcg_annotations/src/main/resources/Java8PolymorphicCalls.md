@@ -5,6 +5,7 @@ interfaces, i.e. default methods.
 [//]: # (MAIN: j8pc1/Class)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and 
 inherits the method from the inherited interface.
+
 ```java
 // j8pc1/Class.java
 package j8pc1;
@@ -34,6 +35,7 @@ Tests the resolution of a polymorphic calls when a class implements an interface
 where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
 define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
 called on the interface**. 
+
 ```java
 // j8pc2/SuperClass.java
 package j8pc2;
@@ -76,6 +78,7 @@ Tests the resolution of a polymorphic calls when a class implements an interface
 where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
 define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
 called on the class**. 
+
 ```java
 // j8pc3/SuperClass.java
 package j8pc3;
@@ -116,6 +119,7 @@ class SubClass extends SuperClass implements Interface {
 [//]: # (MAIN: j8pc4/SuperClass)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
 where the method is only defined in the interface.
+
 ```java
 // j8pc4/SuperClass.java
 package j8pc4;
@@ -149,7 +153,8 @@ class SubClass extends SuperClass implements Interface {
 
 ##J8PC5
 [//]: # (MAIN: j8pc5/SuperClass)
-Tests the resolution of a polymorphic calls when a class extends an abstract class that declares an abstract method
+Tests the resolution of a polymorphic calls when a class extends an abstract class that declares an abstract method.
+
 ```java
 // j8pc5/SuperClass.java
 package j8pc5;
@@ -214,6 +219,7 @@ interface DirectInterface extends Interface1, Interface2 {
 ##J8PC6
 [//]: # (MAIN: j8pc6/Class)
 Tests the resolution of static interface methods.
+
 ```java
 // j8pc6/Class.java
 package j8pc6;
@@ -235,7 +241,3 @@ interface Interface {
 }
 ```
 [//]: # (END)
-
-// TODO - Test the case of the JVM specification. That case requires engineering of Java bytecode. The computation of
-// maximally specific methods in the case, that there is a class that inherits two independent interfaces that define a
-// method with an equivalent signature. The resolution of that construct is w.r.t. to the JVM arbitrary.

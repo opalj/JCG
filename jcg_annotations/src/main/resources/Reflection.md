@@ -3,6 +3,7 @@ The strings are directly available. No control- or data-flow analysis is require
 ##TR1
 [//]: # (MAIN: tr1.Foo)
 Test reflection with respect to static methods.
+
 ```java
 // tr1/Foo.java
 package tr1;
@@ -25,6 +26,7 @@ class Foo {
 ##TR2
 [//]: # (MAIN: tr2.Foo)
 Test reflection with respect to instance methods.
+
 ```java
 // tr2/Foo.java
 package tr2;
@@ -49,6 +51,7 @@ class Foo {
 ##TR3
 [//]: # (MAIN: tr3.Foo)
 Test reflection with respect to constructors.
+
 ```java
 // tr3/Foo.java
 package tr3;
@@ -70,7 +73,8 @@ class Foo {
 
 ##TR4
 [//]: # (MAIN: tr4.Foo)
-Test reflection with respect to the default constructor
+Test reflection with respect to the default constructor.
+
 ```java
 // tr4/Foo.java
 package tr4;
@@ -90,6 +94,7 @@ class Foo {
 ##TR5
 [//]: # (MAIN: tr5.Foo)
 Test reflection with respect to instance methods having parameters.
+
 ```java
 // tr5/Foo.java
 package tr5;
@@ -114,6 +119,7 @@ class Foo {
 ##TR6
 [//]: # (MAIN: tr6.Foo)
 Test reflection with respect to instance methods retrieved via getMethod.
+
 ```java
 // tr6/Foo.java
 package tr6;
@@ -138,6 +144,7 @@ public class Foo {
 ##TR7
 [//]: # (MAIN: tr7.Foo)
 Test reflection used to retrieve a field.
+
 ```java
 // tr7/Foo.java
 package tr7;
@@ -170,6 +177,7 @@ public class Foo {
 ##TR8
 [//]: # (MAIN: tr8.Foo)
 Test reflection used to retrieve a field.
+
 ```java
 // tr8/Foo.java
 package tr8;
@@ -202,6 +210,7 @@ public class Foo {
 ##TR9
 [//]: # (MAIN: tr9.Foo)
 Test reflection with respect to static methods (class retrieved via forName).
+
 ```java
 // tr9/Foo.java
 package tr9;
@@ -224,6 +233,7 @@ class Foo {
 ##TR10
 [//]: # (MAIN: tr10.Foo)
 Test reflection with respect to instance methods (class retrieved via forName).
+
 ```java
 // tr10/Foo.java
 package tr10;
@@ -250,6 +260,7 @@ class Foo {
 The complete information is locally (intra-procedurally) available.
 ##LRR1
 Test reflection with respect to static methods where the target class is dynamically decided.
+
 ```java
 // lrr1/Foo.java
 package lrr1;
@@ -279,6 +290,7 @@ class Foo {
 ##LRR2
 [//]: # (MAIN: lrr2.Foo1)
 Tests reflection with respect to static methods where the target class is dynamically decided and the result of a StringBuilder.
+
 ```java
 // lrr2/Foo1.java
 package lrr2;
@@ -313,6 +325,7 @@ class Foo2 {
 ##LRR3
 [//]: # (MAIN: lrr3.Foo)
 Test reflection with respect to static methods where the target method is dynamically decided.
+
 ```java
 // lrr3/Foo.java
 package lrr3;
@@ -344,9 +357,11 @@ class Foo {
 #ContextSensitiveReflection
 The concrete strings require information about the context.
 
+
 ##CSR1
 [//]: # (MAIN: csr1.Foo)
 The method name is passed as an argument.
+
 ```java
 // csr1/Foo.java
 package csr1;
@@ -374,6 +389,7 @@ class Foo {
 ##CSR2
 [//]: # (MAIN: csr2.Foo)
 The class name is passed as an argument.
+
 ```java
 // csr2/Foo.java
 package csr2;
@@ -404,6 +420,7 @@ class Bar {
 ##CSR3
 [//]: # (MAIN: csr3.Foo)
 The method name is unknown.
+
 ```java
 // csr3/Foo.java
 package csr3;
@@ -435,6 +452,7 @@ public class Foo {
 ##CSR4
 [//]: # (MAIN: csr4.Foo)
 The class name is passed as an argument.
+
 ```java
 // csr4/Foo.java
 package csr4;
@@ -465,6 +483,7 @@ class Bar {
 ##CSR5
 [//]: # (MAIN: csr5.Foo)
 Here newInstance could call every default constructor.
+
 ```java
 // csr5/Foo.java
 package csr5;
@@ -491,6 +510,7 @@ class Bar {
 ##CSR6
 [//]: # (MAIN: csr6.Foo)
 Tests reflection with a unknown target class.
+
 ```java
 // csr6/Foo.java
 package csr6;

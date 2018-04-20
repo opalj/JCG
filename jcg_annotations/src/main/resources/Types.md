@@ -3,6 +3,7 @@ Using local information to get better type information
 ##SimpleCast
 [//]: # (MAIN: simplecast.Foo)
 Type narrowing due to previous cast.
+
 ```java
 // simplecast/Foo.java
 package simplecast;
@@ -37,6 +38,7 @@ class Bar {
 ##CastClassAPI
 [//]: # (MAIN: castclassapi.Foo)
 Type narrowing due to previous cast using java class API.
+
 ```java
 // castclassapi/Foo.java
 package castclassapi;
@@ -71,6 +73,7 @@ class Bar {
 ##ClassEQ
 [//]: # (MAIN: classeq.Foo)
 Type narrowing due to class equallity check.
+
 ```java
 // classeq/Foo.java
 package classeq;
@@ -106,6 +109,7 @@ class Bar {
 ##InstanceOf
 [//]: # (MAIN: instanceofcheck.Foo)
 Type narrowing due to previous instance of check.
+
 ```java
 // instanceofcheck/Foo.java
 package instanceofcheck;
@@ -140,6 +144,7 @@ class Bar {
 ##InstanceOfClassAPI
 [//]: # (MAIN: instanceofclassapi.Foo)
 Type narrowing due to previous instance of check.
+
 ```java
 // instanceofclassapi/Foo.java
 package instanceofclassapi;
@@ -175,6 +180,7 @@ class Bar {
 ##IsAssignable
 [//]: # (MAIN: isssignable.Foo)
 Type narrowing due to previous is assignable.
+
 ```java
 // isssignable/Foo.java
 package isssignable;
@@ -205,5 +211,3 @@ class Bar {
 
 ```
 [//]: # (END)
-
-//TODO GENERICS and intersection types

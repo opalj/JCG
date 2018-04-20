@@ -4,6 +4,7 @@ Test cases in the presence of method references.
 ##MR1
 [//]: # (MAIN: mr1/Class)
 Tests method reference that deals with interface default methods (Java 8 or higher).
+
 ```java
 // mr1/Class.java
 package mr1;
@@ -42,6 +43,7 @@ interface Interface {
 ##MR2
 [//]: # (MAIN: mr2/Class)
 Tests method reference that result in an *INVOKESPECIAL* call issued by calling a private method.
+
 ```java
 // mr2/Class.java
 package mr2;
@@ -72,6 +74,7 @@ class Class {
 [//]: # (MAIN: mr3/Class)
 Tests method reference that result in an *INVOKESPECIAL* call issued by calling a protected method
 from a super class.
+
 ```java
 // mr3/Class.java
 package mr3;
@@ -104,6 +107,7 @@ class SuperClass{
 [//]: # (MAIN: mr4/Class)
 Tests method reference that result in an *INVOKESPECIAL* call issued by calling a static method
 from a super class.
+
 ```java
 // mr4/Class.java
 package mr4;
@@ -130,6 +134,7 @@ class Class {
 [//]: # (MAIN: mr5/Class)
 Tests method reference dealing with primitive type parameters.
 from a super class.
+
 ```java
 // mr5/Class.java
 package mr5;
@@ -159,6 +164,7 @@ class Class {
 ##MR6
 [//]: # (MAIN: mr6/Class)
 Tests method reference that result in a constructor call.
+
 ```java
 // mr6/Class.java
 package mr6;
@@ -183,6 +189,7 @@ class Class {
 ##MR7
 [//]: # (MAIN: mr7/Class)
 Tests method reference that result in a method invocation where the method is defined in a super class.
+
 ```java
 // mr7/Class.java
 package mr7;
@@ -210,6 +217,7 @@ class SuperClass {
 ##MR8
 [//]: # (MAIN: mr8/Class)
 Tests method reference where the method is defined in a super interface.
+
 ```java
 // mr8/Class.java
 package mr8;
@@ -240,6 +248,7 @@ Test cases in the presence of lambdas.
 ##Lambda1
 [//]: # (MAIN: lambda1/Class)
 Tests the invocation of a lambda with a integer boxing.
+
 ```java
 // lambda1/Class.java
 package lambda1;
@@ -268,6 +277,7 @@ class Class {
 ##Lambda2
 [//]: # (MAIN: lambda2/Class)
 Tests the invocation of a higher-order lambda predicate.
+
 ```java
 // lambda2/Class.java
 package lambda2;
@@ -304,6 +314,7 @@ class Class {
 ##Lambda3
 [//]: # (MAIN: lambda3/Class)
 Tests the invocation of nested lambda.
+
 ```java
 // lambda3/Class.java
 package lambda3;
@@ -343,6 +354,7 @@ class Class {
 ##Lambda4
 [//]: # (MAIN: lambda4/Class)
 Tests the invocation on an object receiver captured in a lambda.
+
 ```java
 // lambda4/Class.java
 package lambda4;
@@ -391,6 +403,7 @@ class SubSubClass extends SubClass {
 ##Lambda5
 [//]: # (MAIN: lambda5/Class)
 Tests the invocation on an object receiver captured in a lambda.
+
 ```java
 // lambda5/Class.java
 package lambda5;

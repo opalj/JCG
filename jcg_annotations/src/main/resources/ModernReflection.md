@@ -2,7 +2,8 @@
 The strings are directly available. No control- or data-flow analysis is required.
 ##TMR1
 [//]: # (MAIN: tmr1.Foo)
-Tests modern reflection with respect to static methods using invokeExact and .
+Tests modern reflection with respect to static methods using invokeExact.
+
 ```java
 // tmr1/Foo.java
 package tmr1;
@@ -32,6 +33,7 @@ class Foo {
 ##TMR2
 [//]: # (MAIN: tmr2.Foo)
 Tests modern reflection with respect to virtual calls and invoke.
+
 ```java
 // tmr2/Foo.java
 package tmr2;
@@ -61,6 +63,7 @@ class Foo {
 ##TMR3
 [//]: # (MAIN: tmr3.Foo)
 Tests modern reflection with respect to virtual calls and invoke.
+
 ```java
 // tmr3/Foo.java
 package tmr3;

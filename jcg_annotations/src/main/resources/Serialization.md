@@ -4,6 +4,7 @@ Callbacks related to java.io.Serializable classes.
 ##SC1
 [//]: # (MAIN: sc1.Foo)
 Tests the writeObject/readObject callback methhods.
+
 ```java
 // sc1/Foo.java
 package sc1;
@@ -45,8 +46,9 @@ public class Foo implements Serializable {
 [//]: # (END)
 
 ##SC2
-Tests the writeReplace/readResolve/validateObject methods.
 [//]: # (MAIN: sc2.Foo)
+Tests the writeReplace/readResolve/validateObject methods.
+
 ```java
 // sc2/Foo.java
 package sc2;
@@ -108,6 +110,7 @@ Callback methods related to java.io.Externalizable classes.
 ##EC1
 [//]: # (MAIN: ec1.Foo)
 Tests the writeExternal/readExternal methods.
+
 ```java
 // ec1/Foo.java
 package ec1;
@@ -147,7 +150,4 @@ public class Foo implements Serializable {
 }
 ```
 [//]: # (END)
-
-TODO test serializable: first call to no-arg constr. of its first non-serilizable super class
-TODO test externalizable: call to no-arg constr.
 
