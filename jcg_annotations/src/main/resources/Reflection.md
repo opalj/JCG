@@ -256,9 +256,9 @@ class Foo {
 [//]: # (END)
 
 #LocallyResolvableReflection
-[//]: # (MAIN: lrr1.Foo)
 The complete information is locally (intra-procedurally) available.
 ##LRR1
+[//]: # (MAIN: lrr1.Foo)
 Test reflection with respect to static methods where the target class is dynamically decided.
 
 ```java
