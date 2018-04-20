@@ -1,9 +1,9 @@
-#Usage of sun.misc.Unsafe
-
+#Usage of `sun.misc.Unsafe`
+Test cases related to the usage of `sun.mist.Unsafe` to operate on fields.
 
 ##UnsafeSwap
 [//]: # (MAIN: swap.Foo)
-
+Using compareAndSwapObject to set the value in a private field.
 ```java
 // swap/Foo.java
 package swap;
@@ -41,7 +41,7 @@ class Bar {
 
 ##UnsafePut
 [//]: # (MAIN: put.Foo)
-
+Using putObject to set the value in a private field.
 ```java
 // put/Foo.java
 package put;
@@ -79,7 +79,7 @@ class Bar {
 
 ##UnsafeGet
 [//]: # (MAIN: get.Foo)
-
+Using getObject to retrieve a value of a private field.
 ```java
 // get/Foo.java
 package get;

@@ -245,14 +245,11 @@ class Foo {
 ```
 [//]: # (END)
 
-
-TODO forName(String name, boolean initialize, ClassLoader loader)
-
 #LocallyResolvableReflection
+[//]: # (MAIN: lrr1.Foo)
 The complete information is locally (intra-procedurally) available.
 ##LRR1
-[//]: # (MAIN: lrr1.Foo)
-Test reflection with respect to static methods where the target class is dynamically decided
+Test reflection with respect to static methods where the target class is dynamically decided.
 ```java
 // lrr1/Foo.java
 package lrr1;
@@ -281,6 +278,7 @@ class Foo {
 
 ##LRR2
 [//]: # (MAIN: lrr2.Foo1)
+Tests reflection with respect to static methods where the target class is dynamically decided and the result of a StringBuilder.
 ```java
 // lrr2/Foo1.java
 package lrr2;
@@ -314,6 +312,7 @@ class Foo2 {
 
 ##LRR3
 [//]: # (MAIN: lrr3.Foo)
+Test reflection with respect to static methods where the target method is dynamically decided.
 ```java
 // lrr3/Foo.java
 package lrr3;
@@ -491,7 +490,7 @@ class Bar {
 
 ##CSR6
 [//]: # (MAIN: csr6.Foo)
-TODO
+Tests reflection with a unknown target class.
 ```java
 // csr6/Foo.java
 package csr6;
