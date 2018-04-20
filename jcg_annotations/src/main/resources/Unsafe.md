@@ -115,7 +115,3 @@ class Bar {
 }
 ```
 [//]: # (END)
-
-
-
-//put/getObject
