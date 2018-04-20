@@ -2,7 +2,7 @@
 Using local information to get better type information
 ##SimpleCast
 [//]: # (MAIN: simplecast.Foo)
-Type narrowing due to previous cast
+Type narrowing due to previous cast.
 ```java
 // simplecast/Foo.java
 package simplecast;
