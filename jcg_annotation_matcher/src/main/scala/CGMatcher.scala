@@ -182,8 +182,8 @@ object CGMatcher {
                 val lineNumber = body.lineNumber(pc)
                 instr != null && instr.isInvocationInstruction && lineNumber.isDefined && lineNumber.get == annotatedLineNumber
         }
-        if (!existsCall)
-            System.err.println(s"There is no call in line $annotatedLineNumber")
+//        if (!existsCall)
+//            System.err.println(s"There is no call in line $annotatedLineNumber")
     }
 
     private def handleIndirectCallAnnotations(
