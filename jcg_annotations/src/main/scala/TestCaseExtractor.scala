@@ -7,7 +7,7 @@ import scala.io.Source
 
 import org.apache.commons.io.FileUtils
 
-object Test {
+object TestCaseExtractor {
     def main(args: Array[String]): Unit = {
 
         val tmp = new File("tmp")
