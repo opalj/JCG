@@ -1,3 +1,6 @@
-This is the Annotated Java Call Graph (JCG) project. The JARs it produces are supposed to be used as test input for call graph bilders. 
+# Java Call Graph (JCG)
 
-The project contains several sub-projects each implementing a library handling arithmetic expressions and possibly an application using the library. Each sub-project features a certain kind of cases relevant to the construction of java call graphs. The relevant call graph edges and all entry points are annotated with special annotations to allow automated construction of ground truth.
+This repository accommodates the Java Call Graph (JCG) project, a collection of annotated test cases
+that are relevant for call-graph construction in Java. The test cases specifically target the call
+graph's soundness and, therefore, tests the correct support of Java language features, core APIs, and
+runtime (JVM) callbacks. Not supporting those features/APIs will render the call graph unsound.
