@@ -7,10 +7,18 @@ runtime (JVM) callbacks. Not supporting those features/APIs will render the call
 ## The Annotations Project
 The subproject `jcg_annotations` provides the core of the JCG test suite.
 It contains the annotation classes that are used to specify expectations of the call graph that represent
-the ground truth.
+the ground truth (`lib.annotations`).
 
 Furthermore, the set of test cases, that are shipped with JCG, are located in the `src/main/resources`
 directory as markdown `.md` files.
+There is one markdown file for each language feature to be tested.
+For each such file there might be multiple categories of test cases, indicated
+by first level headers.
+Each category then contains several test cases, that are identified using a second level
+header.
+Finally, a test case consists of a name, the specification of the main class (each test case must be a full
+runnable Java programm) and several Java classes given in a code listing.
+Theses listings should be annotated using the provided annotations.
 
 In addition to the specification of the test cases, the `TestCaseExtractor` retrieves, compiles, bundle and
 runs the Java code for each test case in each markdown file.
@@ -62,4 +70,10 @@ that are identified as call targets in the computed call graph.
 Each method object is defined, using a `name`, `returnType`, `parameterTypes` and a `declaringClass`.
 All types must be given in JVM binary notation (object types start with `L`, ends with `;` and `/` is used in packages
 instead of a `.`).
+
+## Matching Expectations and Reality.
+The `CGMatcher` in the `jcg_annotation_matcher` project, is given one `.jar` file of a test case together with the
+`.json` file of a serialized call graph and computes whether the call graph matches the expectations.
+Furthermore, it does some verification of the test case in order to avoid wrong annotations.
+
 
