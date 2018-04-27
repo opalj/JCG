@@ -31,7 +31,7 @@ For each Frameworg, e.g. OPAL, WALA, Soot, there should be one test adapter impl
 A call to `serialize` should execute the specific call graph algorithm and write a JSon file containing
 the serialized version of the computed callgraph in the following format:
 
-```
+```json
 { "callSites": [
     { "declaredTarget": {
         "name": "getDeclaredMethod",
