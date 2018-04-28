@@ -43,7 +43,7 @@ public @interface ResolvedMethod {
 
 	/*
 	 * The type name of the receiver using JVM notation (e.g.,
-	 * "java/lang/Object").
+	 * "Ljava/lang/Object;").
 	 */
 	String receiverType();
 

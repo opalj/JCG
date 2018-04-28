@@ -46,7 +46,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ProhibitedMethod {
 	/*
 	 * The type name of the receiver using JVM notation (e.g.,
-	 * "java/lang/Object").
+	 * "Ljava/lang/Object;").
 	 */
 	String receiverType();
 }
