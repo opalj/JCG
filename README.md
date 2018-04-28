@@ -4,10 +4,44 @@ that are relevant for call-graph construction in Java. The test cases specifical
 graph's soundness and, therefore, tests the correct support of Java language features, core APIs, and
 runtime (JVM) callbacks. Not supporting those features/APIs will render the call graph unsound.
 
+The project's structure and usage are explained in the following.
+
 ## The Annotations Project
-The subproject `jcg_annotations` provides the core of the JCG test suite.
-It contains the annotation classes that are used to specify expectations of the call graph that represent
-the ground truth (`lib.annotations`).
+The subproject `jcg_annotations` is test suite's s core project. It holds the test files as well as the annotations that
+are required to express the test case's expectations.
+
+### Annotating Test Expectations
+
+Within the core project, in `lib.annotations`, are three different annotation classes that enable to specify expectations
+for a call site's method resolution, i.e., they allow to annotate a method's call sites with expected call targets.
+The first annotation, `lib.annotations.CallSite`, enables to annotate a method with expectations for a specific call site,
+specified by line number. Please note that the annotation of two call sites within the same source line which call a
+equally named method is not supported.
+
+```java
+class Class {
+    
+    @CallSite(name = "toString", line = 6, resolvedTargets = "Ljava/lang/String;")
+    public static void main(String[] args){ 
+        if(args.length == 1){
+            args[0].toString();
+        }
+    }
+}
+```
+
+The above example shows how the `CallSite` annotation sets the expected for the call site on *line 6*. It expresses,
+that the call of the method `toString` is expected to be resolved to `java.lang.String.toString`. However, the above
+example is only sufficiently annotated as long as no other `toString` method exists on String, e.g., a arbitrary 
+`toString` method with another method signature. To overcome this issue, the `CallSite` annotations supports the
+specification of the called method's return type as well as parameter types. Additionally, it's supported to specify more
+than one expected call receiver which is required virtually resolved methods. However, the `CallSite` annotation specifies
+only direct callee expectations, i.e., the annotation's expectation implies that the annotated method directly calls the
+expected call targets. In other words, considering our previous example, it's expected that the call graph contains
+a call edge from `Class.main` to `java.lang.String.toString`.
+
+
+### Writing Tests
 
 Furthermore, the set of test cases, that are shipped with JCG, are located in the `src/main/resources`
 directory as markdown `.md` files.
@@ -71,7 +105,7 @@ Each method object is defined, using a `name`, `returnType`, `parameterTypes` an
 All types must be given in JVM binary notation (object types start with `L`, ends with `;` and `/` is used in packages
 instead of a `.`).
 
-## Matching Expectations and Reality.
+## Matching Expectations against Call-graph Implementations.
 The `CGMatcher` in the `jcg_annotation_matcher` project, is given one `.jar` file of a test case together with the
 `.json` file of a serialized call graph and computes whether the call graph matches the expectations.
 Furthermore, it does some verification of the test case in order to avoid wrong annotations.
