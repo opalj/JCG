@@ -30,19 +30,19 @@ class Class {
 }
 ```
 
-The above example shows how the `CallSite` annotation sets the expected for the call site on *line 6*. It expresses,
+The above example shows how the `CallSite` annotation sets the expectations for the call site on *line 6*. It expresses,
 that the call of the method `toString` is expected to be resolved to `java.lang.String.toString`. However, the above
-example is only sufficiently annotated as long as no other `toString` method exists on String, e.g., a arbitrary 
+example is only sufficiently annotated as long as no other `toString` method exists on type `String`, e.g., a arbitrary 
 `toString` method with another method signature. To overcome this issue, the `CallSite` annotations supports the
-specification of the called method's return type as well as parameter types. Additionally, it's supported to specify more
-than one expected call receiver which is required virtually resolved methods. However, the `CallSite` annotation specifies
+specification of the called method's return type as well as parameter types. Additionally, it is supported to specify more
+than one expected call receiver which is required by virtually resolved methods. However, the `CallSite` annotation specifies
 only direct callee expectations, i.e., the annotation's expectation implies that the annotated method directly calls the
 expected call targets. In other words, considering our previous example, it's expected that the call graph contains
 a call edge from `Class.main` to `java.lang.String.toString`.
 
-Another annotation, that does not excpect an direct but transitive edge within the call graph, is the
-`lib.annotations.IndirectCall` annotation. This annotation is specified in analogously to the `CallSite` annotation but
-is matched differently. That allows a framework specific handling for indirect method invocations such as calls invoked
+Another annotation, that does not expect a direct but transitive edge within the call graph, is the
+`lib.annotations.IndirectCall` annotation. This annotation is specified analogously to the `CallSite` annotation but
+is matched differently. It therefore allows a framework specific handling for indirect method invocations such as calls invoked
 via `invokedynamics` or Java's reflection API.
 
 ### Writing Tests
