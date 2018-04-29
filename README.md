@@ -40,6 +40,10 @@ only direct callee expectations, i.e., the annotation's expectation implies that
 expected call targets. In other words, considering our previous example, it's expected that the call graph contains
 a call edge from `Class.main` to `java.lang.String.toString`.
 
+Another annotation, that does not excpect an direct but transitive edge within the call graph, is the
+`lib.annotations.IndirectCall` annotation. This annotation is specified in analogously to the `CallSite` annotation but
+is matched differently. That allows a framework specific handling for indirect method invocations such as calls invoked
+via `invokedynamics` or Java's reflection API.
 
 ### Writing Tests
 
