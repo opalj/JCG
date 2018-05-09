@@ -73,9 +73,9 @@ public interface JCGTestAdapter {
 }
 ```
 
-For each Frameworg, e.g. OPAL, WALA, Soot, there should be one test adapter implementation.
+For each framework, e.g. OPAL, WALA, Soot, there should be one test adapter implementation.
 A call to `serialize` should execute the specific call graph algorithm and write a JSon file containing
-the serialized version of the computed callgraph in the following format:
+the serialized version of the computed  call graph in the following format:
 
 ```json
 { "callSites": [
