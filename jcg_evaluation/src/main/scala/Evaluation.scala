@@ -7,7 +7,8 @@ object Evaluation {
         val rtJar = bytecode.RTJar.getAbsolutePath
         val jarDir = new File("result/")
         if (jarDir.exists && jarDir.isDirectory) {
-            val jars = jarDir.listFiles((_, name) ⇒ name.endsWith(".jar")).sorted
+            val jarFilter = if(args.length > 0) args(0) else "";
+            val jars = jarDir.listFiles((_, name) ⇒ name.endsWith(".jar")).sorted.filter(_.getName.startsWith(jarFilter))
             // print header
             print("algorithm")
             for (tgt <- jars) {
