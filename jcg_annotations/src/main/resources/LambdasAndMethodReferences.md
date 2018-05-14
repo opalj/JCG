@@ -442,3 +442,82 @@ class Class {
 }
 ```
 [//]: # (END)
+
+##Lambda6
+[//]: # (MAIN: lambda6/Class)
+Tests the invocation on an object receiver captured in a lambda.
+
+```java
+// lambda6/Class.java
+package lambda6;
+
+import lib.annotations.callgraph.IndirectCall;
+
+class Class {
+    
+    @FunctionalInterface interface Runnable {
+        void run();
+    }
+    
+    public static void doSomething(){ }
+    
+    @IndirectCall(name = "doSomething", line = 17, resolvedTargets = "Llambda6/LambdaProvider;")
+    public static void main(String[] args) {
+        Runnable lambda = LambdaProvider.getRunnable();
+        
+        lambda.run();
+    }
+}
+
+class LambdaProvider {
+        
+    public static void doSomething(){
+        /* do something */
+    }
+    
+    public static Class.Runnable getRunnable(){
+        return () -> LambdaProvider.doSomething(); 
+    }
+}
+```
+[//]: # (END)
+
+##Lambda7
+[//]: # (MAIN: lambda7/Class)
+Tests the invocation of a lambda when it was written to an array and later retrieved and applied.
+
+```java
+// lambda7/Class.java
+package lambda7;
+
+import lib.annotations.callgraph.IndirectCall;
+
+class Class {
+    
+     @FunctionalInterface interface Runnable {
+        void run();
+    }
+    
+    public static void doSomething(){
+        /* do something */
+    }
+
+    public static Runnable[] lambdaArray = new Runnable[10];
+
+    @IndirectCall(name = "doSomething", line = 25, resolvedTargets = "Llambda7/Class;")       
+    public static void main(String[] args) {
+        Runnable r1 = () -> doSomething();
+        lambdaArray[0] = r1;
+        Runnable same = lambdaArray[0];
+        
+        same.run();
+    }
+}
+
+final class Math {
+    public static int PI(){
+        return 3;
+    }
+}
+```
+[//]: # (END)
