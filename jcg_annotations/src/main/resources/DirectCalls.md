@@ -17,11 +17,10 @@ class Class {
     public static void method(){ /* do something*/}
     public static void method(int param){ /* do something*/}
     
-    @CallSite(name = "method", line = 12, resolvedTargets = "Ldc1/Class;")
+    @CallSite(name = "method", parameterTypes = int.class, line = 12, resolvedTargets = "Ldc1/Class;")
     public static void main(String[] args){
         Class.method();
     }
-    
 }
 ```
 [//]: # (END)
@@ -34,7 +33,6 @@ different signature is presence.
 // dc2/Class.java
 package dc2;
 
-import lib.annotations.callgraph.CallSites;
 import lib.annotations.callgraph.CallSite;
 
 class Class {
@@ -42,10 +40,7 @@ class Class {
     private void method(){ /* do something*/}
     private void method(int num){ /* do something*/}
     
-    @CallSites({
-        @CallSite(name = "method", line = 17, resolvedTargets = "Ldc2/Class;"),
-        @CallSite(name = "method", line = 17, parameterTypes = {int.class}, resolvedTargets = "Ldc2/Class;", prohibitedTargets = "Ldc2/Class;"),
-    })
+    @CallSite(name = "method", line = 13, resolvedTargets = "Ldc2/Class;")
     public static void main(String[] args){
         Class cls = new Class();
         cls.method();
@@ -95,7 +90,6 @@ have an identical signature.
 // dc4/Class.java
 package dc4;
 
-import lib.annotations.callgraph.CallSites;
 import lib.annotations.callgraph.CallSite;
 
 class Class {
@@ -104,17 +98,10 @@ class Class {
          /* do something */
     }
     
-     @CallSites({
-        @CallSite(name = "method", line = 17, resolvedTargets = "Ldc4/Class;", prohibitedTargets = "Ldc4/AlternativeClass;"),
-        @CallSite(name = "method", line = 17, parameterTypes = {int.class}, prohibitedTargets = "Ldc4/Class;")
-    })
-    void method(int num){
-        this.method();
-    }
-    
+    @CallSite(name = "method", line = 14, resolvedTargets = "Ldc4/Class;", prohibitedTargets = "Ldc4/AlternativeClass;")
     public static void main(String[] args){
         Class cls = new Class();
-        cls.method(42);
+        cls.method();
     }
 }
 
