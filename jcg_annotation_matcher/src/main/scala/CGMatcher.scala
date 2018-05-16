@@ -39,7 +39,7 @@ object CGMatcher {
     val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
     val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
 
-    def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): Boolean = {
+    def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): Assessment = {
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
         implicit val p: SomeProject = Project(new File(tgtJar), org.opalj.bytecode.RTJar)
 
@@ -81,13 +81,15 @@ object CGMatcher {
                                 else
                                     Seq.empty
 
-                            if (!handleCallSiteAnnotations(
+                            val csAssessment = handleCallSiteAnnotations(
                                 computedCallSites.callSites,
                                 method,
                                 callSiteAnnotations,
-                                verbose
-                            ))
-                                return false;
+                                verbose)
+
+                            if(csAssessment.isUnsound){
+                                return Unsound;
+                            }
 
                             val indirectCallAnnotations =
                                 if (annotation.annotationType == indirectCallAnnotationType)
@@ -97,18 +99,22 @@ object CGMatcher {
                                 else
                                     Seq.empty
 
-                            if (!handleIndirectCallAnnotations(
+                            val icsAssessment = handleIndirectCallAnnotations(
                                 computedCallSites.callSites,
                                 method,
                                 indirectCallAnnotations,
                                 verbose
-                            ))
-                                return false;
+                            )
+
+                            val finalAssessment = csAssessment.combine(icsAssessment)
+
+                            if(!finalAssessment.isSound)
+                                return finalAssessment
                         }
                     }
                 }
 
-                true
+                Sound
             case _ ⇒
                 throw new RuntimeException("Unable to parse json")
         }
@@ -133,7 +139,7 @@ object CGMatcher {
         method:              br.Method,
         callSiteAnnotations: Seq[Annotation],
         verbose:             Boolean
-    )(implicit p: SomeProject): Boolean = {
+    )(implicit p: SomeProject): Assessment = {
         for (callSiteAnnotation ← callSiteAnnotations) {
             val line = getLineNumber(callSiteAnnotation)
             val name = getName(callSiteAnnotation)
@@ -152,7 +158,7 @@ object CGMatcher {
                     for (annotatedTgt ← getResolvedTargets(callSiteAnnotation)) {
                         if (!computedTargets.contains(annotatedTgt)) {
                             if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
-                            return false;
+                            return Unsound;
                         } else {
                             if (verbose) println("found it")
                         }
@@ -161,18 +167,18 @@ object CGMatcher {
                     for (prohibitedTgt ← getProhibitedTargets(callSiteAnnotation)) {
                         if (computedTargets.contains(prohibitedTgt)) {
                             if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
-                            return false;
+                            return Imprecise;
                         } else {
                             if (verbose) println("no call to prohibited")
                         }
                     }
                 case _ ⇒
-                    return false
+                    return Unsound
                     //throw new RuntimeException(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
             }
         }
 
-        true
+        Sound
     }
 
     private def verifyCallExistance(annotatedLineNumber: Int, method: br.Method): Unit = {
@@ -191,7 +197,7 @@ object CGMatcher {
         source:                  br.Method,
         indirectCallAnnotations: Seq[Annotation],
         verbose:                 Boolean
-    )(implicit p: SomeProject): Boolean = {
+    )(implicit p: SomeProject): Assessment= {
         for (annotation ← indirectCallAnnotations) {
             val line = getLineNumber(annotation)
             verifyCallExistance(line, source)
@@ -202,10 +208,10 @@ object CGMatcher {
                 val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
                 val annotatedSource = convertMethod(source)
                 if (!callsIndirectly(computedCallSites, annotatedSource, annotatedTarget, verbose))
-                    return false;
+                    return Unsound;
             }
         }
-        true
+        Sound
     }
 
     private def callsIndirectly(

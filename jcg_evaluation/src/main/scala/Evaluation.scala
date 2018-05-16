@@ -9,13 +9,14 @@ import org.opalj.bytecode
 object Evaluation {
 
     val debug = true;
-    val OUTPUT_FILENAME = "result/evaluation_results.tsv"
+    val OUTPUT_FILENAME = "evaluation_results.tsv"
+    val JAR_DIR_PATH = "result/"
     val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
 
 
     def main(args: Array[String]): Unit = {
         val rtJar = bytecode.RTJar.getAbsolutePath
-        val jarDir = new File("result/")
+        val jarDir = new File(JAR_DIR_PATH)
 
         var jarFilter = ""
         var target = ""
@@ -36,8 +37,8 @@ object Evaluation {
                     for (tgt ← jars) {
                         adapter.serializeCG(cgAlgo, tgt.getAbsolutePath, rtJar, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
                         System.gc()
-                        val result : Boolean = CGMatcher.matchCallSites(tgt.getAbsolutePath, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
-                        ow.write(s"\t$result")
+                        val result = CGMatcher.matchCallSites(tgt.getAbsolutePath, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
+                        ow.write(s"\t${result.shortNotation}")
                     }
                     ow.newLine()
                 }
