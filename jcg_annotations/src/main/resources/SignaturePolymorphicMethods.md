@@ -95,7 +95,7 @@ class Class {
 [//]: # (END)
 
 ##SPM3
-[//]: # (MAIN: spm2/Class)
+[//]: # (MAIN: spm3/Class)
 This tests checks whether a static method call to a method with polymorphic signature is correctly performed.
 The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findStatic(..)``` and then
 invoked via the MethodHandle's ```invoke``` method. The passed parameter must be widened to
@@ -133,5 +133,183 @@ class Class {
 
 class MyObject {}
 final class MyString extends MyObject {}
+```
+[//]: # (END)
+
+##SPM4
+[//]: # (MAIN: spm4/VirtualSPMCall)
+This tests checks whether a virutal method call to a method with polymorphic signature is correctly performed.
+The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findVirtual(..)``` and then
+invoked via the MethodHandle's ```invoke``` method. The method is inherited from the super class.
+
+```java
+// spm4/VirtualSPMCall.java
+package spm4;
+
+import lib.annotations.callgraph.IndirectCall;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
+class VirtualSPMCall {
+    
+       @IndirectCall(
+            name = "method", returnType = void.class, parameterTypes = {byte.class}, line = 19,
+            resolvedTargets = "Lspm4/SuperClassWithMethod;")
+       public static void main(String[] args) throws Throwable {
+           MethodType descriptor = MethodType.methodType(void.class, byte.class);
+           MethodHandle mh = MethodHandles.lookup().findVirtual(SuperClassWithMethod.class,"method", descriptor);
+           Class callOnMe = new Class();
+           byte paramValue = 42;
+           mh.invoke(callOnMe, paramValue);
+       }
+}
+
+class Class  extends SuperClassWithMethod { /* empty class */}
+
+class SuperClassWithMethod {
+    
+    public void method(byte b){
+        /* do something */
+    }
+}
+```
+[//]: # (END)
+
+##SPM5
+[//]: # (MAIN: spm5/VirtualSPMCall)
+This tests checks whether a virutal method call to a method with polymorphic signature is correctly performed.
+The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findVirtual(..)``` and then
+invoked via the MethodHandle's ```invoke``` method. The method is defined in the class and available
+within the super class.
+
+```java
+// spm5/VirtualSPMCall.java
+package spm5;
+
+import lib.annotations.callgraph.IndirectCall;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
+class VirtualSPMCall {
+    
+       @IndirectCall(
+            name = "method", returnType = void.class, parameterTypes = {byte.class}, line = 19,
+            resolvedTargets = "Lspm5/Class;", prohibitedTargets = "Lspm5/SuperClassWithMethod;")
+       public static void main(String[] args) throws Throwable {
+           MethodType descriptor = MethodType.methodType(void.class, byte.class);
+           MethodHandle mh = MethodHandles.lookup().findVirtual(SuperClassWithMethod.class,"method", descriptor);
+           Class callOnMe = new Class();
+           byte paramValue = 42;
+           mh.invoke(callOnMe, paramValue);
+       }
+}
+
+class Class  extends SuperClassWithMethod { 
+    
+    public void method(byte b){
+        /* do something */
+    }
+}
+
+class SuperClassWithMethod {
+    
+    public void method(byte b){
+        /* do something */
+    }
+}
+```
+[//]: # (END)
+
+##SPM6
+[//]: # (MAIN: spm6/VirtualSPMCall)
+This tests checks whether a virutal method call to a method with polymorphic signature is correctly performed.
+The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findVirtual(..)``` and then
+invoked via the MethodHandle's ```invoke``` method. The called method is defined within an interface
+(as default method).
+
+```java
+// spm6/VirtualSPMCall.java
+package spm6;
+
+import lib.annotations.callgraph.IndirectCall;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
+class VirtualSPMCall {
+    
+       @IndirectCall(
+            name = "method", returnType = void.class, parameterTypes = {byte.class}, line = 19,
+            resolvedTargets = "Lspm6/Interface;")
+       public static void main(String[] args) throws Throwable {
+           MethodType descriptor = MethodType.methodType(void.class, byte.class);
+           MethodHandle mh = MethodHandles.lookup().findVirtual(Interface.class,"method", descriptor);
+           Class callOnMe = new Class();
+           byte paramValue = 42;
+           mh.invoke(callOnMe, paramValue);
+       }
+}
+
+class Class implements Interface {}
+
+interface Interface {
+    
+    default void method(byte b){
+        /* do something */
+    }
+}
+```
+[//]: # (END)
+
+##SPM7
+[//]: # (MAIN: spm7/VirtualSPMCall)
+This tests checks whether a virutal method call to a method with polymorphic signature is correctly performed.
+The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findVirtual(..)``` and then
+invoked via the MethodHandle's ```invoke``` method. The ```MethodHandle``` itself points to an interface
+default method but must be resolved to ```Superclass.method```.
+
+```java
+// spm7/VirtualSPMCall.java
+package spm7;
+
+import lib.annotations.callgraph.IndirectCall;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
+class VirtualSPMCall {
+    
+    @IndirectCall(
+    name = "method", returnType = void.class, parameterTypes = {byte.class}, line = 19,
+    resolvedTargets = "Lspm7/Superclass;", prohibitedTargets = "Lspm7/Interface;")
+    public static void main(String[] args) throws Throwable {   
+        MethodType descriptor = MethodType.methodType(void.class, Object.class);
+        MethodHandle mh = MethodHandles.lookup().findVirtual(Interface.class,"method", descriptor);
+        Class callOnMe = new Class();
+        mh.invoke(callOnMe, new Class());
+   }
+}
+
+class Class extends Superclass implements Interface {
+    /* empty class */
+}
+
+class Superclass {
+   public void method(Object b){
+       /* do something */
+   }
+}
+
+interface Interface {
+   default void method(Object b){
+       /* do something */
+   }
+}
 ```
 [//]: # (END)
