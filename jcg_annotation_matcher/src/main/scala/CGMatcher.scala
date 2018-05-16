@@ -173,8 +173,8 @@ object CGMatcher {
                         }
                     }
                 case _ ⇒
-                    return Unsound
                     //throw new RuntimeException(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
+                    return Unsound
             }
         }
 

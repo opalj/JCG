@@ -20,7 +20,20 @@ object TestCaseExtractor {
             FileUtils.deleteDirectory(result)
         result.mkdirs()
 
-        val resources = new File(getClass.getResource("/").getPath).listFiles(_.getPath.endsWith(".md"))
+        var mdFilter = ""
+        var fileDir = getClass.getResource("/").getPath
+        args.sliding(2, 2).toList.collect {
+            case Array("--md", f: String) => mdFilter = f
+            case Array("--rsrcDir", dir: String) => fileDir = dir
+        }
+
+        val resources = new File(fileDir).
+            listFiles(_.getPath.endsWith(".md")).
+            filter(_.getName.startsWith(mdFilter))
+
+
+        println(resources.mkString(", "))
+
         resources.foreach { sourceFile ⇒
             println(sourceFile)
             val source = Source.fromFile(sourceFile)
