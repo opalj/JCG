@@ -90,9 +90,11 @@ object TestCaseExtractor {
                 val allClassFiles = recursiveListFiles(bin)
                 val allClassFileNames = allClassFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
 
-                val jarCommand = Seq("jar", "cfe", s"../../../${result.getPath}/$projectName.jar")
+
+                val jarOpts = Seq(if (main != null) "cfe" else "cf")
+                val outPath = Seq(s"../../../${result.getPath}/$projectName.jar")
                 val mainIfPresent = if (main != null) Seq(main) else Seq.empty
-                val args = jarCommand ++ mainIfPresent ++ allClassFileNames
+                val args = Seq("jar") ++ jarOpts ++ outPath ++ mainIfPresent ++ allClassFileNames
                 sys.process.Process(args, bin).!
 
                 if (main != null) {

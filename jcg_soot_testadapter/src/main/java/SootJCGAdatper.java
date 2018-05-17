@@ -27,7 +27,7 @@ public class SootJCGAdatper implements JCGTestAdapter {
 
     @Override
     public String[] possibleAlgorithms() {
-        return new String[] {CHA, RTA, VTA, Spark};
+        return new String[]{CHA, RTA, VTA, Spark, LibCHA, LibSpark};
     }
 
     @Override
