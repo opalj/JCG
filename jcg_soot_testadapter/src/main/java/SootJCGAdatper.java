@@ -21,6 +21,8 @@ public class SootJCGAdatper implements JCGTestAdapter {
     private static final String RTA = "RTA";
     private static final String VTA = "VTA";
     private static final String Spark = "SPARK";
+    private static final String LibCHA = "LibCHA";
+    private static final String LibSpark = "LibSpark";
 
 
     @Override
@@ -46,10 +48,6 @@ public class SootJCGAdatper implements JCGTestAdapter {
 
         cgOptions.handleForNameSafe().handleNewInstanceSafe().useTypesForInvoke();
 
-        //TODO we should use these two options only on the library project
-        //cgOptions.processAllReachable();
-        //cgOptions.libraryModeSignatureResolution();
-
         CallGraphPhaseSubOptions cgModeOption = null;
         switch (algorithm) {
             case CHA:
@@ -63,6 +61,16 @@ public class SootJCGAdatper implements JCGTestAdapter {
                 break;
             case Spark:
                 cgModeOption = new SparkOptions().enable();
+                break;
+            case LibCHA:
+                cgModeOption = new CHAOptions().enable();
+                cgOptions.processAllReachable();
+                cgOptions.libraryModeSignatureResolution();
+                break;
+            case LibSpark:
+                cgModeOption = new SparkOptions().enable();
+                cgOptions.processAllReachable();
+                cgOptions.libraryModeSignatureResolution();
                 break;
         }
         cgOptions.addSubOption(cgModeOption);
