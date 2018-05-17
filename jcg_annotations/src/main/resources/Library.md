@@ -114,3 +114,49 @@ class InternalClass {
 }
 ```
 [//]: # (END)
+
+##LIB2
+[//]: # (LIBRARY)
+Tests library interface invocation for CBS edges under the following circumstances:
+1) a ```public class PotentialSuperclass``` in package ```lib3.internal``` that can be
+inherited from and, therefore, provides the method ```public void method()``` from its superclass,
+2) a ```package visible class InternalClass``` in package ```lib3.internal``` that can be inherited 
+(analogously to 1) ),
+3) a ```package visible interface``` in package ```lib3.collude``` that can be inherited from classes in the same package,
+4) all of the previous mentioned classes/interfaces declare the method ```public void method()```. 
+```java
+// lib3/collude/Demo.java
+package lib3.collude;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+    
+    @CallSite(name = "method", line = 9, resolvedTargets = "Llib3/internal/InternalClass;")
+    public static void interfaceCallSite(PotentialInterface pi){
+        pi.method();
+    }
+}
+
+interface PotentialInterface {
+    
+    void method();
+}
+```
+```java
+// lib3/internal/PotentialSuperclass.java
+package lib3.internal;
+
+public class PotentialSuperclass extends InternalClass {
+    
+}
+
+class InternalClass {
+    
+    public void method(){
+        /* do something */
+    }
+}
+
+```
+[//]: # (END)
