@@ -65,3 +65,52 @@ public interface Interface {
 }
 ```
 [//]: # (END)
+
+##LIB2
+[//]: # (LIBRARY)
+Tests library interface invocation for CBS edges under the following circumstances:
+1) a ```package visible class PotentialSuperclass``` in package ```lib2.collude``` that can be
+inherited from a class within the same package, i.e. when a new class is added to the same package,
+2) a ```package visible class InternalClass``` in package ```lib2.internal``` that can be inherited 
+(analogously to 1) ),
+3) a ```package visible interface``` in package ```lib2.collude``` that can be inherited from classes in the same package,
+4) all of the previous mentioned classes/interfaces declare the method ```public void method()```. 
+```java
+// lib2/collude/Demo.java
+package lib2.collude;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+    
+    @CallSite(name = "method", line = 10, resolvedTargets = "Llib2/collude/PotentialSuperclass;", 
+    prohibitedTargets = "Llib2/internal/InternalClass;")
+    public static void interfaceCallSite(PotentialInterface pi){
+        pi.method();
+    }
+}
+
+class PotentialSuperclass {
+    
+    public void method(){
+        /* do something */
+    }
+}
+
+interface PotentialInterface {
+    
+    void method();
+}
+```
+```java
+// lib2/internal/InternalClass.java
+package lib2.internal;
+
+class InternalClass {
+    
+    public void method(){
+        /* do something */
+    }
+}
+```
+[//]: # (END)
