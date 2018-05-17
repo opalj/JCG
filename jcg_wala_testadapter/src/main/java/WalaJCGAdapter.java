@@ -45,7 +45,14 @@ public class WalaJCGAdapter implements JCGTestAdapter {
         AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(target, ex);
 
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
-        Iterable<Entrypoint> entrypoints = Util.makeMainEntrypoints(scope, classHierarchy);
+
+        Iterable<Entrypoint> entrypoints;
+        if (algorithm.startsWith("Lib")) {
+            entrypoints = new AllSubtypesOfApplicationEntrypoints(scope, classHierarchy);
+        } else {
+            entrypoints = Util.makeMainEntrypoints(scope, classHierarchy);
+        }
+
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
         options.setReflectionOptions(AnalysisOptions.ReflectionOptions.FULL);
 
@@ -53,16 +60,16 @@ public class WalaJCGAdapter implements JCGTestAdapter {
         CallGraph callGraph = null;
         AnalysisCache cache = new AnalysisCacheImpl();
 
-        if (algorithm.equals("0-CFA")) {
+        if (algorithm.contains("0-CFA")) {
             SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(options, cache, classHierarchy, scope);
             callGraph = ncfaBuilder.makeCallGraph(options);
-        } else if (algorithm.equals("0-1-CFA")) {
+        } else if (algorithm.contains("0-1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
-        } else if (algorithm.equals("1-CFA")) {
+        } else if (algorithm.contains("1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
-        } else if (algorithm.equals("RTA")) {
+        } else if (algorithm.contains("RTA")) {
             CallGraphBuilder<?> rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope);
             callGraph = rtaBuilder.makeCallGraph(options, new NullProgressMonitor());
         } else {
