@@ -23,14 +23,13 @@ object TestCaseExtractor {
         var mdFilter = ""
         var fileDir = getClass.getResource("/").getPath
         args.sliding(2, 2).toList.collect {
-            case Array("--md", f: String) => mdFilter = f
-            case Array("--rsrcDir", dir: String) => fileDir = dir
+            case Array("--md", f: String)        ⇒ mdFilter = f
+            case Array("--rsrcDir", dir: String) ⇒ fileDir = dir
         }
 
         val resources = new File(fileDir).
             listFiles(_.getPath.endsWith(".md")).
             filter(_.getName.startsWith(mdFilter))
-
 
         println(resources.mkString(", "))
 
@@ -39,13 +38,32 @@ object TestCaseExtractor {
             val source = Source.fromFile(sourceFile)
             val lines = try source.mkString finally source.close()
 
-            val reHeaders = """(?s)\#\#([^\n]*)\n\[//\]: \# \(MAIN: ([^\n]*)\)\n(.*?)\[//\]: \# \(END\)""".r
+            /*
+             * ##ProjectName
+             * [//]: # (Main: path/to/Main.java)
+             * multiple code snippets
+             * [//]: # (END)
+             */
+            val reHeaders = ("""(?s)"""+
+                """\#\#([^\n]*)\n"""+ // ##ProjectName
+                """\[//\]: \# \((?:MAIN: ([^\n]*)|LIBRARY)\)\n"""+ // [//]: # (Main: path/to/Main.java) or [//]: # (LIBRARY)
+                """(.*?)"""+ // multiple code snippets
+                """\[//\]: \# \(END\)""").r( // [//]: # (END)
+                    "projectName", "mainClass", "body"
+                )
+
+            /*
+             * ```java
+             * // path/to/Class.java
+             * CODE SNIPPET
+             * ```
+             */
             val re = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
 
             reHeaders.findAllIn(lines).matchData.foreach { projectMatchResult ⇒
-                val projectName = projectMatchResult.group(1)
-                val main = projectMatchResult.group(2)
-                val srcFiles = re.findAllIn(projectMatchResult.group(3)).matchData.map { matchResult ⇒
+                val projectName = projectMatchResult.group("projectName")
+                val main = projectMatchResult.group("mainClass")
+                val srcFiles = re.findAllIn(projectMatchResult.group("body")).matchData.map { matchResult ⇒
                     val packageName = matchResult.group(2)
                     val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
                     val codeSnippet = matchResult.group(4)
@@ -65,17 +83,22 @@ object TestCaseExtractor {
                 val bin = new File(tmp.getPath, s"$projectName/bin/")
                 bin.mkdirs()
 
-
                 val compilerArgs = (srcFiles ++ Seq("-d", bin.getPath)).toSeq
 
                 compiler.run(null, null, null, compilerArgs: _*)
 
                 val allClassFiles = recursiveListFiles(bin)
                 val allClassFileNames = allClassFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
-                val args = Seq("jar", "cfe", s"../../../${result.getPath}/$projectName.jar", main) ++ allClassFileNames
+
+                val jarCommand = Seq("jar", "cfe", s"../../../${result.getPath}/$projectName.jar")
+                val mainIfPresent = if (main != null) Seq(main) else Seq.empty
+                val args = jarCommand ++ mainIfPresent ++ allClassFileNames
                 sys.process.Process(args, bin).!
-                println(s"running $projectName.jar")
-                sys.process.Process(Seq("java", "-jar", s"$projectName.jar"), result).!
+
+                if (main != null) {
+                    println(s"running $projectName.jar")
+                    sys.process.Process(Seq("java", "-jar", s"$projectName.jar"), result).!
+                }
 
             }
         }
