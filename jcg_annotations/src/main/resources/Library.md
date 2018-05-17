@@ -18,7 +18,6 @@ Tests library interface invocation for CBS edges under the following circumstanc
 2) a ```public class DismissedSuperclass``` that cannot be inherited and, therefore, can't be target,
 3) a ```public interface``` that can be inherited,
 4) all of the previous mentioned classes/interfaces declare the method ```public void method()```. 
-
 ```java
 // lib1/Demo.java
 package lib1;
@@ -60,7 +59,7 @@ public final class DismissedSuperlass {
 // lib/Interface.java
 package lib1;
 
-public class Interface {
+public interface Interface {
     
     void method();
 }
