@@ -177,9 +177,8 @@ parameter,
 2) A type ```public class Type``` which declares a method ```public void method()```,
 3) Another type ```public class Subtype extends Type``` which also declares a method ```public void method()```,
 4) An additional type ```public class SomeType``` which also delcares a method ```public void method()```.
-Since the calling context of ```Type.method()``` in ```Demo.entrypoint(Type t)``` is unknown. The call
-graph construction must assume that the call all possible subtypes of ```Type``` can be passed over
-the parameter.
+Since the calling context of ```Type.method()``` in ```Demo.entrypoint(Type t)``` is unknown. The call-graph
+construction must assume that the parameter ```type``` can hold all possible subtypes of ```Type``` .
 ```java
 // lib4/Demo.java
 package lib4;
@@ -220,6 +219,70 @@ public class Subtype extends Type {
 ```java
 // lib4/SomeType.java
 package lib4;
+
+public class SomeType {
+    
+    public void method(){
+        /* do something */
+    }
+}
+```
+[//]: # (END)
+
+##LIB5
+[//]: # (LIBRARY)
+Tests virtual call resolution in the context of libraries where the calling context is unknown. 
+The circumstances of the virtual call are as follows:
+1) We have a method ```public void libraryEntryPoint(Type type)``` which calls a method on the passed
+parameter,
+2) A type ```public class Type``` which declares a method ```public void method()```,
+3) Another type ```public class Subtype extends Type``` which also declares a method ```public void method()```,
+4) An additional type ```public class SomeType``` which also delcares a method ```public void method()```.
+Since the calling context of ```Type.method()``` in ```Demo.callOnField()``` is unknown, i.e.,
+the field is public and non-final and, therefore, can be re-assigned by library users. The call-graph 
+construction must assume that all possible subtypes of ```Type``` can be assigned to the field.
+```java
+// lib5/Demo.java
+package lib5;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+    
+    public Type field = new Subtype();
+    
+    @CallSite(name = "method", line = 12, resolvedTargets = {"Llib5/Type;", "Llib5/Subtype;"}, 
+    prohibitedTargets = "Llib5/SomeType;")
+    public void callOnField(){
+        field.method();
+    }
+}
+```
+```java
+// lib5/Type.java
+package lib5;
+
+public class Type {
+    
+    public void method(){
+        /* do something */
+    }
+}
+```
+```java
+// lib5/Subtype.java
+package lib5;
+1
+public class Subtype extends Type {
+    
+    public void method(){
+        /* do something */
+    }
+}
+```
+```java
+// lib5/SomeType.java
+package lib5;
 
 public class SomeType {
     
