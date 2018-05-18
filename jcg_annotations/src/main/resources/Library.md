@@ -1,4 +1,4 @@
-## Library
+# Library
 Tests the call-graph handling for the analysis of software libraries, i.e. partial programs. The main
 difference between applications and library software is, that libraries are intended to be used, and,
 therefore, to be extended. Library extensions can cause call-graph edges within the library that can
@@ -15,9 +15,9 @@ that must be additionally resolved to the class' method. We refer to those edges
 [//]: # (LIBRARY)
 Tests library interface invocation for CBS edges under the following circumstances:
 1) a ```public class PotentialSuperclass``` that can be inherited,
-2) a ```public class DismissedSuperclass``` that cannot be inherited and, therefore, can't be target,
-3) a ```public interface``` that can be inherited,
-4) all of the previous mentioned classes/interfaces declare the method ```public void method()```. 
+1) a ```public class DismissedSuperclass``` that cannot be inherited and, therefore, canå't be target,
+1) a ```public interface``` that can be inherited,
+1) all of the previous mentioned classes/interfaces declare the method ```public void method()```. 
 ```java
 // lib1/Demo.java
 package lib1;
@@ -89,6 +89,10 @@ public class Demo {
         pi.method();
     }
 }
+```
+```java
+// lib2/collude/PotentialSuperclass.java
+package lib2.collude;
 
 class PotentialSuperclass {
     
@@ -96,6 +100,10 @@ class PotentialSuperclass {
         /* do something */
     }
 }
+```
+```java
+// lib2/collude/PotentialInterface.java
+package lib2.collude;
 
 interface PotentialInterface {
     
@@ -115,7 +123,7 @@ class InternalClass {
 ```
 [//]: # (END)
 
-##LIB2
+##LIB3
 [//]: # (LIBRARY)
 Tests library interface invocation for CBS edges under the following circumstances:
 1) a ```public class PotentialSuperclass``` in package ```lib3.internal``` that can be
@@ -157,6 +165,67 @@ class InternalClass {
         /* do something */
     }
 }
+```
+[//]: # (END)
 
+##LIB4
+[//]: # (LIBRARY)
+Tests virtual call resolution in the context of libraries where the calling context is unknown. 
+The circumstances of the virtual call are as follows:
+1) We have a method ```public void libraryEntryPoint(Type type)``` which calls a method on the passed
+parameter,
+2) A type ```public class Type``` which declares a method ```public void method()```,
+3) Another type ```public class Subtype extends Type``` which also declares a method ```public void method()```,
+4) An additional type ```public class SomeType``` which also delcares a method ```public void method()```.
+Since the calling context of ```Type.method()``` in ```Demo.entrypoint(Type t)``` is unknown. The call
+graph construction must assume that the call all possible subtypes of ```Type``` can be passed over
+the parameter.
+```java
+// lib4/Demo.java
+package lib4;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+    
+    @CallSite(name = "method", line = 10, resolvedTargets = {"Llib4/Type;", "Llib4/Subtype;"}, 
+    prohibitedTargets = "Llib4/SomeType;")
+    public void libraryEntryPoint(Type type){
+        type.method();
+    }
+}
+```
+```java
+// lib4/Type.java
+package lib4;
+
+public class Type {
+    
+    public void method(){
+        /* do something */
+    }
+}
+```
+```java
+// lib4/Subtype.java
+package lib4;
+
+public class Subtype extends Type {
+    
+    public void method(){
+        /* do something */
+    }
+}
+```
+```java
+// lib4/SomeType.java
+package lib4;
+
+public class SomeType {
+    
+    public void method(){
+        /* do something */
+    }
+}
 ```
 [//]: # (END)
