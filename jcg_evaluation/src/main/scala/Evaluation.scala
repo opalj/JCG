@@ -13,7 +13,6 @@ object Evaluation {
     val JAR_DIR_PATH = "result/"
     val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
 
-
     def main(args: Array[String]): Unit = {
         val rtJar = bytecode.RTJar.getAbsolutePath
         val jarDir = new File(JAR_DIR_PATH)
@@ -21,8 +20,8 @@ object Evaluation {
         var jarFilter = ""
         var target = ""
         args.sliding(2, 2).toList.collect {
-            case Array("--output", t: String) => target = t
-            case Array("--filter", name: String) => jarFilter = name
+            case Array("--output", t: String)    ⇒ target = t
+            case Array("--filter", name: String) ⇒ jarFilter = name
         }
 
         val outputTarget = getOutputTarget(target)
@@ -35,10 +34,15 @@ object Evaluation {
                 for (cgAlgo ← adapter.possibleAlgorithms()) {
                     ow.write(s"${adapter.frameworkName()} $cgAlgo")
                     for (tgt ← jars) {
-                        adapter.serializeCG(cgAlgo, tgt.getAbsolutePath, rtJar, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
-                        System.gc()
-                        val result = CGMatcher.matchCallSites(tgt.getAbsolutePath, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
-                        ow.write(s"\t${result.shortNotation}")
+                        try {
+                            adapter.serializeCG(cgAlgo, tgt.getAbsolutePath, rtJar, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
+                            System.gc()
+                            val result = CGMatcher.matchCallSites(tgt.getAbsolutePath, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
+                            ow.write(s"\t${result.shortNotation}")
+                        } catch {
+                            case e: Throwable ⇒
+                                ow.write(s"\tE")
+                        }
                     }
                     ow.newLine()
                 }
@@ -50,25 +54,25 @@ object Evaluation {
 
     private def printHeader(ow: BufferedWriter, jars: Array[File]) = {
         ow.write("algorithm")
-        for (tgt <- jars) {
+        for (tgt ← jars) {
             ow.write(s"\t$tgt")
         }
         ow.newLine()
     }
 
-    def getOutputTarget(target: String) : Writer = {
+    def getOutputTarget(target: String): Writer = {
         target match {
-            case "c" => new OutputStreamWriter(System.out)
-            case "f" => {
+            case "c" ⇒ new OutputStreamWriter(System.out)
+            case "f" ⇒ {
                 val outputFile = new File(OUTPUT_FILENAME);
-                if(outputFile.exists()){
+                if (outputFile.exists()) {
                     outputFile.delete()
                     outputFile.createNewFile()
                 }
 
                 new FileWriter(outputFile, false)
             }
-            case _ => new OutputStreamWriter(System.out)
+            case _ ⇒ new OutputStreamWriter(System.out)
         }
     }
 }

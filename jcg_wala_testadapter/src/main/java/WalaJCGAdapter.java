@@ -22,7 +22,9 @@ public class WalaJCGAdapter implements JCGTestAdapter {
 
     @Override
     public String[] possibleAlgorithms() {
-        return new String[] {"RTA", "0-CFA", "1-CFA", "0-1-CFA"};
+        return new String[]{
+                /*"RTA", "0-CFA", "1-CFA", "0-1-CFA", */"Lib0-CFA", "Lib1-CFA", "Lib0-1-CFA"
+        };
     }
 
     @Override
@@ -39,7 +41,7 @@ public class WalaJCGAdapter implements JCGTestAdapter {
     }
 
     @Override
-    public void serializeCG(String algorithm, String target, String classPath, String outputFile) throws Exception{
+    public void serializeCG(String algorithm, String target, String classPath, String outputFile) throws Exception {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         File ex = new File(cl.getResource("exclusions.txt").getFile());
         AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(target, ex);
