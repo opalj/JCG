@@ -272,7 +272,7 @@ public class Type {
 ```java
 // lib5/Subtype.java
 package lib5;
-1
+
 public class Subtype extends Type {
     
     public void method(){
