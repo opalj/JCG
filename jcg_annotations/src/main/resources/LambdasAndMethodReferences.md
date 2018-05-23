@@ -21,14 +21,14 @@ class Class implements Interface {
            name = "method", returnType = boolean.class, line = 17,
            resolvedTargets = "Lmr1/Interface;"
     )
-    public static boolean callWithMethodHandle(Interface i) {
+    public static boolean callViaMethodReference(Interface i) {
         FIBoolean bc = i::method;
         return bc.get();
     }
     
     public static void main(String[] args){
         Class cls = new Class();
-        callWithMethodHandle(cls);
+        callViaMethodReference(cls);
     }
 }
 
@@ -57,14 +57,14 @@ class Class {
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 14,
        resolvedTargets = "Lmr2/Class;")
-    public void callMethodHandle(){
+    public void callViaMethodReference(){
         java.util.function.Supplier<String> stringSupplier = this::getTypeName;
         stringSupplier.get();
     }
     
     public static void main(String[] args){
         Class cls = new Class();
-        cls.callMethodHandle();
+        cls.callViaMethodReference();
     }
 }
 ```
@@ -86,14 +86,14 @@ class Class extends SuperClass {
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 12,
        resolvedTargets = "Lmr3/SuperClass;")
-    public void callMethodHandle(){
+    public void callViaMethodReference(){
         java.util.function.Supplier<String> stringSupplier = super::getTypeName;
         stringSupplier.get();
     }
     
     public static void main(String[] args){
         Class cls = new Class();
-        cls.callMethodHandle();
+        cls.callViaMethodReference();
     }
 }
 
@@ -517,6 +517,38 @@ class Class {
 final class Math {
     public static int PI(){
         return 3;
+    }
+}
+```
+[//]: # (END)
+
+##Lambda8
+[//]: # (MAIN: lambda8/Class)
+Tests the invocation of an intersection type lambda. 
+
+```java
+// lambda8/Class.java
+package lambda8;
+
+import lib.annotations.callgraph.IndirectCall;
+
+class Class {
+    
+    public interface MyMarkerInterface1 {}
+    public interface MyMarkerInterface2 {}
+    
+    public @FunctionalInterface interface Runnable {
+        void run();
+    }
+    
+    public static void doSomething(){
+        /* do something */
+    }
+
+    @IndirectCall(name = "doSomething", line = 21, resolvedTargets = "Llambda8/Class;")       
+    public static void main(String[] args) {
+        Runnable run = (Runnable & MyMarkerInterface1 & MyMarkerInterface2) () -> doSomething();
+        run.run();
     }
 }
 ```
