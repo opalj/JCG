@@ -18,17 +18,13 @@ class Class implements Interface {
     }
     
     @IndirectCall(
-           name = "method", returnType = boolean.class, line = 17,
+           name = "method", returnType = boolean.class, line = 18,
            resolvedTargets = "Lmr1/Interface;"
     )
-    public static boolean callViaMethodReference(Interface i) {
-        FIBoolean bc = i::method;
-        return bc.get();
-    }
-    
     public static void main(String[] args){
         Class cls = new Class();
-        callViaMethodReference(cls);
+        FIBoolean bc = cls::method;
+        bc.get();
     }
 }
 
@@ -210,34 +206,6 @@ class Class extends SuperClass{
 
 class SuperClass {
     public String version() { return "1.0"; }
-}
-```
-[//]: # (END)
-
-##MR8
-[//]: # (MAIN: mr8/Class)
-Tests method reference where the method is defined in a super interface.
-
-```java
-// mr8/Class.java
-package mr8;
-
-import lib.annotations.callgraph.IndirectCall;
-
-class Class implements Interface {
-    
-    @IndirectCall(
-       name = "version", returnType = String.class, line = 13,
-       resolvedTargets = "Lmr8/Interface;")
-    public static void main(String[] args){
-        Class cls = new Class();
-        java.util.function.Supplier<String> classSupplier = cls::version;
-        classSupplier.get();
-    }
-}
-
-interface Interface{
-    default String version() { return "0.2"; }
 }
 ```
 [//]: # (END)
