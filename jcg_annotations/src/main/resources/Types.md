@@ -1,105 +1,113 @@
 #TypeNarrowing
 Using local information to get better type information
 ##SimpleCast
-[//]: # (MAIN: simplecast.Foo)
+[//]: # (MAIN: simplecast.Demo)
 Type narrowing due to previous cast.
 
 ```java
-// simplecast/Foo.java
+// simplecast/Demo.java
 package simplecast;
 
 import lib.annotations.callgraph.CallSite;
-class Foo {
+class Demo {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
-          m(new Bar());
+          m(new Target());
         else 
-          m(new Foo());
+          m(new Demo());
     }
 
     @CallSite(
         name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Lsimplecast/Bar;"
+        resolvedTargets = "Lsimplecast/Target;"
     )
     static void m(Object o) {
-        Bar b = (Bar) o;
+        Target b = (Target) o;
         b.toString();
     }
 
-    public String toString() { return "Foo"; }
+    public String toString() { return "Demo"; }
 }
-class Bar {
-  public String toString() { return "Bar"; }
+class Target {
+  public String toString() { return "Target"; }
 }
 
 ```
 [//]: # (END)
 
 ##CastClassAPI
-[//]: # (MAIN: castclassapi.Foo)
+[//]: # (MAIN: castclassapi.Demo)
 Type narrowing due to previous cast using java class API.
 
 ```java
-// castclassapi/Foo.java
+// castclassapi/Demo.java
 package castclassapi;
 
 import lib.annotations.callgraph.CallSite;
-class Foo {
+class Demo {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
-          m(new Bar());
+          m(new Target());
         else 
-          m(new Foo());
+          m(new Demo());
     }
 
     @CallSite(
         name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Lcastclassapi/Bar;"
+        resolvedTargets = "Lcastclassapi/Target;"
     )
     static void m(Object o) {
-        Bar b = Bar.class.cast(o);
-        b.toString();
+        Target target = Target.class.cast(o);
+        target.toString();
     }
 
-    public String toString() { return "Foo"; }
+    public String toString() { return "Demo"; }
 }
-class Bar {
-  public String toString() { return "Bar"; }
-}
+```
+```java
+// castclassapi/Target.java
+package castclassapi;
 
+public class Target {
+    
+    public String toString(){
+        return "Target";
+    }
+}
 ```
 [//]: # (END)
 
 ##ClassEQ
-[//]: # (MAIN: classeq.Foo)
-Type narrowing due to class equallity check.
+[//]: # (MAIN: classeq.Demo)
+Type narrowing due to a class equality check. Within this branch it's known that that object ```o```
+must be of type ```Target```.
 
 ```java
-// classeq/Foo.java
+// classeq/Demo.java
 package classeq;
 
 import lib.annotations.callgraph.CallSite;
-class Foo{ 
+class Demo{ 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
-          m(new Bar());
+          m(new Target());
         else 
-          m(new Foo());
+          m(new Demo());
     }
 
     @CallSite(
         name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Lclasseq/Bar;"
+        resolvedTargets = "Lclasseq/Target;"
     )
     static void m(Object o) {
-      if (o.getClass() == Bar.class)
+      if (o.getClass() == Target.class)
         o.toString();
     }
 
-    public String toString() { return "Foo"; }
+    public String toString() { return "Demo"; }
 }
-class Bar {
-  public String toString() { return "Bar"; }
+class Target {
+  public String toString() { return "Target"; }
 }
 
 ```
@@ -107,70 +115,70 @@ class Bar {
 
 
 ##InstanceOf
-[//]: # (MAIN: instanceofcheck.Foo)
+[//]: # (MAIN: instanceofcheck.Demo)
 Type narrowing due to previous instance of check.
 
 ```java
-// instanceofcheck/Foo.java
+// instanceofcheck/Demo.java
 package instanceofcheck;
 
 import lib.annotations.callgraph.CallSite;
-class Foo{ 
+class Demo{ 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
-          m(new Bar());
+          m(new Target());
         else 
-          m(new Foo());
+          m(new Demo());
     }
 
     @CallSite(
         name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Linstanceofcheck/Bar;"
+        resolvedTargets = "Linstanceofcheck/Target;"
     )
     static void m(Object o) {
-      if (o instanceof Bar)
+      if (o instanceof Target)
         o.toString();
     }
 
-    public String toString() { return "Foo"; }
+    public String toString() { return "Demo"; }
 }
-class Bar {
-  public String toString() { return "Bar"; }
+class Target {
+  public String toString() { return "Target"; }
 }
 
 ```
 [//]: # (END)
 
 ##InstanceOfClassAPI
-[//]: # (MAIN: instanceofclassapi.Foo)
+[//]: # (MAIN: instanceofclassapi.Demo)
 Type narrowing due to previous instance of check.
 
 ```java
-// instanceofclassapi/Foo.java
+// instanceofclassapi/Demo.java
 package instanceofclassapi;
 
 import lib.annotations.callgraph.CallSite;
-class Foo{ 
+class Demo{ 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
-          m(new Bar());
+          m(new Target());
         else 
-          m(new Foo());
+          m(new Demo());
     }
 
     @CallSite(
         name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Linstanceofclassapi/Bar;"
+        resolvedTargets = "Linstanceofclassapi/Target;"
     )
     static void m(Object o) {
-      if (Bar.class.isInstance(o))
+      if (Target.class.isInstance(o))
         o.toString();
     }
 
-    public String toString() { return "Foo"; }
+    public String toString() { return "Demo"; }
 }
-class Bar {
-  public String toString() { return "Bar"; }
+class Target {
+  public String toString() { return "Target"; }
 }
 
 ```
@@ -178,35 +186,35 @@ class Bar {
 
 
 ##IsAssignable
-[//]: # (MAIN: isssignable.Foo)
+[//]: # (MAIN: isssignable.Demo)
 Type narrowing due to previous is assignable.
 
 ```java
-// isssignable/Foo.java
+// isssignable/Demo.java
 package isssignable;
 
 import lib.annotations.callgraph.CallSite;
-class Foo{ 
+class Demo{ 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
-          m(new Bar());
+          m(new Target());
         else 
-          m(new Foo());
+          m(new Demo());
     }
 
     @CallSite(
         name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Lisssignable/Bar;"
+        resolvedTargets = "Lisssignable/Target;"
     )
     static void m(Object o) {
-      if (Bar.class.isAssignableFrom(o.getClass()))
+      if (Target.class.isAssignableFrom(o.getClass()))
         o.toString();
     }
 
-    public String toString() { return "Foo"; }
+    public String toString() { return "Demo"; }
 }
-class Bar {
-  public String toString() { return "Bar"; }
+class Target {
+  public String toString() { return "Target"; }
 }
 
 ```
