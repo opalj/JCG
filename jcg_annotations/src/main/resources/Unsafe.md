@@ -1,9 +1,10 @@
 #Usage of `sun.misc.Unsafe`
-Test cases related to the usage of `sun.misc.Unsafe` to operate on fields.
+Test cases related to the usage of `sun.misc.Unsafe`. This API provided methods to manipulate
+the content of fields.
 
 ##Unsafe1
 [//]: # (MAIN: unsafe.Demo)
-Using compareAndSwapObject to set the value in a private field.
+Using ```Unsafe.compareAndSwapObject``` to set the value in a private field.
 
 ```java
 // unsafe/Demo.java
@@ -42,7 +43,7 @@ class UnsafeTarget {
 
 ##Unsafe2
 [//]: # (MAIN: unsafe.Demo)
-Using putObject to set the value in a private field.
+Using ```Unsafe.putObject``` to set the value in a private field.
 
 ```java
 // unsafe/Demo.java
@@ -81,7 +82,7 @@ class UnsafeTarget {
 
 ##Unsafe3
 [//]: # (MAIN: unsafe.Demo)
-Using getObject to retrieve a value of a private field.
+Using ```Unsafe.getObject``` to retrieve a value of a private field.
 
 ```java
 // unsafe/Demo.java
