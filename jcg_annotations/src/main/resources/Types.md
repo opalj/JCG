@@ -47,17 +47,17 @@ import lib.annotations.callgraph.CallSite;
 class Demo {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
-          m(new Target());
+          m(Target.class, new Target());
         else 
-          m(new Demo());
+          m(Demo.class, new Demo());
     }
 
     @CallSite(
         name = "toString", returnType = String.class, line = 18,
         resolvedTargets = "Lcastclassapi/Target;"
     )
-    static void m(Object o) {
-        Target target = Target.class.cast(o);
+    static <T> void m(Class<T> cls,  Object o) {
+        T target = cls.cast(o);
         target.toString();
     }
 
