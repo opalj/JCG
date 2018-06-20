@@ -1,5 +1,6 @@
 
 import java.io.File
+import java.io.PrintWriter
 
 import org.opalj.br.FieldType
 import org.opalj.br.MethodDescriptor
@@ -7,6 +8,9 @@ import org.opalj.br.ObjectType
 import org.opalj.br.ReturnType
 import org.opalj.br.analyses.Project
 import org.opalj.br.instructions.MethodInvocationInstruction
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.Writes
 
 import scala.collection.mutable
 import scala.io.Source
@@ -17,12 +21,18 @@ case class CallSite(declaredTarget: Method, line: Int, method: Method, targets: 
 
 case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String])
 
-object DoopAdapter {
+object DoopAdapter extends JCGTestAdapter {
+
+    override def serializeCG(algorithm: String, target: String, classPath: String, outputFile: String): Unit = ???
+
+    override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
+
+    override def frameworkName(): String = "Doop"
 
     def main(args: Array[String]): Unit = {
 
-        val source = Source.fromFile("/Users/floriankuebler/Desktop/edges.txt")
-        val p = Project(Array(new File("result"), org.opalj.bytecode.JRELibraryFolder), Array.empty[File]) // TODO use real project here
+        val source = Source.fromFile("/Users/floriankuebler/Desktop/SI1.jar.txt")
+        val p = Project(Array(new File("result"), new File("/Users/floriankuebler/Documents/git/doop-benchmarks/JREs/jre1.7.0_95_debug")), Array.empty[File]) // TODO use real project here
 
         org.opalj.br.LineNumberTable
         val re = """\[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>/([^/]+)/(\d+), \[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r ////([^/]+)/(\d+), \[\d+\\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r
@@ -39,9 +49,6 @@ object DoopAdapter {
                     val number = x.group(4).toInt
                     val tgt = x.group(5)
 
-                    if (caller.contains("void main"))
-                        println(caller)
-
                     val currentCallsites = callGraph(caller)
                     val callSite = declaredTgt → number
                     val currentCallees = currentCallsites(callSite)
@@ -52,10 +59,7 @@ object DoopAdapter {
                 case _ ⇒ // no match
             }
         }
-
-        println(callGraph("lambda1.Class: void main(java.lang.String[])").size)
         source.close()
-        println("read file")
 
         var resultingCallSites = Set.empty[CallSite]
 
@@ -82,18 +86,16 @@ object DoopAdapter {
                                 val tgtMethods = tgts.map(toMethod)
                                 val calls = callerOpal.body.get.collect {
                                     // todo what about lambdas?
-                                    case instr: MethodInvocationInstruction if instr.name == name  => instr//&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
+                                    case instr: MethodInvocationInstruction if instr.name == name ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
                                 }
-
-                                if (calls.size <= number)
-                                    println()
 
                                 assert(calls.size > number)
                                 val pc = calls(number).pc
+                                val lineNumber = callerOpal.body.get.lineNumber(pc)
 
                                 resultingCallSites += CallSite(
                                     firstTgt.copy(declaringClass = declaredType),
-                                    pc, //TODO to lineNumber
+                                    lineNumber.getOrElse(-1),
                                     callerMethod,
                                     tgtMethods.toSet
                                 )
@@ -105,7 +107,16 @@ object DoopAdapter {
                 case None ⇒
             }
         }
-        CallSites(resultingCallSites)
+
+        implicit val methodReads: Writes[Method] = Json.writes[Method]
+        implicit val callSiteReads: Writes[CallSite] = Json.writes[CallSite]
+        implicit val callSitesReads: Writes[CallSites] = Json.writes[CallSites]
+
+
+        val callSitesJson: JsValue = Json.toJson(CallSites(resultingCallSites))
+        val pw = new PrintWriter(new File("result.json" ))
+        pw.write(Json.prettyPrint(callSitesJson))
+        pw.close
     }
 
     def toMethod(methodStr: String): Method = {
@@ -142,4 +153,5 @@ object DoopAdapter {
         assert(jvmRefType.size > 2)
         ObjectType(jvmRefType.substring(1, jvmRefType.size - 1))
     }
+
 }
