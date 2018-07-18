@@ -1,6 +1,7 @@
 
 import java.io.File
 import java.io.PrintWriter
+import java.net.URL
 
 import org.opalj.br.FieldType
 import org.opalj.br.MethodDescriptor
@@ -8,11 +9,17 @@ import org.opalj.br.ObjectType
 import org.opalj.br.ReturnType
 import org.opalj.br.analyses.Project
 import org.opalj.br.instructions.MethodInvocationInstruction
+import org.opalj.log.GlobalLogContext
+import org.opalj.log.LogContext
+import org.opalj.log.LogMessage
+import org.opalj.log.OPALLogger
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
 
 import scala.collection.mutable
+import scala.collection.Map
+import scala.collection.Set
 import scala.io.Source
 
 case class CallSites(callSites: Set[CallSite])
@@ -20,6 +27,10 @@ case class CallSites(callSites: Set[CallSite])
 case class CallSite(declaredTarget: Method, line: Int, method: Method, targets: Set[Method])
 
 case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String])
+
+class DevNullLogger extends OPALLogger {
+    override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
+}
 
 object DoopAdapter extends JCGTestAdapter {
 
@@ -31,36 +42,38 @@ object DoopAdapter extends JCGTestAdapter {
 
     def main(args: Array[String]): Unit = {
 
-        val source = Source.fromFile("/Users/floriankuebler/Desktop/SI1.jar.txt")
-        val p = Project(Array(new File("result"), new File("/Users/floriankuebler/Documents/git/doop-benchmarks/JREs/jre1.7.0_95_debug")), Array.empty[File]) // TODO use real project here
+        val doopResults = new File(args(0)).listFiles(f => f.isFile && f.getName.endsWith(".jar.txt"))
+        val jreDir = new File(args(1))
 
-        org.opalj.br.LineNumberTable
-        val re = """\[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>/([^/]+)/(\d+), \[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r ////([^/]+)/(\d+), \[\d+\\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r
+        OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
-        val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(s ⇒ mutable.OpenHashMap.empty.withDefault(s ⇒ mutable.Set.empty))
-
-        for (line ← source.getLines()) {
-            // there is at most one occurrence per line
-
-            re.findFirstMatchIn(line) match {
-                case Some(x) ⇒
-                    val caller = x.group(1)
-                    val declaredTgt = x.group(3)
-                    val number = x.group(4).toInt
-                    val tgt = x.group(5)
-
-                    val currentCallsites = callGraph(caller)
-                    val callSite = declaredTgt → number
-                    val currentCallees = currentCallsites(callSite)
-
-                    currentCallees += tgt
-                    currentCallsites += (callSite → currentCallees)
-                    callGraph += (caller → currentCallsites)
-                case _ ⇒ // no match
-            }
+        for (doopResult <- doopResults) {
+            val source = Source.fromFile(doopResult)
+            val tgtJar = new File(s"result/${doopResult.getName.replace(".txt","")}")
+            println(s"${tgtJar.getName}")
+            createJsonRepresentation(source, tgtJar, jreDir)
         }
-        source.close()
 
+    }
+
+    def createJsonRepresentation(doopResult: Source, tgtJar: File, jreDir: File): Unit = {
+        val p = Project(Array(tgtJar, jreDir), Array.empty[File])
+
+        val callGraph = extractDoopCG(doopResult)
+
+        val resultingCallSites: CallSites = convertToCallSites(p, callGraph)
+
+        implicit val methodReads: Writes[Method] = Json.writes[Method]
+        implicit val callSiteReads: Writes[CallSite] = Json.writes[CallSite]
+        implicit val callSitesReads: Writes[CallSites] = Json.writes[CallSites]
+
+        val callSitesJson: JsValue = Json.toJson(resultingCallSites)
+        val pw = new PrintWriter(new File(s"${tgtJar.getName.replace(".jar", ".json")}"))
+        pw.write(Json.prettyPrint(callSitesJson))
+        pw.close()
+    }
+
+    def convertToCallSites(p: Project[URL], callGraph: Map[String, Map[(String, Int), Set[String]]]): CallSites = {
         var resultingCallSites = Set.empty[CallSite]
 
         for {
@@ -102,21 +115,41 @@ object DoopAdapter extends JCGTestAdapter {
 
                             }
                         case _ ⇒
-                            throw new IllegalArgumentException()
+                        // todo
+                        //throw new IllegalArgumentException()
                     }
                 case None ⇒
             }
         }
+        CallSites(resultingCallSites)
+    }
 
-        implicit val methodReads: Writes[Method] = Json.writes[Method]
-        implicit val callSiteReads: Writes[CallSite] = Json.writes[CallSite]
-        implicit val callSitesReads: Writes[CallSites] = Json.writes[CallSites]
+    def extractDoopCG(doopResult: Source): Map[String, Map[(String, Int), Set[String]]] = {
+        val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(s ⇒ mutable.OpenHashMap.empty.withDefault(s ⇒ mutable.Set.empty))
 
+        val re = """\[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>/([^/]+)/(\d+), \[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r ////([^/]+)/(\d+), \[\d+\\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r
+        for (line ← doopResult.getLines()) {
+            // there is at most one occurrence per line
 
-        val callSitesJson: JsValue = Json.toJson(CallSites(resultingCallSites))
-        val pw = new PrintWriter(new File("result.json" ))
-        pw.write(Json.prettyPrint(callSitesJson))
-        pw.close
+            re.findFirstMatchIn(line) match {
+                case Some(x) ⇒
+                    val caller = x.group(1)
+                    val declaredTgt = x.group(3)
+                    val number = x.group(4).toInt
+                    val tgt = x.group(5)
+
+                    val currentCallsites = callGraph(caller)
+                    val callSite = declaredTgt → number
+                    val currentCallees = currentCallsites(callSite)
+
+                    currentCallees += tgt
+                    currentCallsites += (callSite → currentCallees)
+                    callGraph += (caller → currentCallsites)
+                case _ ⇒ // no match
+            }
+        }
+        doopResult.close()
+        callGraph
     }
 
     def toMethod(methodStr: String): Method = {

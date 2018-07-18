@@ -1,5 +1,7 @@
 #!/bin/bash
 for filename in result/*.jar; do
-    $DOOP_HOME/bin/doop "-a context-insensitive -i $filename --reflection-high-soundness-mode --lb"
-    bloxbatch "-dp last-analysis -print CallGraphEdge > $filename.txt"
+	echo $filename
+    $DOOP_HOME/bin/doop -a context-insensitive -i $filename --platform java_8 --reflection-high-soundness-mode --lb
+    bloxbatch -db $DOOP_HOME/last-analysis -print CallGraphEdge > $filename.txt
+    echo "finished $filename"
 done
