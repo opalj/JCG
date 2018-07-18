@@ -3,11 +3,15 @@ import java.io.File
 import java.io.PrintWriter
 import java.net.URL
 
+import org.opalj.br.ClassFile
 import org.opalj.br.FieldType
 import org.opalj.br.MethodDescriptor
 import org.opalj.br.ObjectType
+import org.opalj.br.ReferenceType
 import org.opalj.br.ReturnType
 import org.opalj.br.analyses.Project
+import org.opalj.br.analyses.SomeProject
+import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.log.GlobalLogContext
 import org.opalj.log.LogContext
@@ -17,9 +21,9 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
 
-import scala.collection.mutable
 import scala.collection.Map
 import scala.collection.Set
+import scala.collection.mutable
 import scala.io.Source
 
 case class CallSites(callSites: Set[CallSite])
@@ -42,14 +46,14 @@ object DoopAdapter extends JCGTestAdapter {
 
     def main(args: Array[String]): Unit = {
 
-        val doopResults = new File(args(0)).listFiles(f => f.isFile && f.getName.endsWith(".jar.txt"))
+        val doopResults = new File(args(0)).listFiles(f ⇒ f.isFile && f.getName.endsWith(".jar.txt"))
         val jreDir = new File(args(1))
 
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
-        for (doopResult <- doopResults) {
+        for (doopResult ← doopResults) {
             val source = Source.fromFile(doopResult)
-            val tgtJar = new File(s"result/${doopResult.getName.replace(".txt","")}")
+            val tgtJar = new File(s"result/${doopResult.getName.replace(".txt", "")}")
             println(s"${tgtJar.getName}")
             createJsonRepresentation(source, tgtJar, jreDir)
         }
@@ -57,11 +61,11 @@ object DoopAdapter extends JCGTestAdapter {
     }
 
     def createJsonRepresentation(doopResult: Source, tgtJar: File, jreDir: File): Unit = {
-        val p = Project(Array(tgtJar, jreDir), Array.empty[File])
+        implicit val p: Project[URL] = Project(Array(tgtJar, jreDir), Array.empty[File])
 
         val callGraph = extractDoopCG(doopResult)
 
-        val resultingCallSites: CallSites = convertToCallSites(p, callGraph)
+        val resultingCallSites: CallSites = convertToCallSites(callGraph)
 
         implicit val methodReads: Writes[Method] = Json.writes[Method]
         implicit val callSiteReads: Writes[CallSite] = Json.writes[CallSite]
@@ -73,44 +77,81 @@ object DoopAdapter extends JCGTestAdapter {
         pw.close()
     }
 
-    def convertToCallSites(p: Project[URL], callGraph: Map[String, Map[(String, Int), Set[String]]]): CallSites = {
+    def resolveBridgeMethod(
+                               bridgeMethod: org.opalj.br.Method)(implicit classFile: ClassFile, p: SomeProject
+                           ): org.opalj.br.Method = {
+        val methods = classFile.findMethod(bridgeMethod.name).filter { m ⇒
+            !m.isBridge && (m.returnType match {
+                case rt: ReferenceType ⇒ p.classHierarchy.isSubtypeOf(
+                    rt, bridgeMethod.returnType.asReferenceType
+                ).isYes
+                case rt ⇒ rt == bridgeMethod.returnType
+            })
+        }
+        assert(methods.size == 1)
+        methods.head
+    }
+
+    def computeCallSite(
+                           declaredTgt: String,
+                           number: Int,
+                           tgts: Set[String],
+                           callerMethod: Method,
+                           callerOpal: org.opalj.br.Method,
+                       )(implicit classFile: ClassFile,
+                         project: SomeProject): CallSite = {
+        assert(tgts.nonEmpty)
+        val firstTgt = toMethod(tgts.head)
+        val tgtReturnType = ReturnType(firstTgt.returnType)
+        val tgtParamTypes = firstTgt.parameterTypes.map(FieldType.apply)
+        val tgtMD = MethodDescriptor(tgtParamTypes.toIndexedSeq, tgtReturnType)
+        val split = declaredTgt.split("""\.""")
+        val declaredType = s"L${split.slice(0, split.size - 1).mkString("/")};"
+        val name = split.last.replace("'", "")
+        val tgtMethods = tgts.map(toMethod)
+        val calls = callerOpal.body.get.collect {
+            // todo what about lambdas?
+            case instr: MethodInvocationInstruction if instr.name == name ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
+            case instr: INVOKEDYNAMIC ⇒ instr
+            //throw new Error()
+        }
+
+        if (calls.size <= number && callerOpal.isBridge) {
+            computeCallSite(declaredTgt, number, tgts, callerMethod, resolveBridgeMethod(callerOpal))
+        } else {
+            assert(calls.size > number)
+            val pc = calls(number).pc
+            val lineNumber = callerOpal.body.get.lineNumber(pc)
+
+            CallSite(
+                firstTgt.copy(declaringClass = declaredType),
+                lineNumber.getOrElse(-1),
+                callerMethod,
+                tgtMethods.toSet
+            )
+        }
+    }
+
+    def convertToCallSites(
+                              callGraph: Map[String, Map[(String, Int), Set[String]]])(implicit project: Project[URL]): CallSites = {
         var resultingCallSites = Set.empty[CallSite]
 
         for {
             (caller, callSites) ← callGraph
         } {
             val callerMethod = toMethod(caller)
-            p.classFile(toObjectType(callerMethod.declaringClass)) match {
+            project.classFile(toObjectType(callerMethod.declaringClass)) match {
                 case Some(cf) ⇒
+                    implicit val classFile: ClassFile = cf
                     val returnType = ReturnType(callerMethod.returnType)
                     val parameterTypes = callerMethod.parameterTypes.map(FieldType.apply)
                     val md = MethodDescriptor(parameterTypes.toIndexedSeq, returnType)
+
                     cf.findMethod(callerMethod.name, md) match {
                         case Some(callerOpal) if callerOpal.body.isDefined ⇒
                             for (((declaredTgt, number), tgts) ← callSites) {
-                                assert(tgts.nonEmpty)
-                                val firstTgt = toMethod(tgts.head)
-                                val tgtReturnType = ReturnType(firstTgt.returnType)
-                                val tgtParamTypes = firstTgt.parameterTypes.map(FieldType.apply)
-                                val tgtMD = MethodDescriptor(tgtParamTypes.toIndexedSeq, tgtReturnType)
-                                val split = declaredTgt.split("""\.""")
-                                val declaredType = s"L${split.slice(0, split.size - 1).mkString("/")};"
-                                val name = split.last.replace("'", "")
-                                val tgtMethods = tgts.map(toMethod)
-                                val calls = callerOpal.body.get.collect {
-                                    // todo what about lambdas?
-                                    case instr: MethodInvocationInstruction if instr.name == name ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
-                                }
-
-                                assert(calls.size > number)
-                                val pc = calls(number).pc
-                                val lineNumber = callerOpal.body.get.lineNumber(pc)
-
-                                resultingCallSites += CallSite(
-                                    firstTgt.copy(declaringClass = declaredType),
-                                    lineNumber.getOrElse(-1),
-                                    callerMethod,
-                                    tgtMethods.toSet
+                                resultingCallSites += computeCallSite(
+                                    declaredTgt, number, tgts, callerMethod, callerOpal
                                 )
 
                             }
@@ -168,23 +209,23 @@ object DoopAdapter extends JCGTestAdapter {
         if (t.endsWith("[]"))
             s"[${toJVMType(t.substring(0, t.length - 2))}"
         else t match {
-            case "byte"    ⇒ "B"
-            case "short"   ⇒ "S"
-            case "int"     ⇒ "I"
-            case "long"    ⇒ "J"
-            case "float"   ⇒ "F"
-            case "double"  ⇒ "D"
+            case "byte" ⇒ "B"
+            case "short" ⇒ "S"
+            case "int" ⇒ "I"
+            case "long" ⇒ "J"
+            case "float" ⇒ "F"
+            case "double" ⇒ "D"
             case "boolean" ⇒ "Z"
-            case "char"    ⇒ "C"
-            case "void"    ⇒ "V"
-            case _         ⇒ s"L${t.replace(".", "/")};"
+            case "char" ⇒ "C"
+            case "void" ⇒ "V"
+            case _ ⇒ s"L${t.replace(".", "/")};"
 
         }
     }
 
     def toObjectType(jvmRefType: String): ObjectType = {
-        assert(jvmRefType.size > 2)
-        ObjectType(jvmRefType.substring(1, jvmRefType.size - 1))
+        assert(jvmRefType.length > 2)
+        ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
 
 }
