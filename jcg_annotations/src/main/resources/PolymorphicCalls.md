@@ -25,12 +25,12 @@ class Class {
 [//]: # (END)
 
 ##BPC2
-[//]: # (MAIN: bpc2/Class)
+[//]: # (MAIN: bpc/Class)
 Tests a virtually dispatched method call when a simple type hierarchy is present.
 
 ```java
-// bpc2/Class.java
-package bpc2;
+// bpc/Class.java
+package bpc;
 
 import lib.annotations.callgraph.CallSite;
 
@@ -38,10 +38,13 @@ class Class {
     
     public void method(){ }
     
-    @CallSite(name = "method", line = 12, resolvedTargets = "Lbpc2/SubClass;")
-    public static void main(String[] args){ 
-        Class cls = new SubClass();
+    @CallSite(name = "method", line = 11, resolvedTargets = "Lbpc/SubClass;")
+    public static void callMethod(Class cls) {
         cls.method();
+    }
+    
+    public static void main(String[] args){
+        callMethod(new SubClass());
     }
 }
 
@@ -66,11 +69,11 @@ interface Interface {
     void method();
 }
 
-class Class implements Interface {
+class Class {
     
     public void method(){ }
  
-    @CallSite(name = "method", line = 15, resolvedTargets = "Lbpc3/ClassImpl;")
+    @CallSite(name = "method", line = 15, resolvedTargets = {"Lbpc3/ClassImpl;"}, prohibitedTargets ={"Lbpc3/Class"})
     public static void callOnInterface(Interface i){
         i.method();
     }
@@ -114,35 +117,6 @@ class Class implements Interface {
 }
 
 class ClassImpl implements Interface {
-    public void method(){ }
-}
-```
-[//]: # (END)
-
-##BPC5
-[//]: # (MAIN: bpc5/Class)
-Tests a virtually dispatched method call should not be dispatched to methods with the same signature
-when the types are in no relation.
-from the super class.
-
-```java
-// bpc5/Class.java
-package bpc5;
-
-import lib.annotations.callgraph.CallSite;
-
-class Class {
-    
-    public void method(){ }
- 
-    @CallSite(name = "method", line = 12, resolvedTargets = "Lbpc5/Class;", prohibitedTargets = "Lbpc5/DifferentClass;")
-    public static void main(String[] args){
-        Class cls = new Class();
-        cls.method();
-    }
-}
-
-class DifferentClass {
     public void method(){ }
 }
 ```

@@ -11,6 +11,10 @@ interface respectively without overriding the respective method which leads to i
 that must be additionally resolved to the class' method. We refer to those edges as call-by-signature
 (CBS) edges. 
 
+According to [1], all test cases in that category assume that all packages are closed.
+ 
+[1] Reif et al., Call Graph Construction for Java Libraries, FSE 2016.
+
 ##LIB1
 [//]: # (LIBRARY)
 Tests virtual call resolution in the context of libraries where the calling context is unknown. 
