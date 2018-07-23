@@ -100,13 +100,13 @@ class SuperClass{
 [//]: # (END)
 
 ##MR4
-[//]: # (MAIN: mr4/Class)
+[//]: # (MAIN: mr/Class)
 Tests method reference that result in an *INVOKESPECIAL* call issued by calling a static method
 from a super class.
 
 ```java
-// mr4/Class.java
-package mr4;
+// mr/Class.java
+package mr;
 
 import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
@@ -115,25 +115,25 @@ class Class {
     
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 13,
-       resolvedTargets = "Lmr4/Class;")
+       resolvedTargets = "Lmr/Class;")
     public static void main(String[] args){     
         Supplier<String> stringSupplier = Class::getTypeName;
         stringSupplier.get();
     }
     
-    static String getTypeName() { return "Lmr4/Class"; }
+    static String getTypeName() { return "Lmr/Class"; }
 }
 ```
 [//]: # (END)
 
 ##MR5
-[//]: # (MAIN: mr5/Class)
+[//]: # (MAIN: mr/Class)
 Tests method reference dealing with primitive type parameters.
 from a super class.
 
 ```java
-// mr5/Class.java
-package mr5;
+// mr/Class.java
+package mr;
 
 import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
@@ -148,7 +148,7 @@ class Class {
     
     @IndirectCall(
        name = "sum", returnType = double.class, line = 19,
-       resolvedTargets = "Lmr5/Class;")
+       resolvedTargets = "Lmr/Class;")
     public static void main(String[] args){     
         FIDoubleDouble fidd = Class::sum;
         fidd.apply(1d,2d);
@@ -158,12 +158,12 @@ class Class {
 [//]: # (END)
 
 ##MR6
-[//]: # (MAIN: mr6/Class)
+[//]: # (MAIN: mr/Class)
 Tests method reference that result in a constructor call.
 
 ```java
-// mr6/Class.java
-package mr6;
+// mr/Class.java
+package mr;
 
 import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
@@ -173,7 +173,7 @@ class Class {
     public Class(){}
     
     @IndirectCall(
-       name = "<init>", line = 14, resolvedTargets = "Lmr6/Class;")
+       name = "<init>", line = 14, resolvedTargets = "Lmr/Class;")
     public static void main(String[] args){     
         Supplier<Class> classSupplier = Class::new;
         classSupplier.get();
@@ -183,12 +183,12 @@ class Class {
 [//]: # (END)
 
 ##MR7
-[//]: # (MAIN: mr7/Class)
+[//]: # (MAIN: mr/Class)
 Tests method reference that result in a method invocation where the method is defined in a super class.
 
 ```java
-// mr7/Class.java
-package mr7;
+// mr/Class.java
+package mr;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -196,7 +196,7 @@ class Class extends SuperClass{
     
     @IndirectCall(
        name = "version", returnType = String.class, line = 13,
-       resolvedTargets = "Lmr7/SuperClass;")
+       resolvedTargets = "Lmr/SuperClass;")
     public static void main(String[] args){
         Class cls = new Class();
         java.util.function.Supplier<String> classSupplier = cls::version;
@@ -214,19 +214,19 @@ class SuperClass {
 Test cases in the presence of lambdas.
 
 ##Lambda1
-[//]: # (MAIN: lambda1/Class)
+[//]: # (MAIN: lambda/Class)
 Tests the invocation of a lambda with a integer boxing.
 
 ```java
-// lambda1/Class.java
-package lambda1;
+// lambda/Class.java
+package lambda;
 
 import lib.annotations.callgraph.IndirectCall;
 import java.util.function.Function;
 
 class Class {
     @IndirectCall(
-       name = "doSomething", line = 11, resolvedTargets = "Llambda1/Class;")
+       name = "doSomething", line = 11, resolvedTargets = "Llambda/Class;")
     public static void main(String[] args){
         Function<Integer, Boolean> isEven = (Integer a) -> {
             doSomething();
@@ -243,193 +243,20 @@ class Class {
 [//]: # (END)
 
 ##Lambda2
-[//]: # (MAIN: lambda2/Class)
-Tests the invocation of a higher-order lambda predicate.
-
-```java
-// lambda2/Class.java
-package lambda2;
-
-import java.util.function.Predicate;
-import lib.annotations.callgraph.IndirectCall;
-import lib.annotations.callgraph.IndirectCalls;
-
-class Class {
-    @IndirectCalls({
-        @IndirectCall(
-           name = "doSomething", line = 16, resolvedTargets = "Llambda2/Class;"),
-       @IndirectCall(
-           name = "doSomething", line = 20, resolvedTargets = "Llambda2/Class;")
-       })
-    public static void main(String[] args){
-        Predicate<Predicate<String>> acceptsEmptyString = ((Predicate<String> p) -> {
-            doSomething();
-            return p.test("");
-        });
-        acceptsEmptyString.test((String s) -> {
-            doSomething();
-            return s.isEmpty();
-        });
-    }
-    
-    private static void doSomething(){ 
-        // call in lamdba
-    }
-}
-```
-[//]: # (END)
-
-##Lambda3
-[//]: # (MAIN: lambda3/Class)
-Tests the invocation of nested lambda.
-
-```java
-// lambda3/Class.java
-package lambda3;
-
-import java.util.function.Predicate;
-import lib.annotations.callgraph.IndirectCall;
-import lib.annotations.callgraph.IndirectCalls;
-
-class Class {
-    @IndirectCalls({
-        @IndirectCall(
-           name = "doSomething", line = 19, resolvedTargets = "Llambda3/Class;"),
-       @IndirectCall(
-           name = "doSomething", line = 22, resolvedTargets = "Llambda3/Class;")
-       })
-    public static void main(String[] args){
-        Predicate<String> outer = (String s) -> {
-            Predicate<Character> inner = (Character c) -> c > 31;
-            for(char c : s.toCharArray()){
-                boolean test = inner.test(c);
-                doSomething();
-                if(!test) return false;
-            }
-            doSomething();
-            return true;
-        };
-        outer.test("NestedLambdas");
-    }
-    
-    private static void doSomething(){ 
-        // call in lambda
-    } 
-}
-```
-[//]: # (END)
-
-##Lambda4
-[//]: # (MAIN: lambda4/Class)
+[//]: # (MAIN: lambda/Class)
 Tests the invocation on an object receiver captured in a lambda.
 
 ```java
-// lambda4/Class.java
-package lambda4;
+// lambda/Class.java
+package lambda;
 
-import lib.annotations.callgraph.IndirectCalls;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
-    
-    @FunctionalInterface interface Runnable {
-        void run();
-    }
-    
-    public static final Class cls = new SubClass();
-    public static Class pCls = new SubClass();
-    
-    @IndirectCalls({
-        @IndirectCall(name = "doSomething", line = 22, resolvedTargets = "Llambda4/SubClass;"),
-        @IndirectCall(name = "doSomething", line = 23, resolvedTargets = "Llambda4/SubClass;"),
-        @IndirectCall(name = "doSomething", line = 24, resolvedTargets = "Llambda4/SubClass;")
-    })
-    public static void main(String[] args){
-        Class lCls = new SubClass();
-        Runnable psfField = () -> cls.doSomething();
-        Runnable psField = () -> pCls.doSomething();
-        Runnable localVar = () -> lCls.doSomething();
-        
-        psfField.run();
-        psField.run();
-        localVar.run();
-    }
-    
-    public void doSomething(){ }
-}
-
-class SubClass extends Class {
-    public void doSomething(){ }
-}
-
-class SubSubClass extends SubClass {
-    public void doSomething(){ }
-}
-```
-[//]: # (END)
-
-##Lambda5
-[//]: # (MAIN: lambda5/Class)
-Tests the invocation on an object receiver captured in a lambda.
-
-```java
-// lambda5/Class.java
-package lambda5;
-
-import lib.annotations.callgraph.CallSites;
-import lib.annotations.callgraph.CallSite;
-
-class Class {
-    
-    @FunctionalInterface interface Runnable {
-        void run();
-    }
     
     public static void doSomething(){ }
     
-    @CallSites({
-        @CallSite(name = "equals", line = 26, resolvedTargets = "Ljava/lang/Object;"),
-        @CallSite(name = "getClass", line = 27, resolvedTargets = "Ljava/lang/Object;"),
-        @CallSite(name = "hashCode", line = 28, resolvedTargets = "Ljava/lang/Object;"),
-        @CallSite(name = "notify", line = 29, resolvedTargets = "Ljava/lang/Object;"),
-        @CallSite(name = "notifyAll", line = 30, resolvedTargets = "Ljava/lang/Object;"),
-        @CallSite(name = "toString", line = 31, resolvedTargets = "Ljava/lang/Object;"),
-        @CallSite(name = "wait", line = 32, resolvedTargets = "Ljava/lang/Object;")
-    })
-    public static void main(String[] args) throws InterruptedException {
-        Runnable lambda = () -> doSomething();
-        Object o = new Object();
-        lambda.equals(o);
-        lambda.getClass();
-        lambda.hashCode();
-        lambda.notify();
-        lambda.notifyAll();
-        lambda.toString();
-        lambda.wait();
-    }
-}
-```
-[//]: # (END)
-
-##Lambda6
-[//]: # (MAIN: lambda6/Class)
-Tests the invocation on an object receiver captured in a lambda.
-
-```java
-// lambda6/Class.java
-package lambda6;
-
-import lib.annotations.callgraph.IndirectCall;
-
-class Class {
-    
-    @FunctionalInterface interface Runnable {
-        void run();
-    }
-    
-    public static void doSomething(){ }
-    
-    @IndirectCall(name = "doSomething", line = 17, resolvedTargets = "Llambda6/LambdaProvider;")
+    @IndirectCall(name = "doSomething", line = 17, resolvedTargets = "Llambda/LambdaProvider;")
     public static void main(String[] args) {
         Runnable lambda = LambdaProvider.getRunnable();
         
@@ -443,20 +270,28 @@ class LambdaProvider {
         /* do something */
     }
     
-    public static Class.Runnable getRunnable(){
+    public static lambda.Runnable getRunnable(){
         return () -> LambdaProvider.doSomething(); 
     }
 }
 ```
+```java
+// lambda/Runnable.java
+package lambda;
+
+@FunctionalInterface interface Runnable {
+    void run();
+}
+```
 [//]: # (END)
 
-##Lambda7
-[//]: # (MAIN: lambda7/Class)
+##Lambda3
+[//]: # (MAIN: lambda/Class)
 Tests the invocation of a lambda when it was written to an array and later retrieved and applied.
 
 ```java
-// lambda7/Class.java
-package lambda7;
+// lambda/Class.java
+package lambda;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -472,7 +307,7 @@ class Class {
 
     public static Runnable[] lambdaArray = new Runnable[10];
 
-    @IndirectCall(name = "doSomething", line = 25, resolvedTargets = "Llambda7/Class;")       
+    @IndirectCall(name = "doSomething", line = 25, resolvedTargets = "Llambda/Class;")       
     public static void main(String[] args) {
         Runnable r1 = () -> doSomething();
         lambdaArray[0] = r1;
@@ -490,13 +325,13 @@ final class Math {
 ```
 [//]: # (END)
 
-##Lambda8
-[//]: # (MAIN: lambda8/Class)
+##Lambda4
+[//]: # (MAIN: lambda/Class)
 Tests the invocation of an intersection type lambda. 
 
 ```java
-// lambda8/Class.java
-package lambda8;
+// lambda/Class.java
+package lambda;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -513,7 +348,7 @@ class Class {
         /* do something */
     }
 
-    @IndirectCall(name = "doSomething", line = 21, resolvedTargets = "Llambda8/Class;")       
+    @IndirectCall(name = "doSomething", line = 21, resolvedTargets = "Llambda/Class;")       
     public static void main(String[] args) {
         Runnable run = (Runnable & MyMarkerInterface1 & MyMarkerInterface2) () -> doSomething();
         run.run();
