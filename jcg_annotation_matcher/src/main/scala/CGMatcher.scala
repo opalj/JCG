@@ -246,7 +246,7 @@ object CGMatcher {
     }
 
     def main(args: Array[String]): Unit = {
-        matchCallSites(args(0), args(1), verbose = true)
+        println(matchCallSites(args(0), args(1), verbose = true))
     }
 
     def convertMethod(method: org.opalj.br.Method): Method = {

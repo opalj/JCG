@@ -31,6 +31,14 @@ lazy val jcg_soot_testadapter = project.settings(
 //    aggregate in assembly := false
 //).dependsOn(jcg_testadapter_commons)
 
+lazy val jcg_doop_testadapter = project.settings(
+    commonSettings,
+    aggregate in assembly := false
+).dependsOn(
+    jcg_annotation_matcher,
+    jcg_testadapter_commons
+)
+
 lazy val jcg_testadapter_commons = project.settings(
     commonSettings,
     aggregate in assembly := false
