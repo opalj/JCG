@@ -1,8 +1,9 @@
 javacOptions in ThisBuild ++= Seq("-parameters")
 
 lazy val commonSettings = Seq(
-    scalaVersion := "2.12.4",
+    scalaVersion := "2.12.6",
     organization := "de.tu-darmstadt.stg",
+    resolvers += Resolver.sonatypeRepo("snapshots"),
     version := "0.1"
 )
 

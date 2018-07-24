@@ -21,8 +21,6 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
 
-import scala.collection.Map
-import scala.collection.Set
 import scala.collection.mutable
 import scala.io.Source
 
@@ -55,12 +53,14 @@ object DoopAdapter extends JCGTestAdapter {
             val source = Source.fromFile(doopResult)
             val tgtJar = new File(s"result/${doopResult.getName.replace(".txt", "")}")
             println(s"${tgtJar.getName}")
-            createJsonRepresentation(source, tgtJar, jreDir)
+            val outFile = createJsonRepresentation(source, tgtJar, jreDir)
+            println(CGMatcher.matchCallSites(tgtJar.getAbsolutePath, outFile.getAbsolutePath))
+
         }
 
     }
 
-    def createJsonRepresentation(doopResult: Source, tgtJar: File, jreDir: File): Unit = {
+    def createJsonRepresentation(doopResult: Source, tgtJar: File, jreDir: File): File = {
         implicit val p: Project[URL] = Project(Array(tgtJar, jreDir), Array.empty[File])
 
         val callGraph = extractDoopCG(doopResult)
@@ -72,13 +72,16 @@ object DoopAdapter extends JCGTestAdapter {
         implicit val callSitesReads: Writes[CallSites] = Json.writes[CallSites]
 
         val callSitesJson: JsValue = Json.toJson(resultingCallSites)
-        val pw = new PrintWriter(new File(s"${tgtJar.getName.replace(".jar", ".json")}"))
+        val outFile = new File(s"${tgtJar.getName.replace(".jar", ".json")}")
+        val pw = new PrintWriter(outFile)
         pw.write(Json.prettyPrint(callSitesJson))
         pw.close()
+        outFile
     }
 
     def resolveBridgeMethod(
-                               bridgeMethod: org.opalj.br.Method)(implicit classFile: ClassFile, p: SomeProject
+                               bridgeMethod: org.opalj.br.Method)
+                           (implicit classFile: ClassFile, p: SomeProject
                            ): org.opalj.br.Method = {
         val methods = classFile.findMethod(bridgeMethod.name).filter { m ⇒
             !m.isBridge && (m.returnType match {
@@ -127,7 +130,7 @@ object DoopAdapter extends JCGTestAdapter {
                 firstTgt.copy(declaringClass = declaredType),
                 lineNumber.getOrElse(-1),
                 callerMethod,
-                tgtMethods.toSet
+                tgtMethods
             )
         }
     }
@@ -190,7 +193,7 @@ object DoopAdapter extends JCGTestAdapter {
             }
         }
         doopResult.close()
-        callGraph
+        callGraph.map { case (k, v) => k -> v.map { case (k, v) => k -> v.toSet }.toMap }.toMap
     }
 
     def toMethod(methodStr: String): Method = {
