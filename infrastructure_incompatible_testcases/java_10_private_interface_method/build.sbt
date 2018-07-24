@@ -1,0 +1,1 @@
+name := "Java 10 Private Interface Method"
