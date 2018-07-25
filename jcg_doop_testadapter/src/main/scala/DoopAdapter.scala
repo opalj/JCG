@@ -47,6 +47,9 @@ object DoopAdapter extends JCGTestAdapter {
         val doopResults = new File(args(0)).listFiles(f ⇒ f.isFile && f.getName.endsWith(".jar.txt"))
         val jreDir = new File(args(1))
 
+        if (!jreDir.exists())
+            throw new IllegalArgumentException()
+
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
         for (doopResult ← doopResults) {
@@ -80,9 +83,8 @@ object DoopAdapter extends JCGTestAdapter {
     }
 
     def resolveBridgeMethod(
-                               bridgeMethod: org.opalj.br.Method)
-                           (implicit classFile: ClassFile, p: SomeProject
-                           ): org.opalj.br.Method = {
+        bridgeMethod: org.opalj.br.Method
+    )(implicit classFile: ClassFile, p: SomeProject): org.opalj.br.Method = {
         val methods = classFile.findMethod(bridgeMethod.name).filter { m ⇒
             !m.isBridge && (m.returnType match {
                 case rt: ReferenceType ⇒ p.classHierarchy.isSubtypeOf(
@@ -96,13 +98,14 @@ object DoopAdapter extends JCGTestAdapter {
     }
 
     def computeCallSite(
-                           declaredTgt: String,
-                           number: Int,
-                           tgts: Set[String],
-                           callerMethod: Method,
-                           callerOpal: org.opalj.br.Method,
-                       )(implicit classFile: ClassFile,
-                         project: SomeProject): CallSite = {
+        declaredTgt:  String,
+        number:       Int,
+        tgts:         Set[String],
+        callerMethod: Method,
+        callerOpal:   org.opalj.br.Method
+    )(implicit
+        classFile: ClassFile,
+      project: SomeProject): CallSite = {
         assert(tgts.nonEmpty)
         val firstTgt = toMethod(tgts.head)
         val tgtReturnType = ReturnType(firstTgt.returnType)
@@ -115,7 +118,7 @@ object DoopAdapter extends JCGTestAdapter {
         val calls = callerOpal.body.get.collect {
             // todo what about lambdas?
             case instr: MethodInvocationInstruction if instr.name == name ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
-            case instr: INVOKEDYNAMIC ⇒ instr
+            case instr: INVOKEDYNAMIC                                     ⇒ instr
             //throw new Error()
         }
 
@@ -136,7 +139,8 @@ object DoopAdapter extends JCGTestAdapter {
     }
 
     def convertToCallSites(
-                              callGraph: Map[String, Map[(String, Int), Set[String]]])(implicit project: Project[URL]): CallSites = {
+        callGraph: Map[String, Map[(String, Int), Set[String]]]
+    )(implicit project: Project[URL]): CallSites = {
         var resultingCallSites = Set.empty[CallSite]
 
         for {
@@ -193,7 +197,7 @@ object DoopAdapter extends JCGTestAdapter {
             }
         }
         doopResult.close()
-        callGraph.map { case (k, v) => k -> v.map { case (k, v) => k -> v.toSet }.toMap }.toMap
+        callGraph.map { case (k, v) ⇒ k → v.map { case (k, v) ⇒ k → v.toSet }.toMap }.toMap
     }
 
     def toMethod(methodStr: String): Method = {
@@ -212,16 +216,16 @@ object DoopAdapter extends JCGTestAdapter {
         if (t.endsWith("[]"))
             s"[${toJVMType(t.substring(0, t.length - 2))}"
         else t match {
-            case "byte" ⇒ "B"
-            case "short" ⇒ "S"
-            case "int" ⇒ "I"
-            case "long" ⇒ "J"
-            case "float" ⇒ "F"
-            case "double" ⇒ "D"
+            case "byte"    ⇒ "B"
+            case "short"   ⇒ "S"
+            case "int"     ⇒ "I"
+            case "long"    ⇒ "J"
+            case "float"   ⇒ "F"
+            case "double"  ⇒ "D"
             case "boolean" ⇒ "Z"
-            case "char" ⇒ "C"
-            case "void" ⇒ "V"
-            case _ ⇒ s"L${t.replace(".", "/")};"
+            case "char"    ⇒ "C"
+            case "void"    ⇒ "V"
+            case _         ⇒ s"L${t.replace(".", "/")};"
 
         }
     }
