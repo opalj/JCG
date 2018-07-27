@@ -5,7 +5,7 @@ Especially package visibility sometimes permits the resolution to some target me
 public. The following test cases target mostly the method resolution of inter-package method calls.
 
 ##PB1
-[//]: # (MAIN: a/Main)
+[//]: # (MAIN: a.Main)
 Tests the resolution of a call site with a public receiver type (```a.A```) but a package visible method where the
 actual receiver type is a class defined in another package (```b```). The receiver type's class
 (```b.B```) also declares a package visible method with the exact same signature. However,
@@ -51,7 +51,7 @@ public class B extends a.A {
 [//]: # (END)
 
 ##PB2
-[//]: # (MAIN: a/A)
+[//]: # (MAIN: a.A)
 Tests the resolution of a call site with a public receiver type (```a.A```) but a package visible method where the
 actual receiver type is a class defined in same package (```a```). The receiver type's class
 (```a.C```) does not declare a method with the same name and inherits from a public type from another

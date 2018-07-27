@@ -46,7 +46,7 @@ object TestCaseExtractor {
              */
             val reHeaders = ("""(?s)"""+
                 """\#\#([^\n]*)\n"""+ // ##ProjectName
-                """\[//\]: \# \((?:MAIN: ([^\n]*)|LIBRARY)\)\n"""+ // [//]: # (Main: path/to/Main.java) or [//]: # (LIBRARY)
+                """\[//\]: \# \((?:MAIN: ([^\n]*)|LIBRARY)\)\n"""+ // [//]: # (Main: path.to.Main.java) or [//]: # (LIBRARY)
                 """(.*?)"""+ // multiple code snippets
                 """\[//\]: \# \(END\)""").r( // [//]: # (END)
                     "projectName", "mainClass", "body"
@@ -63,6 +63,7 @@ object TestCaseExtractor {
             reHeaders.findAllIn(lines).matchData.foreach { projectMatchResult ⇒
                 val projectName = projectMatchResult.group("projectName")
                 val main = projectMatchResult.group("mainClass")
+                assert(main == null || !main.contains("/"), "invalid main class, use '.' instead of '/'")
                 val srcFiles = re.findAllIn(projectMatchResult.group("body")).matchData.map { matchResult ⇒
                     val packageName = matchResult.group(2)
                     val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
@@ -89,7 +90,6 @@ object TestCaseExtractor {
 
                 val allClassFiles = recursiveListFiles(bin)
                 val allClassFileNames = allClassFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
-
 
                 val jarOpts = Seq(if (main != null) "cfe" else "cf")
                 val outPath = Seq(s"../../../${result.getPath}/$projectName.jar")

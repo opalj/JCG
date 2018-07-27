@@ -2,7 +2,7 @@
 This tests aim to test basic virtual calls.
 
 ##BPC1
-[//]: # (MAIN: bpc1/Class)
+[//]: # (MAIN: bpc1.Class)
 Tests a virtually dispatched method call which is in fact monomorphic.
 
 ```java
@@ -25,7 +25,7 @@ class Class {
 [//]: # (END)
 
 ##BPC2
-[//]: # (MAIN: bpc/Class)
+[//]: # (MAIN: bpc.Class)
 Tests a virtually dispatched method call when a simple type hierarchy is present.
 
 ```java
@@ -56,7 +56,7 @@ class SubClass extends Class {
 [//]: # (END)
 
 ##BPC3
-[//]: # (MAIN: bpc3/Class)
+[//]: # (MAIN: bpc3.Class)
 Tests a virtually dispatched method call when the receiver is an interface type.
 
 ```java
@@ -90,7 +90,7 @@ class ClassImpl implements Interface {
 [//]: # (END)
 
 ##BPC4
-[//]: # (MAIN: bpc4/Class)
+[//]: # (MAIN: bpc4.Class)
 Tests a virtually dispatched method call when the receiver is loaded from an array.
 
 ```java

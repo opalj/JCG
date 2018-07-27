@@ -3,7 +3,7 @@ Tests that relate to this category are typically directly resolvable.
 Hence, it covers static method calls, private calls, constructor calls, super calls, as well as
 calls on the implicit this parameter. Every call of this category is inherently monomorphic.
 ##DC1
-[//]: # (MAIN: dc1/Class)
+[//]: # (MAIN: dc1.Class)
 Tests the resolution of a static method call when another static method with the same name but
 different signature is presence.
 ```java
@@ -26,7 +26,7 @@ class Class {
 [//]: # (END)
 
 ##DC2
-[//]: # (MAIN: dc/Class)
+[//]: # (MAIN: dc.Class)
 Tests the resolution of a constructor call (<init>)
 ```java
 // dc/Class.java
@@ -49,7 +49,7 @@ public class Class {
 [//]: # (END)
 
 ##DC3
-[//]: # (MAIN: dc/Class)
+[//]: # (MAIN: dc.Class)
 Tests the resolution of a private method call when another method with the same name but
 different signature is presence.
 ```java
@@ -73,7 +73,7 @@ class Class {
 [//]: # (END)
 
 ##DC4
-[//]: # (MAIN: dc/Class)
+[//]: # (MAIN: dc.Class)
 Tests the resolution of a super call in the form ```super.<methodName>```. The method call should
 only be propagated to the immediate super class.
 ```java

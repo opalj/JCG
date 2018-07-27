@@ -104,7 +104,7 @@ class Foo {
     public String m(String parameter) { return "Foo" + parameter; }
 
     @IndirectCall(
-        name = "toString", returnType = String.class, parameterTypes = String.class, line = 12,
+        name = "m", returnType = String.class, parameterTypes = String.class, line = 12,
         resolvedTargets = "Ltr5/Foo;"
     )
     void m() throws Exception {

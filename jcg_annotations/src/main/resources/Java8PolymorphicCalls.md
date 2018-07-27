@@ -2,7 +2,7 @@
 Tests the correct method resolution in the presence of Java 8
 interfaces, i.e. default methods.
 ##J8PC1
-[//]: # (MAIN: j8pc1/Class)
+[//]: # (MAIN: j8pc1.Class)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and 
 inherits the method from the inherited interface.
 
@@ -30,7 +30,7 @@ interface Interface {
 [//]: # (END)
 
 ##J8PC2
-[//]: # (MAIN: j8pc2/SuperClass)
+[//]: # (MAIN: j8pc2.SuperClass)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
 where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
 define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
@@ -73,7 +73,7 @@ class SubClass extends SuperClass implements Interface {
 [//]: # (END)
 
 ##J8PC3
-[//]: # (MAIN: j8pc3/SuperClass)
+[//]: # (MAIN: j8pc3.SuperClass)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
 where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
 define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
@@ -116,7 +116,7 @@ class SubClass extends SuperClass implements Interface {
 [//]: # (END)
 
 ##J8PC4
-[//]: # (MAIN: j8pc4/SuperClass)
+[//]: # (MAIN: j8pc4.SuperClass)
 Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
 where the method is only defined in the interface.
 
@@ -152,7 +152,7 @@ class SubClass extends SuperClass implements Interface {
 [//]: # (END)
 
 ##J8PC5
-[//]: # (MAIN: j8pc5/SuperClass)
+[//]: # (MAIN: j8pc5.SuperClass)
 Tests the resolution of a polymorphic calls when a class extends an abstract class that declares an abstract method.
 
 ```java
@@ -217,7 +217,7 @@ interface DirectInterface extends Interface1, Interface2 {
 [//]: # (END)
 
 ##J8PC6
-[//]: # (MAIN: j8pc6/Class)
+[//]: # (MAIN: j8pc6.Class)
 Tests the resolution of static interface methods.
 
 ```java

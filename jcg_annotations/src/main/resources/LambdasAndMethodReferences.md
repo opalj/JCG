@@ -2,7 +2,7 @@
 Test cases in the presence of method references.
 
 ##MR1
-[//]: # (MAIN: mr1/Class)
+[//]: # (MAIN: mr1.Class)
 Tests method reference that deals with interface default methods (Java 8 or higher).
 
 ```java
@@ -37,7 +37,7 @@ interface Interface {
 [//]: # (END)
 
 ##MR2
-[//]: # (MAIN: mr2/Class)
+[//]: # (MAIN: mr2.Class)
 Tests method reference that result in an *INVOKESPECIAL* call issued by calling a private method.
 
 ```java
@@ -67,7 +67,7 @@ class Class {
 [//]: # (END)
 
 ##MR3
-[//]: # (MAIN: mr3/Class)
+[//]: # (MAIN: mr3.Class)
 Tests method reference that result in an *INVOKESPECIAL* call issued by calling a protected method
 from a super class.
 
@@ -100,7 +100,7 @@ class SuperClass{
 [//]: # (END)
 
 ##MR4
-[//]: # (MAIN: mr/Class)
+[//]: # (MAIN: mr.Class)
 Tests method reference that result in an *INVOKESPECIAL* call issued by calling a static method
 from a super class.
 
@@ -127,7 +127,7 @@ class Class {
 [//]: # (END)
 
 ##MR5
-[//]: # (MAIN: mr/Class)
+[//]: # (MAIN: mr.Class)
 Tests method reference dealing with primitive type parameters.
 from a super class.
 
@@ -158,7 +158,7 @@ class Class {
 [//]: # (END)
 
 ##MR6
-[//]: # (MAIN: mr/Class)
+[//]: # (MAIN: mr.Class)
 Tests method reference that result in a constructor call.
 
 ```java
@@ -183,7 +183,7 @@ class Class {
 [//]: # (END)
 
 ##MR7
-[//]: # (MAIN: mr/Class)
+[//]: # (MAIN: mr.Class)
 Tests method reference that result in a method invocation where the method is defined in a super class.
 
 ```java
@@ -214,7 +214,7 @@ class SuperClass {
 Test cases in the presence of lambdas.
 
 ##Lambda1
-[//]: # (MAIN: lambda/Class)
+[//]: # (MAIN: lambda.Class)
 Tests the invocation of a lambda with a integer boxing.
 
 ```java
@@ -243,7 +243,7 @@ class Class {
 [//]: # (END)
 
 ##Lambda2
-[//]: # (MAIN: lambda/Class)
+[//]: # (MAIN: lambda.Class)
 Tests the invocation on an object receiver captured in a lambda.
 
 ```java
@@ -286,7 +286,7 @@ package lambda;
 [//]: # (END)
 
 ##Lambda3
-[//]: # (MAIN: lambda/Class)
+[//]: # (MAIN: lambda.Class)
 Tests the invocation of a lambda when it was written to an array and later retrieved and applied.
 
 ```java
@@ -326,7 +326,7 @@ final class Math {
 [//]: # (END)
 
 ##Lambda4
-[//]: # (MAIN: lambda/Class)
+[//]: # (MAIN: lambda.Class)
 Tests the invocation of an intersection type lambda. 
 
 ```java

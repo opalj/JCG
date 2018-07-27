@@ -17,7 +17,7 @@ casted, or widened automatically. Please note, those automated operations are no
 > Further information pertaining signature polymorhpic methods can be found withing the JVM spec §2.9.3
 
 ##SPM1
-[//]: # (MAIN: spm1/Class)
+[//]: # (MAIN: spm1.Class)
 This tests checks whether a static method call to a method with polymorphic signature is correctly performed.
 The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findStatic(..)``` and then
 invoked via the MethodHandle's ```invoke``` method. The passed parameter must be casted to
@@ -56,7 +56,7 @@ class Class {
 [//]: # (END)
 
 ##SPM2
-[//]: # (MAIN: spm2/Class)
+[//]: # (MAIN: spm2.Class)
 This tests checks whether a static method call to a method with polymorphic signature is correctly performed.
 The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findStatic(..)``` and then
 invoked via the MethodHandle's ```invoke``` method. The passed parameter must be unboxed to
@@ -95,7 +95,7 @@ class Class {
 [//]: # (END)
 
 ##SPM3
-[//]: # (MAIN: spm3/Class)
+[//]: # (MAIN: spm3.Class)
 This tests checks whether a static method call to a method with polymorphic signature is correctly performed.
 The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findStatic(..)``` and then
 invoked via the MethodHandle's ```invoke``` method. The passed parameter must be widened to
@@ -137,7 +137,7 @@ final class MyString extends MyObject {}
 [//]: # (END)
 
 ##SPM4
-[//]: # (MAIN: spm4/VirtualSPMCall)
+[//]: # (MAIN: spm4.VirtualSPMCall)
 This tests checks whether a virutal method call to a method with polymorphic signature is correctly performed.
 The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findVirtual(..)``` and then
 invoked via the MethodHandle's ```invoke``` method. The method is inherited from the super class.
@@ -178,7 +178,7 @@ class SuperClassWithMethod {
 [//]: # (END)
 
 ##SPM5
-[//]: # (MAIN: spm5/VirtualSPMCall)
+[//]: # (MAIN: spm5.VirtualSPMCall)
 This tests checks whether a virutal method call to a method with polymorphic signature is correctly performed.
 The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findVirtual(..)``` and then
 invoked via the MethodHandle's ```invoke``` method. The method is defined in the class and available
@@ -225,7 +225,7 @@ class SuperClassWithMethod {
 [//]: # (END)
 
 ##SPM6
-[//]: # (MAIN: spm6/VirtualSPMCall)
+[//]: # (MAIN: spm6.VirtualSPMCall)
 This tests checks whether a virutal method call to a method with polymorphic signature is correctly performed.
 The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findVirtual(..)``` and then
 invoked via the MethodHandle's ```invoke``` method. The called method is defined within an interface
@@ -267,7 +267,7 @@ interface Interface {
 [//]: # (END)
 
 ##SPM7
-[//]: # (MAIN: spm7/VirtualSPMCall)
+[//]: # (MAIN: spm7.VirtualSPMCall)
 This tests checks whether a virutal method call to a method with polymorphic signature is correctly performed.
 The ```MethodHandle``` is first retrieved via ```MethodHandles.lookup().findVirtual(..)``` and then
 invoked via the MethodHandle's ```invoke``` method. The ```MethodHandle``` itself points to an interface
