@@ -10,4 +10,3 @@ public @interface CGNotes {
 
     CGNote[] value();
 }
-
