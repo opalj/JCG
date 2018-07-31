@@ -11,15 +11,13 @@ import java.io._
  */
 object Demo {
 
-    @IndirectCall(name = "twice", line = 16, resolvedTargets = Array("Ldemo/Demo;"), returnType= classOf[Int])
-    def m(m : Int => Int) : Unit = {
-        println(m(2))
+    def m(m : AnyRef) : Unit = {
+        println(m.toString)
     }
 
+    @IndirectCall(name = "<init>", line = 14, resolvedTargets = Array("Lscala/Symbol;"), returnType= classOf[scala.Symbol])
     def main(args : Array[String]) : Unit = {
-        m(twice)
+        m('mySymbol)
     }
-
-    def twice(i : Int) : Int = i * 2
 
 }
