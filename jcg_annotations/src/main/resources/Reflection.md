@@ -354,6 +354,83 @@ class Foo {
 ```
 [//]: # (END)
 
+##LRR4
+[//]: # (MAIN: lrr4.Foo)
+Test reflection with respect to a private instance field that is set locally.
+
+```java
+// lrr4/Foo.java
+package lrr4;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString() { return "1"; }
+    private String methodName;
+
+    @IndirectCall(
+        name = "staticToString", returnType = String.class, line = 15,
+        resolvedTargets = "Llrr4/Foo;"
+    )
+    public static void main(String[] args) throws Exception {
+        Foo foo = new Foo();
+        foo.methodName = "staticToString";
+        Foo.class.getDeclaredMethod(foo.methodName).invoke(null);
+    }
+}
+```
+[//]: # (END)
+
+##LRR5
+[//]: # (MAIN: lrr5.Foo)
+Test reflection with respect to a public static field that is set locally.
+
+```java
+// lrr5/Foo.java
+package lrr5;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString() { return "1"; }
+    public static String methodName;
+
+    @IndirectCall(
+        name = "staticToString", returnType = String.class, line = 14,
+        resolvedTargets = "Llrr5/Foo;"
+    )
+    public static void main(String[] args) throws Exception {
+        Foo.methodName = "staticToString";
+        Foo.class.getDeclaredMethod(Foo.methodName).invoke(null);
+    }
+}
+```
+[//]: # (END)
+
+##LRR6
+[//]: # (MAIN: lrr6.Foo)
+Test reflection to an instance method with respect to a private instance field that is set locally.
+
+```java
+// lrr6/Foo.java
+package lrr6;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString() { return "1"; }
+    private String methodName;
+
+    @IndirectCall(
+        name = "staticToString", returnType = String.class, line = 15,
+        resolvedTargets = "Llrr6/Foo;"
+    )
+    public static void main(String[] args) throws Exception {
+        Foo foo = new Foo();
+        foo.methodName = "staticToString";
+        Foo.class.getDeclaredMethod(foo.methodName).invoke(foo);
+    }
+}
+```
+[//]: # (END)
+
 #ContextSensitiveReflection
 The concrete strings require information about the context.
 
@@ -527,6 +604,32 @@ class Foo {
         Object o = Class.forName(args[0]).newInstance();
         if (o instanceof Foo)
             o.toString();
+    }
+}
+```
+[//]: # (END)
+
+
+##CSR7
+[//]: # (MAIN: csr7.Foo)
+Test reflection with respect to a private instance field that is set in the initializer.
+
+```java
+// csr7/Foo.java
+package lrr5;
+
+import lib.annotations.callgraph.IndirectCall;
+class Foo {
+    static String staticToString() { return "1"; }
+    private String methodName = "staticToString";
+
+    @IndirectCall(
+        name = "staticToString", returnType = String.class, line = 14,
+        resolvedTargets = "Lcsr7/Foo;"
+    )
+    public static void main(String[] args) throws Exception {
+        Foo foo = new Foo();
+        Foo.class.getDeclaredMethod(foo.methodName).invoke(null);
     }
 }
 ```
