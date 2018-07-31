@@ -24,8 +24,7 @@ lazy val jcg_annotation_matcher = project.settings(
     commonSettings,
     name := "JCG Annotation Matcher",
     libraryDependencies += "de.opal-project" %% "bytecode-representation" % "1.1.0-SNAPSHOT",
-    aggregate in assembly := false,
-    publishArtifact := false
+    aggregate in assembly := false
 ).dependsOn(jcg_annotations, jcg_testadapter_commons)
 
 lazy val jcg_wala_testadapter = project.settings(
@@ -70,8 +69,7 @@ lazy val jcg_doop_testadapter = project.settings(
 lazy val jcg_testadapter_commons = project.settings(
     commonSettings,
     name := "JCG Test Adapter Commons",
-    aggregate in assembly := false,
-    publishArtifact := false
+    aggregate in assembly := false
 )
 
 lazy val jcg_evaluation = project.settings(
