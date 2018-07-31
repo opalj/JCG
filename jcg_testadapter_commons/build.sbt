@@ -1,1 +1,1 @@
-name := "JCG Test Adapter Commons"
+// see main build file for ALL settings
