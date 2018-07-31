@@ -10,10 +10,12 @@ import soot.jimple.Stmt;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
 import soot.util.backend.ASMBackendUtils;
-
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 public class SootJCGAdatper implements JCGTestAdapter {
 
@@ -36,7 +38,7 @@ public class SootJCGAdatper implements JCGTestAdapter {
     }
 
     @Override
-    public void serializeCG(String algorithm, String target, String classPath, String outputFile) {
+    public void serializeCG(String algorithm, String target, String[] classPath, String outputFile) {
         FluentOptions options = new FluentOptions();
         options.wholeProgramAnalysis();
         options.keepLineNumbers();
@@ -77,7 +79,8 @@ public class SootJCGAdatper implements JCGTestAdapter {
 
 
         AnalysisTarget analysisTarget = new AnalysisTarget();
-        analysisTarget.classPath(classPath);
+        String cp = Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator));
+        analysisTarget.classPath(cp);
         analysisTarget.processPath(target);
 
         SootRun run = new SootRun(options, analysisTarget);
@@ -135,8 +138,8 @@ public class SootJCGAdatper implements JCGTestAdapter {
     public static void main(String[] args) {
         String cgAlgorithm = args[0];
         String targetJar = args[1];
-        String cp = args[2];
-        String outputPath = args[3];
+        String outputPath = args[2];
+        String[] cp = Arrays.copyOfRange(args, 3, args.length);
 
         new SootJCGAdatper().serializeCG(cgAlgorithm, targetJar, cp, outputPath);
     }

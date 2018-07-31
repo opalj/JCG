@@ -35,7 +35,7 @@ object Evaluation {
                     ow.write(s"${adapter.frameworkName()} $cgAlgo")
                     for (tgt ← jars) {
                         try {
-                            adapter.serializeCG(cgAlgo, tgt.getAbsolutePath, rtJar, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
+                            adapter.serializeCG(cgAlgo, tgt.getAbsolutePath, Array(rtJar), s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
                             System.gc()
                             val result = CGMatcher.matchCallSites(tgt.getAbsolutePath, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
                             ow.write(s"\t${result.shortNotation}")
