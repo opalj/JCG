@@ -1,3 +1,1 @@
-name := "JCG Annotations"
-
-libraryDependencies += "commons-io" % "commons-io" % "2.5"
+// see main build file for ALL settings
