@@ -16,7 +16,9 @@ import org.json.simple.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 public class WalaJCGAdapter implements JCGTestAdapter {
 
@@ -34,17 +36,22 @@ public class WalaJCGAdapter implements JCGTestAdapter {
 
     public static void main(String[] args) throws Exception {
         String cgAlgorithm = args[0];
-        String testfile = args[1];
+        String targetJar = args[1];
         String outputPath = args[2];
+        String[] cp = Arrays.copyOfRange(args, 3, args.length);
 
-        new WalaJCGAdapter().serializeCG(cgAlgorithm, testfile, null, outputPath);
+        new WalaJCGAdapter().serializeCG(cgAlgorithm, targetJar, cp, outputPath);
     }
 
     @Override
-    public void serializeCG(String algorithm, String target, String classPath, String outputFile) throws Exception {
+    public void serializeCG(String algorithm, String target, String[] classPath, String outputFile) throws Exception {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        String cp = Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator));
+        cp = target + File.pathSeparator + cp;
+
         File ex = new File(cl.getResource("exclusions.txt").getFile());
-        AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(target, ex);
+        AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex);
 
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
 

@@ -36,8 +36,6 @@ class DevNullLogger extends OPALLogger {
 
 object DoopAdapter extends JCGTestAdapter {
 
-    override def serializeCG(algorithm: String, target: String, classPath: String, outputFile: String): Unit = ???
-
     override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
 
     override def frameworkName(): String = "Doop"
@@ -89,7 +87,7 @@ object DoopAdapter extends JCGTestAdapter {
             !m.isBridge && (m.returnType match {
                 case rt: ReferenceType ⇒ p.classHierarchy.isSubtypeOf(
                     rt, bridgeMethod.returnType.asReferenceType
-                ).isYes
+                )
                 case rt ⇒ rt == bridgeMethod.returnType
             })
         }
@@ -235,4 +233,5 @@ object DoopAdapter extends JCGTestAdapter {
         ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
 
+    override def serializeCG(algorithm: String, target: String, classPath: Array[String], outputFile: String): Unit = ???
 }
