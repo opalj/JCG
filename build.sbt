@@ -16,6 +16,8 @@ lazy val jcg_annotations = project.settings(
     commonSettings,
     name := "JCG Annotations",
     libraryDependencies += "commons-io" % "commons-io" % "2.5",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
+    libraryDependencies += "org.apache.ivy" % "ivy" % "2.4.0",
     aggregate in assembly := false,
     compileOrder := CompileOrder.Mixed
 )
