@@ -44,6 +44,7 @@ object Evaluation {
                                     adapter.serializeCG(
                                         cgAlgo,
                                         projectSpecification.target,
+                                        projectSpecification.main.orNull,
                                         Array(rtJar) ++ projectSpecification.cp.toArray.flatten.flatMap(_.getLocations).map(_.getAbsolutePath),
                                         s"${adapter.frameworkName()}-$cgAlgo-${projectSpecification.name}.json"
                                     )
