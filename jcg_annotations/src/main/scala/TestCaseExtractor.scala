@@ -1,19 +1,19 @@
 import java.io.File
 import java.io.PrintWriter
 
+import coursier.Cache
+import coursier.Module
+import coursier.Dependency
+import coursier.Fetch
+import coursier.FileError
+import coursier.Resolution
+import coursier.maven.MavenRepository
 import javax.tools.ToolProvider
 
 import scala.io.Source
 import org.apache.commons.io.FileUtils
-import org.apache.ivy.Ivy
-import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor
-import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor
-import org.apache.ivy.core.module.id.ModuleRevisionId
-import org.apache.ivy.core.resolve.ResolveOptions
-import org.apache.ivy.core.settings.IvySettings
-import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter
-import org.apache.ivy.plugins.resolver.URLResolver
 import play.api.libs.json._
+import scalaz.\/
 
 case class ProjectSpecification(
     name: String, target: String, main: Option[String], java: Int, cp: Option[Array[ClassPathEntry]]
@@ -24,7 +24,7 @@ object ProjectSpecification {
 }
 
 sealed trait ClassPathEntry {
-    def getLocation: File
+    def getLocations: Seq[File]
 }
 object ClassPathEntry {
     implicit val classPathEntryReads: Reads[ClassPathEntry] =
@@ -36,46 +36,16 @@ object ClassPathEntry {
     }
 }
 case class MavenClassPathEntry(org: String, id: String, version: String) extends ClassPathEntry {
-    override def getLocation: File = {
-        //creates clear ivy settings
-        val ivySettings = new IvySettings()
-        //url resolver for configuration of maven repo
-        val resolver = new URLResolver()
-        resolver.setM2compatible(true)
-        resolver.setName("central")
-        //you can specify the url resolution pattern strategy
-        resolver.addArtifactPattern(
-            "http://repo1.maven.org/maven2/[organisation]/[module]/[revision]/[artifact](-[revision]).[ext]"
-        )
-        //adding maven repo resolver
-        ivySettings.addResolver(resolver)
-        //set to the default resolver
-        ivySettings.setDefaultResolver(resolver.getName)
-        //creates an Ivy instance with settings
-        val ivy = Ivy.newInstance(ivySettings)
+    override def getLocations: Seq[File] = {
+        val start = Resolution(Set(Dependency(Module(org, id), version)))
+        val repositories = Seq(Cache.ivy2Local, MavenRepository("https://repo1.maven.org/maven2"))
+        val fetch = Fetch.from(repositories, Cache.fetch())
 
-        val ivyfile = File.createTempFile("ivy", ".xml")
-        ivyfile.deleteOnExit()
+        val resolution = start.process.run(fetch).unsafePerformSync
+        val r: Seq[\/[FileError, File]] = resolution.artifacts.map(Cache.file(_).run).map(_.unsafePerformSync)
+        assert(r.forall(_.isRight))
 
-        val dep = Array(org, id, version)
-
-        val md =
-            DefaultModuleDescriptor.newDefaultInstance(ModuleRevisionId.newInstance(dep(0), dep(1)+"-caller", "working"))
-
-        val dd = new DefaultDependencyDescriptor(md, ModuleRevisionId.newInstance(dep(0), dep(1), dep(2)), false, false, true)
-        md.addDependency(dd)
-
-        //creates an ivy configuration file
-        XmlModuleDescriptorWriter.write(md, ivyfile)
-
-        val confs = Array("default")
-        val resolveOptions = new ResolveOptions().setConfs(confs)
-
-        //init resolve report
-        val report = ivy.resolve(ivyfile.toURL, resolveOptions)
-
-        //so you can get the jar library
-        report.getAllArtifactsReports()(0).getLocalFile
+        r.map(_.toOption.get)
     }
 }
 object MavenClassPathEntry {
@@ -84,7 +54,7 @@ object MavenClassPathEntry {
 }
 
 case class LocalClassPathEntry(path: String) extends ClassPathEntry {
-    override def getLocation: File = new File(path)
+    override def getLocations: Seq[File] = Seq(new File(path))
 }
 object LocalClassPathEntry {
     implicit val reader: Reads[LocalClassPathEntry] = Json.reads[LocalClassPathEntry]

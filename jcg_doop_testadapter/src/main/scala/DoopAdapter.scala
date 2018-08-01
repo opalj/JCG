@@ -37,7 +37,6 @@ class DevNullLogger extends OPALLogger {
 object DoopAdapter extends JCGTestAdapter {
 
     override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
-
     override def frameworkName(): String = "Doop"
 
     def main(args: Array[String]): Unit = {
@@ -233,5 +232,11 @@ object DoopAdapter extends JCGTestAdapter {
         ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
 
-    override def serializeCG(algorithm: String, target: String, classPath: Array[String], outputFile: String): Unit = ???
+    override def serializeCG(
+        algorithm:  String,
+        target:     String,
+        mainClass:  String,
+        classPath:  Array[String],
+        outputFile: String
+    ): Unit = ???
 }
