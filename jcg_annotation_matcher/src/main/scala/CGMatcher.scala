@@ -34,6 +34,8 @@ class DevNullLogger extends OPALLogger {
 
 object CGMatcher {
 
+    val DEBUG = false
+
     val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/CallSite")
     val callSitesAnnotationType = ObjectType("lib/annotations/callgraph/CallSites")
     val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
@@ -67,6 +69,8 @@ object CGMatcher {
                                     (body.lineNumber(pc), instr.asInvocationInstruction.name)
                             }.toSet
                             if (lines.size != invokations.length) {
+                                if(DEBUG)
+                                    println(invokations.map(x => x._1.toLabeledInstruction(x._2)).mkString(";\n"))
                                 throw new RuntimeException(s"Multiple call sites with same name in the same line $tgtJar, ${method.name}")
                             }
                         }

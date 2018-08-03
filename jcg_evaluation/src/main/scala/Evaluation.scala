@@ -8,7 +8,7 @@ import org.opalj.bytecode
 
 object Evaluation {
 
-    val debug = true;
+    val debug = false;
     val OUTPUT_FILENAME = "evaluation_results.tsv"
     val JAR_DIR_PATH = "result/"
     val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
@@ -41,6 +41,8 @@ object Evaluation {
                             ow.write(s"\t${result.shortNotation}")
                         } catch {
                             case e: Throwable ⇒
+                                if(debug)
+                                    println(e.printStackTrace());
                                 ow.write(s"\tE")
                         }
                     }
