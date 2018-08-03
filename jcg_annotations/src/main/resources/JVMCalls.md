@@ -8,7 +8,9 @@ substantial feature and is thus handled as own category.
 
 ##JVMC1
 [//]: # (MAIN: jvmc.Demo)
-
+This tests covers a callback that can be introduced to the program, namely ```Runtime.addShutdownHook```.
+It allows the program to pass a customizable thread to the JVM that is called by the JVM when it
+shuts down. 
 ```java
 // jvmc/Demo.java
 package jvmc;
@@ -40,7 +42,8 @@ class TargetRunnable implements Runnable {
 
 ##JVMC2
 [//]: # (MAIN: jvmc.Demo)
-
+This test case covers the ```finalize``` method, which __can__ be called by the JVM during
+garbage collection.
 ```java
 // jvmc/Demo.java
 package jvmc;
@@ -69,7 +72,9 @@ public class Demo {
 
 ##JVMC3
 [//]: # (MAIN: jvmc.Demo)
-
+This cases tests the implicitly introduced call edge from ```Thread.start``` to ```Thread.run```.
+Please note that this test tests this feature indirectly by validating that the run method of
+```TargetRunnable``` is transitively reachable.
 ```java
 // jvmc/Demo.java
 package jvmc;
