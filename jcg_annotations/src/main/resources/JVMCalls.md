@@ -1,45 +1,49 @@
 #JVMCalls
-System Callbacks must be treated as (on-the-fly) entry points, i.e. when certain operations are performed
-like creating an object or adding an ShutdownHook. 
+JVM calls or callbacks must be treated as (on-the-fly) entry points and explicitly modelled for correct
+call-graph construction, i.e. when certain operations are performed like creating an object or 
+adding an ShutdownHook. 
 
 Please note that Java's Serialization feature is a similar mechanism. However, Serialization is
 substantial feature and is thus handled as own category.
 
-##SC1
-[//]: # (MAIN: sc.Dmeo)
+##JVMC1
+[//]: # (MAIN: jvmc.Demo)
 
 ```java
-// sc/Demo.java
-package sc;
+// jvmc/Demo.java
+package jvmc;
 
 import java.lang.System;
 import java.lang.Runtime;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 
 public class Demo {
 
-    public static void callback(){};
+    public static void callback(){ /* do something */ }
 
-    @CallSite(name = "callback", line = 16, resolvedTargets = "Lsc/Demo;")
 	public static void main(String[] args){
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run(){
-                callbackTest();           
-                System.out.println("Good bye! Was nice to have you.");
-            }
-        });	  
+        Runnable r = new TargetRunnable();
+        Runtime.getRuntime().addShutdownHook(new Thread(r));
 	}
+}
+
+class TargetRunnable implements Runnable {
+    
+    @CallSite(name = "callback", line = 22, resolvedTargets = "Ljvmc/Demo;")
+    public void run(){
+        Demo.callback();
+    }
 }
 ```
 [//]: # (END)
 
-##SC2
-[//]: # (MAIN: sc.Dmeo)
+##JVMC2
+[//]: # (MAIN: jvmc.Demo)
 
 ```java
-// sc/Demo.java
-package sc;
+// jvmc/Demo.java
+package jvmc;
 
 
 import lib.annotations.callgraph.CallSite;
@@ -54,11 +58,40 @@ public class Demo {
           }
 	}
 	
-	@CallSite(name="callback", line=18, resolvedTargets = "Lsc/Demo;")
-    public void finalize(){
-        callbackTest();
+	@CallSite(name="callback", line=18, resolvedTargets = "Ljvmc/Demo;")
+    public void finalize() throws java.lang.Throwable {
+        callback();
         super.finalize();
     }	
+}
+```
+[//]: # (END)
+
+##JVMC3
+[//]: # (MAIN: jvmc.Demo)
+
+```java
+// jvmc/Demo.java
+package jvmc;
+
+import lib.annotations.callgraph.IndirectCall;
+
+public class Demo {
+
+    @IndirectCall(name="run", line = 11, resolvedTargets = "Ljvmc/TargetRunnable;")
+	public static void main(String[] args) throws InterruptedException {
+        Runnable r = new TargetRunnable();
+        Thread t = new Thread(r);
+        t.start();
+        t.join();
+	}
+}
+
+class TargetRunnable implements Runnable {
+    
+    public void run(){
+        /* Do the hard work */
+    }   
 }
 ```
 [//]: # (END)
