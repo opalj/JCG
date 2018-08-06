@@ -100,3 +100,74 @@ class TargetRunnable implements Runnable {
 }
 ```
 [//]: # (END)
+
+##JVMC4
+[//]: # (MAIN: jvmc.Demo)
+This cases tests the implicitly introduced call edge from ```Thread.start``` to the transitively
+reachable ```Thread.exit``` method that is also called by the JVM.
+```java
+// jvmc/Demo.java
+package jvmc;
+
+import lib.annotations.callgraph.IndirectCall;
+
+public class Demo {
+
+    @IndirectCall(name="exit", line = 12, resolvedTargets = "Ljava/lang/Thread;")
+	public static void main(String[] args) throws InterruptedException {
+        Runnable r = new TargetRunnable();
+        Thread t = new Thread(r);
+        t.start();
+        t.join();
+	}
+}
+
+class TargetRunnable implements Runnable {
+    
+    public void run(){
+        /* Do the hard work */
+    }   
+}
+```
+[//]: # (END)
+
+##JVMC5
+[//]: # (MAIN: jvmc.Demo)
+This cases tests the implicitly introduced call edge from ```Thread.setUncaughtExceptionHandler```
+to ```Thread.dispatchUncaughtException``` method that is intended to be called by the JVM.
+```java
+// jvmc/Demo.java
+package jvmc;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+
+	public static void main(String[] args) throws InterruptedException {
+        Runnable r = new TargetRunnable();
+        Thread t = new Thread(r);
+        t.setUncaughtExceptionHandler(new ExceptionalExceptionHandler());
+        t.start();
+        t.join();
+	}
+}
+
+class TargetRunnable implements Runnable {
+    
+    public void run(){
+        throw new IllegalArgumentException("We don't want this thread to work!");
+    }   
+}
+
+class ExceptionalExceptionHandler implements Thread.UncaughtExceptionHandler {
+ 
+    private static void callback() { /* do something */ }
+    
+    @CallSite(name="callback", line= 29, resolvedTargets = "Ljvmc/ExceptionalExceptionHandler;")
+     public void uncaughtException(Thread t, Throwable e){
+        callback();
+        // Handle the uncaught Exception (IllegalArgumentException)
+     }
+}
+```
+[//]: # (END)
