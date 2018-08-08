@@ -51,67 +51,70 @@ object CGMatcher {
         jsResult match {
             case _: JsSuccess[CallSites] ⇒
                 val computedCallSites = jsResult.get
-                for (clazz ← p.allProjectClassFiles) {
-                    for ((method, _) ← clazz.methodsWithBody) {
-                        // check if the call site might not be ambiguous
-                        if (method.annotations.exists { a ⇒
-                            a.annotationType == callSiteAnnotationType ||
-                                a.annotationType == callSitesAnnotationType ||
-                                a.annotationType == indirectCallAnnotationType ||
-                                a.annotationType == indirectCallsAnnotationType
-                        }) {
-                            val body = method.body.get
-                            val invokations = body.instructions.zipWithIndex.filter { case (instr, pc) ⇒ instr != null && instr.isInvocationInstruction }
-                            val lines = invokations.map {
-                                case (instr, pc) ⇒
-                                    (body.lineNumber(pc), instr.asInvocationInstruction.name)
-                            }.toSet
-                            if (lines.size != invokations.length) {
-                                throw new RuntimeException(s"Multiple call sites with same name in the same line $tgtJar, ${method.name}")
-                            }
-                        }
-
-                        for (annotation ← method.annotations) {
-
-                            val callSiteAnnotations =
-                                if (annotation.annotationType == callSiteAnnotationType)
-                                    Seq(annotation)
-                                else if (annotation.annotationType == callSitesAnnotationType)
-                                    getAnnotations(annotation, "value")
-                                else
-                                    Seq.empty
-
-                            val csAssessment = handleCallSiteAnnotations(
-                                computedCallSites.callSites,
-                                method,
-                                callSiteAnnotations,
-                                verbose)
-
-                            if(csAssessment.isUnsound){
-                                return Unsound;
-                            }
-
-                            val indirectCallAnnotations =
-                                if (annotation.annotationType == indirectCallAnnotationType)
-                                    Seq(annotation)
-                                else if (annotation.annotationType == indirectCallsAnnotationType)
-                                    getAnnotations(annotation, "value")
-                                else
-                                    Seq.empty
-
-                            val icsAssessment = handleIndirectCallAnnotations(
-                                computedCallSites.callSites,
-                                method,
-                                indirectCallAnnotations,
-                                verbose
-                            )
-
-                            val finalAssessment = csAssessment.combine(icsAssessment)
-
-                            if(!finalAssessment.isSound)
-                                return finalAssessment
+                for {
+                    clazz ← p.allProjectClassFiles
+                    method ← clazz.methodsWithBody
+                } {
+                    // check if the call site might not be ambiguous
+                    if (method.annotations.exists { a ⇒
+                        a.annotationType == callSiteAnnotationType ||
+                            a.annotationType == callSitesAnnotationType ||
+                            a.annotationType == indirectCallAnnotationType ||
+                            a.annotationType == indirectCallsAnnotationType
+                    }) {
+                        val body = method.body.get
+                        val invokations = body.instructions.zipWithIndex.filter { case (instr, pc) ⇒ instr != null && instr.isInvocationInstruction }
+                        val lines = invokations.map {
+                            case (instr, pc) ⇒
+                                (body.lineNumber(pc), instr.asInvocationInstruction.name)
+                        }.toSet
+                        if (lines.size != invokations.length) {
+                            throw new RuntimeException(s"Multiple call sites with same name in the same line $tgtJar, ${method.name}")
                         }
                     }
+
+                    for (annotation ← method.annotations) {
+
+                        val callSiteAnnotations =
+                            if (annotation.annotationType == callSiteAnnotationType)
+                                Seq(annotation)
+                            else if (annotation.annotationType == callSitesAnnotationType)
+                                getAnnotations(annotation, "value")
+                            else
+                                Seq.empty
+
+                        val csAssessment = handleCallSiteAnnotations(
+                            computedCallSites.callSites,
+                            method,
+                            callSiteAnnotations,
+                            verbose
+                        )
+
+                        if (csAssessment.isUnsound) {
+                            return Unsound;
+                        }
+
+                        val indirectCallAnnotations =
+                            if (annotation.annotationType == indirectCallAnnotationType)
+                                Seq(annotation)
+                            else if (annotation.annotationType == indirectCallsAnnotationType)
+                                getAnnotations(annotation, "value")
+                            else
+                                Seq.empty
+
+                        val icsAssessment = handleIndirectCallAnnotations(
+                            computedCallSites.callSites,
+                            method,
+                            indirectCallAnnotations,
+                            verbose
+                        )
+
+                        val finalAssessment = csAssessment.combine(icsAssessment)
+
+                        if (!finalAssessment.isSound)
+                            return finalAssessment
+                    }
+
                 }
 
                 Sound
@@ -188,8 +191,8 @@ object CGMatcher {
                 val lineNumber = body.lineNumber(pc)
                 instr != null && instr.isInvocationInstruction && lineNumber.isDefined && lineNumber.get == annotatedLineNumber
         }
-//        if (!existsCall)
-//            System.err.println(s"There is no call in line $annotatedLineNumber")
+        //        if (!existsCall)
+        //            System.err.println(s"There is no call in line $annotatedLineNumber")
     }
 
     private def handleIndirectCallAnnotations(
@@ -197,7 +200,7 @@ object CGMatcher {
         source:                  br.Method,
         indirectCallAnnotations: Seq[Annotation],
         verbose:                 Boolean
-    )(implicit p: SomeProject): Assessment= {
+    )(implicit p: SomeProject): Assessment = {
         for (annotation ← indirectCallAnnotations) {
             val line = getLineNumber(annotation)
             verifyCallExistance(line, source)
