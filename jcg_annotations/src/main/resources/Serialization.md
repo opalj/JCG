@@ -60,23 +60,24 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.io.ObjectStreamException;
+import java.io.ObjectInputValidation;
 import java.io.InvalidObjectException;
 import lib.annotations.callgraph.CallSite;
-public class Foo implements Serializable {
+public class Foo implements Serializable, ObjectInputValidation {
     public Object replace() { return this; }
     public void callback() { }
 
-	@CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc2/Foo;", line = 18)
+	@CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc2/Foo;", line = 19)
     private Object writeReplace() throws ObjectStreamException {
     	return replace();
     }
 
-	@CallSite(name = "callback", resolvedTargets = "Lsc2/Foo;", line = 23)
+	@CallSite(name = "callback", resolvedTargets = "Lsc2/Foo;", line = 24)
     public void validateObject() throws InvalidObjectException {
     	callback();
     }
 
-	@CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc2/Foo;", line = 28)
+	@CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc2/Foo;", line = 29)
     private Object readResolve() throws ObjectStreamException {
     	return replace();
     }
@@ -115,14 +116,14 @@ Tests the writeExternal/readExternal methods.
 // ec1/Foo.java
 package ec1;
 
-import java.io.Serializable;
+import java.io.Externalizable;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
-public class Foo implements Serializable {
+public class Foo implements Externalizable {
     public static String callback() { return ""; }
 
     @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 15)
