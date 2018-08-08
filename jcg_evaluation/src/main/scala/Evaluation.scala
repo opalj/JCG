@@ -1,24 +1,21 @@
-import java.io.BufferedWriter
 import java.io.File
-import java.io.FileInputStream
+import java.io.BufferedWriter
 import java.io.FileWriter
 import java.io.OutputStreamWriter
 import java.io.Writer
 
 import org.opalj.bytecode
-import play.api.libs.json.JsSuccess
-import play.api.libs.json.Json
 
 object Evaluation {
 
-    val debug = true;
+    val debug = false;
     val OUTPUT_FILENAME = "evaluation_results.tsv"
     val JAR_DIR_PATH = "result/"
     val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
 
     def main(args: Array[String]): Unit = {
         val rtJar = bytecode.RTJar.getAbsolutePath
-        val dir = new File(JAR_DIR_PATH)
+        val jarDir = new File(JAR_DIR_PATH)
 
         var jarFilter = ""
         var target = ""
@@ -30,32 +27,23 @@ object Evaluation {
         val outputTarget = getOutputTarget(target)
         val ow = new BufferedWriter(outputTarget)
 
-        if (dir.exists && dir.isDirectory) {
-            val projectSpecs = dir.listFiles((_, name) ⇒ name.endsWith(".conf")).filter(_.getName.startsWith(jarFilter)).sorted
-            printHeader(ow, projectSpecs)
+        if (jarDir.exists && jarDir.isDirectory) {
+            val jars = jarDir.listFiles((_, name) ⇒ name.endsWith(".jar")).sorted.filter(_.getName.startsWith(jarFilter))
+            printHeader(ow, jars)
             for (adapter ← EVALUATION_ADAPTERS) {
                 for (cgAlgo ← adapter.possibleAlgorithms()) {
                     ow.write(s"${adapter.frameworkName()} $cgAlgo")
-                    for (projectSpecFile ← projectSpecs) {
-                        val jsValue = Json.parse(new FileInputStream(projectSpecFile))
-                        jsValue.validate[ProjectSpecification] match {
-                            case JsSuccess(projectSpecification, _) ⇒
-                                try {
-                                    adapter.serializeCG(
-                                        cgAlgo,
-                                        projectSpecification.target,
-                                        projectSpecification.main.orNull,
-                                        Array(rtJar) ++ projectSpecification.cp.toArray.flatten.flatMap(_.getLocations).map(_.getAbsolutePath),
-                                        s"${adapter.frameworkName()}-$cgAlgo-${projectSpecification.name}.json"
-                                    )
-                                    System.gc()
-                                    val result = CGMatcher.matchCallSites(projectSpecification.target, s"${adapter.frameworkName()}-$cgAlgo-${projectSpecification.name}.json")
-                                    ow.write(s"\t${result.shortNotation}")
-                                } catch {
-                                    case e: Throwable ⇒
-                                        ow.write(s"\tE")
-                                }
-                            case _ ⇒ throw new IllegalArgumentException()
+                    for (tgt ← jars) {
+                        try {
+                            adapter.serializeCG(cgAlgo, tgt.getAbsolutePath, Array(rtJar), s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
+                            System.gc()
+                            val result = CGMatcher.matchCallSites(tgt.getAbsolutePath, s"${adapter.frameworkName()}-$cgAlgo-${tgt.getName}.json")
+                            ow.write(s"\t${result.shortNotation}")
+                        } catch {
+                            case e: Throwable ⇒
+                                if(debug)
+                                    println(e.printStackTrace());
+                                ow.write(s"\tE")
                         }
                     }
                     ow.newLine()
