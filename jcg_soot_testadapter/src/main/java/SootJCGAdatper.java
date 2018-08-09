@@ -20,13 +20,11 @@ public class SootJCGAdatper implements JCGTestAdapter {
     private static final String RTA = "RTA";
     private static final String VTA = "VTA";
     private static final String Spark = "SPARK";
-    private static final String LibCHA = "LibCHA";
-    private static final String LibSpark = "LibSpark";
 
 
     @Override
     public String[] possibleAlgorithms() {
-        return new String[]{CHA, RTA, VTA, Spark, LibCHA, LibSpark};
+        return new String[]{CHA/*, RTA, VTA, Spark*/};
     }
 
     @Override
@@ -67,16 +65,6 @@ public class SootJCGAdatper implements JCGTestAdapter {
                 break;
             case Spark:
                 cgModeOption = new SparkOptions().enable();
-                break;
-            case LibCHA:
-                cgModeOption = new CHAOptions().enable();
-                cgOptions.processAllReachable();
-                cgOptions.libraryModeSignatureResolution();
-                break;
-            case LibSpark:
-                cgModeOption = new SparkOptions().enable();
-                cgOptions.processAllReachable();
-                cgOptions.libraryModeSignatureResolution();
                 break;
         }
         cgOptions.addSubOption(cgModeOption);

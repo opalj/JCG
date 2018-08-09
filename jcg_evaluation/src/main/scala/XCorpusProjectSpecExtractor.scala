@@ -6,7 +6,6 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
 
-
 object XCorpusProjectSpecExtractor {
 
     def main(args: Array[String]): Unit = {
@@ -24,8 +23,8 @@ object XCorpusProjectSpecExtractor {
             val libDir = new File(projectDir, "default-lib")
 
             val libs = if (libDir.exists())
-                libDir.listFiles(f ⇒ f.getName.endsWith(".jar")).map(_.getAbsolutePath) ++ Array(bytecode.JRELibraryFolder.getAbsolutePath)
-            else Array(bytecode.JRELibraryFolder.getAbsolutePath)
+                libDir.listFiles(f ⇒ f.getName.endsWith(".jar")).map(_.getAbsolutePath)
+            else Array.empty[String]
 
             val projectName = projectRootDir.getName
 

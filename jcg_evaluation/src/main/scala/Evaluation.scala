@@ -1,11 +1,10 @@
-import java.io.File
 import java.io.BufferedWriter
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.io.OutputStreamWriter
 import java.io.Writer
 
-import org.opalj.bytecode
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json
 
@@ -13,7 +12,7 @@ import scala.io.Source
 
 object Evaluation {
 
-    val debug = false
+    val debug = true
     val runHermes = false
     val hermesResult = "hermes.csv"
     val hermesLocationsDir = "hermesResults/"
@@ -23,10 +22,8 @@ object Evaluation {
     val OUTPUT_FILENAME = "evaluation_results.tsv"
     val PROJECTS_DIR_PATH = "/Users/floriankuebler/Documents/files/xcorpus/data/" //"result/"
     val JRE_LOCATIONS_FILE = "jre.json"
-    val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
+    val EVALUATION_ADAPTERS = List(new SootJCGAdatper()) //, new WalaJCGAdapter())
     val HERMES_PROJECT_FILE = "hermes.json"
-
-    type ProjectAndFeature = (String, String)
 
     def main(args: Array[String]): Unit = {
         val projectsDir = new File(PROJECTS_DIR_PATH)
@@ -50,7 +47,7 @@ object Evaluation {
                 )
 
                 val hermesDefaultArgs = Array(
-                    "-config", "xcorpus.json", //todo create this file
+                    "-config", HERMES_PROJECT_FILE,
                     "-statistics", hermesResult
                 )
                 val writeLocationsArgs =
@@ -64,7 +61,7 @@ object Evaluation {
                     hermesDefaultArgs ++ writeLocationsArgs
                 )
             }
-            val locations: Map[ProjectAndFeature, Set[Method]] =
+            val locations: Map[String, Map[String, Set[Method]]] =
                 if (projectSpecifigEvaluation) {
                     val locations = new File(hermesLocationsDir)
                     assert(locations.exists() && locations.isDirectory)
@@ -81,8 +78,12 @@ object Evaluation {
                             else
                                 paramsDescr.split(";")
                         val returnType = mdMatch.group(2)
-                        (projectId → featureId) → Method(methodName, className, returnType, params)
-                    }).groupBy(_._1).map { case (k, v) ⇒ k → v.map(_._2).toSet }
+                        (projectId, featureId, Method(methodName, className, returnType, params))
+                    }).groupBy(_._1).map {
+                        case (pId, group1) ⇒ pId → group1.map { case (_, f, m) ⇒ f → m }.groupBy(_._1).map {
+                            case (fId, group2) ⇒ fId → group2.map(_._2).toSet
+                        }
+                    }
                 } else
                     Map.empty
 
@@ -99,7 +100,7 @@ object Evaluation {
         projectsDir:  File,
         jarFilter:    String,
         ow:           BufferedWriter,
-        locationsMap: Map[ProjectAndFeature, Set[Method]],
+        locationsMap: Map[String, Map[String, Set[Method]]],
         jreLocations: Map[Int, String]
     ): Unit = {
         val projectSpecFiles = projectsDir.listFiles((_, name) ⇒ name.endsWith(".conf")).filter(_.getName.startsWith(jarFilter)).sorted
@@ -138,21 +139,24 @@ object Evaluation {
                                     val json = Json.parse(new FileInputStream(new File(jsFileName)))
                                     val callSites = json.validate[CallSites].get
                                     for {
-                                        ((pId, fID), locations) ← locationsMap
+                                        (fId, locations) ← locationsMap(projectSpec.name)
                                         location ← locations
                                     } {
                                         // todo we are unsound -> write that info somewhere
                                         // source and how often
-                                        println(callSites.callSites.exists { cs ⇒
+                                        val unsound = callSites.callSites.exists { cs ⇒
                                             cs.method == location || cs.targets.contains(location)
-                                        })
+                                        }
+                                        if (unsound)
+                                            println(s"${projectSpec.name} - $fId - $location)") //
                                     }
                                 }
 
                             } catch {
                                 case e: Throwable ⇒
                                     if (debug)
-                                        println(e.printStackTrace());
+                                        println(projectSpec.name)
+                                    println(e.printStackTrace())
                                     ow.write(s"\tE")
                             }
                         case _ ⇒ throw new IllegalArgumentException("invalid project.conf")
@@ -172,19 +176,16 @@ object Evaluation {
         ow.newLine()
     }
 
-    def getOutputTarget(target: String): Writer = {
-        target match {
-            case "c" ⇒ new OutputStreamWriter(System.out)
-            case "f" ⇒ {
-                val outputFile = new File(OUTPUT_FILENAME);
-                if (outputFile.exists()) {
-                    outputFile.delete()
-                    outputFile.createNewFile()
-                }
-
-                new FileWriter(outputFile, false)
+    def getOutputTarget(target: String): Writer = target match {
+        case "c" ⇒ new OutputStreamWriter(System.out)
+        case "f" ⇒
+            val outputFile = new File(OUTPUT_FILENAME);
+            if (outputFile.exists()) {
+                outputFile.delete()
+                outputFile.createNewFile()
             }
-            case _ ⇒ new OutputStreamWriter(System.out)
-        }
+
+            new FileWriter(outputFile, false)
+        case _ ⇒ new OutputStreamWriter(System.out)
     }
 }
