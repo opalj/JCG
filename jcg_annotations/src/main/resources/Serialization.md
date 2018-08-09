@@ -34,7 +34,44 @@ public class Foo implements Serializable {
 
 ##SC2
 [//]: # (MAIN: sc.Foo)
-Tests the writeObject with object from param methhod.
+Tests writeObject with intraprocedurally resolvable parameters.
+ 
+```java
+// sc/Foo.java
+package sc;
+
+import java.io.Serializable;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import lib.annotations.callgraph.CallSite;
+public class Foo implements Serializable {
+
+    @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Object f;
+        if(args.length == 0)
+            f = new Foo();
+        else
+            f = new Bar();
+        FileOutputStream fos = new FileOutputStream("test.ser");
+        ObjectOutputStream out = new ObjectOutputStream(fos);
+        out.writeObject(f);
+        out.close();
+    }
+}
+
+class Bar implements Serializable {}
+```
+[//]: # (END)
+
+##SC3
+[//]: # (MAIN: sc.Foo)
+Tests writeObject with object from param methhod.
 
 ```java
 // sc/Foo.java
@@ -67,7 +104,7 @@ public class Foo implements Serializable {
 ```
 [//]: # (END)
 
-##SC3
+##SC4
 [//]: # (MAIN: sc.Foo)
 Tests the readObject callback methhod with no cast done.
 
@@ -98,7 +135,7 @@ public class Foo implements Serializable {
 [//]: # (END)
 
 
-##SC4
+##SC5
 [//]: # (MAIN: sc.Foo)
 Tests the readObject callback methhod with a cast done.
 
@@ -128,7 +165,7 @@ public class Foo implements Serializable {
 ```
 [//]: # (END)
 
-##SC5
+##SC6
 [//]: # (MAIN: sc.Foo)
 Tests the writeReplace method.
 
@@ -165,7 +202,7 @@ public class Foo implements Serializable {
 ```
 [//]: # (END)
 
-##SC6
+##SC7
 [//]: # (MAIN: sc.Foo)
 Tests the readResolve method.
 
@@ -201,7 +238,7 @@ public class Foo implements Serializable {
 ```
 [//]: # (END)
 
-##SC7
+##SC8
 [//]: # (MAIN: sc.Foo)
 Tests the validateObject method.
 
@@ -239,7 +276,7 @@ public class Foo implements Serializable, ObjectInputValidation {
 ```
 [//]: # (END)
 
-##SC8
+##SC9
 [//]: # (MAIN: sc.Foo)
 Tests that the no-arg. constructor of the first super class that is not serializable is called.
 
