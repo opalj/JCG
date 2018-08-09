@@ -20,13 +20,6 @@ import org.opalj.log.LogMessage
 import org.opalj.log.OPALLogger
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json
-import play.api.libs.json.Reads
-
-case class CallSites(callSites: Set[CallSite])
-
-case class CallSite(declaredTarget: Method, line: Int, method: Method, targets: Set[Method])
-
-case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String])
 
 class DevNullLogger extends OPALLogger {
     override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
@@ -44,9 +37,6 @@ object CGMatcher {
         implicit val p: SomeProject = Project(new File(tgtJar), org.opalj.bytecode.RTJar)
 
         val json = Json.parse(new FileInputStream(new File(jsonPath)))
-        implicit val methodReads: Reads[Method] = Json.reads[Method]
-        implicit val callSiteReads: Reads[CallSite] = Json.reads[CallSite]
-        implicit val callSitesReads: Reads[CallSites] = Json.reads[CallSites]
         val jsResult = json.validate[CallSites]
         jsResult match {
             case _: JsSuccess[CallSites] ⇒
@@ -208,7 +198,7 @@ object CGMatcher {
             val returnType = getReturnType(annotation).toJVMTypeName
             val parameterTypes = getParameterList(annotation).map(_.toJVMTypeName)
             for (declaringClass ← getResolvedTargets(annotation)) {
-                val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
+                val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes.toArray)
                 val annotatedSource = convertMethod(source)
                 if (!callsIndirectly(computedCallSites, annotatedSource, annotatedTarget, verbose))
                     return Unsound;
@@ -258,7 +248,7 @@ object CGMatcher {
         val returnType = method.returnType.toJVMTypeName
         val parameterTypes = method.parameterTypes.map(_.toJVMTypeName).toList
 
-        Method(name, declaringClass, returnType, parameterTypes)
+        Method(name, declaringClass, returnType, parameterTypes.toArray)
     }
 
     //

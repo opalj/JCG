@@ -2,14 +2,12 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.PrintWriter
 
-import org.opalj.bytecode
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
 
 import scala.collection.mutable.ArrayBuffer
-
 
 private case class ORG(org: OPALJ)
 private case class OPALJ(opalj: HERMES)
@@ -19,20 +17,19 @@ private case class HermesProject(id: String, cp: String)
 
 object TestCaseHermesJsonExtractor {
 
-    def main(args: Array[String]): Unit = {
-        val testCasesDir = new File(args(0))
-        assert(testCasesDir.exists() && testCasesDir.isDirectory)
+    def createHermesJsonFile(
+        projectsDir: File, jreLocations: Map[Int, String], outputFile: File
+    ): Unit = {
+        assert(projectsDir.exists() && projectsDir.isDirectory)
 
-        val projectSpecFiles = testCasesDir.listFiles((_, name) ⇒ name.endsWith(".conf")).sorted
+        val projectSpecFiles = projectsDir.listFiles((_, name) ⇒ name.endsWith(".conf")).sorted
 
         val projects = for (projectSpecFile ← projectSpecFiles) yield {
             val json = Json.parse(new FileInputStream(projectSpecFile))
-
             json.validate[ProjectSpecification] match {
                 case JsSuccess(projectSpec, _) ⇒
                     val allTargets = ArrayBuffer(projectSpec.target)
-                    // todo correct java version
-                    allTargets += bytecode.JRELibraryFolder.getAbsolutePath
+                    allTargets += jreLocations(projectSpec.java)
                     allTargets ++= projectSpec.allClassPathEntryFiles.map(_.getAbsolutePath)
                     HermesProject(projectSpec.name, allTargets.mkString(File.pathSeparator))
                 case _ ⇒
@@ -49,10 +46,14 @@ object TestCaseHermesJsonExtractor {
         implicit val orgWrites: Writes[ORG] = Json.writes[ORG]
 
         val json: JsValue = Json.toJson(ORG(OPALJ(HERMES(HermesProjects(projects)))))
-        val outFile = new File("result.json") // todo specify outputfile
-        val pw = new PrintWriter(outFile)
+        val pw = new PrintWriter(outputFile)
         pw.write(Json.prettyPrint(json))
         pw.close()
+    }
+
+    def main(args: Array[String]): Unit = {
+        val jreLocations = JRELocation.mapping(new File(args(1)))
+        createHermesJsonFile(new File(args(0)), jreLocations, new File(args(1)))
     }
 
 }
