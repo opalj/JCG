@@ -2,31 +2,23 @@
 Callbacks related to java.io.Serializable classes.
 
 ##SC1
-[//]: # (MAIN: sc1.Foo)
-Tests the writeObject/readObject callback methhods.
-
+[//]: # (MAIN: sc.Foo)
+Tests the writeObject callback methhod.
+ 
 ```java
-// sc1/Foo.java
-package sc1;
+// sc/Foo.java
+package sc;
 
 import java.io.Serializable;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable {
-    public static String callback() { return ""; }
 
-    @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 15)
+    @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
-    }
-    
-    @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 20)
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
     }
 
     public static void main(String[] args) throws Exception {
@@ -35,27 +27,189 @@ public class Foo implements Serializable {
     	ObjectOutputStream out = new ObjectOutputStream(fos);
     	out.writeObject(f);
     	out.close();
-
-    	FileInputStream fis = new FileInputStream("test.ser");
-    	ObjectInputStream in = new ObjectInputStream(fis);
-    	Object obj = in.readObject();
-    	in.close();
     }
 }
 ```
 [//]: # (END)
 
 ##SC2
-[//]: # (MAIN: sc2.Foo)
-Tests the writeReplace/readResolve/validateObject methods.
+[//]: # (MAIN: sc.Foo)
+Tests the writeObject with object from param methhod.
 
 ```java
-// sc2/Foo.java
-package sc2;
+// sc/Foo.java
+package sc;
 
 import java.io.Serializable;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.IOException;
+import lib.annotations.callgraph.CallSite;
+public class Foo implements Serializable {
+
+    @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+    }
+
+    public static void serialize(Object f) throws Exception {
+        FileOutputStream fos = new FileOutputStream("test.ser");
+        ObjectOutputStream out = new ObjectOutputStream(fos);
+        out.writeObject(f);
+        out.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Foo f = new Foo();
+        serialize(f);
+    }
+}
+```
+[//]: # (END)
+
+##SC3
+[//]: # (MAIN: sc.Foo)
+Tests the readObject callback methhod with no cast done.
+
+```java
+// sc/Foo.java
+package sc;
+
+import java.io.Serializable;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+import lib.annotations.callgraph.CallSite;
+public class Foo implements Serializable {
+    
+    @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+    }
+
+    public static void main(String[] args) throws Exception {
+        FileInputStream fis = new FileInputStream("test.ser");
+        ObjectInputStream in = new ObjectInputStream(fis);
+        Object obj = in.readObject();
+        in.close();
+    }
+}
+```
+[//]: # (END)
+
+
+##SC4
+[//]: # (MAIN: sc.Foo)
+Tests the readObject callback methhod with a cast done.
+
+```java
+// sc/Foo.java
+package sc;
+
+import java.io.Serializable;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+import lib.annotations.callgraph.CallSite;
+public class Foo implements Serializable {
+    
+    @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+    }
+
+    public static void main(String[] args) throws Exception {
+        FileInputStream fis = new FileInputStream("test.ser");
+        ObjectInputStream in = new ObjectInputStream(fis);
+        Foo obj = (Foo) in.readObject();
+        in.close();
+    }
+}
+```
+[//]: # (END)
+
+##SC5
+[//]: # (MAIN: sc.Foo)
+Tests the writeReplace method.
+
+```java
+// sc/Foo.java
+package sc;
+
+import java.io.Serializable;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import lib.annotations.callgraph.CallSite;
+public class Foo implements Serializable {
+    public Object replace() { return this; }
+
+	@CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc/Foo;", line = 14)
+    private Object writeReplace() throws ObjectStreamException {
+    	return replace();
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+    	out.defaultWriteObject();
+    }
+
+    public static void main(String[] args) throws Exception {
+    	Foo f = new Foo();
+    	FileOutputStream fos = new FileOutputStream("test.ser");
+    	ObjectOutputStream out = new ObjectOutputStream(fos);
+    	out.writeObject(f);
+    	out.close();
+    }
+}
+```
+[//]: # (END)
+
+##SC6
+[//]: # (MAIN: sc.Foo)
+Tests the readResolve method.
+
+```java
+// sc/Foo.java
+package sc;
+
+import java.io.Serializable;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import lib.annotations.callgraph.CallSite;
+public class Foo implements Serializable {
+    public Object replace() { return this; }
+
+    @CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc/Foo;", line = 14)
+    private Object readResolve() throws ObjectStreamException {
+        return replace();
+    }
+    
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+    }
+
+    public static void main(String[] args) throws Exception {
+        FileInputStream fis = new FileInputStream("test.ser");
+        ObjectInputStream in = new ObjectInputStream(fis);
+        Foo obj = (Foo) in.readObject();
+        in.close();
+    }
+}
+```
+[//]: # (END)
+
+##SC7
+[//]: # (MAIN: sc.Foo)
+Tests the validateObject method.
+
+```java
+// sc/Foo.java
+package sc;
+
+import java.io.Serializable;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.IOException;
@@ -64,43 +218,67 @@ import java.io.ObjectInputValidation;
 import java.io.InvalidObjectException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable, ObjectInputValidation {
-    public Object replace() { return this; }
-    public void callback() { }
+    public void callback() {  }
 
-	@CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc2/Foo;", line = 19)
-    private Object writeReplace() throws ObjectStreamException {
-    	return replace();
-    }
-
-	@CallSite(name = "callback", resolvedTargets = "Lsc2/Foo;", line = 24)
+    @CallSite(name = "callback", resolvedTargets = "Lsc/Foo;", line = 16)
     public void validateObject() throws InvalidObjectException {
-    	callback();
-    }
-
-	@CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc2/Foo;", line = 29)
-    private Object readResolve() throws ObjectStreamException {
-    	return replace();
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
+        callback();
     }
     
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
+        in.defaultReadObject();
     }
 
     public static void main(String[] args) throws Exception {
-    	Foo f = new Foo();
-    	FileOutputStream fos = new FileOutputStream("test.ser");
-    	ObjectOutputStream out = new ObjectOutputStream(fos);
-    	out.writeObject(f);
-    	out.close();
+        FileInputStream fis = new FileInputStream("test.ser");
+        ObjectInputStream in = new ObjectInputStream(fis);
+        Foo obj = (Foo) in.readObject();
+        in.close();
+    }
+}
+```
+[//]: # (END)
 
-    	FileInputStream fis = new FileInputStream("test.ser");
-    	ObjectInputStream in = new ObjectInputStream(fis);
-    	Object obj = in.readObject();
-    	in.close();
+##SC8
+[//]: # (MAIN: sc.Foo)
+Tests that the no-arg. constructor of the first super class that is not serializable is called.
+
+```java
+// sc/Bar.java
+package sc;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Bar {
+    public void callback() { }
+
+    @CallSite(name = "callback", resolvedTargets = "Lsc/Bar;", line = 10)
+    public Bar() {
+        callback();
+    }
+}
+```
+
+```java
+// sc/Foo.java
+package sc;
+
+import java.io.Serializable;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+
+public class Foo extends Bar implements Serializable {
+    
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+    }
+
+    public static void main(String[] args) throws Exception {
+        FileInputStream fis = new FileInputStream("test.ser");
+        ObjectInputStream in = new ObjectInputStream(fis);
+        Foo obj = (Foo) in.readObject();
+        in.close();
     }
 }
 ```
@@ -109,32 +287,34 @@ public class Foo implements Serializable, ObjectInputValidation {
 #ExternalizableClasses
 Callback methods related to java.io.Externalizable classes.
 ##EC1
-[//]: # (MAIN: ec1.Foo)
-Tests the writeExternal/readExternal methods.
+[//]: # (MAIN: ec.Foo)
+Tests the writeExternal method.
 
 ```java
-// ec1/Foo.java
-package ec1;
+// ec/Foo.java
+package ec;
 
 import java.io.Externalizable;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectOutput;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectInput;
 import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Externalizable {
-    public static String callback() { return ""; }
 
-    @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 15)
-    public void writeExternal(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
+    @CallSite(name = "callback", resolvedTargets = "Lec/Foo;", line = 16)
+    public void writeExternal(ObjectOutput out) throws IOException {
+        callback();
     }
-    
-    @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 20)
-    public void readExternal(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        callback();
     }
+
+    public void callback() { }
 
     public static void main(String[] args) throws Exception {
         Foo f = new Foo();
@@ -142,10 +322,90 @@ public class Foo implements Externalizable {
         ObjectOutputStream out = new ObjectOutputStream(fos);
         out.writeObject(f);
         out.close();
+    }
+}
+```
+[//]: # (END)
 
+##EC2
+[//]: # (MAIN: ec.Foo)
+Tests the readExternal method.
+
+```java
+// ec/Foo.java
+package ec;
+
+import java.io.Externalizable;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectOutput;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectInput;
+import java.io.IOException;
+import lib.annotations.callgraph.CallSite;
+public class Foo implements Externalizable {
+    
+    @CallSite(name = "callback", resolvedTargets = "Lec/Foo;", line = 16)
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        callback();
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        callback();
+    }
+
+    public void callback() { }
+
+    public static void main(String[] args) throws Exception {
         FileInputStream fis = new FileInputStream("test.ser");
         ObjectInputStream in = new ObjectInputStream(fis);
-        Object obj = in.readObject();
+        Foo obj = (Foo) in.readObject();
+        in.close();
+    }
+}
+```
+[//]: # (END)
+
+##EC3
+[//]: # (MAIN: ec.Foo)
+Tests that the no-arg constructor is called.
+
+```java
+// ec/Foo.java
+package ec;
+
+import java.io.Externalizable;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectOutput;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectInput;
+import java.io.IOException;
+import lib.annotations.callgraph.CallSite;
+
+public class Foo implements Externalizable {
+    
+    public void callback() { }
+
+    @CallSite(name = "callback", resolvedTargets = "Lec/Foo;", line = 19)
+    public Foo() {
+        callback();
+    }
+    
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        callback();
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        callback();
+    }
+
+    public static void main(String[] args) throws Exception {
+        FileInputStream fis = new FileInputStream("test.ser");
+        ObjectInputStream in = new ObjectInputStream(fis);
+        Foo obj = (Foo) in.readObject();
         in.close();
     }
 }
