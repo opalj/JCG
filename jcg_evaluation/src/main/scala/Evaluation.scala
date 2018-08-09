@@ -13,14 +13,14 @@ import scala.io.Source
 object Evaluation {
 
     val debug = true
-    val runHermes = false
+    val runHermes = true
     val hermesResult = "hermes.csv"
     val hermesLocationsDir = "hermesResults/"
     val projectSpecifigEvaluation = true
     val runAnalyses = true
     val isAnnotatedProject = false
     val OUTPUT_FILENAME = "evaluation_results.tsv"
-    val PROJECTS_DIR_PATH = "/Users/floriankuebler/Documents/files/xcorpus/data/" //"result/"
+    val PROJECTS_DIR_PATH = "result/"
     val JRE_LOCATIONS_FILE = "jre.json"
     val EVALUATION_ADAPTERS = List(new SootJCGAdatper()) //, new WalaJCGAdapter())
     val HERMES_PROJECT_FILE = "hermes.json"
