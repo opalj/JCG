@@ -1,65 +1,11 @@
 import java.io.File
 import java.io.PrintWriter
 
-import coursier.Cache
-import coursier.Module
-import coursier.Dependency
-import coursier.Fetch
-import coursier.FileError
-import coursier.Resolution
-import coursier.maven.MavenRepository
 import javax.tools.ToolProvider
-
-import scala.io.Source
 import org.apache.commons.io.FileUtils
 import play.api.libs.json._
-import scalaz.\/
 
-case class ProjectSpecification(
-    name: String, target: String, main: Option[String], java: Int, cp: Option[Array[ClassPathEntry]]
-)
-object ProjectSpecification {
-    implicit val configReads: Reads[ProjectSpecification] = Json.reads[ProjectSpecification]
-    implicit val configWrites: OWrites[ProjectSpecification] = Json.writes[ProjectSpecification]
-}
-
-sealed trait ClassPathEntry {
-    def getLocations: Seq[File]
-}
-object ClassPathEntry {
-    implicit val classPathEntryReads: Reads[ClassPathEntry] =
-        __.read[MavenClassPathEntry].map(x ⇒ x: ClassPathEntry) orElse __.read[LocalClassPathEntry].map(x ⇒ x: ClassPathEntry)
-
-    implicit val classPathEntryWrites: Writes[ClassPathEntry] = Writes[ClassPathEntry] {
-        case mvn: MavenClassPathEntry ⇒ MavenClassPathEntry.writer.writes(mvn)
-        case lcl: LocalClassPathEntry ⇒ LocalClassPathEntry.writer.writes(lcl)
-    }
-}
-case class MavenClassPathEntry(org: String, id: String, version: String) extends ClassPathEntry {
-    override def getLocations: Seq[File] = {
-        val start = Resolution(Set(Dependency(Module(org, id), version)))
-        val repositories = Seq(Cache.ivy2Local, MavenRepository("https://repo1.maven.org/maven2"))
-        val fetch = Fetch.from(repositories, Cache.fetch())
-
-        val resolution = start.process.run(fetch).unsafePerformSync
-        val r: Seq[\/[FileError, File]] = resolution.artifacts.map(Cache.file(_).run).map(_.unsafePerformSync)
-        assert(r.forall(_.isRight))
-
-        r.map(_.toOption.get)
-    }
-}
-object MavenClassPathEntry {
-    implicit val reader: Reads[MavenClassPathEntry] = Json.reads[MavenClassPathEntry]
-    val writer: Writes[MavenClassPathEntry] = Json.writes[MavenClassPathEntry]
-}
-
-case class LocalClassPathEntry(path: String) extends ClassPathEntry {
-    override def getLocations: Seq[File] = Seq(new File(path))
-}
-object LocalClassPathEntry {
-    implicit val reader: Reads[LocalClassPathEntry] = Json.reads[LocalClassPathEntry]
-    val writer: Writes[LocalClassPathEntry] = Json.writes[LocalClassPathEntry]
-}
+import scala.io.Source
 
 object TestCaseExtractor {
     def main(args: Array[String]): Unit = {
