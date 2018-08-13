@@ -2,10 +2,10 @@ import java.io.File
 import java.io.PrintWriter
 
 import javax.tools.ToolProvider
+import org.apache.commons.io.FileUtils
+import play.api.libs.json._
 
 import scala.io.Source
-
-import org.apache.commons.io.FileUtils
 
 object TestCaseExtractor {
     def main(args: Array[String]): Unit = {
@@ -92,9 +92,9 @@ object TestCaseExtractor {
                 val allClassFileNames = allClassFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
 
                 val jarOpts = Seq(if (main != null) "cfe" else "cf")
-                val outPath = Seq(s"../../../${result.getPath}/$projectName.jar")
-                val mainIfPresent = if (main != null) Seq(main) else Seq.empty
-                val args = Seq("jar") ++ jarOpts ++ outPath ++ mainIfPresent ++ allClassFileNames
+                val outPathCompiler = new File(s"../../../${result.getPath}/$projectName.jar")
+                val mainOpt = Option(main)
+                val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getPath) ++ mainOpt ++ allClassFileNames
                 sys.process.Process(args, bin).!
 
                 if (main != null) {
@@ -102,6 +102,15 @@ object TestCaseExtractor {
                     sys.process.Process(Seq("java", "-jar", s"$projectName.jar"), result).!
                 }
 
+                val projectSpec = ProjectSpecification(
+                    name = projectName, target = new File(bin, outPathCompiler.getPath).getCanonicalPath, main = mainOpt, java = 8, cp = None
+                )
+
+                val projectSpecJson: JsValue = Json.toJson(projectSpec)
+                val projectSpecOut = new File(result, s"$projectName.conf")
+                val pw = new PrintWriter(projectSpecOut)
+                pw.write(Json.prettyPrint(projectSpecJson))
+                pw.close()
             }
         }
 

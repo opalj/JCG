@@ -19,16 +19,9 @@ import org.opalj.log.LogMessage
 import org.opalj.log.OPALLogger
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.Writes
 
 import scala.collection.mutable
 import scala.io.Source
-
-case class CallSites(callSites: Set[CallSite])
-
-case class CallSite(declaredTarget: Method, line: Int, method: Method, targets: Set[Method])
-
-case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String])
 
 class DevNullLogger extends OPALLogger {
     override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
@@ -37,7 +30,6 @@ class DevNullLogger extends OPALLogger {
 object DoopAdapter extends JCGTestAdapter {
 
     override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
-
     override def frameworkName(): String = "Doop"
 
     def main(args: Array[String]): Unit = {
@@ -67,10 +59,6 @@ object DoopAdapter extends JCGTestAdapter {
         val callGraph = extractDoopCG(doopResult)
 
         val resultingCallSites: CallSites = convertToCallSites(callGraph)
-
-        implicit val methodReads: Writes[Method] = Json.writes[Method]
-        implicit val callSiteReads: Writes[CallSite] = Json.writes[CallSite]
-        implicit val callSitesReads: Writes[CallSites] = Json.writes[CallSites]
 
         val callSitesJson: JsValue = Json.toJson(resultingCallSites)
         val outFile = new File(s"${tgtJar.getName.replace(".jar", ".json")}")
@@ -205,7 +193,7 @@ object DoopAdapter extends JCGTestAdapter {
                 val returnType = m.group(2)
                 val name = m.group(3)
                 val params = if (m.group(4).isEmpty) Array.empty[String] else m.group(4).split(",")
-                Method(name, toJVMType(declClass), toJVMType(returnType), params.map(toJVMType).toList)
+                Method(name, toJVMType(declClass), toJVMType(returnType), params.map(toJVMType))
             case None ⇒ throw new IllegalArgumentException()
         }
     }
@@ -233,5 +221,11 @@ object DoopAdapter extends JCGTestAdapter {
         ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
 
-    override def serializeCG(algorithm: String, target: String, classPath: Array[String], outputFile: String): Unit = ???
+    override def serializeCG(
+        algorithm:  String,
+        target:     String,
+        mainClass:  String,
+        classPath:  Array[String],
+        outputFile: String
+    ): Unit = ???
 }

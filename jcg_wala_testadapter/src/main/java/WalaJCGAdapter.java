@@ -25,7 +25,7 @@ public class WalaJCGAdapter implements JCGTestAdapter {
     @Override
     public String[] possibleAlgorithms() {
         return new String[]{
-                "RTA", "0-CFA", "1-CFA", "0-1-CFA", "Lib0-CFA", "Lib1-CFA", "Lib0-1-CFA"
+                "0-1-CFA"//"RTA", "0-CFA", "1-CFA", "0-1-CFA"
         };
     }
 
@@ -37,14 +37,15 @@ public class WalaJCGAdapter implements JCGTestAdapter {
     public static void main(String[] args) throws Exception {
         String cgAlgorithm = args[0];
         String targetJar = args[1];
-        String outputPath = args[2];
-        String[] cp = Arrays.copyOfRange(args, 3, args.length);
+        String mainClass = args[2];
+        String outputPath = args[3];
+        String[] cp = Arrays.copyOfRange(args, 4, args.length);
 
-        new WalaJCGAdapter().serializeCG(cgAlgorithm, targetJar, cp, outputPath);
+        new WalaJCGAdapter().serializeCG(cgAlgorithm, targetJar,mainClass, cp, outputPath);
     }
 
     @Override
-    public void serializeCG(String algorithm, String target, String[] classPath, String outputFile) throws Exception {
+    public void serializeCG(String algorithm, String target, String mainClass, String[] classPath, String outputFile) throws Exception {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
         String cp = Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator));
@@ -56,10 +57,10 @@ public class WalaJCGAdapter implements JCGTestAdapter {
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
 
         Iterable<Entrypoint> entrypoints;
-        if (algorithm.startsWith("Lib")) {
+        if (mainClass == null) {
             entrypoints = new AllSubtypesOfApplicationEntrypoints(scope, classHierarchy);
         } else {
-            entrypoints = Util.makeMainEntrypoints(scope, classHierarchy);
+            entrypoints = Util.makeMainEntrypoints(scope, classHierarchy, mainClass);
         }
 
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);

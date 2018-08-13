@@ -1,8 +1,5 @@
 import de.tud.cs.peaks.sootconfig.*;
-import options.CGOptionsWithReflection;
-import options.CHAOptions;
-import options.RTAOptions;
-import options.VTAOptions;
+import options.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import soot.*;
@@ -23,13 +20,11 @@ public class SootJCGAdatper implements JCGTestAdapter {
     private static final String RTA = "RTA";
     private static final String VTA = "VTA";
     private static final String Spark = "SPARK";
-    private static final String LibCHA = "LibCHA";
-    private static final String LibSpark = "LibSpark";
 
 
     @Override
     public String[] possibleAlgorithms() {
-        return new String[]{CHA, RTA, VTA, Spark, LibCHA, LibSpark};
+        return new String[]{CHA/*, RTA, VTA, Spark*/};
     }
 
     @Override
@@ -38,8 +33,8 @@ public class SootJCGAdatper implements JCGTestAdapter {
     }
 
     @Override
-    public void serializeCG(String algorithm, String target, String[] classPath, String outputFile) {
-        FluentOptions options = new FluentOptions();
+    public void serializeCG(String algorithm, String target, String mainClass, String[] classPath, String outputFile) {
+        FluentOptionsWithMainClass options = new FluentOptionsWithMainClass();
         options.wholeProgramAnalysis();
         options.keepLineNumbers();
         options.allowPhantomReferences();
@@ -49,6 +44,13 @@ public class SootJCGAdatper implements JCGTestAdapter {
         options.addPhaseOptions(cgOptions);
 
         cgOptions.handleForNameSafe().handleNewInstanceSafe().useTypesForInvoke();
+
+        if (mainClass == null) {
+            cgOptions.libraryModeSignatureResolution();
+            cgOptions.processAllReachable();
+        } else {
+            options.setMainClass(mainClass);
+        }
 
         CallGraphPhaseSubOptions cgModeOption = null;
         switch (algorithm) {
@@ -63,16 +65,6 @@ public class SootJCGAdatper implements JCGTestAdapter {
                 break;
             case Spark:
                 cgModeOption = new SparkOptions().enable();
-                break;
-            case LibCHA:
-                cgModeOption = new CHAOptions().enable();
-                cgOptions.processAllReachable();
-                cgOptions.libraryModeSignatureResolution();
-                break;
-            case LibSpark:
-                cgModeOption = new SparkOptions().enable();
-                cgOptions.processAllReachable();
-                cgOptions.libraryModeSignatureResolution();
                 break;
         }
         cgOptions.addSubOption(cgModeOption);
@@ -138,10 +130,12 @@ public class SootJCGAdatper implements JCGTestAdapter {
     public static void main(String[] args) {
         String cgAlgorithm = args[0];
         String targetJar = args[1];
-        String outputPath = args[2];
-        String[] cp = Arrays.copyOfRange(args, 3, args.length);
+        String mainClass = args[2];
+        String outputPath = args[3];
 
-        new SootJCGAdatper().serializeCG(cgAlgorithm, targetJar, cp, outputPath);
+        String[] cp = Arrays.copyOfRange(args, 4, args.length);
+
+        new SootJCGAdatper().serializeCG(cgAlgorithm, targetJar, mainClass, cp, outputPath);
     }
 
     private static JSONObject createMethodObject(SootMethod method) {
