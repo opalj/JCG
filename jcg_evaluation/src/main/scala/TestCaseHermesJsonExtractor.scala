@@ -51,7 +51,7 @@ object TestCaseHermesJsonExtractor {
 
     def main(args: Array[String]): Unit = {
         val jreLocations = JRELocation.mapping(new File(args(1)))
-        createHermesJsonFile(new File(args(0)), jreLocations, new File(args(1)))
+        createHermesJsonFile(new File(args(0)), jreLocations, new File(args(2)))
     }
 
 }
