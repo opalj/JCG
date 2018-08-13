@@ -2,7 +2,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.PrintWriter
 
-import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
@@ -26,15 +25,14 @@ object TestCaseHermesJsonExtractor {
 
         val projects = for (projectSpecFile ← projectSpecFiles) yield {
             val json = Json.parse(new FileInputStream(projectSpecFile))
-            json.validate[ProjectSpecification] match {
-                case JsSuccess(projectSpec, _) ⇒
-                    val allTargets = ArrayBuffer(projectSpec.target)
-                    allTargets += jreLocations(projectSpec.java)
-                    allTargets ++= projectSpec.allClassPathEntryFiles.map(_.getAbsolutePath)
-                    HermesProject(projectSpec.name, allTargets.mkString(File.pathSeparator))
-                case _ ⇒
-                    throw new IllegalArgumentException("invalid project.conf")
+            val projectSpec = json.validate[ProjectSpecification].getOrElse {
+                throw new IllegalArgumentException("invalid project.conf")
             }
+
+            val allTargets = ArrayBuffer(projectSpec.target)
+            allTargets += jreLocations(projectSpec.java)
+            allTargets ++= projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
+            HermesProject(projectSpec.name, allTargets.mkString(File.pathSeparator))
 
         }
 

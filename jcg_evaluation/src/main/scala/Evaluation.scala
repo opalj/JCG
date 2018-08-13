@@ -8,6 +8,7 @@ import java.io.Writer
 import org.opalj.br.MethodDescriptor
 import org.opalj.log.GlobalLogContext
 import org.opalj.log.OPALLogger
+import org.opalj.util.PerformanceEvaluation.time
 import play.api.libs.json.Json
 
 import scala.io.Source
@@ -24,7 +25,7 @@ object Evaluation {
     val OUTPUT_FILENAME = "evaluation_results.tsv"
     val PROJECTS_DIR_PATH = "result/"
     val JRE_LOCATIONS_FILE = "jre.json"
-    val EVALUATION_ADAPTERS = List(new SootJCGAdatper()) //, new WalaJCGAdapter())
+    val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
     val HERMES_PROJECT_FILE = "hermes.json"
 
     def main(args: Array[String]): Unit = {
@@ -121,43 +122,31 @@ object Evaluation {
                     }
 
                     if (debug)
-                        println(s"running $adapter $cgAlgo against ${projectSpec.name}")
+                        println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
 
+                    val jsFileName = s"${adapter.frameworkName()}-$cgAlgo-${projectSpec.name}.json"
                     try {
-                        val jsFileName = s"${adapter.frameworkName()}-$cgAlgo-${projectSpec.name}.json"
-                        adapter.serializeCG(
-                            cgAlgo,
-                            projectSpec.target,
-                            projectSpec.main.orNull,
-                            Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles.map(_.getAbsolutePath),
-                            jsFileName
-                        )
+                        time {
+                            adapter.serializeCG(
+                                cgAlgo,
+                                projectSpec.target,
+                                projectSpec.main.orNull,
+                                Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles(projectsDir).map(_.getAbsolutePath),
+                                jsFileName
+                            )
+                        } { t ⇒
+                            if (debug)
+                                println(s"analysis took ${t.toSeconds} s")
+                        }
+
                         System.gc()
 
                         if (isAnnotatedProject) {
-
                             val result = CGMatcher.matchCallSites(
                                 projectSpec.target,
                                 jsFileName
                             )
                             ow.write(s"\t${result.shortNotation}")
-                        }
-
-                        if (projectSpecifigEvaluation) {
-                            val json = Json.parse(new FileInputStream(new File(jsFileName)))
-                            val callSites = json.validate[CallSites].get
-                            for {
-                                (fId, locations) ← locationsMap(projectSpec.name)
-                                location ← locations
-                            } {
-                                // todo we are unsound -> write that info somewhere
-                                // source and how often
-                                val unsound = callSites.callSites.exists { cs ⇒
-                                    cs.method == location || cs.targets.contains(location)
-                                }
-                                if (unsound)
-                                    println(s"${projectSpec.name} - $fId - $location)") //
-                            }
                         }
 
                     } catch {
@@ -168,6 +157,23 @@ object Evaluation {
                             }
 
                             ow.write(s"\tE")
+                    }
+                    val jsFile = new File(jsFileName)
+                    if (projectSpecifigEvaluation && jsFile.exists()) {
+                        val json = Json.parse(new FileInputStream(jsFile))
+                        val callSites = json.validate[CallSites].get
+                        for {
+                            (fId, locations) ← locationsMap(projectSpec.name)
+                            location ← locations
+                        } {
+                            // todo we are unsound -> write that info somewhere
+                            // source and how often
+                            val unsound = callSites.callSites.exists { cs ⇒
+                                cs.method == location || cs.targets.contains(location)
+                            }
+                            if (unsound)
+                                println(s"${projectSpec.name} - $fId - $location)") //
+                        }
                     }
 
                 }

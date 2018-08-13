@@ -25,7 +25,7 @@ public class WalaJCGAdapter implements JCGTestAdapter {
     @Override
     public String[] possibleAlgorithms() {
         return new String[]{
-                "RTA", "0-CFA", "1-CFA", "0-1-CFA", "Lib0-CFA", "Lib1-CFA", "Lib0-1-CFA"
+                "0-1-CFA"//"RTA", "0-CFA", "1-CFA", "0-1-CFA"
         };
     }
 

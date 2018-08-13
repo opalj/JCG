@@ -17,9 +17,13 @@ import scalaz.\/
 case class ProjectSpecification(
         name: String, target: String, main: Option[String], java: Int, cp: Option[Array[ClassPathEntry]]
 ) {
-    def allClassPathEntryFiles: Array[File] = {
-        cp.getOrElse(Array.empty).flatMap(_.getLocations)
-        // todo add the correct java version
+    def allClassPathEntryFiles(parent: File): Array[File] = {
+        cp.getOrElse(Array.empty).flatMap(_.getLocations.map { location ⇒
+            if (location.isAbsolute)
+                location
+            else
+                new File(parent, location.getPath)
+        })
     }
 }
 object ProjectSpecification {
@@ -57,6 +61,11 @@ object MavenClassPathEntry {
     val writer: Writes[MavenClassPathEntry] = Json.writes[MavenClassPathEntry]
 }
 
+/**
+ * Represents a local class path entry, i.e. a file such as a jar
+ * @param path file to the class path entry: either absolute or relative to the directory of the
+ *             specification file.
+ */
 case class LocalClassPathEntry(path: String) extends ClassPathEntry {
     override def getLocations: Array[File] = Array(new File(path))
 }
