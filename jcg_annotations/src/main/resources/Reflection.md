@@ -299,11 +299,11 @@ class Foo1 {
         name = "<clinit>", line = 17, resolvedTargets = { "Llrr2/Foo1;", "Llrr2/Foo2;" }
     )
     static void m(boolean b) throws Exception {
-        String className;
+        String className = "lrr2.Foo";
         if (b)
-            className = "lrr2.Foo" + 1;
+            className += 1;
         else
-            className = "lrr2.Foo" + 2;
+            className += 2;
         Class.forName(className);
     }
 
