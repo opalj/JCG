@@ -15,15 +15,9 @@ import org.opalj.br.VoidType
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.SomeProject
 import org.opalj.log.GlobalLogContext
-import org.opalj.log.LogContext
-import org.opalj.log.LogMessage
 import org.opalj.log.OPALLogger
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json
-
-class DevNullLogger extends OPALLogger {
-    override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
-}
 
 object CGMatcher {
 
@@ -198,7 +192,7 @@ object CGMatcher {
             val returnType = getReturnType(annotation).toJVMTypeName
             val parameterTypes = getParameterList(annotation).map(_.toJVMTypeName)
             for (declaringClass ← getResolvedTargets(annotation)) {
-                val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes.toArray)
+                val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
                 val annotatedSource = convertMethod(source)
                 if (!callsIndirectly(computedCallSites, annotatedSource, annotatedTarget, verbose))
                     return Unsound;
@@ -248,7 +242,7 @@ object CGMatcher {
         val returnType = method.returnType.toJVMTypeName
         val parameterTypes = method.parameterTypes.map(_.toJVMTypeName).toList
 
-        Method(name, declaringClass, returnType, parameterTypes.toArray)
+        Method(name, declaringClass, returnType, parameterTypes)
     }
 
     //

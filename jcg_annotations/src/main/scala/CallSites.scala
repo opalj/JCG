@@ -18,7 +18,7 @@ object CallSite {
     implicit val callSiteWrites: Writes[CallSite] = Json.writes[CallSite]
 }
 
-case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: Array[String])
+case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String])
 
 object Method {
     implicit val methodReads: Reads[Method] = Json.reads[Method]

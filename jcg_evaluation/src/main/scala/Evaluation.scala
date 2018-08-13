@@ -5,7 +5,9 @@ import java.io.FileWriter
 import java.io.OutputStreamWriter
 import java.io.Writer
 
-import play.api.libs.json.JsSuccess
+import org.opalj.br.MethodDescriptor
+import org.opalj.log.GlobalLogContext
+import org.opalj.log.OPALLogger
 import play.api.libs.json.Json
 
 import scala.io.Source
@@ -42,6 +44,9 @@ object Evaluation {
 
         if (projectsDir.exists && projectsDir.isDirectory) {
             if (runHermes) {
+                if (debug)
+                    println("running hermes")
+                OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
                 TestCaseHermesJsonExtractor.createHermesJsonFile(
                     projectsDir, jreLocations, new File(HERMES_PROJECT_FILE)
                 )
@@ -63,21 +68,19 @@ object Evaluation {
             }
             val locations: Map[String, Map[String, Set[Method]]] =
                 if (projectSpecifigEvaluation) {
+                    if (debug)
+                        println("create locations mapping")
                     val locations = new File(hermesLocationsDir)
                     assert(locations.exists() && locations.isDirectory)
                     (for {
                         projectLocation ← locations.listFiles(_.getName.endsWith(".tsv"))
                         line ← Source.fromFile(projectLocation).getLines().drop(1)
                     } yield {
-                        val Array(projectId, featureId, _, _, className, methodName, md, _, _) = line.split("\t", -1)
-                        val mdMatch = """\((.*)\)(.*)""".r.findFirstMatchIn(md).get
-                        val paramsDescr = mdMatch.group(1)
-                        val params =
-                            if (paramsDescr.isEmpty)
-                                Array.empty[String]
-                            else
-                                paramsDescr.split(";")
-                        val returnType = mdMatch.group(2)
+                        val Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = line.split("\t", -1)
+                        val className = classString.replace("\"", "")
+                        val md = MethodDescriptor(mdString.replace("\"", ""))
+                        val params = md.parameterTypes.map(_.toJVMTypeName).toList
+                        val returnType = md.returnType.toJVMTypeName
                         (projectId, featureId, Method(methodName, className, returnType, params))
                     }).groupBy(_._1).map {
                         case (pId, group1) ⇒ pId → group1.map { case (_, f, m) ⇒ f → m }.groupBy(_._1).map {
@@ -113,53 +116,58 @@ object Evaluation {
 
                     val json = Json.parse(new FileInputStream(projectSpecFile))
 
-                    json.validate[ProjectSpecification] match {
-                        case JsSuccess(projectSpec, _) ⇒
-                            try {
-                                val jsFileName = s"${adapter.frameworkName()}-$cgAlgo-${projectSpec.name}.json"
-                                adapter.serializeCG(
-                                    cgAlgo,
-                                    projectSpec.target,
-                                    projectSpec.main.orNull,
-                                    Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles.map(_.getAbsolutePath),
-                                    jsFileName
-                                )
-                                System.gc()
+                    val projectSpec = json.validate[ProjectSpecification].getOrElse {
+                        throw new IllegalArgumentException("invalid project.conf")
+                    }
 
-                                if (isAnnotatedProject) {
+                    if (debug)
+                        println(s"running $adapter $cgAlgo against ${projectSpec.name}")
 
-                                    val result = CGMatcher.matchCallSites(
-                                        projectSpec.target,
-                                        jsFileName
-                                    )
-                                    ow.write(s"\t${result.shortNotation}")
+                    try {
+                        val jsFileName = s"${adapter.frameworkName()}-$cgAlgo-${projectSpec.name}.json"
+                        adapter.serializeCG(
+                            cgAlgo,
+                            projectSpec.target,
+                            projectSpec.main.orNull,
+                            Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles.map(_.getAbsolutePath),
+                            jsFileName
+                        )
+                        System.gc()
+
+                        if (isAnnotatedProject) {
+
+                            val result = CGMatcher.matchCallSites(
+                                projectSpec.target,
+                                jsFileName
+                            )
+                            ow.write(s"\t${result.shortNotation}")
+                        }
+
+                        if (projectSpecifigEvaluation) {
+                            val json = Json.parse(new FileInputStream(new File(jsFileName)))
+                            val callSites = json.validate[CallSites].get
+                            for {
+                                (fId, locations) ← locationsMap(projectSpec.name)
+                                location ← locations
+                            } {
+                                // todo we are unsound -> write that info somewhere
+                                // source and how often
+                                val unsound = callSites.callSites.exists { cs ⇒
+                                    cs.method == location || cs.targets.contains(location)
                                 }
-
-                                if (projectSpecifigEvaluation) {
-                                    val json = Json.parse(new FileInputStream(new File(jsFileName)))
-                                    val callSites = json.validate[CallSites].get
-                                    for {
-                                        (fId, locations) ← locationsMap(projectSpec.name)
-                                        location ← locations
-                                    } {
-                                        // todo we are unsound -> write that info somewhere
-                                        // source and how often
-                                        val unsound = callSites.callSites.exists { cs ⇒
-                                            cs.method == location || cs.targets.contains(location)
-                                        }
-                                        if (unsound)
-                                            println(s"${projectSpec.name} - $fId - $location)") //
-                                    }
-                                }
-
-                            } catch {
-                                case e: Throwable ⇒
-                                    if (debug)
-                                        println(projectSpec.name)
-                                    println(e.printStackTrace())
-                                    ow.write(s"\tE")
+                                if (unsound)
+                                    println(s"${projectSpec.name} - $fId - $location)") //
                             }
-                        case _ ⇒ throw new IllegalArgumentException("invalid project.conf")
+                        }
+
+                    } catch {
+                        case e: Throwable ⇒
+                            if (debug) {
+                                println(projectSpec.name)
+                                println(e.printStackTrace())
+                            }
+
+                            ow.write(s"\tE")
                     }
 
                 }
