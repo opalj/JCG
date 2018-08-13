@@ -16,7 +16,7 @@ class Foo {
         name = "<clinit>", line = 11, resolvedTargets = "Ltr1/Foo;"
     )
     public static void main(String[] args) throws Exception {
-        Foo.class;
+        Class c = Foo.class;
     }
 }
 ```
@@ -112,7 +112,7 @@ class Foo {
         resolvedTargets = "Ltr5/Foo;"
     )
     public static void main(String[] args) throws Exception {
-        Foo.class.getDeclaredMethod("m", String.class).invoke("Bar");
+        Foo.class.getDeclaredMethod("m", String.class).invoke(null, "Bar");
     }
 }
 ```
@@ -143,7 +143,7 @@ class Foo {
 
 
 ##TR7
-[//]: # (MAIN: tr4.Foo)
+[//]: # (MAIN: tr7.Foo)
 Test reflection with respect to the default constructor.
 
 ```java
@@ -162,13 +162,13 @@ class Foo {
 ```
 [//]: # (END)
 
-##TR7
-[//]: # (MAIN: tr7.Foo)
+##TR8
+[//]: # (MAIN: tr8.Foo)
 Test reflection used to retrieve a field.
 
 ```java
-// tr7/Foo.java
-package tr7;
+// tr8/Foo.java
+package tr8;
 
 import java.lang.reflect.Field;
 import lib.annotations.callgraph.IndirectCall;
@@ -177,7 +177,7 @@ public class Foo {
 
     @IndirectCall(
         name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Ltr7/Foo;"
+        resolvedTargets = "Ltr8/Foo;"
     )
     public static void main(String[] args) throws Exception {
         Foo foo = new Foo();
@@ -195,13 +195,13 @@ public class Foo {
 ```
 [//]: # (END)
 
-##TR8
-[//]: # (MAIN: tr8.Foo)
+##TR9
+[//]: # (MAIN: tr9.Foo)
 Test reflection used to retrieve a field via getField.
 
 ```java
-// tr8/Foo.java
-package tr8;
+// tr9/Foo.java
+package tr9;
 
 import java.lang.reflect.Field;
 import lib.annotations.callgraph.IndirectCall;
@@ -210,7 +210,7 @@ public class Foo {
 
     @IndirectCall(
         name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Ltr8/Foo;"
+        resolvedTargets = "Ltr9/Foo;"
     )
     public static void main(String[] args) throws Exception {
         Foo foo = new Foo();
@@ -228,23 +228,23 @@ public class Foo {
 ```
 [//]: # (END)
 
-##TR9
-[//]: # (MAIN: tr9.Foo)
+##TR10
+[//]: # (MAIN: tr10.Foo)
 Test reflection with respect to forName.
 
 ```java
-// tr9/Foo.java
-package tr9;
+// tr10/Foo.java
+package tr10;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
     static int foo = 1;
 
     @IndirectCall(
-        name = "<clinit>", line = 11, resolvedTargets = "Ltr9/Foo;"
+        name = "<clinit>", line = 11, resolvedTargets = "Ltr10/Foo;"
     )
     public static void main(String[] args) throws Exception {
-        Class.forName("tr9.Foo");
+        Class.forName("tr10.Foo");
     }
 }
 ```
@@ -411,19 +411,19 @@ Test reflection with respect to a private instance field that is set in the init
 
 ```java
 // csr3/Foo.java
-package lrr3;
+package csr3;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
     static int foo = 1;
-    private String methodName = "staticToString";
+    public static String className;
 
     @IndirectCall(
         name = "<clinit>", line = 13, resolvedTargets = "Lcsr3/Foo;"
     )
     public static void main(String[] args) throws Exception {
-        Foo foo = new Foo();
-        Class.forName(foo.className);
+        Foo.className = args[0];
+        Class.forName(Foo.className);
     }
 }
 ```
