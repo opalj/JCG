@@ -20,7 +20,7 @@ object Evaluation {
     val runHermes = true
     val projectSpecifigEvaluation = true
     val runAnalyses = true
-    val isAnnotatedProject = true
+    val isAnnotatedProject = false
     val PROJECTS_DIR_PATH = "result/"
     val RESULTS_DIR_PATH = "evaluation/"
     val JRE_LOCATIONS_FILE = "jre.json"
@@ -142,9 +142,9 @@ object Evaluation {
                         time {
                             adapter.serializeCG(
                                 cgAlgo,
-                                projectSpec.target,
+                                projectSpec.target(projectsDir).getCanonicalPath,
                                 projectSpec.main.orNull,
-                                Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles(projectsDir).map(_.getAbsolutePath),
+                                Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath),
                                 jsFile.getPath
                             )
                         } { t ⇒
@@ -156,7 +156,7 @@ object Evaluation {
 
                         if (isAnnotatedProject) {
                             val result = CGMatcher.matchCallSites(
-                                projectSpec.target,
+                                projectSpec.target(projectsDir).getCanonicalPath,
                                 jsFile.getPath
                             )
                             ow.write(s"\t${result.shortNotation}")

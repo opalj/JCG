@@ -15,7 +15,7 @@ import play.api.libs.json.__
 import scalaz.\/
 
 case class ProjectSpecification(
-        name: String, target: String, main: Option[String], java: Int, cp: Option[Array[ClassPathEntry]]
+        name: String, private val target: String, main: Option[String], java: Int, private val cp: Option[Array[ClassPathEntry]]
 ) {
     def allClassPathEntryFiles(parent: File): Array[File] = {
         cp.getOrElse(Array.empty).flatMap(_.getLocations.map { location ⇒
@@ -24,6 +24,14 @@ case class ProjectSpecification(
             else
                 new File(parent, location.getPath)
         })
+    }
+
+    def target(parent: File): File = {
+        val tgtFile = new File(target)
+        if (tgtFile.isAbsolute)
+            tgtFile
+        else
+            new File(parent, target)
     }
 }
 object ProjectSpecification {

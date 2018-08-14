@@ -29,7 +29,7 @@ object TestCaseHermesJsonExtractor {
                 throw new IllegalArgumentException("invalid project.conf")
             }
 
-            val allTargets = ArrayBuffer(projectSpec.target)
+            val allTargets = ArrayBuffer(projectSpec.target(projectsDir).getCanonicalPath)
             allTargets += jreLocations(projectSpec.java)
             allTargets ++= projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
             HermesProject(projectSpec.name, allTargets.mkString(File.pathSeparator))
