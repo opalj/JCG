@@ -109,7 +109,7 @@ interface Interface {
     static String testHook = init();
     static final Demo referenceMe = new Demo();
     
-    @CallSite(name = "callback", line = 15, resolvedTargets = "Lsi/Interface;")
+    @CallSite(name = "callback", line = 17, resolvedTargets = "Lsi/Interface;")
     static String init() {
         callback();
         return "Interface";

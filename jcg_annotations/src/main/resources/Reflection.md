@@ -274,7 +274,7 @@ class Foo {
 
     @IndirectCall(
         name = "<clinit>", returnType = String.class, line = 19,
-        resolvedTargets = { "Llrr1/Foo;", "Llrr2/Foo;" }
+        resolvedTargets = { "Llrr1/Foo;", "Llrr1/Foo;" }
     )
     static void m(boolean b) throws Exception {
         Class.forName(b ? "lrr1.Foo" : "lrr1.Bar");
@@ -299,12 +299,12 @@ class Foo1 {
         name = "<clinit>", line = 17, resolvedTargets = { "Llrr2/Foo1;", "Llrr2/Foo2;" }
     )
     static void m(boolean b) throws Exception {
-        String className = "lrr2.Foo";
+        StringBuilder className = new StringBuilder("lrr2.Foo");
         if (b)
-            className += 1;
+            className.append("1");
         else
-            className += 2;
-        Class.forName(className);
+            className.append("2");
+        Class.forName(className.toString());
     }
 
     public static void main(String[] args) throws Exception {

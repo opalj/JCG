@@ -73,7 +73,7 @@ class Class {
     
     public void method(){ }
  
-    @CallSite(name = "method", line = 15, resolvedTargets = {"Lbpc3/ClassImpl;"}, prohibitedTargets ={"Lbpc3/Class"})
+    @CallSite(name = "method", line = 15, resolvedTargets = {"Lbpc3/ClassImpl;"}, prohibitedTargets ={"Lbpc3/Class;"})
     public static void callOnInterface(Interface i){
         i.method();
     }
