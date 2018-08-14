@@ -34,9 +34,10 @@ lazy val jcg_annotation_matcher = project.settings(
 lazy val jcg_wala_testadapter = project.settings(
     commonSettings,
     name := "JCG WALA Test Adapter",
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.core" % "1.4.3",
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.4.3",
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.4.3",
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.core" % "1.5.0-SNAPSHOT",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.5.0-SNAPSHOT",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.5.0-SNAPSHOT",
     libraryDependencies += "com.googlecode.json-simple" % "json-simple" % "1.1.1",
     aggregate in assembly := false,
     publishArtifact := false

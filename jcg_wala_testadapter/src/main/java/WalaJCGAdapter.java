@@ -1,6 +1,7 @@
 import com.ibm.wala.classLoader.CallSiteReference;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.classLoader.Language;
 import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
@@ -60,6 +61,7 @@ public class WalaJCGAdapter implements JCGTestAdapter {
         if (mainClass == null) {
             entrypoints = new AllSubtypesOfApplicationEntrypoints(scope, classHierarchy);
         } else {
+            mainClass = "L" + mainClass.replace(".", "/");
             entrypoints = Util.makeMainEntrypoints(scope, classHierarchy, mainClass);
         }
 
@@ -71,10 +73,10 @@ public class WalaJCGAdapter implements JCGTestAdapter {
         AnalysisCache cache = new AnalysisCacheImpl();
 
         if (algorithm.contains("0-CFA")) {
-            SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(options, cache, classHierarchy, scope);
+            SSAPropagationCallGraphBuilder ncfaBuilder = Util.makeZeroCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
             callGraph = ncfaBuilder.makeCallGraph(options);
         } else if (algorithm.contains("0-1-CFA")) {
-            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(options, cache, classHierarchy, scope);
+            SSAPropagationCallGraphBuilder cfaBuilder = Util.makeZeroOneCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
             callGraph = cfaBuilder.makeCallGraph(options);
         } else if (algorithm.contains("1-CFA")) {
             SSAPropagationCallGraphBuilder cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope);
