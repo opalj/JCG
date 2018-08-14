@@ -15,7 +15,7 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable {
-
+    static final long serialVersionUID = 42L;
     @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
     	out.defaultWriteObject();
@@ -46,7 +46,7 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable {
-
+    static final long serialVersionUID = 42L;
     @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
@@ -83,7 +83,7 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable {
-
+    static final long serialVersionUID = 42L;
     @CallSite(name = "defaultWriteObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
@@ -117,8 +117,8 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
-public class Foo implements Serializable {
-    
+public class Foo implements Serializable { 
+    static final long serialVersionUID = 42L;
     @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -149,7 +149,7 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable {
-    
+    static final long serialVersionUID = 42L;
     @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -180,8 +180,8 @@ import java.io.IOException;
 import java.io.ObjectStreamException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable {
+    static final long serialVersionUID = 42L;
     public Object replace() { return this; }
-
 	@CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc/Foo;", line = 14)
     private Object writeReplace() throws ObjectStreamException {
     	return replace();
@@ -217,8 +217,8 @@ import java.io.IOException;
 import java.io.ObjectStreamException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable {
+    static final long serialVersionUID = 42L;
     public Object replace() { return this; }
-
     @CallSite(name = "replace", returnType = Object.class, resolvedTargets = "Lsc/Foo;", line = 14)
     private Object readResolve() throws ObjectStreamException {
         return replace();
@@ -255,8 +255,8 @@ import java.io.ObjectInputValidation;
 import java.io.InvalidObjectException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable, ObjectInputValidation {
+    static final long serialVersionUID = 42L;
     public void callback() {  }
-
     @CallSite(name = "callback", resolvedTargets = "Lsc/Foo;", line = 16)
     public void validateObject() throws InvalidObjectException {
         callback();
@@ -306,7 +306,7 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 
 public class Foo extends Bar implements Serializable {
-    
+    static final long serialVersionUID = 42L;
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
