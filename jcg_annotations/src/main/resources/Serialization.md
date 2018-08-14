@@ -187,10 +187,6 @@ public class Foo implements Serializable {
     	return replace();
     }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-    	out.defaultWriteObject();
-    }
-
     public static void main(String[] args) throws Exception {
     	Foo f = new Foo();
     	FileOutputStream fos = new FileOutputStream("test.ser");
@@ -223,10 +219,6 @@ public class Foo implements Serializable {
     private Object readResolve() throws ObjectStreamException {
         return replace();
     }
-    
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-    }
 
     public static void main(String[] args) throws Exception {
         FileInputStream fis = new FileInputStream("test.ser");
@@ -256,13 +248,14 @@ import java.io.InvalidObjectException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable, ObjectInputValidation {
     static final long serialVersionUID = 42L;
-    public void callback() {  }
+    public void callback() { }
     @CallSite(name = "callback", resolvedTargets = "Lsc/Foo;", line = 16)
     public void validateObject() throws InvalidObjectException {
         callback();
     }
     
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.registerValidation(this, 0);
         in.defaultReadObject();
     }
 
