@@ -54,6 +54,7 @@ object Evaluation {
                     println("running hermes")
 
                 val hermesFile = new File("hermes.json")
+                assert(!hermesFile.exists())
 
                 OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
