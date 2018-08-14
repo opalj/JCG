@@ -19,3 +19,4 @@ out/
 doc/src/document.log
 result/
 *.jar.json
+/evaluation

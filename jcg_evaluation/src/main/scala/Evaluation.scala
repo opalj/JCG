@@ -3,6 +3,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.io.OutputStreamWriter
+import java.io.PrintWriter
 import java.io.Writer
 
 import org.opalj.br.MethodDescriptor
@@ -17,19 +18,23 @@ object Evaluation {
 
     val debug = true
     val runHermes = true
-    val hermesResult = "hermes.csv"
-    val hermesLocationsDir = "hermesResults/"
     val projectSpecifigEvaluation = true
     val runAnalyses = true
-    val isAnnotatedProject = false
-    val OUTPUT_FILENAME = "evaluation_results.tsv"
+    val isAnnotatedProject = true
     val PROJECTS_DIR_PATH = "result/"
+    val RESULTS_DIR_PATH = "evaluation/"
     val JRE_LOCATIONS_FILE = "jre.json"
     val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
-    val HERMES_PROJECT_FILE = "hermes.json"
 
     def main(args: Array[String]): Unit = {
         val projectsDir = new File(PROJECTS_DIR_PATH)
+        assert(projectsDir.exists())
+        val resultsDir = new File(RESULTS_DIR_PATH)
+
+        if (resultsDir.exists()) {
+            resultsDir.delete()
+        }
+        resultsDir.mkdirs()
 
         var jarFilter = ""
         var target = ""
@@ -40,41 +45,44 @@ object Evaluation {
 
         val jreLocations = JRELocation.mapping(new File(JRE_LOCATIONS_FILE))
 
-        val outputTarget = getOutputTarget(target)
+        val outputTarget = getOutputTarget(target, resultsDir)
         val ow = new BufferedWriter(outputTarget)
 
         if (projectsDir.exists && projectsDir.isDirectory) {
             if (runHermes) {
                 if (debug)
                     println("running hermes")
+
+                val hermesFile = new File("hermes.json")
+
                 OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
+
                 TestCaseHermesJsonExtractor.createHermesJsonFile(
-                    projectsDir, jreLocations, new File(HERMES_PROJECT_FILE)
+                    projectsDir, jreLocations, hermesFile
                 )
 
                 val hermesDefaultArgs = Array(
-                    "-config", HERMES_PROJECT_FILE,
-                    "-statistics", hermesResult
+                    "-config", hermesFile.getPath,
+                    "-statistics", s"$RESULTS_DIR_PATH${File.separator}hermes.csv"
                 )
                 val writeLocationsArgs =
                     if (projectSpecifigEvaluation)
                         Array(
-                            "-writeLocations", hermesLocationsDir
+                            "-writeLocations", RESULTS_DIR_PATH
                         )
                     else Array.empty[String]
 
                 org.opalj.hermes.HermesCLI.main(
                     hermesDefaultArgs ++ writeLocationsArgs
                 )
+                hermesFile.delete()
             }
             val locations: Map[String, Map[String, Set[Method]]] =
                 if (projectSpecifigEvaluation) {
                     if (debug)
                         println("create locations mapping")
-                    val locations = new File(hermesLocationsDir)
-                    assert(locations.exists() && locations.isDirectory)
                     (for {
-                        projectLocation ← locations.listFiles(_.getName.endsWith(".tsv"))
+                        projectLocation ← resultsDir.listFiles(_.getName.endsWith(".tsv"))
                         line ← Source.fromFile(projectLocation).getLines().drop(1)
                     } yield {
                         val Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = line.split("\t", -1)
@@ -92,7 +100,7 @@ object Evaluation {
                     Map.empty
 
             if (runAnalyses) {
-                runAnalyses(projectsDir, jarFilter, ow, locations, jreLocations)
+                runAnalyses(projectsDir, resultsDir, jarFilter, ow, locations, jreLocations)
             }
 
             ow.flush()
@@ -102,6 +110,7 @@ object Evaluation {
 
     private def runAnalyses(
         projectsDir:  File,
+        resultsDir:   File,
         jarFilter:    String,
         ow:           BufferedWriter,
         locationsMap: Map[String, Map[String, Set[Method]]],
@@ -124,7 +133,10 @@ object Evaluation {
                     if (debug)
                         println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
 
-                    val jsFileName = s"${adapter.frameworkName()}-$cgAlgo-${projectSpec.name}.json"
+                    val outDir = new File(resultsDir, s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo")
+                    outDir.mkdirs()
+
+                    val jsFile = new File(outDir, "cg.json")
                     try {
                         time {
                             adapter.serializeCG(
@@ -132,7 +144,7 @@ object Evaluation {
                                 projectSpec.target,
                                 projectSpec.main.orNull,
                                 Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles(projectsDir).map(_.getAbsolutePath),
-                                jsFileName
+                                jsFile.getPath
                             )
                         } { t ⇒
                             if (debug)
@@ -144,7 +156,7 @@ object Evaluation {
                         if (isAnnotatedProject) {
                             val result = CGMatcher.matchCallSites(
                                 projectSpec.target,
-                                jsFileName
+                                jsFile.getPath
                             )
                             ow.write(s"\t${result.shortNotation}")
                         }
@@ -158,8 +170,8 @@ object Evaluation {
 
                             ow.write(s"\tE")
                     }
-                    val jsFile = new File(jsFileName)
                     if (projectSpecifigEvaluation && jsFile.exists()) {
+                        val pw = new PrintWriter(new File(outDir, "pse.tsv"))
                         val json = Json.parse(new FileInputStream(jsFile))
                         val callSites = json.validate[CallSites].get
                         for {
@@ -172,8 +184,9 @@ object Evaluation {
                                 cs.method == location || cs.targets.contains(location)
                             }
                             if (unsound)
-                                println(s"${projectSpec.name} - $fId - $location)") //
+                                pw.println(s"${projectSpec.name}\t$fId\t$location)") //
                         }
+                        pw.close
                     }
 
                 }
@@ -190,10 +203,10 @@ object Evaluation {
         ow.newLine()
     }
 
-    def getOutputTarget(target: String): Writer = target match {
+    def getOutputTarget(target: String, resultsDir: File): Writer = target match {
         case "c" ⇒ new OutputStreamWriter(System.out)
         case "f" ⇒
-            val outputFile = new File(OUTPUT_FILENAME);
+            val outputFile = new File(resultsDir, "evaluation-result.tsv")
             if (outputFile.exists()) {
                 outputFile.delete()
                 outputFile.createNewFile()
