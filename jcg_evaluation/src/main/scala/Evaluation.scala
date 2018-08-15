@@ -89,9 +89,14 @@ object Evaluation {
                         )
                     else Array.empty[String]
 
-                org.opalj.hermes.HermesCLI.main(
-                    hermesDefaultArgs ++ writeLocationsArgs
-                )
+                time {
+                    org.opalj.hermes.HermesCLI.main(
+                        hermesDefaultArgs ++ writeLocationsArgs
+                    )
+                } { t ⇒
+                    if (debug)
+                        println(s"hermes run took ${t.toSeconds} seconds")
+                }
                 hermesFile.delete()
             }
             val locations: Map[String, Map[String, Set[Method]]] =
