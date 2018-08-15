@@ -41,7 +41,8 @@ class OpalJCGAdatper extends JCGTestAdapter {
         mainClass:  String,
         classPath:  Array[String],
         outputFile: String
-    ): Unit = {
+    ): Long = {
+        val before = System.nanoTime()
         val baseConfig: Config = ConfigFactory.load()
 
         implicit val config: Config =
@@ -55,11 +56,11 @@ class OpalJCGAdatper extends JCGTestAdapter {
                     "org.opalj.br.analyses.cg.InitialEntryPointsKey.analysis",
                     ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.ConfigurationEntryPointsFinder")
                 ).withValue(
-                    "org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints",
-                    ConfigValueFactory.fromIterable(Seq(ConfigValueFactory.fromMap(Map(
-                        "declaringClass" -> mainClass.replace('.', '/'), "name" -> "main"
-                    ).asJava)).asJava)
-                )
+                        "org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints",
+                        ConfigValueFactory.fromIterable(Seq(ConfigValueFactory.fromMap(Map(
+                            "declaringClass" → mainClass.replace('.', '/'), "name" → "main"
+                        ).asJava)).asJava)
+                    )
             }
 
         val targetClassFiles = JavaClassFileReader().ClassFiles(new File(target)).toIterator
@@ -88,6 +89,8 @@ class OpalJCGAdatper extends JCGTestAdapter {
 
         ps.waitOnPhaseCompletion()
 
+        val after = System.nanoTime()
+
         var callSites: Set[CallSite] = Set.empty
 
         for (dm ← declaredMethods.declaredMethods) {
@@ -107,6 +110,8 @@ class OpalJCGAdatper extends JCGTestAdapter {
         file.write(Json.prettyPrint(Json.toJson(CallSites(callSites))))
         file.flush()
         file.close()
+
+        after - before
     }
 
     private def createCallSites(
@@ -132,7 +137,7 @@ class OpalJCGAdatper extends JCGTestAdapter {
                     desc.parameterTypes.iterator.map(_.toJVMTypeName).toList
                 )
 
-            val (directCallees, indirectCallees) = callees.partition { callee =>
+            val (directCallees, indirectCallees) = callees.partition { callee ⇒
                 callee.name == name && // TODO check descriptor correctly for refinement
                     callee.descriptor.parametersCount == desc.parametersCount
             }

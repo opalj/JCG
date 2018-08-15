@@ -161,17 +161,15 @@ object Evaluation {
 
                     val jsFile = new File(outDir, "cg.json")
                     try {
-                        time {
-                            adapter.serializeCG(
-                                cgAlgo,
-                                projectSpec.target(projectsDir).getCanonicalPath,
-                                projectSpec.main.orNull,
-                                Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath),
-                                jsFile.getPath
-                            )
-                        } { t ⇒
-                            if (debug)
-                                println(s"analysis took ${t.toSeconds} s")
+                        val elapsed = adapter.serializeCG(
+                            cgAlgo,
+                            projectSpec.target(projectsDir).getCanonicalPath,
+                            projectSpec.main.orNull,
+                            Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath),
+                            jsFile.getPath
+                        )
+                        if (debug) {
+                            println(s"analysis took ${elapsed / 1000000000d}")
                         }
 
                         System.gc()

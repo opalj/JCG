@@ -227,5 +227,5 @@ object DoopAdapter extends JCGTestAdapter {
         mainClass:  String,
         classPath:  Array[String],
         outputFile: String
-    ): Unit = ???
+    ): Long = ???
 }

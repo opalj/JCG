@@ -46,7 +46,8 @@ public class WalaJCGAdapter implements JCGTestAdapter {
     }
 
     @Override
-    public void serializeCG(String algorithm, String target, String mainClass, String[] classPath, String outputFile) throws Exception {
+    public long serializeCG(String algorithm, String target, String mainClass, String[] classPath, String outputFile) throws Exception {
+        long before = System.nanoTime();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
         String cp = Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator));
@@ -87,6 +88,7 @@ public class WalaJCGAdapter implements JCGTestAdapter {
         } else {
             throw new IllegalArgumentException();
         }
+        long after = System.nanoTime();
 
         JSONArray callSites = new JSONArray();
         JSONObject callSitesObject = new JSONObject();
@@ -144,6 +146,8 @@ public class WalaJCGAdapter implements JCGTestAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return after - before;
     }
 
     private static JSONObject createMethodObject(MethodReference method) {

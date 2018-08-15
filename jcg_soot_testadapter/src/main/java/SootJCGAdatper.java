@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class SootJCGAdatper implements JCGTestAdapter {
@@ -33,7 +34,7 @@ public class SootJCGAdatper implements JCGTestAdapter {
     }
 
     @Override
-    public void serializeCG(String algorithm, String target, String mainClass, String[] classPath, String outputFile) {
+    public long serializeCG(String algorithm, String target, String mainClass, String[] classPath, String outputFile) {
         FluentOptionsWithMainClass options = new FluentOptionsWithMainClass();
         options.wholeProgramAnalysis();
         options.keepLineNumbers();
@@ -125,6 +126,8 @@ public class SootJCGAdatper implements JCGTestAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return result.packRuntime().elapsed(TimeUnit.NANOSECONDS);
     }
 
     public static void main(String[] args) {
