@@ -20,3 +20,5 @@ doc/src/document.log
 result/
 *.jar.json
 /evaluation
+jre.conf
+local.sbt

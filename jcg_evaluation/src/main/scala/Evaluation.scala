@@ -23,7 +23,7 @@ object Evaluation {
     var isAnnotatedProject = false
 
     val RESULTS_DIR_PATH = "evaluation/" // todo merge outputs
-    val JRE_LOCATIONS_FILE = "jre.json"
+    val JRE_LOCATIONS_FILE = "jre.conf"
     val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
 
     def main(args: Array[String]): Unit = {
