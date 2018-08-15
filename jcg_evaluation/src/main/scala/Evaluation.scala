@@ -16,32 +16,48 @@ import scala.io.Source
 
 object Evaluation {
 
-    val debug = true
-    val runHermes = true
-    val projectSpecifigEvaluation = true
-    val runAnalyses = true
-    val isAnnotatedProject = false
-    val PROJECTS_DIR_PATH = "result/"
-    val RESULTS_DIR_PATH = "evaluation/"
+    var debug = true
+    var runHermes = true
+    var projectSpecificEvaluation = false
+    var runAnalyses = false
+    var isAnnotatedProject = false
+
+    val RESULTS_DIR_PATH = "evaluation/" // todo merge outputs
     val JRE_LOCATIONS_FILE = "jre.json"
     val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
 
     def main(args: Array[String]): Unit = {
-        val projectsDir = new File(PROJECTS_DIR_PATH)
-        assert(projectsDir.exists())
-        val resultsDir = new File(RESULTS_DIR_PATH)
-
-        if (resultsDir.exists()) {
-            resultsDir.delete()
-        }
-        resultsDir.mkdirs()
-
+        var input = ""
         var jarFilter = ""
         var target = ""
         args.sliding(2, 2).toList.collect {
-            case Array("--output", t: String)    ⇒ target = t
-            case Array("--filter", name: String) ⇒ jarFilter = name
+            case Array("--input", i: String)                ⇒ input = i
+            case Array("--output", t: String)               ⇒ target = t
+            case Array("--filter", name: String)            ⇒ jarFilter = name
+            case Array("--debug", value: String)            ⇒ debug = value.toBoolean
+            case Array("--hermes", value: String)           ⇒ runHermes = value.toBoolean
+            case Array("--analyze", value: String)          ⇒ runAnalyses = value.toBoolean
+            case Array("--project-specific", value: String) ⇒ projectSpecificEvaluation = value.toBoolean
+            case Array("--testcase", value: String)         ⇒ isAnnotatedProject = value.toBoolean
         }
+
+        if (projectSpecificEvaluation)
+            assert(runAnalyses, "`--analyze` must be set to true on `--project-specific true`")
+
+        if (isAnnotatedProject)
+            assert(runAnalyses, "`--analyze` must be set to true on `--testcase true`")
+
+        assert(input.nonEmpty, "no input directory specified")
+        val projectsDir = new File(input)
+
+        assert(projectsDir.exists(), s"${projectsDir.getPath} does not exists")
+        assert(projectsDir.isDirectory, s"${projectsDir.getPath} is not a directory")
+        assert(
+            projectsDir.listFiles(_.getName.endsWith(".conf")).nonEmpty,
+            s"${projectsDir.getPath} does not contain *.conf files"
+        )
+        val resultsDir = new File(RESULTS_DIR_PATH)
+        resultsDir.mkdirs()
 
         val jreLocations = JRELocation.mapping(new File(JRE_LOCATIONS_FILE))
 
@@ -67,7 +83,7 @@ object Evaluation {
                     "-statistics", s"$RESULTS_DIR_PATH${File.separator}hermes.csv"
                 )
                 val writeLocationsArgs =
-                    if (projectSpecifigEvaluation)
+                    if (projectSpecificEvaluation)
                         Array(
                             "-writeLocations", RESULTS_DIR_PATH
                         )
@@ -79,7 +95,7 @@ object Evaluation {
                 hermesFile.delete()
             }
             val locations: Map[String, Map[String, Set[Method]]] =
-                if (projectSpecifigEvaluation) {
+                if (projectSpecificEvaluation) {
                     if (debug)
                         println("create locations mapping")
                     (for {
@@ -171,7 +187,7 @@ object Evaluation {
 
                             ow.write(s"\tE")
                     }
-                    if (projectSpecifigEvaluation && jsFile.exists()) {
+                    if (projectSpecificEvaluation && jsFile.exists()) {
                         val pw = new PrintWriter(new File(outDir, "pse.tsv"))
                         val json = Json.parse(new FileInputStream(jsFile))
                         val callSites = json.validate[CallSites].get
