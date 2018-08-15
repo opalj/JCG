@@ -1,4 +1,4 @@
-javacOptions in ThisBuild ++= Seq("-parameters")
+javacOptions in ThisBuild ++= Seq("-encoding", "utf8", "-parameters")
 
 lazy val commonSettings = Seq(
     scalaVersion := "2.12.6",
