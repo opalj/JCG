@@ -1,0 +1,16 @@
+//
+// Additional configuration __settings__ specific to each developers machine.
+// Please note that you have to change scalac.options.local for changes to
+// the configuration of the scalac compiler.
+//
+// Copy this file to "local.sbt" and change all settings as appropriate.
+//
+
+// If your CPU uses hyperthreading, it is recommended to specify the
+// number of physical cores and the number of hyperthreaded cores;
+// this will spead up the overall execution.
+javaOptions in ThisBuild ++= Seq(
+	"-Xmx60g",
+	"-Dorg.opalj.threads.CPUBoundTasks=12", // Number of physical (not hyperthreaded) cores/CPUs
+	"-Dorg.opalj.threads.IOBoundTasks=36" // Number of (hyperthreaded) cores * 1,5
+)
