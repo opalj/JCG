@@ -72,7 +72,8 @@ object Evaluation {
                 val hermesFile = new File("hermes.json")
                 assert(!hermesFile.exists())
 
-                OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
+                if (!debug)
+                    OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
                 TestCaseHermesJsonExtractor.createHermesJsonFile(
                     projectsDir, jreLocations, hermesFile
