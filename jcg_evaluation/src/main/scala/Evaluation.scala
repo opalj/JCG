@@ -24,7 +24,7 @@ object Evaluation {
 
     val RESULTS_DIR_PATH = "evaluation/" // todo merge outputs
     val JRE_LOCATIONS_FILE = "jre.conf"
-    val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter())
+    val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter(), new OpalJCGAdatper())
 
     def main(args: Array[String]): Unit = {
         var input = ""
