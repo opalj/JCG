@@ -39,7 +39,7 @@ public class SootJCGAdatper implements JCGTestAdapter {
         options.wholeProgramAnalysis();
         options.keepLineNumbers();
         options.allowPhantomReferences();
-        options.noBodiesForExcluded();
+        options.includeAll();
 
         CGOptionsWithReflection cgOptions = new CGOptionsWithReflection();
         options.addPhaseOptions(cgOptions);
