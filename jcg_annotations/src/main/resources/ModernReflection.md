@@ -70,15 +70,21 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
 
-    @IndirectCall(name = "<init>", line = 14, resolvedTargets = "Ltmr3/Foo;")
     public static void main(String[] args) throws Throwable {
         MethodType methodType = MethodType.methodType(void.class);
         MethodHandle handle = MethodHandles.lookup().findConstructor(Foo.class, methodType);
         Foo f = (Foo) handle.invokeExact();
     }
+    
+    @CallSite(name="verifyCall", line=18, resolvedTargets = "Ltmr3/Foo;")
+    public Foo() {
+        Foo.verifyCall();
+    }
+    
+    public static void verifyCall(){ /* do something */ }
 }
 ```
 [//]: # (END)
