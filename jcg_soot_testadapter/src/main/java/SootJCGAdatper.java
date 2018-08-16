@@ -1,5 +1,3 @@
-import de.tud.cs.peaks.sootconfig.*;
-import options.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import soot.*;
@@ -7,13 +5,14 @@ import soot.jimple.Stmt;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
 import soot.util.backend.ASMBackendUtils;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.List;
 
 public class SootJCGAdatper implements JCGTestAdapter {
 
@@ -33,62 +32,100 @@ public class SootJCGAdatper implements JCGTestAdapter {
         return "Soot";
     }
 
+    private void addPhaseOptions(List<String> options, String phase, String[] phaseOptions) {
+        options.add("-p");
+        options.add(phase);
+        options.add(String.join(",", phaseOptions));
+    }
+
     @Override
-    public long serializeCG(String algorithm, String target, String mainClass, String[] classPath, String outputFile) {
-        FluentOptionsWithMainClass options = new FluentOptionsWithMainClass();
-        options.wholeProgramAnalysis();
-        options.keepLineNumbers();
-        options.allowPhantomReferences();
-        options.includeAll();
+    public long serializeCG(
+            String algorithm,
+            String target,
+            String mainClass,
+            String[] classPath,
+            String outputFile
+    ) {
+        List<String> options = new ArrayList<>(40);
+        options.add("-whole-program");
+        options.add("-keep-line-number");
+        options.add("-allow-phantom-refs");
+        options.add("-include-all");
+        options.add("-no-writeout-body-releasing"); //todo we do not want this option here
 
-        CGOptionsWithReflection cgOptions = new CGOptionsWithReflection();
-        options.addPhaseOptions(cgOptions);
+        addPhaseOptions(options, "cg", new String[]{
+                "safe-forname:true",
+                "safe-newinstance:true",
+                "types-for-invoke:true"}
+        );
 
-        cgOptions.handleForNameSafe().handleNewInstanceSafe().useTypesForInvoke();
+        addPhaseOptions(options, "jb", new String[]{
+                "enabled:true", "use-original-names:true"});
+
 
         if (mainClass == null) {
-            cgOptions.libraryModeSignatureResolution();
-            cgOptions.processAllReachable();
+            addPhaseOptions(options, "cg", new String[]{
+                            "library:signature-resolution",
+                            "all-reachable:true"
+                    }
+            );
         } else {
-            options.setMainClass(mainClass);
+            options.add("-main-class");
+            options.add(mainClass);
         }
 
-        CallGraphPhaseSubOptions cgModeOption = null;
+        options.add("-process-dir");
+        options.add(target);
+        options.add("-cp");
+        options.add(target + File.pathSeparator + String.join(File.pathSeparator, classPath));
+        options.add("-output-format");
+        options.add("n");
+
         switch (algorithm) {
             case CHA:
-                cgModeOption = new CHAOptions().enable();
+                addPhaseOptions(options, "cg.cha", new String[]{"enabled:true"});
                 break;
             case RTA:
-                cgModeOption = new RTAOptions().enableRTA();
+                addPhaseOptions(options, "cg.spark", new String[]{
+                                "enabled:true",
+                                "rta:true",
+                                "simulate-natives:true",
+                                "on-fly-cg:false"
+                        }
+                );
                 break;
             case VTA:
-                cgModeOption = new VTAOptions().enableVTA();
+                addPhaseOptions(options, "cg.spark", new String[]{
+                                "enabled:true",
+                                "vta:true",
+                                "simulate-natives:true"
+                        }
+                );
                 break;
             case Spark:
-                cgModeOption = new SparkOptions().enable();
+                addPhaseOptions(options, "cg.spark", new String[]{
+                                "enabled:true",
+                                "simulate-natives:true"
+                        }
+                );
                 break;
         }
-        cgOptions.addSubOption(cgModeOption);
 
+        long before = System.nanoTime();
+        Main.main(options.toArray(new String[0]));
+        long after = System.nanoTime();
 
-        AnalysisTarget analysisTarget = new AnalysisTarget();
-        String cp = Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator));
-        analysisTarget.classPath(cp);
-        analysisTarget.processPath(target);
-
-        SootRun run = new SootRun(options, analysisTarget);
-        SootResult result = run.perform();
-
-        Scene scene = result.getScene();
+        Scene scene = Scene.v();
         CallGraph cg = scene.getCallGraph();
 
         JSONObject callSitesObject = new JSONObject();
         JSONArray callSites = new JSONArray();
 
-        // all application classes
         for (SootClass clazz : scene.getClasses()) {
             // all methods defined in that class
             for (SootMethod method : clazz.getMethods()) {
+                if (method.getName().equals("main"))
+                    System.out.println(method.hasActiveBody());
                 if (method.hasActiveBody()) {
                     // all stmts in that method that contains invokations
                     for (Unit u : method.getActiveBody().getUnits()) {
@@ -127,7 +164,7 @@ public class SootJCGAdatper implements JCGTestAdapter {
             e.printStackTrace();
         }
 
-        return result.packRuntime().elapsed(TimeUnit.NANOSECONDS);
+        return after - before;
     }
 
     public static void main(String[] args) {
