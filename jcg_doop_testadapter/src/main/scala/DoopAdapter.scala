@@ -193,7 +193,9 @@ object DoopAdapter extends JCGTestAdapter {
                 val returnType = m.group(2)
                 val name = m.group(3)
                 val params = if (m.group(4).isEmpty) Array.empty[String] else m.group(4).split(",")
-                Method(name, toJVMType(declClass), toJVMType(returnType), params.map(toJVMType))
+                Method(
+                    name, toJVMType(declClass), toJVMType(returnType), params.map(toJVMType).toList
+                )
             case None ⇒ throw new IllegalArgumentException()
         }
     }
