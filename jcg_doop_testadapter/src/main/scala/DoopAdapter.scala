@@ -58,9 +58,9 @@ object DoopAdapter extends JCGTestAdapter {
 
         val callGraph = extractDoopCG(doopResult)
 
-        val resultingCallSites: CallSites = convertToCallSites(callGraph)
+        val reachableMe: ReachableMethods = convertToReachableMethods(callGraph)
 
-        val callSitesJson: JsValue = Json.toJson(resultingCallSites)
+        val callSitesJson: JsValue = Json.toJson(reachableMe)
         val outFile = new File(s"${tgtJar.getName.replace(".jar", ".json")}")
         val pw = new PrintWriter(outFile)
         pw.write(Json.prettyPrint(callSitesJson))
@@ -101,6 +101,7 @@ object DoopAdapter extends JCGTestAdapter {
         val declaredType = s"L${split.slice(0, split.size - 1).mkString("/")};"
         val name = split.last.replace("'", "")
         val tgtMethods = tgts.map(toMethod)
+        // todo what abot <clinit> etc where no call is in the bytecode
         val calls = callerOpal.body.get.collect {
             // todo what about lambdas?
             case instr: MethodInvocationInstruction if instr.name == name ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
@@ -118,21 +119,21 @@ object DoopAdapter extends JCGTestAdapter {
             CallSite(
                 firstTgt.copy(declaringClass = declaredType),
                 lineNumber.getOrElse(-1),
-                callerMethod,
                 tgtMethods
             )
         }
     }
 
-    def convertToCallSites(
+    def convertToReachableMethods(
         callGraph: Map[String, Map[(String, Int), Set[String]]]
-    )(implicit project: Project[URL]): CallSites = {
-        var resultingCallSites = Set.empty[CallSite]
+    )(implicit project: Project[URL]): ReachableMethods = {
+        var reachableMethods = Set.empty[ReachableMethod]
 
         for {
             (caller, callSites) ← callGraph
         } {
             val callerMethod = toMethod(caller)
+            var resultingCallSites = Set.empty[CallSite]
             project.classFile(toObjectType(callerMethod.declaringClass)) match {
                 case Some(cf) ⇒
                     implicit val classFile: ClassFile = cf
@@ -154,8 +155,9 @@ object DoopAdapter extends JCGTestAdapter {
                     }
                 case None ⇒
             }
+            reachableMethods += ReachableMethod(callerMethod, resultingCallSites)
         }
-        CallSites(resultingCallSites)
+        ReachableMethods(reachableMethods)
     }
 
     def extractDoopCG(doopResult: Source): Map[String, Map[(String, Int), Set[String]]] = {

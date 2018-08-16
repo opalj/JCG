@@ -29,7 +29,7 @@ import org.opalj.fpcf.properties.NoCalleesDueToNotReachableMethod
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 
-class OpalJCGAdatper extends JCGTestAdapter {
+object OpalJCGAdatper extends JCGTestAdapter {
 
     def possibleAlgorithms(): Array[String] = Array[String]("RTA")
 
@@ -91,23 +91,28 @@ class OpalJCGAdatper extends JCGTestAdapter {
 
         val after = System.nanoTime()
 
-        var callSites: Set[CallSite] = Set.empty
+        var reachableMethods = Set.empty[ReachableMethod]
 
         for (dm ← declaredMethods.declaredMethods) {
+            val m = createMethodObject(dm)
             ps(dm, Callees.key) match {
-                case FinalEP(_, NoCallees | NoCalleesDueToNotReachableMethod) ⇒ // TODO the callsite is needed anyway!
+                case FinalEP(_, NoCalleesDueToNotReachableMethod) ⇒
+                case FinalEP(_, NoCallees) ⇒
+                    reachableMethods += ReachableMethod(m, Set.empty)
                 case FinalEP(_, cs: Callees) ⇒
                     val body = dm.definedMethod.body.get
-                    for ((pc, callees) ← cs.callees) {
-                        callSites ++= createCallSites(dm, body, pc, callees)
-                    }
+                    val callSites = cs.callees.flatMap {
+                        case (pc, callees) ⇒
+                            createCallSites(body, pc, callees)
+                    }.toSet
+                    reachableMethods += ReachableMethod(m, callSites)
             }
         }
 
         ps.shutdown()
 
         val file: FileWriter = new FileWriter(outputFile)
-        file.write(Json.prettyPrint(Json.toJson(CallSites(callSites))))
+        file.write(Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods))))
         file.flush()
         file.close()
 
@@ -115,7 +120,6 @@ class OpalJCGAdatper extends JCGTestAdapter {
     }
 
     private def createCallSites(
-        caller:  DeclaredMethod,
         body:    Code,
         pc:      Int,
         callees: Set[DeclaredMethod]
@@ -142,27 +146,24 @@ class OpalJCGAdatper extends JCGTestAdapter {
                     callee.descriptor.parametersCount == desc.parametersCount
             }
 
-            indirectCallees.iterator.map(createIndividualCallSite(_, caller, line)).toSeq :+
+            indirectCallees.iterator.map(createIndividualCallSite(_, line)).toSeq :+
                 CallSite(
                     declaredTarget,
                     line,
-                    createMethodObject(caller),
                     directCallees.iterator.map(createMethodObject).toSet
                 )
         } else {
-            callees.iterator.map(createIndividualCallSite(_, caller, line)).toSeq
+            callees.iterator.map(createIndividualCallSite(_, line)).toSeq
         }
     }
 
     def createIndividualCallSite(
         method: DeclaredMethod,
-        caller: DeclaredMethod,
         line:   Int
     ): CallSite = {
         CallSite(
             createMethodObject(method),
             line,
-            createMethodObject(caller),
             Set(createMethodObject(method))
         )
     }

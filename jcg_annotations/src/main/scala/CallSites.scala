@@ -2,15 +2,27 @@ import play.api.libs.json.Json
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 
-case class CallSites(callSites: Set[CallSite])
-
-object CallSites {
-    implicit val callSitesReads: Reads[CallSites] = Json.reads[CallSites]
-
-    implicit val callSitesWrites: Writes[CallSites] = Json.writes[CallSites]
+case class ReachableMethods(reachableMethods: Set[ReachableMethod]) {
+    lazy val toMap: Map[Method, Set[CallSite]] = {
+        reachableMethods.groupBy(_.method).map { case (k, v) ⇒ k → v.flatMap(_.callSites) }
+    }
 }
 
-case class CallSite(declaredTarget: Method, line: Int, method: Method, targets: Set[Method])
+object ReachableMethods {
+    implicit val reachableMethodsReads: Reads[ReachableMethods] = Json.reads[ReachableMethods]
+
+    implicit val reachableMethodsWrites: Writes[ReachableMethods] = Json.writes[ReachableMethods]
+}
+
+case class ReachableMethod(method: Method, callSites: Set[CallSite])
+
+object ReachableMethod {
+    implicit val reachableMethodsReads: Reads[ReachableMethod] = Json.reads[ReachableMethod]
+
+    implicit val reachableMethodsWrites: Writes[ReachableMethod] = Json.writes[ReachableMethod]
+}
+
+case class CallSite(declaredTarget: Method, line: Int, targets: Set[Method])
 
 object CallSite {
     implicit val callSiteReads: Reads[CallSite] = Json.reads[CallSite]

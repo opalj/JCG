@@ -38,10 +38,10 @@ lazy val jcg_wala_testadapter = project.settings(
     libraryDependencies += "com.ibm.wala" % "com.ibm.wala.core" % "1.5.0-SNAPSHOT",
     libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.5.0-SNAPSHOT",
     libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.5.0-SNAPSHOT",
-    libraryDependencies += "com.googlecode.json-simple" % "json-simple" % "1.1.1",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
-).dependsOn(jcg_testadapter_commons)
+).dependsOn(jcg_annotations, jcg_testadapter_commons)
 
 lazy val jcg_soot_testadapter = project.settings(
     commonSettings,
@@ -49,10 +49,10 @@ lazy val jcg_soot_testadapter = project.settings(
     resolvers += "soot snapshot" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-snapshot/",
     resolvers += "soot release" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-release/",
     libraryDependencies += "ca.mcgill.sable" % "soot" % "3.1.0",
-    libraryDependencies += "com.googlecode.json-simple" % "json-simple" % "1.1.1",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
-).dependsOn(jcg_testadapter_commons)
+).dependsOn(jcg_annotations, jcg_testadapter_commons)
 
 lazy val jcg_opal_testadapter = project.settings(
     commonSettings,

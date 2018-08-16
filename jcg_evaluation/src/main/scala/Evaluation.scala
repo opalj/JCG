@@ -24,7 +24,7 @@ object Evaluation {
 
     val RESULTS_DIR_PATH = "evaluation/" // todo merge outputs
     val JRE_LOCATIONS_FILE = "jre.conf"
-    val EVALUATION_ADAPTERS = List(new SootJCGAdatper(), new WalaJCGAdapter(), new OpalJCGAdatper())
+    val EVALUATION_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
 
     def main(args: Array[String]): Unit = {
         var input = ""
@@ -197,20 +197,15 @@ object Evaluation {
                     if (projectSpecificEvaluation && jsFile.exists()) {
                         val pw = new PrintWriter(new File(outDir, "pse.tsv"))
                         val json = Json.parse(new FileInputStream(jsFile))
-                        val callSites = json.validate[CallSites].get
+                        val reachableMethods = json.validate[ReachableMethods].get.toMap
                         for {
                             (fId, locations) ← locationsMap(projectSpec.name)
                             location ← locations
+                            if reachableMethods.contains(location) // we are unsound
                         } {
-                            // todo we are unsound -> write that info somewhere
-                            // source and how often
-                            val unsound = callSites.callSites.exists { cs ⇒
-                                cs.method == location || cs.targets.contains(location)
-                            }
-                            if (unsound)
-                                pw.println(s"${projectSpec.name}\t$fId\t$location)") //
+                            pw.println(s"${projectSpec.name}\t$fId\t$location)")
                         }
-                        pw.close
+                        pw.close()
                     }
 
                 }
