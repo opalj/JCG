@@ -8,15 +8,23 @@ Test static initializer call for class constant.
 // tr1/Foo.java
 package tr1;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
-    static int foo = 1;
+    public static void verifyCall(){ /* do something */ }
 
-    @IndirectCall(
-        name = "<clinit>", line = 11, resolvedTargets = "Ltr1/Foo;"
-    )
     public static void main(String[] args) throws Exception {
-        Class c = Foo.class;
+        Class c = Bar.class;
+    }
+}
+
+class Bar {   
+    static {
+        staticInitializerCalled();
+    }
+    
+    @CallSite(name="verifyCall", line=19, resolvedTargets = "Ltr1/Foo;")
+    static private void staticInitializerCalled(){
+        Foo.verifyCall();
     }
 }
 ```
@@ -126,14 +134,13 @@ Test reflection with respect to constructors.
 // tr6/Foo.java
 package tr6;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
-    public Foo(String s) {    }
+    public static void verifyCall(){ /* do something */ }
+    
+    @CallSite(name="verifyCall", line=8, resolvedTargets = "Ltr6/Foo;")
+    public Foo(String s) { Foo.verifyCall(); }
 
-    @IndirectCall(
-        name = "<init>", parameterTypes = String.class, line = 12,
-        resolvedTargets = "Ltr6/Foo;"
-    )
     public static void main(String[] args) throws Exception {
         Foo.class.getConstructor(String.class).newInstance("ASD");
     }
@@ -152,9 +159,11 @@ package tr7;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
-    public Foo() {    }
+    public static void verifyCall(){ /* do something */ }
+    
+    @CallSite(name="verifyCall", line=8, resolvedTargets = "Ltr7/Foo;")
+    public Foo(String s) { Foo.verifyCall(); }
 
-    @IndirectCall(name = "<init>", line = 9, resolvedTargets = "Ltr7/Foo;")
     public static void main(String[] args) throws Exception {
         Foo.class.newInstance();
     }
@@ -236,15 +245,23 @@ Test reflection with respect to forName.
 // tr10/Foo.java
 package tr10;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
-    static int foo = 1;
+    public static void verifyCall(){ /* do something */ }
 
-    @IndirectCall(
-        name = "<clinit>", line = 11, resolvedTargets = "Ltr10/Foo;"
-    )
     public static void main(String[] args) throws Exception {
-        Class.forName("tr10.Foo");
+        Class.forName("tr10.Bar");
+    }
+}
+
+class Bar {
+    static {
+        staticInitializerCalled();
+    }
+    
+    @CallSite(name="verifyCall", line=19, resolvedTargets = "Ltr10/Foo;")
+    static private void staticInitializerCalled(){
+        Foo.verifyCall();
     }
 }
 ```
@@ -261,23 +278,39 @@ Test reflection where the target class is dynamically decided.
 // lrr1/Foo.java
 package lrr1;
 
-import lib.annotations.callgraph.IndirectCall;
-class Bar {
-    static int bar = 2;
-}
+import lib.annotations.callgraph.CallSite;
 class Foo {
-    static int foo = 1;
+    public static void verifyCall(){ /* do something */ }
 
     public static void main(String[] args) throws Exception {
         m(args.length % 2 == 0);
     }
 
-    @IndirectCall(
-        name = "<clinit>", returnType = String.class, line = 19,
-        resolvedTargets = { "Llrr1/Foo;", "Llrr1/Foo;" }
-    )
     static void m(boolean b) throws Exception {
-        Class.forName(b ? "lrr1.Foo" : "lrr1.Bar");
+        Class.forName(b ? "lrr1.Bar" : "lrr1.Baz");
+    }
+}
+
+class Bar {
+    static {
+        staticInitializerCalled();
+    }
+    
+    @CallSite(name="verifyCall", line=23, resolvedTargets = "Llrr1/Foo;")
+    static private void staticInitializerCalled(){
+        Foo.verifyCall();
+    }
+}
+
+
+class Baz {
+    static {
+        staticInitializerCalled();
+    }
+    
+    @CallSite(name="verifyCall", line=35, resolvedTargets = "Llrr1/Foo;")
+    static private void staticInitializerCalled(){
+        Foo.verifyCall();
     }
 }
 ```
@@ -291,19 +324,16 @@ Tests reflection where the target class is dynamically decided and the result of
 // lrr2/Foo1.java
 package lrr2;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo1 {
-    static int foo = 1;
-
-    @IndirectCall(
-        name = "<clinit>", line = 17, resolvedTargets = { "Llrr2/Foo1;", "Llrr2/Foo2;" }
-    )
+    public static void verifyCall(){ /* do something */ }
+    
     static void m(boolean b) throws Exception {
-        StringBuilder className = new StringBuilder("lrr2.Foo");
+        StringBuilder className = new StringBuilder("lrr2.Ba");
         if (b)
-            className.append("1");
+            className.append("r");
         else
-            className.append("2");
+            className.append("z");
         Class.forName(className.toString());
     }
 
@@ -311,9 +341,29 @@ class Foo1 {
         m(args.length % 2 == 0);
     }
 }
-class Foo2 {
-    static int foo = 2;
-}
+
+class Bar {
+     static {
+         staticInitializerCalled();
+     }
+     
+     @CallSite(name="verifyCall", line=28, resolvedTargets = "Llrr2/Foo;")
+     static private void staticInitializerCalled(){
+         Foo.verifyCall();
+     }
+ }
+ 
+ 
+ class Baz {
+     static {
+         staticInitializerCalled();
+     }
+     
+     @CallSite(name="verifyCall", line=40, resolvedTargets = "Llrr2/Foo;")
+     static private void staticInitializerCalled(){
+         Foo.verifyCall();
+     }
+ }
 ```
 [//]: # (END)
 
@@ -325,20 +375,29 @@ Test reflection where the target class is dynamically decided from a locally set
 // lrr3/Foo.java
 package lrr3;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
-    static int foo = 1;
     private String className;
+    
+    public static void verifyCall(){ /* do something */ }
 
-    @IndirectCall(
-        name = "<clinit>", line = 15, resolvedTargets = "Llrr3/Foo;"
-    )
     public static void main(String[] args) throws Exception {
         Foo foo = new Foo();
-        foo.className = "lrr3.Foo";
+        foo.className = "lrr3.Bar";
         Class.forName(foo.className);
     }
 }
+
+class Bar {
+     static {
+         staticInitializerCalled();
+     }
+     
+     @CallSite(name="verifyCall", line=23, resolvedTargets = "Llrr3/Foo;")
+     static private void staticInitializerCalled(){
+         Foo.verifyCall();
+     }
+ }
 ```
 [//]: # (END)
 
@@ -353,25 +412,29 @@ The class name is passed as an argument.
 // csr1/Foo.java
 package csr1;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
-    static int foo = 1;
+    public static void verifyCall(){ /* do something */ }
 
-    @IndirectCall(
-        name = "<clinit>", line = 11, resolvedTargets = "Lcsr1/Foo;"
-    )
     static void m(String className) throws Exception {
         Class.forName(className);
     }
 
     public static void main(String[] args) throws Exception {
-        m("csr1.Foo");
+        m("csr1.Bar");
     }
 }
 
 class Bar {
-    static String staticToString() { return "Bar"; }
-}
+     static {
+         staticInitializerCalled();
+     }
+     
+     @CallSite(name="verifyCall", line=23, resolvedTargets = "Lcsr1/Foo;")
+     static private void staticInitializerCalled(){
+         Foo.verifyCall();
+     }
+ }
 ```
 [//]: # (END)
 
@@ -383,13 +446,10 @@ The class name is unknown.
 // csr2/Foo.java
 package csr2;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 public class Foo {
-    static int foo = 1;
+    public static void verifyCall(){ /* do something */ }
 
-    @IndirectCall(
-        name = "<clinit>", line = 11, resolvedTargets = { "Lcsr2/Foo;", "Lcsr2/Bar;" }
-    )
     static void m(String className) throws Exception {
         Class.forName(className);
     }
@@ -400,8 +460,15 @@ public class Foo {
 }
 
 class Bar {
-    static int bar = 2;
-}
+     static {
+         staticInitializerCalled();
+     }
+     
+     @CallSite(name="verifyCall", line=23, resolvedTargets = "Lcsr2/Foo;")
+     static private void staticInitializerCalled(){
+         Foo.verifyCall();
+     }
+ }
 ```
 [//]: # (END)
 
@@ -413,18 +480,27 @@ Test reflection with respect to a private instance field that is set in the init
 // csr3/Foo.java
 package csr3;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
-    static int foo = 1;
     public static String className;
+    
+    public static void verifyCall(){ /* do something */ }
 
-    @IndirectCall(
-        name = "<clinit>", line = 13, resolvedTargets = "Lcsr3/Foo;"
-    )
     public static void main(String[] args) throws Exception {
-        Foo.className = args[0];
+        Foo.className = "csr3.Bar";
         Class.forName(Foo.className);
     }
 }
+
+class Bar {
+     static {
+         staticInitializerCalled();
+     }
+     
+     @CallSite(name="verifyCall", line=22, resolvedTargets = "Lcsr3/Foo;")
+     static private void staticInitializerCalled(){
+         Foo.verifyCall();
+     }
+ }
 ```
 [//]: # (END)

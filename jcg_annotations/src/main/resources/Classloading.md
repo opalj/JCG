@@ -1,7 +1,7 @@
 #Classloading
 This test cases w.r.t. to classloading over ```Class.forName(cls)```.
 
-##CL3
+##CL1
 [//]: # (MAIN: cl.Demo)
 This test cases targets a common try catch pattern when classes are loaded. An existing class is loaded
 over ```Class.forName(...)```, instantiated and then casted to another class. Unfortunately, the class
@@ -42,7 +42,7 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CL4
+##CL2
 [//]: # (MAIN: cl.Demo)
 This test cases targets a common try catch pattern when classes are loaded. An absent class is loaded
 over ```Class.forName(...)```. Since the class __can't be found__ the operation results in a ```ClassNotFoundException```
@@ -79,7 +79,7 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CL5
+##CL3
 [//]: # (MAIN: cl.Demo)
 This case targets a concerns not only loading of classes but also the execution of their 
 static initializer. When a class is loaded, its static initializer must be called.
@@ -96,7 +96,7 @@ public class Demo {
 	public static void main(String[] args){
 	    try {
 	        Class cls = Class.forName("cl.LoadedClass");
-	        LoadedClass lCls = (LoadedClass) cls.newInstance();
+	        Object lCls = cls.newInstance();
 	    } catch(ClassCastException cce){
 	        // DEAD CODE
 	    } catch(ClassNotFoundException cnfe){
@@ -121,7 +121,7 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CL6
+##CL4
 [//]: # (MAIN: cl.Demo)
 This case targets a concerns not only loading of classes but also the execution of their 
 static initializer. When a class is loaded, its static initializer must be called. Also the static
@@ -139,7 +139,7 @@ public class Demo {
 	public static void main(String[] args){
 	    try {
 	        Class cls = Class.forName("cl.LoadedClass");
-	        LoadedClass lCls = (LoadedClass) cls.newInstance();
+	        Object lCls = cls.newInstance();
 	    } catch(ClassCastException cce){
 	        // DEAD CODE
 	    } catch(ClassNotFoundException cnfe){
