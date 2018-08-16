@@ -17,7 +17,7 @@ private case class HermesProject(id: String, cp: String)
 object TestCaseHermesJsonExtractor {
 
     def createHermesJsonFile(
-        projectsDir: File, jreLocations: Map[Int, String], outputFile: File
+        projectsDir: File, jreLocations: Map[Int, Array[File]], outputFile: File
     ): Unit = {
         assert(projectsDir.exists() && projectsDir.isDirectory)
 
@@ -30,7 +30,7 @@ object TestCaseHermesJsonExtractor {
             }
 
             val allTargets = ArrayBuffer(projectSpec.target(projectsDir).getCanonicalPath)
-            allTargets += jreLocations(projectSpec.java)
+            allTargets ++= jreLocations(projectSpec.java).map(_.getCanonicalPath)
             allTargets ++= projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
             HermesProject(projectSpec.name, allTargets.mkString(File.pathSeparator))
 

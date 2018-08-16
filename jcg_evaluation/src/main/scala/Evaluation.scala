@@ -17,10 +17,10 @@ import scala.io.Source
 object Evaluation {
 
     var debug = true
-    var runHermes = true
+    var runHermes = false
     var projectSpecificEvaluation = false
-    var runAnalyses = false
-    var isAnnotatedProject = false
+    var runAnalyses = true
+    var isAnnotatedProject = true
 
     val RESULTS_DIR_PATH = "evaluation/" // todo merge outputs
     val JRE_LOCATIONS_FILE = "jre.conf"
@@ -137,7 +137,7 @@ object Evaluation {
         jarFilter:    String,
         ow:           BufferedWriter,
         locationsMap: Map[String, Map[String, Set[Method]]],
-        jreLocations: Map[Int, String]
+        jreLocations: Map[Int, Array[File]]
     ): Unit = {
         val projectSpecFiles = projectsDir.listFiles((_, name) ⇒ name.endsWith(".conf")).filter(_.getName.startsWith(jarFilter)).sorted
         printHeader(ow, projectSpecFiles)
@@ -161,11 +161,14 @@ object Evaluation {
 
                     val jsFile = new File(outDir, "cg.json")
                     try {
+                        val jreJars = jreLocations(projectSpec.java).map(_.getCanonicalPath)
+                        val cp = projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
+
                         val elapsed = adapter.serializeCG(
                             cgAlgo,
                             projectSpec.target(projectsDir).getCanonicalPath,
                             projectSpec.main.orNull,
-                            Array(jreLocations(projectSpec.java)) ++ projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath),
+                            jreJars ++ cp,
                             jsFile.getPath
                         )
                         if (debug) {

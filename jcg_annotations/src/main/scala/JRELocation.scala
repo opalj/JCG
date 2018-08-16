@@ -13,12 +13,20 @@ object JRELocation {
 
     implicit val methodWrites: Writes[JRELocation] = Json.writes[JRELocation]
 
-    def mapping(jreLocationsFile: File): Map[Int, String] = {
+    def mapping(jreLocationsFile: File): Map[Int, Array[File]] = {
         Json.parse(new FileInputStream(jreLocationsFile)).validate[Array[JRELocation]] match {
             case JsSuccess(location, _) ⇒
-                location.map(jreLocation ⇒ jreLocation.version → jreLocation.path).toMap
+                location.map(
+                    jreLocation ⇒ jreLocation.version → getAllJREJars(new File(jreLocation.path))
+                ).toMap
             case _ ⇒
                 throw new IllegalArgumentException("invalid jre location specification")
         }
+    }
+
+    def getAllJREJars(jreDir: File): Array[File] = {
+        val jars = jreDir.listFiles(_.getName.endsWith(".jar"))
+        val jarsInSubDirs = jreDir.listFiles(_.isDirectory).flatMap(getAllJREJars)
+        jars ++ jarsInSubDirs
     }
 }
