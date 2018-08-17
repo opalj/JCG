@@ -22,7 +22,7 @@ object Evaluation {
     var runAnalyses = true
     var isAnnotatedProject = true
 
-    val RESULTS_DIR_PATH = "evaluation/" // todo merge outputs
+    var RESULTS_DIR_PATH = "evaluation/" // todo merge outputs
     val JRE_LOCATIONS_FILE = "jre.conf"
     val EVALUATION_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
 
@@ -33,6 +33,7 @@ object Evaluation {
         args.sliding(2, 2).toList.collect {
             case Array("--input", i: String)                ⇒ input = i
             case Array("--output", t: String)               ⇒ target = t
+            case Array("--output-dir", t: String)           ⇒ RESULTS_DIR_PATH = t
             case Array("--filter", name: String)            ⇒ jarFilter = name
             case Array("--debug", value: String)            ⇒ debug = value.toBoolean
             case Array("--hermes", value: String)           ⇒ runHermes = value.toBoolean
