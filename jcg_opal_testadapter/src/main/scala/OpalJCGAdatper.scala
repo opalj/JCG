@@ -20,12 +20,14 @@ import org.opalj.fpcf.analyses.cg.EagerThreadRelatedCallsAnalysis
 import org.opalj.fpcf.analyses.cg.EagerLoadedClassesAnalysis
 import org.opalj.fpcf.analyses.cg.EagerFinalizerAnalysisScheduler
 import org.opalj.fpcf.analyses.cg.LazyCalleesAnalysis
+import org.opalj.fpcf.analyses.cg.EagerReflectionRelatedCallsAnalysis
 import org.opalj.fpcf.properties.ThreadRelatedCallees
 import org.opalj.fpcf.properties.StandardInvokeCallees
 import org.opalj.fpcf.properties.Callees
 import org.opalj.fpcf.properties.SerializationRelatedCallees
 import org.opalj.fpcf.properties.NoCallees
 import org.opalj.fpcf.properties.NoCalleesDueToNotReachableMethod
+import org.opalj.fpcf.properties.ReflectionRelatedCallees
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 
@@ -77,8 +79,14 @@ object OpalJCGAdatper extends JCGTestAdapter {
             EagerFinalizerAnalysisScheduler,
             EagerThreadRelatedCallsAnalysis,
             EagerSerializationRelatedCallsAnalysis,
+            EagerReflectionRelatedCallsAnalysis,
             new LazyCalleesAnalysis(
-                Set(StandardInvokeCallees, ThreadRelatedCallees, SerializationRelatedCallees)
+                Set(
+                    StandardInvokeCallees,
+                    ThreadRelatedCallees,
+                    SerializationRelatedCallees,
+                    ReflectionRelatedCallees
+                )
             )
         )
 
