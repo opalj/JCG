@@ -63,14 +63,14 @@ package tr3;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
-    public String toString() { return "Foo"; }
+    public String n() { return "Foo"; }
 
     @IndirectCall(
-        name = "toString", returnType = String.class, line = 12,
+        name = "n", returnType = String.class, line = 12,
         resolvedTargets = "Ltr3/Foo;"
     )
     void m() throws Exception {
-        Foo.class.getDeclaredMethod("toString").invoke(this);
+        Foo.class.getDeclaredMethod("n").invoke(this);
     }
 
     public static void main(String[] args) throws Exception { new Foo().m(); }
@@ -88,14 +88,14 @@ package tr4;
 
 import lib.annotations.callgraph.IndirectCall;
 public class Foo {
-    public String toString() { return "Foo"; }
+    public String n() { return "Foo"; }
 
     @IndirectCall(
-        name = "toString", returnType = String.class, line = 12,
+        name = "n", returnType = String.class, line = 12,
         resolvedTargets = "Ltr4/Foo;"
     )
     void m() throws Exception {
-        Foo.class.getMethod("toString").invoke(this);
+        Foo.class.getMethod("n").invoke(this);
     }
 
     public static void main(String[] args) throws Exception { new Foo().m(); }
@@ -157,12 +157,12 @@ Test reflection with respect to the default constructor.
 // tr7/Foo.java
 package tr7;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.CallSite;
 class Foo {
     public static void verifyCall(){ /* do something */ }
     
     @CallSite(name="verifyCall", line=8, resolvedTargets = "Ltr7/Foo;")
-    public Foo(String s) { Foo.verifyCall(); }
+    public Foo() { Foo.verifyCall(); }
 
     public static void main(String[] args) throws Exception {
         Foo.class.newInstance();
@@ -317,15 +317,15 @@ class Baz {
 [//]: # (END)
 
 ##LRR2
-[//]: # (MAIN: lrr2.Foo1)
+[//]: # (MAIN: lrr2.Foo)
 Tests reflection where the target class is dynamically decided and the result of a StringBuilder.
 
 ```java
-// lrr2/Foo1.java
+// lrr2/Foo.java
 package lrr2;
 
 import lib.annotations.callgraph.CallSite;
-class Foo1 {
+class Foo {
     public static void verifyCall(){ /* do something */ }
     
     static void m(boolean b) throws Exception {
