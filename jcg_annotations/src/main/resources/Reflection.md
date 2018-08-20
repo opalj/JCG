@@ -1,36 +1,7 @@
 #TrivialReflection
 The strings are directly available. No control- or data-flow analysis is required.
+
 ##TR1
-[//]: # (MAIN: tr1.Foo)
-Test static initializer call for class constant.
-
-```java
-// tr1/Foo.java
-package tr1;
-
-import lib.annotations.callgraph.CallSite;
-class Foo {
-    public static void verifyCall(){ /* do something */ }
-
-    public static void main(String[] args) throws Exception {
-        Class c = Bar.class;
-    }
-}
-
-class Bar {   
-    static {
-        staticInitializerCalled();
-    }
-    
-    @CallSite(name="verifyCall", line=19, resolvedTargets = "Ltr1/Foo;")
-    static private void staticInitializerCalled(){
-        Foo.verifyCall();
-    }
-}
-```
-[//]: # (END)
-
-##TR2
 [//]: # (MAIN: tr2.Foo)
 Test reflection with respect to static methods.
 
@@ -53,7 +24,7 @@ class Foo {
 ```
 [//]: # (END)
 
-##TR3
+##TR2
 [//]: # (MAIN: tr3.Foo)
 Test reflection with respect to instance methods.
 
@@ -78,7 +49,7 @@ class Foo {
 ```
 [//]: # (END)
 
-##TR4
+##TR3
 [//]: # (MAIN: tr4.Foo)
 Test reflection with respect to instance methods retrieved via getMethod.
 
@@ -103,7 +74,7 @@ public class Foo {
 ```
 [//]: # (END)
 
-##TR5
+##TR4
 [//]: # (MAIN: tr5.Foo)
 Test reflection with respect to methods having parameters.
 
@@ -126,7 +97,7 @@ class Foo {
 ```
 [//]: # (END)
 
-##TR6
+##TR5
 [//]: # (MAIN: tr6.Foo)
 Test reflection with respect to constructors.
 
@@ -149,7 +120,7 @@ class Foo {
 [//]: # (END)
 
 
-##TR7
+##TR6
 [//]: # (MAIN: tr7.Foo)
 Test reflection with respect to the default constructor.
 
@@ -171,7 +142,7 @@ class Foo {
 ```
 [//]: # (END)
 
-##TR8
+##TR7
 [//]: # (MAIN: tr8.Foo)
 Test reflection used to retrieve a field.
 
@@ -204,7 +175,7 @@ public class Foo {
 ```
 [//]: # (END)
 
-##TR9
+##TR8
 [//]: # (MAIN: tr9.Foo)
 Test reflection used to retrieve a field via getField.
 
@@ -237,7 +208,7 @@ public class Foo {
 ```
 [//]: # (END)
 
-##TR10
+##TR9
 [//]: # (MAIN: tr10.Foo)
 Test reflection with respect to forName.
 
