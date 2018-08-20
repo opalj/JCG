@@ -42,13 +42,12 @@ object DoopAdapter extends JCGTestAdapter {
 
         OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
-        for (doopResult ← doopResults) {
+        for (doopResult ← doopResults.sorted) {
             val source = Source.fromFile(doopResult)
             val tgtJar = new File(s"result/${doopResult.getName.replace(".txt", "")}")
             println(s"${tgtJar.getName}")
             val outFile = createJsonRepresentation(source, tgtJar, jreDir)
             println(CGMatcher.matchCallSites(tgtJar.getAbsolutePath, outFile.getAbsolutePath))
-
         }
 
     }
