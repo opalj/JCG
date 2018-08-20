@@ -212,7 +212,7 @@ object CGMatcher {
             val currentSource = workset.head
             workset = workset.tail
 
-            val computedCallSites = reachableMethods(currentSource)
+            val computedCallSites = reachableMethods.getOrElse(currentSource, Set.empty)
 
             for (tgt ← computedCallSites.flatMap(_.targets)) {
                 if (tgt == annotatedTarget) {
