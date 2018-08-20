@@ -18,7 +18,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
 
-	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", line = 22)
+	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -57,7 +57,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
 
-	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", line = 22)
+	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, returnType = String.class, line = 22)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -96,7 +96,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
 
-	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", line = 23)
+	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 23)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -139,8 +139,8 @@ public class Demo {
     private Object objectVar = null;
     
     @CallSites({
-	    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", line = 29),
-        @CallSite(name = "toString", resolvedTargets = "Lunsafe/SafeTarget;", line = 30)
+	    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 29),
+        @CallSite(name = "toString", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 30)
     })
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
@@ -193,7 +193,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", line = 25)
+    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -244,7 +244,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "toString", resolvedTargets = "Lunsafe/SafeTarget;", line = 24)
+    @CallSite(name = "toString", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 24)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -294,7 +294,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", line = 25)
+    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);

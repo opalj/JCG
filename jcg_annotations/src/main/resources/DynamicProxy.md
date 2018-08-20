@@ -56,7 +56,7 @@ import lib.annotations.callgraph.IndirectCall;
 
 public class Main {
 	@IndirectCall(
-        name = "bar", returnType = String.class, parameterTypes = String.class, line = 12,
+        name = "bar", returnType = Object.class, parameterTypes = Object.class, line = 12,
         resolvedTargets = "Ldp/FooImpl;"
     )
 	public static void main(String[] args) {

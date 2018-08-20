@@ -147,7 +147,7 @@ class Class {
     }
     
     @IndirectCall(
-       name = "sum", returnType = double.class, line = 19,
+       name = "sum", returnType = double.class, parameterTypes = {double.class, double.class}, line = 19,
        resolvedTargets = "Lmr/Class;")
     public static void main(String[] args){     
         FIDoubleDouble fidd = Class::sum;
