@@ -45,7 +45,10 @@ object OpalJCGAdatper extends JCGTestAdapter {
         outputFile: String
     ): Long = {
         val before = System.nanoTime()
-        val baseConfig: Config = ConfigFactory.load()
+        val baseConfig: Config = ConfigFactory.load().withValue(
+            "org.opalj.br.reader.ClassFileReader.Invokedynamic.rewrite",
+            ConfigValueFactory.fromAnyRef(true)
+        )
 
         implicit val config: Config =
             if (mainClass eq null) {
@@ -65,8 +68,9 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     )
             }
 
-        val targetClassFiles = JavaClassFileReader().ClassFiles(new File(target)).toIterator
-        val cpClassFiles = JavaClassFileReader().AllClassFiles(classPath.map(new File(_))).toIterator
+        val cfReader = JavaClassFileReader(theConfig = config)
+        val targetClassFiles = cfReader.ClassFiles(new File(target)).toIterator
+        val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_))).toIterator
         val allClassFiles = targetClassFiles ++ cpClassFiles
         val project: Project[URL] = Project(allClassFiles.toTraversable, Seq.empty, true, Seq.empty)
 
