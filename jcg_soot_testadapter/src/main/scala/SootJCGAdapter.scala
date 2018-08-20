@@ -1,14 +1,17 @@
-import scala.collection.JavaConverters._
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileWriter
+import java.io.PrintStream
 
 import play.api.libs.json.Json
 import soot.G
-import soot.Main
+import soot.PackManager
 import soot.Scene
 import soot.SootMethod
+import soot.options.Options
 import soot.util.backend.ASMBackendUtils
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -19,54 +22,63 @@ object SootJCGAdapter extends JCGTestAdapter {
     private val VTA = "VTA"
     private val Spark = "SPARK"
 
-    override def possibleAlgorithms(): Array[String] = Array(CHA /*, RTA, VTA, Spark*/ )
+    override def possibleAlgorithms(): Array[String] = Array(CHA, RTA, VTA, Spark )
 
     override val frameworkName: String = "Soot"
 
     override def serializeCG(algorithm: String, target: String, mainClass: String, classPath: Array[String], outputFile: String): Long = {
-        val options = new ArrayBuffer[String](40)
-        options += "-whole-program"
-        options += "-keep-line-number"
-        options += "-allow-phantom-refs"
-        options += "-include-all"
-        options += "-no-writeout-body-releasing" //todo we do not want this option here
 
-        addPhaseOptions(options, "cg", Array("safe-forname:true", "safe-newinstance:true", "types-for-invoke:true"))
+        val o = G.v().soot_options_Options()
+        o.set_whole_program(true)
+        o.set_keep_line_number(true)
+        o.set_allow_phantom_refs(true)
+        o.set_include_all(true)
 
-        addPhaseOptions(options, "jb", Array("enabled:true", "use-original-names:true"))
+        o.set_process_dir(List(target).asJava)
+        o.set_soot_classpath(classPath.mkString(File.pathSeparator))
+        o.set_output_format(Options.output_format_none)
 
-        if (mainClass == null) addPhaseOptions(options, "cg", Array("library:signature-resolution", "all-reachable:true"))
-        else {
-            options += "-main-class"
-            options += mainClass
+        o.setPhaseOption("jb", "use-original-names:true")
+
+        o.setPhaseOption("cg", "safe-forname:true")
+        o.setPhaseOption("cg", "safe-newinstance:true")
+        o.setPhaseOption("cg", "types-for-invoke:true")
+
+        if (mainClass == null) {
+            o.setPhaseOption("cg", "library:signature-resolution")
+            o.setPhaseOption("cg", "all-reachable:true")
+        } else {
+            o.set_main_class(mainClass)
         }
 
-        options += "-process-dir"
-        options += target
-
-        options += "-cp"
-        options += classPath.mkString(File.pathSeparator)
-
-        options += "-output-format"
-        options += "n"
-
         if (algorithm.contains(CHA)) {
-            addPhaseOptions(options, "cg.cha", Array[String]("enabled:true"))
+            o.setPhaseOption("cg.cha", "enabled:true")
         } else if (algorithm.contains(RTA)) {
-            addPhaseOptions(options, "cg.spark", Array[String]("enabled:true", "rta:true", "simulate-natives:true", "on-fly-cg:false"))
+            o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "rta:true")
+            o.setPhaseOption("cg.spark", "on-fly-cg:false")
+            o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else if (algorithm.contains(VTA)) {
-            addPhaseOptions(options, "cg.spark", Array[String]("enabled:true", "vta:true", "simulate-natives:true"))
+            o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "vta:true")
+            o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else if (algorithm.contains(Spark)) {
-            addPhaseOptions(options, "cg.spark", Array[String]("enabled:true", "simulate-natives:true"))
+            o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else {
             throw new IllegalArgumentException(s"unknown algorithm $algorithm")
         }
 
-        val before = System.nanoTime
-        Main.main(options.toArray)
-        val after = System.nanoTime
+        val out = new ByteArrayOutputStream()
+        G.v.out = new PrintStream(out)
 
         val scene = Scene.v()
+        val before = System.nanoTime
+        scene.loadNecessaryClasses()
+        // TODO SET ENTRYPOINTS?
+        PackManager.v().runPacks()
+        val after = System.nanoTime
+
         val cg = scene.getCallGraph
 
         val worklist = mutable.Queue(scene.getEntryPoints.asScala: _*)
