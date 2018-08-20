@@ -57,7 +57,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
 
-	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, returnType = String.class, line = 22)
+	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
