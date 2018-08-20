@@ -27,7 +27,8 @@ object CGMatcher {
     val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
 
     def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): Assessment = {
-        OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
+        if (!verbose)
+            OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
         implicit val p: SomeProject = Project(new File(tgtJar), org.opalj.bytecode.RTJar)
 
         val json = Json.parse(new FileInputStream(new File(jsonPath)))
