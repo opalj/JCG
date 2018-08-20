@@ -43,15 +43,15 @@ import java.lang.invoke.MethodType;
 
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
-    public String toString() { return "Foo"; }
+    public String foo() { return "Foo"; }
     
     @IndirectCall(
-        name = "toString", returnType = String.class, line = 18,
+        name = "foo", returnType = String.class, line = 18,
         resolvedTargets = "Ltmr2/Foo;"
     )
     public static void main(String[] args) throws Throwable {
         MethodType methodType = MethodType.methodType(String.class);
-        MethodHandle handle = MethodHandles.lookup().findVirtual(Foo.class, "toString", methodType);
+        MethodHandle handle = MethodHandles.lookup().findVirtual(Foo.class, "foo", methodType);
         String s = (String) handle.invokeExact(new Foo());
     }
 }
@@ -206,7 +206,7 @@ class Foo {
     public static Object foo(String bar) { return bar; }
 
     @IndirectCall(
-        name = "foo", returnType = Object.class, line = 18,
+        name = "foo", returnType = Object.class, parameterTypes = String.class, line = 18,
         resolvedTargets = "Ltmr7/Foo;"
     )
     public static void main(String[] args) throws Throwable {
@@ -235,8 +235,8 @@ class Foo {
     public static String foo(String foo, String bar) { return foo + bar; }
 
     @IndirectCall(
-        name = "foo", returnType = Object.class, line = 18,
-        resolvedTargets = "Ltmr8/Foo;"
+        name = "foo", returnType = String.class, parameterTypes = { String.class, String.class },
+        line = 18, resolvedTargets = "Ltmr8/Foo;"
     )
     public static void main(String[] args) throws Throwable {
         MethodType methodType = MethodType.methodType(String.class, String.class, String.class);
