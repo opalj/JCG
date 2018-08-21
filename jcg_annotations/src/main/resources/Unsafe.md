@@ -16,9 +16,9 @@ import java.lang.reflect.Field;
 import lib.annotations.callgraph.CallSite;
 
 public class Demo {
-    private Object objectVar = null;
+    private TargetInterface objectVar = null;
 
-	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
+	@CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -29,14 +29,24 @@ public class Demo {
         long objectOffset = unsafe.objectFieldOffset(objectField);
 
         unsafe.compareAndSwapObject(o, objectOffset, null, new UnsafeTarget());
-        o.objectVar.toString();
+        o.objectVar.targetMethod();
     }
 }
 
-class UnsafeTarget {
-	public String toString() {
+interface TargetInterface {
+    String targetMethod();
+}
+
+class UnsafeTarget implements TargetInterface{
+	public String targetMethod() {
 		return "UnsafeTarget";
 	}
+}
+
+class SafeTarget implements TargetInterface {
+    public String targetMethod() {
+        return "SafeTarget";
+    }
 }
 ```
 [//]: # (END)
@@ -55,9 +65,9 @@ import java.lang.reflect.Field;
 import lib.annotations.callgraph.CallSite;
 
 public class Demo {
-    private Object objectVar = null;
+    private TargetInterface objectVar = null;
 
-	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
+	@CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -68,14 +78,24 @@ public class Demo {
         long objectOffset = unsafe.objectFieldOffset(objectField);
 
         unsafe.putObject(o, objectOffset, new UnsafeTarget());
-        o.objectVar.toString();
+        o.objectVar.targetMethod();
     }
 }
 
-class UnsafeTarget {
-	public String toString() {
+interface TargetInterface {
+    String targetMethod();
+}
+
+class UnsafeTarget implements TargetInterface{
+	public String targetMethod() {
 		return "UnsafeTarget";
 	}
+}
+
+class SafeTarget implements TargetInterface {
+    public String targetMethod() {
+        return "SafeTarget";
+    }
 }
 ```
 [//]: # (END)
@@ -96,7 +116,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
 
-	@CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 23)
+	@CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 23)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -107,15 +127,25 @@ public class Demo {
         long objectOffset = unsafe.objectFieldOffset(objectField);
 
         o.objectVar = new UnsafeTarget();
-        Object f = unsafe.getObject(o, objectOffset);
-        f.toString();
+        TargetInterface f = (TargetInterface) unsafe.getObject(o, objectOffset);
+        f.targetMethod();
     }
 }
 
-class UnsafeTarget {
-	public String toString() {
+interface TargetInterface {
+    String targetMethod();
+}
+
+class UnsafeTarget implements TargetInterface{
+	public String targetMethod() {
 		return "UnsafeTarget";
 	}
+}
+
+class SafeTarget implements TargetInterface {
+    public String targetMethod() {
+        return "SafeTarget";
+    }
 }
 ```
 [//]: # (END)
@@ -139,8 +169,8 @@ public class Demo {
     private Object objectVar = null;
     
     @CallSites({
-	    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 29),
-        @CallSite(name = "toString", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 30)
+	    @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 29),
+        @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 30)
     })
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
@@ -153,25 +183,27 @@ public class Demo {
 
         demo.objectVar = new SafeTarget();
         UnsafeTarget unsafeTarget = new UnsafeTarget();
-        Object f = unsafe.getAndSetObject(demo, objectOffset, unsafeTarget);
+        TargetInterface f = (TargetInterface) unsafe.getAndSetObject(demo, objectOffset, unsafeTarget);
         
-        demo.objectVar.toString();
-        f.toString();
+        (TargetInterface(demo.objectVar)).targetMethod();
+        f.targetMethod();
     }
 }
 
-class UnsafeTarget {
-    
-	public String toString() {
-		return UnsafeTarget.class.toString();
+interface TargetInterface {
+    String targetMethod();
+}
+
+class UnsafeTarget implements TargetInterface{
+	public String targetMethod() {
+		return "UnsafeTarget";
 	}
 }
 
-class SafeTarget {
-    
-	public String toString() {
-		return SafeTarget.class.toString();
-	}
+class SafeTarget implements TargetInterface {
+    public String targetMethod() {
+        return "SafeTarget";
+    }
 }
 ```
 [//]: # (END)
@@ -193,7 +225,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
+    @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -207,22 +239,24 @@ public class Demo {
         UnsafeTarget unsafeTarget = new UnsafeTarget();
         unsafe.putOrderedObject(demo, objectOffset, unsafeTarget);
         
-        demo.objectVar.toString();
+        ((TargetInterface)demo.objectVar).targetMethod();
     }
 }
 
-class UnsafeTarget {
-    
-	public String toString() {
-		return UnsafeTarget.class.toString();
+interface TargetInterface {
+    String targetMethod();
+}
+
+class UnsafeTarget implements TargetInterface{
+	public String targetMethod() {
+		return "UnsafeTarget";
 	}
 }
 
-class SafeTarget {
-    
-	public String toString() {
-		return SafeTarget.class.toString();
-	}
+class SafeTarget implements TargetInterface {
+    public String targetMethod() {
+        return "SafeTarget";
+    }
 }
 ```
 [//]: # (END)
@@ -244,7 +278,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "toString", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 24)
+    @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 24)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -255,24 +289,26 @@ public class Demo {
         long objectOffset = unsafe.objectFieldOffset(objectField);
 
         demo.objectVar = new SafeTarget();
-        Object target = unsafe.getObjectVolatile(demo, objectOffset);
+        TargetInterface target = (TargetInterface) unsafe.getObjectVolatile(demo, objectOffset);
         
-        target.toString();
+        target.targetMethod();
     }
 }
 
-class UnsafeTarget {
-    
-	public String toString() {
-		return UnsafeTarget.class.toString();
+interface TargetInterface {
+    String targetMethod();
+}
+
+class UnsafeTarget implements TargetInterface{
+	public String targetMethod() {
+		return "UnsafeTarget";
 	}
 }
 
-class SafeTarget {
-    
-	public String toString() {
-		return SafeTarget.class.toString();
-	}
+class SafeTarget implements TargetInterface {
+    public String targetMethod() {
+        return "SafeTarget";
+    }
 }
 ```
 [//]: # (END)
@@ -294,7 +330,7 @@ import lib.annotations.callgraph.CallSite;
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "toString", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
+    @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -308,22 +344,24 @@ public class Demo {
         UnsafeTarget unsafeTarget = new UnsafeTarget();
         unsafe.putObjectVolatile(demo, objectOffset, unsafeTarget);
         
-        demo.objectVar.toString();
+        ((TargetInterface)demo.objectVar).targetMethod();
     }
 }
 
-class UnsafeTarget {
-    
-	public String toString() {
-		return UnsafeTarget.class.toString();
+interface TargetInterface {
+    String targetMethod();
+}
+
+class UnsafeTarget implements TargetInterface{
+	public String targetMethod() {
+		return "UnsafeTarget";
 	}
 }
 
-class SafeTarget {
-    
-	public String toString() {
-		return SafeTarget.class.toString();
-	}
+class SafeTarget implements TargetInterface {
+    public String targetMethod() {
+        return "SafeTarget";
+    }
 }
 ```
 [//]: # (END)
