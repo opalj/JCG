@@ -127,11 +127,13 @@ object DoopAdapter extends JCGTestAdapter {
         callGraph: Map[String, Map[(String, Int), Set[String]]]
     )(implicit project: Project[URL]): ReachableMethods = {
         var reachableMethods = Set.empty[ReachableMethod]
+        var reachableMethodsSet = Set.empty[Method]
 
         for {
             (caller, callSites) ← callGraph
         } {
             val callerMethod = toMethod(caller)
+            reachableMethodsSet += callerMethod
             var resultingCallSites = Set.empty[CallSite]
             project.classFile(toObjectType(callerMethod.declaringClass)) match {
                 case Some(cf) ⇒
@@ -155,6 +157,18 @@ object DoopAdapter extends JCGTestAdapter {
                 case None ⇒
             }
             reachableMethods += ReachableMethod(callerMethod, resultingCallSites)
+        }
+
+        for {
+            (_, callSites) ← callGraph
+            (_, tgts) ← callSites
+            tgt ← tgts
+        } {
+            val calleeMethod = toMethod(tgt)
+            if (!reachableMethodsSet.contains(calleeMethod)) {
+                reachableMethodsSet += calleeMethod
+                reachableMethods += ReachableMethod(calleeMethod, Set.empty)
+            }
         }
         ReachableMethods(reachableMethods)
     }
