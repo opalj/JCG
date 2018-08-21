@@ -119,7 +119,7 @@ import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable { 
     static final long serialVersionUID = 42L;
-    @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
+    @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectInputStream;", line = 12)
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
@@ -150,7 +150,7 @@ import java.io.IOException;
 import lib.annotations.callgraph.CallSite;
 public class Foo implements Serializable {
     static final long serialVersionUID = 42L;
-    @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectOutputStream;", line = 12)
+    @CallSite(name = "defaultReadObject", resolvedTargets = "Ljava/io/ObjectInputStream;", line = 12)
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
@@ -158,7 +158,7 @@ public class Foo implements Serializable {
     public static void main(String[] args) throws Exception {
         FileInputStream fis = new FileInputStream("test.ser");
         ObjectInputStream in = new ObjectInputStream(fis);
-        Foo obj = (Foo) in.readObject();
+        Foo obj = (Foo) in.defaultReadObject();
         in.close();
     }
 }
