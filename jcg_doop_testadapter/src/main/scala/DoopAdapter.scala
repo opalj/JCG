@@ -45,6 +45,9 @@ object DoopAdapter extends JCGTestAdapter {
         for (doopResult ← doopResults.sorted) {
             val source = Source.fromFile(doopResult)
             val tgtJar = new File(s"result/${doopResult.getName.replace(".txt", "")}")
+            if (!tgtJar.exists()) {
+                throw new IllegalArgumentException(s"${tgtJar.getAbsolutePath} does not exist")
+            }
             println(s"${tgtJar.getName}")
             val outFile = createJsonRepresentation(source, tgtJar, jreDir)
             println(CGMatcher.matchCallSites(tgtJar.getAbsolutePath, outFile.getAbsolutePath))
