@@ -28,12 +28,13 @@ public class Demo {
     private static final String CLS_NAME = "lib.IntComparator";
 
 
-    @IndirectCall(name = "compare", line = 37, resolvedTargets = "Llib/IntComparator;")
+    @IndirectCall(name = "compare", line = 38, resolvedTargets = "Llib/IntComparator;")
     public static void main(String[] args)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         URLClassLoader cl = URLClassLoader.newInstance(new URL[]{CLv1}, ClassLoader.getSystemClassLoader());
         Class<?> cls = cl.loadClass(CLS_NAME);
         Comparator<Integer> comparator = (Comparator<Integer>) cls.newInstance();
-        comparator.compare(1, 1);
+        Integer one = Integer.valueOf(1);
+        comparator.compare(one, one);
     }
 }
