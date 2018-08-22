@@ -108,8 +108,11 @@ object Evaluation {
                     (for {
                         projectLocation ← resultsDir.listFiles(_.getName.endsWith(".tsv"))
                         line ← Source.fromFile(projectLocation).getLines().drop(1)
+                        lineSplit = line.split("\t", -1)
+                        if lineSplit.size == 9
+                        Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = lineSplit
+                        if methodName.nonEmpty && mdString.nonEmpty
                     } yield {
-                        val Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = line.split("\t", -1)
                         val className = classString.replace("\"", "")
                         val md = MethodDescriptor(mdString.replace("\"", ""))
                         val params = md.parameterTypes.map(_.toJVMTypeName).toList
