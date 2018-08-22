@@ -113,11 +113,13 @@ object Evaluation {
                         Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = lineSplit
                         if methodName.nonEmpty && mdString.nonEmpty
                     } yield {
+                        val projectName = projectId.replace("\"", "")
+                        val featureName = featureId.replace("\"", "")
                         val className = classString.replace("\"", "")
                         val md = MethodDescriptor(mdString.replace("\"", ""))
                         val params = md.parameterTypes.map(_.toJVMTypeName).toList
                         val returnType = md.returnType.toJVMTypeName
-                        (projectId, featureId, Method(methodName, className, returnType, params))
+                        (projectName, featureName, Method(methodName, className, returnType, params))
                     }).groupBy(_._1).map {
                         case (pId, group1) ⇒ pId → group1.map { case (_, f, m) ⇒ f → m }.groupBy(_._1).map {
                             case (fId, group2) ⇒ fId → group2.map(_._2).toSet
