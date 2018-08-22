@@ -174,7 +174,7 @@ object Evaluation {
                             jreJars ++ cp,
                             jsFile.getPath
                         )
-                        
+
                         println(s"analysis took ${elapsed / 1000000000d}")
 
                         System.gc()
@@ -188,6 +188,20 @@ object Evaluation {
                             ow.write(s"\t${result.shortNotation}")
                         }
 
+                        if (projectSpecificEvaluation && jsFile.exists()) {
+                            val pw = new PrintWriter(new File(outDir, "pse.tsv"))
+                            val json = Json.parse(new FileInputStream(jsFile))
+                            val reachableMethods = json.validate[ReachableMethods].get.toMap
+                            for {
+                                (fId, locations) ← locationsMap(projectSpec.name)
+                                location ← locations
+                                if reachableMethods.contains(location) // we are unsound
+                            } {
+                                pw.println(s"${projectSpec.name}\t$fId\t$location)")
+                            }
+                            pw.close()
+                        }
+                        
                     } catch {
                         case e: Throwable ⇒
                             if (debug) {
@@ -196,19 +210,6 @@ object Evaluation {
                             }
 
                             ow.write(s"\tE")
-                    }
-                    if (projectSpecificEvaluation && jsFile.exists()) {
-                        val pw = new PrintWriter(new File(outDir, "pse.tsv"))
-                        val json = Json.parse(new FileInputStream(jsFile))
-                        val reachableMethods = json.validate[ReachableMethods].get.toMap
-                        for {
-                            (fId, locations) ← locationsMap(projectSpec.name)
-                            location ← locations
-                            if reachableMethods.contains(location) // we are unsound
-                        } {
-                            pw.println(s"${projectSpec.name}\t$fId\t$location)")
-                        }
-                        pw.close()
                     }
 
                 }
