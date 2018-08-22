@@ -42,7 +42,7 @@ object SootJCGAdapter extends JCGTestAdapter {
 
         o.setPhaseOption("cg", "safe-forname:true")
         o.setPhaseOption("cg", "safe-newinstance:true")
-        o.setPhaseOption("cg", "types-for-invoke:true")
+        //o.setPhaseOption("cg", "types-for-invoke:true")
 
         if (mainClass == null) {
             o.setPhaseOption("cg", "library:signature-resolution")
