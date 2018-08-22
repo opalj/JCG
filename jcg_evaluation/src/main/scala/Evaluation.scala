@@ -183,9 +183,11 @@ object Evaluation {
 
                         if (isAnnotatedProject) {
                             val result = CGMatcher.matchCallSites(
-                                projectSpec.target(projectsDir).getCanonicalPath,
+                                projectSpec,
+                                jreLocations,
+                                projectsDir,
                                 jsFile.getPath,
-                                verbose = debug
+                                debug
                             )
                             ow.write(s"\t${result.shortNotation}")
                         }
@@ -210,8 +212,8 @@ object Evaluation {
                             if (debug) {
                                 println(e.printStackTrace())
                             }
-
-                            ow.write(s"\tE")
+                            if (isAnnotatedProject)
+                                ow.write(s"\tE")
                     }
 
                 }
