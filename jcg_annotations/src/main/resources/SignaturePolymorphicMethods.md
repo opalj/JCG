@@ -121,7 +121,7 @@ class Class {
        }
        
        @IndirectCall(
-            name = "method", returnType = void.class, parameterTypes = {int.class}, line = 26,
+            name = "method", returnType = void.class, parameterTypes = {MyObject.class}, line = 26,
             resolvedTargets = "Lspm3/Class;")
        public static void main(String[] args) throws Throwable {
            MethodType descriptor = MethodType.methodType(void.class, MyObject.class);
@@ -286,7 +286,7 @@ import java.lang.invoke.MethodType;
 class VirtualSPMCall {
     
     @IndirectCall(
-    name = "method", returnType = void.class, parameterTypes = {byte.class}, line = 19,
+    name = "method", returnType = void.class, parameterTypes = {Object.class}, line = 18,
     resolvedTargets = "Lspm7/Superclass;", prohibitedTargets = "Lspm7/Interface;")
     public static void main(String[] args) throws Throwable {   
         MethodType descriptor = MethodType.methodType(void.class, Object.class);

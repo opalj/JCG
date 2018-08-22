@@ -185,7 +185,7 @@ public class Demo {
         UnsafeTarget unsafeTarget = new UnsafeTarget();
         TargetInterface f = (TargetInterface) unsafe.getAndSetObject(demo, objectOffset, unsafeTarget);
         
-        (TargetInterface(demo.objectVar)).targetMethod();
+        ((TargetInterface)demo.objectVar).targetMethod();
         f.targetMethod();
     }
 }

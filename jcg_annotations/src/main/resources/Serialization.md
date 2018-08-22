@@ -158,7 +158,7 @@ public class Foo implements Serializable {
     public static void main(String[] args) throws Exception {
         FileInputStream fis = new FileInputStream("test.ser");
         ObjectInputStream in = new ObjectInputStream(fis);
-        Foo obj = (Foo) in.defaultReadObject();
+        Foo obj = (Foo) in.readObject();
         in.close();
     }
 }
