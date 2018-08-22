@@ -157,8 +157,7 @@ object Evaluation {
                         throw new IllegalArgumentException("invalid project.conf")
                     }
 
-                    if (debug)
-                        println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
+                    println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
 
                     val outDir = new File(resultsDir, s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo")
                     outDir.mkdirs()
@@ -175,9 +174,8 @@ object Evaluation {
                             jreJars ++ cp,
                             jsFile.getPath
                         )
-                        if (debug) {
-                            println(s"analysis took ${elapsed / 1000000000d}")
-                        }
+                        
+                        println(s"analysis took ${elapsed / 1000000000d}")
 
                         System.gc()
 
