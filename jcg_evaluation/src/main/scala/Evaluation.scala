@@ -201,11 +201,11 @@ object Evaluation {
                             }
                             pw.close()
                         }
-                        
+
                     } catch {
                         case e: Throwable ⇒
+                            println(s"exception in project ${projectSpec.name}")
                             if (debug) {
-                                println(projectSpec.name)
                                 println(e.printStackTrace())
                             }
 
