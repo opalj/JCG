@@ -91,7 +91,11 @@ object WalaJCGAdapter extends JCGTestAdapter {
                 }
                 if (currentMethodResolved != null) {
                     val declaredTarget = cs.getDeclaredTarget
-                    val line = currentMethodResolved.getLineNumber(cs.getProgramCounter)
+                    val line = try {
+                        currentMethodResolved.getLineNumber(cs.getProgramCounter)
+                    } catch {
+                        case _: ArrayIndexOutOfBoundsException ⇒ -1
+                    }
                     val tgts = tgtsWala.map(createMethodObject).toSet
                     Some(CallSite(createMethodObject(declaredTarget), line, tgts))
                 } else {

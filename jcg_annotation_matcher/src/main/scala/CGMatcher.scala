@@ -16,7 +16,6 @@ import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.SomeProject
 import org.opalj.log.GlobalLogContext
 import org.opalj.log.OPALLogger
-import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json
 
 object CGMatcher {
@@ -26,10 +25,20 @@ object CGMatcher {
     val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
     val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
 
-    def matchCallSites(tgtJar: String, jsonPath: String, verbose: Boolean = false): Assessment = {
+    def matchCallSites(
+        projectSpec:  ProjectSpecification,
+        jRELocations: Map[Int, Array[File]],
+        parent:       File,
+        jsonPath:     String,
+        verbose:      Boolean               = false
+    ): Assessment = {
         if (!verbose)
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
-        implicit val p: SomeProject = Project(new File(tgtJar), org.opalj.bytecode.RTJar)
+
+        implicit val p: SomeProject = Project(
+            Array(projectSpec.target(parent)) ++ projectSpec.allClassPathEntryFiles(parent) ++ jRELocations(projectSpec.java),
+            Array.empty[File]
+        )
 
         val json = Json.parse(new FileInputStream(new File(jsonPath)))
         val computedReachableMethods =
@@ -52,7 +61,7 @@ object CGMatcher {
                         (body.lineNumber(pc), instr.asInvocationInstruction.name)
                 }.toSet
                 if (lines.size != invokations.length) {
-                    throw new RuntimeException(s"Multiple call sites with same name in the same line $tgtJar, ${method.name}")
+                    throw new RuntimeException(s"Multiple call sites with same name in the same line ${projectSpec.name}, ${method.name}")
                 }
             }
 
@@ -231,10 +240,6 @@ object CGMatcher {
         if (verbose) println(s"Missed transitive call $source -> $annotatedTarget")
 
         false
-    }
-
-    def main(args: Array[String]): Unit = {
-        println(matchCallSites(args(0), args(1), verbose = true))
     }
 
     def convertMethod(method: org.opalj.br.Method): Method = {

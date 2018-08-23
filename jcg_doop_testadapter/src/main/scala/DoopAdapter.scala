@@ -45,6 +45,9 @@ object DoopAdapter extends JCGTestAdapter {
         for (doopResult ← doopResults.sorted) {
             val source = Source.fromFile(doopResult)
             val tgtJar = new File(s"result/${doopResult.getName.replace(".txt", "")}")
+            if (!tgtJar.exists()) {
+                throw new IllegalArgumentException(s"${tgtJar.getAbsolutePath} does not exist")
+            }
             println(s"${tgtJar.getName}")
             val outFile = createJsonRepresentation(source, tgtJar, jreDir)
             println(CGMatcher.matchCallSites(tgtJar.getAbsolutePath, outFile.getAbsolutePath))
@@ -127,11 +130,13 @@ object DoopAdapter extends JCGTestAdapter {
         callGraph: Map[String, Map[(String, Int), Set[String]]]
     )(implicit project: Project[URL]): ReachableMethods = {
         var reachableMethods = Set.empty[ReachableMethod]
+        var reachableMethodsSet = Set.empty[Method]
 
         for {
             (caller, callSites) ← callGraph
         } {
             val callerMethod = toMethod(caller)
+            reachableMethodsSet += callerMethod
             var resultingCallSites = Set.empty[CallSite]
             project.classFile(toObjectType(callerMethod.declaringClass)) match {
                 case Some(cf) ⇒
@@ -155,6 +160,18 @@ object DoopAdapter extends JCGTestAdapter {
                 case None ⇒
             }
             reachableMethods += ReachableMethod(callerMethod, resultingCallSites)
+        }
+
+        for {
+            (_, callSites) ← callGraph
+            (_, tgts) ← callSites
+            tgt ← tgts
+        } {
+            val calleeMethod = toMethod(tgt)
+            if (!reachableMethodsSet.contains(calleeMethod)) {
+                reachableMethodsSet += calleeMethod
+                reachableMethods += ReachableMethod(calleeMethod, Set.empty)
+            }
         }
         ReachableMethods(reachableMethods)
     }

@@ -108,13 +108,18 @@ object Evaluation {
                     (for {
                         projectLocation ← resultsDir.listFiles(_.getName.endsWith(".tsv"))
                         line ← Source.fromFile(projectLocation).getLines().drop(1)
+                        lineSplit = line.split("\t", -1)
+                        if lineSplit.size == 9
+                        Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = lineSplit
+                        if methodName.nonEmpty && mdString.nonEmpty
                     } yield {
-                        val Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = line.split("\t", -1)
+                        val projectName = projectId.replace("\"", "")
+                        val featureName = featureId.replace("\"", "")
                         val className = classString.replace("\"", "")
                         val md = MethodDescriptor(mdString.replace("\"", ""))
                         val params = md.parameterTypes.map(_.toJVMTypeName).toList
                         val returnType = md.returnType.toJVMTypeName
-                        (projectId, featureId, Method(methodName, className, returnType, params))
+                        (projectName, featureName, Method(methodName, className, returnType, params))
                     }).groupBy(_._1).map {
                         case (pId, group1) ⇒ pId → group1.map { case (_, f, m) ⇒ f → m }.groupBy(_._1).map {
                             case (fId, group2) ⇒ fId → group2.map(_._2).toSet
@@ -154,8 +159,7 @@ object Evaluation {
                         throw new IllegalArgumentException("invalid project.conf")
                     }
 
-                    if (debug)
-                        println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
+                    println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
 
                     val outDir = new File(resultsDir, s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo")
                     outDir.mkdirs()
@@ -172,41 +176,48 @@ object Evaluation {
                             jreJars ++ cp,
                             jsFile.getPath
                         )
-                        if (debug) {
-                            println(s"analysis took ${elapsed / 1000000000d}")
-                        }
 
                         System.gc()
+                        
+                        val seconds = elapsed / 1000000000d
+                        val pw = new PrintWriter(new File(outDir, "timings.txt"))
+                        pw.write(s"$seconds sec.")
+                        pw.close()
+                        println(s"analysis took $seconds sec.")
 
                         if (isAnnotatedProject) {
                             val result = CGMatcher.matchCallSites(
-                                projectSpec.target(projectsDir).getCanonicalPath,
-                                jsFile.getPath
+                                projectSpec,
+                                jreLocations,
+                                projectsDir,
+                                jsFile.getPath,
+                                debug
                             )
                             ow.write(s"\t${result.shortNotation}")
                         }
 
+                        if (projectSpecificEvaluation && jsFile.exists()) {
+                            val pw = new PrintWriter(new File(outDir, "pse.tsv"))
+                            val json = Json.parse(new FileInputStream(jsFile))
+                            val reachableMethods = json.validate[ReachableMethods].get.toMap
+                            for {
+                                (fId, locations) ← locationsMap(projectSpec.name)
+                                location ← locations
+                                if reachableMethods.contains(location) // we are unsound
+                            } {
+                                pw.println(s"${projectSpec.name}\t$fId\t$location)")
+                            }
+                            pw.close()
+                        }
+
                     } catch {
                         case e: Throwable ⇒
+                            println(s"exception in project ${projectSpec.name}")
                             if (debug) {
-                                println(projectSpec.name)
                                 println(e.printStackTrace())
                             }
-
-                            ow.write(s"\tE")
-                    }
-                    if (projectSpecificEvaluation && jsFile.exists()) {
-                        val pw = new PrintWriter(new File(outDir, "pse.tsv"))
-                        val json = Json.parse(new FileInputStream(jsFile))
-                        val reachableMethods = json.validate[ReachableMethods].get.toMap
-                        for {
-                            (fId, locations) ← locationsMap(projectSpec.name)
-                            location ← locations
-                            if reachableMethods.contains(location) // we are unsound
-                        } {
-                            pw.println(s"${projectSpec.name}\t$fId\t$location)")
-                        }
-                        pw.close()
+                            if (isAnnotatedProject)
+                                ow.write(s"\tE")
                     }
 
                 }

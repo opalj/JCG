@@ -9,8 +9,20 @@ import java.io._
  *
  * @author Michael Eichberg
  */
-object Demo {
+class Demo {
 
+    @IndirectCall(name = "twice", line = 21, resolvedTargets = Array("Ldemo/Demo$;"),
+        returnType= classOf[Int], parameterTypes = Array(classOf[Int]))
+    def m2(d : Array[Byte] , i : Int) : Unit = {
+        val bin = new ByteArrayInputStream(d)
+        val oin = new ObjectInputStream(bin)
+        val f: Int => Int = oin.readObject().asInstanceOf[Int => Int]
+        oin.close()
+        println(f(i))
+    }
+}
+
+object Demo {
 
     def m1() : Array[Byte] = {
         val bout = new ByteArrayOutputStream()
@@ -20,21 +32,12 @@ object Demo {
         bout.toByteArray
     }
 
-    @IndirectCall(name = "twice", line = 28, resolvedTargets = Array("Ldemo/Demo;"), returnType= classOf[Int])
-    def m2(d : Array[Byte] , i : Int) : Unit = {
-        val oin = new ObjectInputStream(new ByteArrayInputStream(d))
-        val f: Int => Int = oin.readObject().asInstanceOf[Int => Int]
-        oin.close()
-        println(f(i))
-    }
+    def twice(i : Int) : Int = i * 2
 
     def main(args : Array[String]) : Unit = {
-        m2(
+        new Demo().m2(
             m1(),
             5
         )
     }
-
-    def twice(i : Int) : Int = i * 2
-
 }

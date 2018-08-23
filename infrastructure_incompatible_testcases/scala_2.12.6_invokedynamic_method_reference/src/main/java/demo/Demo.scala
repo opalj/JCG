@@ -9,17 +9,19 @@ import java.io._
  *
  * @author Michael Eichberg
  */
-object Demo {
+class Demo {
 
-    @IndirectCall(name = "twice", line = 16, resolvedTargets = Array("Ldemo/Demo;"), returnType= classOf[Int])
+    @IndirectCall(name = "twice", line = 17, resolvedTargets = Array("Ldemo/Demo$;"), 
+    	returnType= classOf[Int], parameterTypes = Array(classOf[Int]))
     def m(m : Int => Int) : Unit = {
         println(m(2))
     }
+}
 
-    def main(args : Array[String]) : Unit = {
-        m(twice)
-    }
-
+object Demo {	
     def twice(i : Int) : Int = i * 2
 
+    def main(args : Array[String]) : Unit = {
+        new Demo().m(twice)
+    }
 }
