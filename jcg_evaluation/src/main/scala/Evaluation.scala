@@ -177,9 +177,13 @@ object Evaluation {
                             jsFile.getPath
                         )
 
-                        println(s"analysis took ${elapsed / 1000000000d}")
-
                         System.gc()
+                        
+                        val seconds = elapsed / 1000000000d
+                        val pw = new PrintWriter(new File(outDir, "timings.txt"))
+                        pw.write(s"$seconds sec.")
+                        pw.close()
+                        println(s"analysis took $seconds sec.")
 
                         if (isAnnotatedProject) {
                             val result = CGMatcher.matchCallSites(
