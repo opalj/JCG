@@ -22,9 +22,9 @@ object SootJCGAdapter extends JCGTestAdapter {
     private val VTA = "VTA"
     private val Spark = "SPARK"
 
-    override def possibleAlgorithms(): Array[String] = Array(CHA, RTA, VTA, Spark )
+    override def possibleAlgorithms(): Array[String] = Array(/*CHA,*/ RTA/*, VTA, Spark */)
 
-    override val frameworkName: String = "Soot"
+    override def frameworkName(): String = "Soot"
 
     override def serializeCG(algorithm: String, target: String, mainClass: String, classPath: Array[String], outputFile: String): Long = {
 
