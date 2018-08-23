@@ -9,15 +9,22 @@ import java.io._
  *
  * @author Michael Eichberg
  */
-object Demo {
+class Demo {
 
     def m(m : AnyRef) : Unit = {
         println(m.toString)
     }
 
-    @IndirectCall(name = "<init>", line = 14, resolvedTargets = Array("Lscala/Symbol;"), returnType= classOf[scala.Symbol])
-    def main(args : Array[String]) : Unit = {
+    @IndirectCall(name = "<init>", line = 20, resolvedTargets = Array("Lscala/Symbol;"),
+	parameterTypes = Array(classOf[String]))
+    def main() : Unit = {
         m('mySymbol)
     }
 
+}
+
+object Demo {
+	def main(args : Array[String]) : Unit = {
+        new Demo().main()
+    }
 }

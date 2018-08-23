@@ -25,7 +25,7 @@ object JRELocation {
     }
 
     def getAllJREJars(jreDir: File): Array[File] = {
-        val jars = jreDir.listFiles(_.getName.endsWith(".jar"))
+        val jars = jreDir.listFiles(file => file.getName.endsWith(".jar") | file.getName.endsWith(".jmod"))
         val jarsInSubDirs = jreDir.listFiles(_.isDirectory).flatMap(getAllJREJars)
         jars ++ jarsInSubDirs
     }

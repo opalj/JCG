@@ -7,17 +7,18 @@ import lib.annotations.callgraph.IndirectCall;
  *
  * @author Michael Eichberg
  */
-object Demo {
+class Demo {
 
     @IndirectCall(name = "x", line = 14, resolvedTargets = Array("Ldemo/X;"), returnType= classOf[Int])
     def m(m : AnyRef{ def x() : Int}) : Unit = {
         println(m.x())
     }
+}
 
+object Demo {
     def main(args : Array[String]) : Unit = {
-        m(new X())
+        new Demo().m(new X())
     }
-
 }
 
 class X {
