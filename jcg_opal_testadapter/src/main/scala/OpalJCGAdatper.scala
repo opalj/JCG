@@ -105,7 +105,12 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         var reachableMethods = Set.empty[ReachableMethod]
 
-        for (dm ← declaredMethods.declaredMethods) {
+        for (
+            dm ← declaredMethods.declaredMethods
+            //TODO THIS IS BROKEN FIX IT
+            if((!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
+                (dm.hasSingleDefinedMethod && dm.definedMethod.classFile.thisType == dm.declaringClassType))
+        ) {
             val m = createMethodObject(dm)
             ps(dm, Callees.key) match {
                 case FinalEP(_, NoCalleesDueToNotReachableMethod) ⇒
@@ -120,6 +125,8 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     reachableMethods += ReachableMethod(m, callSites)
             }
         }
+
+        println(reachableMethods.size)
 
         ps.shutdown()
 
