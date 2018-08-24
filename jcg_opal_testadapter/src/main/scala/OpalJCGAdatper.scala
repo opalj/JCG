@@ -38,11 +38,13 @@ object OpalJCGAdatper extends JCGTestAdapter {
     def frameworkName(): String = "OPAL"
 
     def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        outputFile: String
+        algorithm:    String,
+        target:       String,
+        mainClass:    String,
+        classPath:    Array[String],
+        jreLocations: String,
+        jreVersion:   Int,
+        outputFile:   String
     ): Long = {
         val before = System.nanoTime()
         val baseConfig: Config = ConfigFactory.load().withValue(
@@ -71,7 +73,9 @@ object OpalJCGAdatper extends JCGTestAdapter {
         val cfReader = JavaClassFileReader(theConfig = config)
         val targetClassFiles = cfReader.ClassFiles(new File(target)).toIterator
         val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_))).toIterator
-        val allClassFiles = targetClassFiles ++ cpClassFiles
+        val jreJars = JRELocation.mapping(new File(jreLocations)).getOrElse(jreVersion, throw new IllegalArgumentException("unspecified java version"))
+        val jre = cfReader.AllClassFiles(jreJars)
+        val allClassFiles = targetClassFiles ++ cpClassFiles ++ jre
         val project: Project[URL] = Project(allClassFiles.toTraversable, Seq.empty, true, Seq.empty)
 
         val ps = project.get(PropertyStoreKey)

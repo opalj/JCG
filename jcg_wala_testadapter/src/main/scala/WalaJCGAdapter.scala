@@ -1,6 +1,7 @@
-import scala.collection.JavaConverters._
 import java.io.File
+import java.io.FileOutputStream
 import java.io.FileWriter
+import java.io.PrintWriter
 import java.util
 import java.util.stream.Collectors
 
@@ -15,25 +16,32 @@ import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
 import play.api.libs.json.Json
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object WalaJCGAdapter extends JCGTestAdapter {
     override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        outputFile: String
+        algorithm:    String,
+        target:       String,
+        mainClass:    String,
+        classPath:    Array[String],
+        jreLocations: String,
+        jreVersion:   Int,
+        outputFile:   String
     ): Long = {
         val before = System.nanoTime
         val cl = Thread.currentThread.getContextClassLoader
 
         var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
         cp = target + File.pathSeparator + cp
+        val propertiesFile = new File("wala.properties")
+        val pw = new PrintWriter(new FileOutputStream(propertiesFile))
+        val jreDirectory = JRELocation.jreDirectory(new File(jreLocations), jreVersion)
+        pw.println(s"java_runtime_dir = $jreDirectory")
+        pw.close()
 
         val ex = new File(cl.getResource("exclusions.txt").getFile)
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
-
         val classHierarchy = ClassHierarchyFactory.make(scope)
 
         val entrypoints =
@@ -64,6 +72,8 @@ object WalaJCGAdapter extends JCGTestAdapter {
                 rtaBuilder.makeCallGraph(options, new NullProgressMonitor)
             } else throw new IllegalArgumentException
         val after = System.nanoTime
+
+        propertiesFile.delete()
 
         val initialEntryPoints = cg.getFakeRootNode.iterateCallSites().asScala.map(_.getDeclaredTarget)
 
@@ -115,18 +125,9 @@ object WalaJCGAdapter extends JCGTestAdapter {
         after - before
     }
 
-    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
+    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "0-1-CFA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
 
     override def frameworkName(): String = "WALA"
-
-    def main(args: Array[String]): Unit = {
-        val cgAlgorithm = args(0)
-        val targetJar = args(1)
-        val mainClass = args(2)
-        val outputPath = args(3)
-        val cp = args.slice(4, args.length)
-        WalaJCGAdapter.serializeCG(cgAlgorithm, targetJar, mainClass, cp, outputPath)
-    }
 
     private def createMethodObject(method: MethodReference): Method = {
         val name = method.getName.toString

@@ -22,11 +22,19 @@ object SootJCGAdapter extends JCGTestAdapter {
     private val VTA = "VTA"
     private val Spark = "SPARK"
 
-    override def possibleAlgorithms(): Array[String] = Array(/*CHA,*/ RTA/*, VTA, Spark */)
+    override def possibleAlgorithms(): Array[String] = Array( /*CHA,*/ RTA /*, VTA, Spark */ )
 
     override def frameworkName(): String = "Soot"
 
-    override def serializeCG(algorithm: String, target: String, mainClass: String, classPath: Array[String], outputFile: String): Long = {
+    override def serializeCG(
+        algorithm:    String,
+        target:       String,
+        mainClass:    String,
+        classPath:    Array[String],
+        jreLocations: String,
+        jreVersion:   Int,
+        outputFile:   String
+    ): Long = {
 
         val o = G.v().soot_options_Options()
         o.set_whole_program(true)
@@ -35,7 +43,8 @@ object SootJCGAdapter extends JCGTestAdapter {
         o.set_include_all(true)
 
         o.set_process_dir(List(target).asJava)
-        o.set_soot_classpath(classPath.mkString(File.pathSeparator))
+        val jreJars = JRELocation.mapping(new File(jreLocations))(jreVersion)
+        o.set_soot_classpath((classPath ++ jreJars).mkString(File.pathSeparator))
         o.set_output_format(Options.output_format_none)
 
         o.setPhaseOption("jb", "use-original-names:true")
@@ -143,15 +152,6 @@ object SootJCGAdapter extends JCGTestAdapter {
         options += "-p"
         options += phase
         options += phaseOptions.mkString(",")
-    }
-
-    def main(args: Array[String]): Unit = {
-        val cgAlgorithm: String = args(0)
-        val targetJar: String = args(1)
-        val mainClass: String = args(2)
-        val outputPath: String = args(3)
-        val cp: Array[String] = args.slice(4, args.length)
-        serializeCG(cgAlgorithm, targetJar, mainClass, cp, outputPath)
     }
 
     private def createMethodObject(method: SootMethod): Method = {

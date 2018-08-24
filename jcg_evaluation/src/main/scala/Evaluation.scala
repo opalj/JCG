@@ -129,7 +129,7 @@ object Evaluation {
                     Map.empty
 
             if (runAnalyses) {
-                runAnalyses(projectsDir, resultsDir, jarFilter, ow, locations, jreLocations)
+                runAnalyses(projectsDir, resultsDir, jarFilter, ow, jreLocations, locations)
             }
 
             ow.flush()
@@ -142,8 +142,8 @@ object Evaluation {
         resultsDir:   File,
         jarFilter:    String,
         ow:           BufferedWriter,
-        locationsMap: Map[String, Map[String, Set[Method]]],
-        jreLocations: Map[Int, Array[File]]
+        jreLocations: Map[Int, Array[File]],
+        locationsMap: Map[String, Map[String, Set[Method]]]
     ): Unit = {
         val projectSpecFiles = projectsDir.listFiles((_, name) ⇒ name.endsWith(".conf")).filter(_.getName.startsWith(jarFilter)).sorted
         printHeader(ow, projectSpecFiles)
@@ -166,19 +166,20 @@ object Evaluation {
 
                     val jsFile = new File(outDir, "cg.json")
                     try {
-                        val jreJars = jreLocations(projectSpec.java).map(_.getCanonicalPath)
                         val cp = projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
 
                         val elapsed = adapter.serializeCG(
                             cgAlgo,
                             projectSpec.target(projectsDir).getCanonicalPath,
                             projectSpec.main.orNull,
-                            jreJars ++ cp,
+                            cp,
+                            JRE_LOCATIONS_FILE,
+                            projectSpec.java,
                             jsFile.getPath
                         )
 
                         System.gc()
-                        
+
                         val seconds = elapsed / 1000000000d
                         val pw = new PrintWriter(new File(outDir, "timings.txt"))
                         pw.write(s"$seconds sec.")

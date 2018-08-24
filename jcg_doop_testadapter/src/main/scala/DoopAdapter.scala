@@ -242,10 +242,12 @@ object DoopAdapter extends JCGTestAdapter {
     }
 
     override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        outputFile: String
+        algorithm: String,
+        target:    String,
+        mainClass: String,
+        classPath: Array[String],
+        jreLocations: String,
+        jreVersion:   Int,
+        outputFile:   String
     ): Long = ???
 }
