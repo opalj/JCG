@@ -10,6 +10,7 @@ import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
 import com.ibm.wala.ipa.callgraph.impl.Util
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory
+import com.ibm.wala.properties.WalaProperties
 import com.ibm.wala.types.MethodReference
 import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
@@ -34,7 +35,10 @@ object WalaJCGAdapter extends JCGTestAdapter {
 
         var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
         cp = target + File.pathSeparator + cp
-        val propertiesFile = new File("wala.properties")
+
+        val root = new File(classOf[WalaProperties].getClassLoader.getResource("").toURI)
+        val propertiesFile = new File(root, "wala.properties")
+        assert(!propertiesFile.exists())
         val pw = new PrintWriter(new FileOutputStream(propertiesFile))
         val jreDirectory = JRELocation.jreDirectory(new File(jreLocations), jreVersion)
         pw.println(s"java_runtime_dir = $jreDirectory")
