@@ -34,7 +34,7 @@ object DoopAdapter extends JCGTestAdapter {
 
     def main(args: Array[String]): Unit = {
 
-        val doopResults = new File(args(0)).listFiles(f ⇒ f.isFile && f.getName.endsWith(".jar.txt"))
+        /*val doopResults = new File(args(0)).listFiles(f ⇒ f.isFile && f.getName.endsWith(".jar.txt"))
         val jreDir = new File(args(1))
 
         if (!jreDir.exists())
@@ -51,7 +51,7 @@ object DoopAdapter extends JCGTestAdapter {
             println(s"${tgtJar.getName}")
             val outFile = createJsonRepresentation(source, tgtJar, jreDir)
             println(CGMatcher.matchCallSites(tgtJar.getAbsolutePath, outFile.getAbsolutePath))
-        }
+        }*/
 
     }
 
