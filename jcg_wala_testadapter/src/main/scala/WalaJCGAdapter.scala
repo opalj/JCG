@@ -36,13 +36,7 @@ object WalaJCGAdapter extends JCGTestAdapter {
         var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
         cp = target + File.pathSeparator + cp
 
-        val root = new File(classOf[WalaProperties].getClassLoader.getResource("").toURI)
-        val propertiesFile = new File(root, "wala.properties")
-        assert(!propertiesFile.exists())
-        val pw = new PrintWriter(new FileOutputStream(propertiesFile))
-        val jreDirectory = JRELocation.jreDirectory(new File(jreLocations), jreVersion)
-        pw.println(s"java_runtime_dir = $jreDirectory")
-        pw.close()
+        //TODO here the default JRE is added to the classpath -> somehow modify the wala.properties
 
         val ex = new File(cl.getResource("exclusions.txt").getFile)
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
@@ -76,8 +70,6 @@ object WalaJCGAdapter extends JCGTestAdapter {
                 rtaBuilder.makeCallGraph(options, new NullProgressMonitor)
             } else throw new IllegalArgumentException
         val after = System.nanoTime
-
-        propertiesFile.delete()
 
         val initialEntryPoints = cg.getFakeRootNode.iterateCallSites().asScala.map(_.getDeclaredTarget)
 
@@ -129,7 +121,7 @@ object WalaJCGAdapter extends JCGTestAdapter {
         after - before
     }
 
-    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "0-1-CFA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
+    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
 
     override def frameworkName(): String = "WALA"
 
