@@ -40,7 +40,9 @@ object WalaJCGAdapter extends JCGTestAdapter {
 
         val ex = new File(cl.getResource("exclusions.txt").getFile)
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
+        println(scope)
         val classHierarchy = ClassHierarchyFactory.make(scope)
+
 
         val entrypoints =
             if (mainClass == null) {
