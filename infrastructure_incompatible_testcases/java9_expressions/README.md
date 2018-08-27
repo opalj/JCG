@@ -1,4 +1,4 @@
-This JCG sub-project highlights language and modularity concepts that have
+This JCG sub-project highlights language and modularity concepts that have been
 introduced with Java 9 and their modules.
 
 ## Tested Module Features
@@ -7,7 +7,7 @@ Java 9's module system provides several constructs that describe the interface b
 multiple modules. Before we start to define concrete test case that are relevant to
 call-graph construction, we give a short overview over the tested features. [1]
 
-#### The ___export___ directive 
+#### The ___export___ directive
 ```java
 module <modulename> {
     exports <packagename>;
@@ -36,7 +36,7 @@ module <modulename> {
 A __requires__ module directive specifies depender modules dependency. Those must always be explicitly specified.
 In case a module is only required at compile time, the __requires static__ directive can be used. It states compile-time
 dependencies which are optional at runtime. ***TODO: GET MORE INFO***
-Since requires is by default not transitive, the __requires transitive__ directive is syntactic sugar for listing all 
+Since requires is by default not transitive, the __requires transitive__ directive is syntactic sugar for listing all
 required dependencies of the required module explicitly.
 
 #### The ___uses___ directive
@@ -44,7 +44,7 @@ required dependencies of the required module explicitly.
 A uses module directive specifies a service used by this module. A service is an object of a class that implements
 the interface or extends the abstract class specified in the uses directive.
 
-#### The ___provides ... with___ directive 
+#### The ___provides ... with___ directive
 
 The __provides…with__ module directive specifies that a module provides a service (interface or abstract type) implementation.
 The provides part of the directive specifies an interface or abstract class listed in a module’s uses directive and
