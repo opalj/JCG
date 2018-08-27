@@ -108,7 +108,7 @@ package tr6;
 import lib.annotations.callgraph.CallSite;
 class Foo {
     public static void verifyCall(){ /* do something */ }
-    
+
     @CallSite(name="verifyCall", line=8, resolvedTargets = "Ltr6/Foo;")
     public Foo(String s) { Foo.verifyCall(); }
 
@@ -131,7 +131,7 @@ package tr7;
 import lib.annotations.callgraph.CallSite;
 class Foo {
     public static void verifyCall(){ /* do something */ }
-    
+
     @CallSite(name="verifyCall", line=8, resolvedTargets = "Ltr7/Foo;")
     public Foo() { Foo.verifyCall(); }
 
@@ -229,7 +229,7 @@ class Bar {
     static {
         staticInitializerCalled();
     }
-    
+
     @CallSite(name="verifyCall", line=19, resolvedTargets = "Ltr10/Foo;")
     static private void staticInitializerCalled(){
         Foo.verifyCall();
@@ -266,7 +266,7 @@ class Bar {
     static {
         staticInitializerCalled();
     }
-    
+
     @CallSite(name="verifyCall", line=23, resolvedTargets = "Llrr1/Foo;")
     static private void staticInitializerCalled(){
         Foo.verifyCall();
@@ -278,7 +278,7 @@ class Baz {
     static {
         staticInitializerCalled();
     }
-    
+
     @CallSite(name="verifyCall", line=35, resolvedTargets = "Llrr1/Foo;")
     static private void staticInitializerCalled(){
         Foo.verifyCall();
@@ -298,7 +298,7 @@ package lrr2;
 import lib.annotations.callgraph.CallSite;
 class Foo {
     public static void verifyCall(){ /* do something */ }
-    
+
     static void m(boolean b) throws Exception {
         StringBuilder className = new StringBuilder("lrr2.Ba");
         if (b)
@@ -317,19 +317,19 @@ class Bar {
      static {
          staticInitializerCalled();
      }
-     
+
      @CallSite(name="verifyCall", line=28, resolvedTargets = "Llrr2/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
  }
- 
- 
+
+
  class Baz {
      static {
          staticInitializerCalled();
      }
-     
+
      @CallSite(name="verifyCall", line=40, resolvedTargets = "Llrr2/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
@@ -349,7 +349,7 @@ package lrr3;
 import lib.annotations.callgraph.CallSite;
 class Foo {
     private String className;
-    
+
     public static void verifyCall(){ /* do something */ }
 
     public static void main(String[] args) throws Exception {
@@ -363,7 +363,7 @@ class Bar {
      static {
          staticInitializerCalled();
      }
-     
+
      @CallSite(name="verifyCall", line=23, resolvedTargets = "Llrr3/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
@@ -400,7 +400,7 @@ class Bar {
      static {
          staticInitializerCalled();
      }
-     
+
      @CallSite(name="verifyCall", line=23, resolvedTargets = "Lcsr1/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
@@ -434,7 +434,7 @@ class Bar {
      static {
          staticInitializerCalled();
      }
-     
+
      @CallSite(name="verifyCall", line=23, resolvedTargets = "Lcsr2/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
@@ -454,7 +454,7 @@ package csr3;
 import lib.annotations.callgraph.CallSite;
 class Foo {
     public static String className;
-    
+
     public static void verifyCall(){ /* do something */ }
 
     static void m() throws Exception {
@@ -471,7 +471,7 @@ class Bar {
      static {
          staticInitializerCalled();
      }
-     
+
      @CallSite(name="verifyCall", line=22, resolvedTargets = "Lcsr3/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
@@ -492,7 +492,7 @@ package csr4;
 import lib.annotations.callgraph.CallSite;
 class Foo {
     public static String className;
-    
+
     public static void verifyCall(){ /* do something */ }
 
     static void m() throws Exception {
@@ -503,7 +503,7 @@ class Foo {
     public static void main(String[] args) throws Exception {
 		Properties props = System.getProperties();
 		props.put("className", "csr4.Bar");
-		System.setProperties(props);      
+		System.setProperties(props);
         Foo.m();
     }
 }
@@ -512,11 +512,181 @@ class Bar {
      static {
          staticInitializerCalled();
      }
-     
+
      @CallSite(name="verifyCall", line=22, resolvedTargets = "Lcsr4/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
  }
+```
+[//]: # (END)
+
+The following test cases
+Test cases w.r.t. to classloading using ```Class.forName(className:String)```.
+
+##CL1
+[//]: # (MAIN: cl.Demo)
+This test case targets a common try catch pattern when classes are loaded. An existing class is loaded
+over ```Class.forName(...)```, instantiated and then casted to another class. Unfortunately, the class
+that is instantiated is __incompatible__ with the cast such that the operation results in a
+```ClassCastException```.
+```java
+// cl/Demo.java
+package cl;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+
+    public static void verifyCall(){ /* do something */ }
+
+    @CallSite(name="verifyCall", line = 15, resolvedTargets = "Lcl/Demo;")
+	public static void main(String[] args){
+	    try {
+	        Class cls = Class.forName("cl.DeceptiveClass");
+	        LoadedClass lCls = (LoadedClass) cls.newInstance();
+	    } catch(ClassCastException cce){
+	        verifyCall();
+	    } catch(ClassNotFoundException cnfe){
+	        // DEAD CODE
+	    } catch(Exception rest){
+            // DEAD CODE
+        }
+	}
+}
+
+class DeceptiveClass {
+
+}
+
+class LoadedClass {
+
+}
+```
+[//]: # (END)
+
+##CL2
+[//]: # (MAIN: cl.Demo)
+This test case targets a common try catch pattern when classes are loaded. An absent class is loaded
+over ```Class.forName(...)```. Since the class __can't be found__ the operation results in a ```ClassNotFoundException```
+which is handled in one of the catch blocks.
+```java
+// cl/Demo.java
+package cl;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+
+    public static void verifyCall(){ /* do something */ }
+
+    @CallSite(name="verifyCall", line = 18, resolvedTargets = "Lcl/Demo;")
+	public static void main(String[] args){
+	    try {
+	        Class cls = Class.forName("cl.CatchMeIfYouCan");
+	        // DEAD CODE
+	        LoadedClass lCls = (LoadedClass) cls.newInstance();
+	    } catch(ClassCastException cce){
+	        /* DEAD CODE */
+	    } catch(ClassNotFoundException cnfe){
+	        verifyCall();
+	    } catch(Exception rest){
+	        //DEAD CODE
+	    }
+	}
+}
+
+class LoadedClass {
+
+}
+```
+[//]: # (END)
+
+##CL3
+[//]: # (MAIN: cl.Demo)
+This case targets a concerns not only loading of classes but also the execution of their
+static initializer. When a class is loaded, its static initializer must be called.
+```java
+// cl/Demo.java
+package cl;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+
+    public static void verifyCall(){ /* do something */ }
+
+	public static void main(String[] args){
+	    try {
+	        Class cls = Class.forName("cl.LoadedClass");
+	        Object lCls = cls.newInstance();
+	    } catch(ClassCastException cce){
+	        // DEAD CODE
+	    } catch(ClassNotFoundException cnfe){
+	        // DEAD CODE
+	    } catch(Exception rest){
+            //DEAD CODE
+        }
+	}
+}
+
+class LoadedClass {
+
+    static {
+        staticInitializerCalled();
+    }
+
+    @CallSite(name="verifyCall", line=31, resolvedTargets = "Lcl/Demo;")
+    static private void staticInitializerCalled(){
+        Demo.verifyCall();
+    }
+}
+```
+[//]: # (END)
+
+##CL4
+[//]: # (MAIN: cl.Demo)
+This case targets a concerns not only loading of classes but also the execution of their
+static initializer. When a class is loaded, its static initializer must be called. Also the static
+initializers of potential super classes.
+```java
+// cl/Demo.java
+package cl;
+
+import lib.annotations.callgraph.CallSite;
+
+public class Demo {
+
+    public static void verifyCall(){ /* do something */ }
+
+	public static void main(String[] args){
+	    try {
+	        Class cls = Class.forName("cl.LoadedClass");
+	        Object lCls = cls.newInstance();
+	    } catch(ClassCastException cce){
+	        // DEAD CODE
+	    } catch(ClassNotFoundException cnfe){
+	        // DEAD CODE
+	    } catch(Exception rest){
+            //DEAD CODE
+        }
+	}
+}
+
+class LoadedClass extends RootClass {
+
+}
+
+class RootClass {
+
+    static {
+        staticInitializerCalled();
+    }
+
+    @CallSite(name="verifyCall", line=35, resolvedTargets = "Lcl/Demo;")
+    static private void staticInitializerCalled(){
+        Demo.verifyCall();
+    }
+}
 ```
 [//]: # (END)
