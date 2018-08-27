@@ -1,5 +1,5 @@
 #Java8Invokedynamics
-Test cases in the presence of method references.
+Tests related to the invokedynamic instructions created by Java8 method references and lambda expressions. Please note, that the Scala compiler hijacks Java's infrastructure and analyses which support Java8's invokedynamics (i.e., those using `(Alt)LambdaMetaFactory`) will also support Scala to a reasonable amount.
 
 ##MR1
 [//]: # (MAIN: mr1.Class)
