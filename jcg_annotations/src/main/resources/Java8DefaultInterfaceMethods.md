@@ -1,4 +1,4 @@
-#Java8PolymorphicCalls
+#Java8DefaultInterfaceMethods
 Tests the resolution of Java 8 default methods.
 
 ##J8PC1
