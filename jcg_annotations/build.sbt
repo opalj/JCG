@@ -1,1 +1,1 @@
-// see main build file for ALL settings
+// see main build file (../build.sbt) for ALL settings
