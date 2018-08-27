@@ -1,4 +1,4 @@
-#MethodReferences
+#Java8Invokedynamics
 Test cases in the presence of method references.
 
 ##MR1
@@ -12,11 +12,11 @@ package mr1;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class implements Interface {
-    
+
     @FunctionalInterface public interface FIBoolean {
         boolean get();
     }
-    
+
     @IndirectCall(
            name = "method", returnType = boolean.class, line = 18,
            resolvedTargets = "Lmr1/Interface;"
@@ -28,7 +28,7 @@ class Class implements Interface {
     }
 }
 
-interface Interface { 
+interface Interface {
     default boolean method() {
         return true;
     }
@@ -47,9 +47,9 @@ package mr2;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
-    
+
     private String getTypeName() { return "Lmr2/Class;";}
-    
+
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 14,
        resolvedTargets = "Lmr2/Class;")
@@ -57,7 +57,7 @@ class Class {
         java.util.function.Supplier<String> stringSupplier = this::getTypeName;
         stringSupplier.get();
     }
-    
+
     public static void main(String[] args){
         Class cls = new Class();
         cls.callViaMethodReference();
@@ -78,7 +78,7 @@ package mr3;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class extends SuperClass {
-    
+
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 12,
        resolvedTargets = "Lmr3/SuperClass;")
@@ -86,14 +86,14 @@ class Class extends SuperClass {
         java.util.function.Supplier<String> stringSupplier = super::getTypeName;
         stringSupplier.get();
     }
-    
+
     public static void main(String[] args){
         Class cls = new Class();
         cls.callViaMethodReference();
     }
 }
 
-class SuperClass{ 
+class SuperClass{
     protected String getTypeName() { return "Lmr3/SuperClass;";}
 }
 ```
@@ -112,15 +112,15 @@ import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
-    
+
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 13,
        resolvedTargets = "Lmr/Class;")
-    public static void main(String[] args){     
+    public static void main(String[] args){
         Supplier<String> stringSupplier = Class::getTypeName;
         stringSupplier.get();
     }
-    
+
     static String getTypeName() { return "Lmr/Class"; }
 }
 ```
@@ -139,17 +139,17 @@ import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
-    
+
     public static double sum(double a, double b) { return a + b; }
-    
+
     @FunctionalInterface public interface FIDoubleDouble {
         double apply(double a, double b);
     }
-    
+
     @IndirectCall(
        name = "sum", returnType = double.class, parameterTypes = {double.class, double.class}, line = 19,
        resolvedTargets = "Lmr/Class;")
-    public static void main(String[] args){     
+    public static void main(String[] args){
         FIDoubleDouble fidd = Class::sum;
         fidd.apply(1d,2d);
     }
@@ -169,12 +169,12 @@ import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
-    
+
     public Class(){}
-    
+
     @IndirectCall(
        name = "<init>", line = 14, resolvedTargets = "Lmr/Class;")
-    public static void main(String[] args){     
+    public static void main(String[] args){
         Supplier<Class> classSupplier = Class::new;
         classSupplier.get();
     }
@@ -193,7 +193,7 @@ package mr;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class extends SuperClass{
-    
+
     @IndirectCall(
        name = "version", returnType = String.class, line = 13,
        resolvedTargets = "Lmr/SuperClass;")
@@ -234,7 +234,7 @@ class Class {
         };
         isEven.apply(2);
     }
-    
+
     private static void doSomething(){
         // call in lambda
     }
@@ -253,25 +253,25 @@ package lambda;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
-    
+
     public static void doSomething(){ }
-    
+
     @IndirectCall(name = "doSomething", line = 17, resolvedTargets = "Llambda/LambdaProvider;")
     public static void main(String[] args) {
         Runnable lambda = LambdaProvider.getRunnable();
-        
+
         lambda.run();
     }
 }
 
 class LambdaProvider {
-        
+
     public static void doSomething(){
         /* do something */
     }
-    
+
     public static lambda.Runnable getRunnable(){
-        return () -> LambdaProvider.doSomething(); 
+        return () -> LambdaProvider.doSomething();
     }
 }
 ```
@@ -296,23 +296,23 @@ package lambda;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
-    
+
      @FunctionalInterface interface Runnable {
         void run();
     }
-    
+
     public static void doSomething(){
         /* do something */
     }
 
     public static Runnable[] lambdaArray = new Runnable[10];
 
-    @IndirectCall(name = "doSomething", line = 25, resolvedTargets = "Llambda/Class;")       
+    @IndirectCall(name = "doSomething", line = 25, resolvedTargets = "Llambda/Class;")
     public static void main(String[] args) {
         Runnable r1 = () -> doSomething();
         lambdaArray[0] = r1;
         Runnable same = lambdaArray[0];
-        
+
         same.run();
     }
 }
@@ -327,7 +327,7 @@ final class Math {
 
 ##Lambda4
 [//]: # (MAIN: lambda.Class)
-Tests the invocation of an intersection type lambda. 
+Tests the invocation of an intersection type lambda.
 
 ```java
 // lambda/Class.java
@@ -336,19 +336,19 @@ package lambda;
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
-    
+
     public interface MyMarkerInterface1 {}
     public interface MyMarkerInterface2 {}
-    
+
     public @FunctionalInterface interface Runnable {
         void run();
     }
-    
+
     public static void doSomething(){
         /* do something */
     }
 
-    @IndirectCall(name = "doSomething", line = 21, resolvedTargets = "Llambda/Class;")       
+    @IndirectCall(name = "doSomething", line = 21, resolvedTargets = "Llambda/Class;")
     public static void main(String[] args) {
         Runnable run = (Runnable & MyMarkerInterface1 & MyMarkerInterface2) () -> doSomething();
         run.run();
