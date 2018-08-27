@@ -1,5 +1,6 @@
 #StaticInitializers
 Static initializers have to be treated as entry points.
+
 ##SI1
 [//]: # (MAIN: si.Bar)
 A static initializer should be triggered when a non-constant field is referenced.
@@ -105,17 +106,17 @@ public class Demo {
 }
 
 interface Interface {
-    
+
     static String testHook = init();
     static final Demo referenceMe = new Demo();
-    
+
     @CallSite(name = "callback", line = 17, resolvedTargets = "Lsi/Interface;")
     static String init() {
         callback();
         return "Interface";
     }
-    
-    static void callback(){}    
+
+    static void callback(){}
 }
 ```
 [//]: # (END)
@@ -243,30 +244,30 @@ class SubClass extends SuperClass {
 }
 
 class SuperClass extends RootClass {
-    
+
     static {
         superInit();
     }
-    
+
     @CallSite(name = "callback", line = 31, resolvedTargets = "Lsi/SuperClass;")
     static void superInit(){
         callback();
     }
-    
+
     static void callback() {}
 }
 
 class RootClass {
-    
-    static { 
+
+    static {
         rootInit();
     }
-    
+
     @CallSite(name = "callback", line = 45, resolvedTargets = "Lsi/RootClass;")
     static void rootInit(){
       callback();
-    }  
-    
+    }
+
     static void callback() {}
 }
 ```

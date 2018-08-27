@@ -1,5 +1,6 @@
 #TrivialModernReflection
 The strings are directly available. No control- or data-flow analysis is required.
+
 ##TMR1
 [//]: # (MAIN: tmr1.Foo)
 Tests modern reflection with respect to static methods.
@@ -13,9 +14,9 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo { 
+class Foo {
     static String staticToString() { return "Foo"; }
-    
+
     @IndirectCall(
         name = "staticToString", returnType = String.class, line = 18,
         resolvedTargets = "Ltmr1/Foo;"
@@ -44,7 +45,7 @@ import java.lang.invoke.MethodType;
 import lib.annotations.callgraph.IndirectCall;
 class Foo {
     public String foo() { return "Foo"; }
-    
+
     @IndirectCall(
         name = "foo", returnType = String.class, line = 18,
         resolvedTargets = "Ltmr2/Foo;"
@@ -78,12 +79,12 @@ class Foo {
         MethodHandle handle = MethodHandles.lookup().findConstructor(Foo.class, methodType);
         Foo f = (Foo) handle.invokeExact();
     }
-    
+
     @CallSite(name="verifyCall", line=18, resolvedTargets = "Ltmr3/Foo;")
     public Foo() {
         Foo.verifyCall();
     }
-    
+
     public static void verifyCall(){ /* do something */ }
 }
 ```
@@ -107,7 +108,7 @@ class Foo {
     public static Foo f = new Foo();
 
     @CallSite(
-        name = "toString", returnType = String.class, 
+        name = "toString", returnType = String.class,
         line = 18, resolvedTargets = "Ltmr4/Foo;"
     )
     public static void main(String[] args) throws Throwable {
@@ -142,7 +143,7 @@ class Foo {
     }
 
     @CallSite(
-        name = "toString", returnType = String.class, 
+        name = "toString", returnType = String.class,
         line = 22, resolvedTargets = "Ltmr5/Foo;"
     )
     public static void main(String[] args) throws Throwable {
@@ -170,7 +171,7 @@ import java.lang.invoke.MethodType;
 import lib.annotations.callgraph.IndirectCall;
 class Bar extends Foo {
     protected String foo() { return "Bar"; }
-    
+
     @IndirectCall(
         name = "foo", returnType = String.class, line = 18,
         resolvedTargets = "Ltmr6/Foo;"
