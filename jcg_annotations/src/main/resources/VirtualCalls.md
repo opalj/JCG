@@ -1,5 +1,5 @@
-#BasicPolymorphicCalls
-This tests aim to test basic virtual calls.
+#VirtualCalls
+Tests related to the resolution of standard virtual methods. 
 
 ##BPC1
 [//]: # (MAIN: bpc1.Class)
@@ -12,11 +12,11 @@ package bpc1;
 import lib.annotations.callgraph.CallSite;
 
 class Class {
-    
+
     public void method(){ }
-    
+
     @CallSite(name = "method", line = 12, resolvedTargets = "Lbpc1/Class;")
-    public static void main(String[] args){ 
+    public static void main(String[] args){
         Class cls = new Class();
         cls.method();
     }
@@ -35,21 +35,21 @@ package bpc;
 import lib.annotations.callgraph.CallSite;
 
 class Class {
-    
+
     public void method(){ }
-    
+
     @CallSite(name = "method", line = 11, resolvedTargets = "Lbpc/SubClass;")
     public static void callMethod(Class cls) {
         cls.method();
     }
-    
+
     public static void main(String[] args){
         callMethod(new SubClass());
     }
 }
 
 class SubClass extends Class {
-    
+
     public void method() { }
 }
 ```
@@ -70,14 +70,14 @@ interface Interface {
 }
 
 class Class {
-    
+
     public void method(){ }
- 
+
     @CallSite(name = "method", line = 15, resolvedTargets = {"Lbpc3/ClassImpl;"}, prohibitedTargets ={"Lbpc3/Class;"})
     public static void callOnInterface(Interface i){
         i.method();
     }
-    
+
     public static void main(String[] args){
         callOnInterface(new ClassImpl());
     }
@@ -104,11 +104,11 @@ interface Interface {
 }
 
 class Class implements Interface {
-    
+
     public static Interface[] types = new Interface[]{new Class(), new ClassImpl()};
-    
+
     public void method(){ }
- 
+
     @CallSite(name = "method", line = 18, resolvedTargets = "Lbpc4/Class;")
     public static void main(String[] args){
         Interface i = types[0];
