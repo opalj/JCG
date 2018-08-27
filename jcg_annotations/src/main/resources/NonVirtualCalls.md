@@ -1,7 +1,10 @@
-# Direct Calls
-Tests that relate to this category are typically directly resolvable.
-Hence, it covers static method calls, private calls, constructor calls, super calls, as well as
-calls on the implicit this parameter. Every call of this category is inherently monomorphic.
+#Non-virtual Calls
+Tests related to non-virtual methods: static method calls, constructor calls (initializers),
+super method calls, and private method calls.
+
+Static initializers are found in their own category due to the inherent complexity of resolving them
+in a meaningful manner.
+
 ##DC1
 [//]: # (MAIN: dc1.Class)
 Tests the resolution of a static method call when another static method with the same name but
@@ -13,10 +16,10 @@ package dc1;
 import lib.annotations.callgraph.CallSite;
 
 class Class {
-    
+
     public static void method(){ /* do something*/}
     public static void method(int param){ /* do something*/}
-    
+
     @CallSite(name = "method", parameterTypes = int.class, line = 12, resolvedTargets = "Ldc1/Class;")
     public static void main(String[] args){
         Class.method();
@@ -35,11 +38,11 @@ package dc;
 import lib.annotations.callgraph.IndirectCall;
 
 public class Class {
-    
+
     public Class(){
-        
+
     }
-    
+
     @IndirectCall(name = "<init>", line = 13, resolvedTargets = "Ldc/Class;")
     public static void main(String[] args){
         Class cls = new Class();
@@ -59,10 +62,10 @@ package dc;
 import lib.annotations.callgraph.CallSite;
 
 class Class {
-    
+
     private void method(){ /* do something*/}
     private void method(int num){ /* do something*/}
-    
+
     @CallSite(name = "method", line = 13, resolvedTargets = "Ldc/Class;")
     public static void main(String[] args){
         Class cls = new Class();
@@ -74,7 +77,7 @@ class Class {
 
 ##DC4
 [//]: # (MAIN: dc.Class)
-Tests the resolution of a super call in the form ```super.<methodName>```. The method call should
+Tests the resolution of a super call in the form `super.<methodName>`. The method call should
 only be propagated to the immediate super class.
 ```java
 // dc/Class.java
@@ -83,12 +86,12 @@ package dc;
 import lib.annotations.callgraph.CallSite;
 
 class Class extends Superclass {
-    
+
     @CallSite(name = "method", line = 9, resolvedTargets = "Ldc/Superclass;", prohibitedTargets = "Ldc/Rootclass;")
-    protected void method(){ 
-        super.method(); 
+    protected void method(){
+        super.method();
     }
-    
+
     public static void main(String[] args){
         Class cls = new Class();
         cls.method();
