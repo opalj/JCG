@@ -392,7 +392,7 @@ class Foo {
     }
 
     public static void main(String[] args) throws Exception {
-        m("csr1.Bar");
+        Foo.m("csr1.Bar");
     }
 }
 
@@ -426,7 +426,7 @@ public class Foo {
     }
 
     public static void main(String[] args) throws Exception {
-        m(args[0]);
+        Foo.m(args[0]);
     }
 }
 
@@ -445,7 +445,7 @@ class Bar {
 
 ##CSR3
 [//]: # (MAIN: csr3.Foo)
-Test reflection with respect to a private instance field that is set in the initializer.
+Test reflection with respect to a public static field.
 
 ```java
 // csr3/Foo.java
@@ -457,9 +457,13 @@ class Foo {
     
     public static void verifyCall(){ /* do something */ }
 
+    static void m() throws Exception {
+        Class.forName(Foo.className);
+    }
+
     public static void main(String[] args) throws Exception {
         Foo.className = "csr3.Bar";
-        Class.forName(Foo.className);
+        Foo.m();
     }
 }
 
@@ -469,6 +473,47 @@ class Bar {
      }
      
      @CallSite(name="verifyCall", line=22, resolvedTargets = "Lcsr3/Foo;")
+     static private void staticInitializerCalled(){
+         Foo.verifyCall();
+     }
+ }
+```
+[//]: # (END)
+
+
+##CSR4
+[//]: # (MAIN: csr4.Foo)
+Test reflection with respect to System properties.
+
+```java
+// csr4/Foo.java
+package csr4;
+
+import lib.annotations.callgraph.CallSite;
+class Foo {
+    public static String className;
+    
+    public static void verifyCall(){ /* do something */ }
+
+    static void m() throws Exception {
+    	String className = System.getProperty("className");
+        Class.forName(className);
+    }
+
+    public static void main(String[] args) throws Exception {
+		Properties props = System.getProperties();
+		props.put("className", "csr4.Bar");
+		System.setProperties(props);      
+        Foo.m();
+    }
+}
+
+class Bar {
+     static {
+         staticInitializerCalled();
+     }
+     
+     @CallSite(name="verifyCall", line=22, resolvedTargets = "Lcsr4/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
