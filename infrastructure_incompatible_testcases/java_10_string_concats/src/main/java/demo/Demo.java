@@ -1,6 +1,7 @@
 package demo;
 
 import lib.annotations.callgraph.IndirectCall;
+
 /**
  * This class pertains to a JCG lambda test case with respect to Java 10 String concatenations.
  * When String concatenation is used within Java 10, the constants are not longer combined using
@@ -13,7 +14,7 @@ import lib.annotations.callgraph.IndirectCall;
 public class Demo {
 
     @IndirectCall(
-            line = 15, name = "makeConcatWithConstants",
+            line = 16, name = "makeConcatWithConstants",
             resolvedTargets = "Ljava/lang/invoke/StringConcatFactory;")
     public static void main(String[] args) {
         String s1 = "Java 10";
