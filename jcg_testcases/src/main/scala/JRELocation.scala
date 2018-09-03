@@ -1,10 +1,11 @@
 import java.io.File
 import java.io.FileInputStream
 
-import play.api.libs.json.JsSuccess
-import play.api.libs.json.Json
 import play.api.libs.json.Reads
+import play.api.libs.json.Json
 import play.api.libs.json.Writes
+import play.api.libs.json.JsSuccess
+
 
 case class JRELocation(version: Int, path: String)
 

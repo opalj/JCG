@@ -1,7 +1,5 @@
 import java.io.File
-import java.io.FileOutputStream
 import java.io.FileWriter
-import java.io.PrintWriter
 import java.util
 import java.util.stream.Collectors
 
@@ -116,7 +114,8 @@ object WalaJCGAdapter extends JCGTestAdapter {
         }
 
         val file: FileWriter = new FileWriter(outputFile)
-        file.write(Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods))))
+        val prettyPrint = Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods)))
+        file.write(prettyPrint)
         file.flush()
         file.close()
 

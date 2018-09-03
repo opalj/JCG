@@ -1,17 +1,18 @@
 import java.io.File
 
-import coursier.Cache
+import coursier.Module
 import coursier.Dependency
+import coursier.Resolution
+import coursier.Cache
 import coursier.Fetch
 import coursier.FileError
-import coursier.Module
-import coursier.Resolution
 import coursier.maven.MavenRepository
 import play.api.libs.json.Json
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.OWrites
 import play.api.libs.json.Writes
 import play.api.libs.json.__
+
 import scalaz.\/
 
 case class ProjectSpecification(

@@ -1,12 +1,15 @@
-import java.io.File
+import scala.io.Source
 import java.io.PrintWriter
+import java.io.File
 
 import javax.tools.ToolProvider
 import org.apache.commons.io.FileUtils
-import play.api.libs.json._
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 
-import scala.io.Source
-
+/**
+ * @author Michael Reif
+ */
 object TestCaseExtractor {
     def main(args: Array[String]): Unit = {
 
