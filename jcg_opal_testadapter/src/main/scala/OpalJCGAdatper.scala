@@ -9,11 +9,13 @@ import org.opalj.br.DeclaredMethod
 import org.opalj.br.Code
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.DeclaredMethodsKey
+import org.opalj.br.analyses.DeclaredMethods
 import org.opalj.br.analyses.Project.JavaClassFileReader
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.fpcf.PropertyStoreKey
 import org.opalj.fpcf.FPCFAnalysesManagerKey
 import org.opalj.fpcf.FinalEP
+import org.opalj.fpcf.PropertyStore
 import org.opalj.fpcf.analyses.cg.EagerRTACallGraphAnalysisScheduler
 import org.opalj.fpcf.analyses.cg.EagerSerializationRelatedCallsAnalysis
 import org.opalj.fpcf.analyses.cg.EagerThreadRelatedCallsAnalysis
@@ -21,14 +23,14 @@ import org.opalj.fpcf.analyses.cg.EagerLoadedClassesAnalysis
 import org.opalj.fpcf.analyses.cg.EagerFinalizerAnalysisScheduler
 import org.opalj.fpcf.analyses.cg.LazyCalleesAnalysis
 import org.opalj.fpcf.analyses.cg.EagerReflectionRelatedCallsAnalysis
-import org.opalj.fpcf.properties.ThreadRelatedCallees
-import org.opalj.fpcf.properties.StandardInvokeCallees
-import org.opalj.fpcf.properties.Callees
-import org.opalj.fpcf.properties.SerializationRelatedCallees
-import org.opalj.fpcf.properties.NoCallees
-import org.opalj.fpcf.properties.NoCalleesDueToNotReachableMethod
-import org.opalj.fpcf.properties.ReflectionRelatedCallees
+import org.opalj.fpcf.cg.properties.StandardInvokeCallees
+import org.opalj.fpcf.cg.properties.Callees
+import org.opalj.fpcf.cg.properties.SerializationRelatedCallees
+import org.opalj.fpcf.cg.properties.NoCallees
+import org.opalj.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
+import org.opalj.fpcf.cg.properties.ReflectionRelatedCallees
 import play.api.libs.json.Json
+
 import scala.collection.JavaConverters._
 
 object OpalJCGAdatper extends JCGTestAdapter {
@@ -76,9 +78,15 @@ object OpalJCGAdatper extends JCGTestAdapter {
         val jreJars = JRELocation.mapping(new File(jreLocations)).getOrElse(jreVersion, throw new IllegalArgumentException("unspecified java version"))
         val jre = cfReader.AllClassFiles(jreJars)
         val allClassFiles = targetClassFiles ++ cpClassFiles ++ jre
-        val project: Project[URL] = Project(allClassFiles.toTraversable, Seq.empty, true, Seq.empty)
 
-        val ps = project.get(PropertyStoreKey)
+        val project: Project[URL] = Project(
+            allClassFiles.toTraversable,
+            Seq.empty,
+            libraryClassFilesAreInterfacesOnly = true,
+            Seq.empty
+        )
+
+        implicit val ps: PropertyStore = project.get(PropertyStoreKey)
 
         val manager = project.get(FPCFAnalysesManagerKey)
         manager.runAll(
@@ -91,14 +99,13 @@ object OpalJCGAdatper extends JCGTestAdapter {
             new LazyCalleesAnalysis(
                 Set(
                     StandardInvokeCallees,
-                    ThreadRelatedCallees,
                     SerializationRelatedCallees,
                     ReflectionRelatedCallees
                 )
             )
         )
 
-        implicit val declaredMethods = project.get(DeclaredMethodsKey)
+        implicit val declaredMethods: DeclaredMethods = project.get(DeclaredMethodsKey)
         for (dm ← declaredMethods.declaredMethods) {
             ps.force(dm, Callees.key)
         }
@@ -110,10 +117,9 @@ object OpalJCGAdatper extends JCGTestAdapter {
         var reachableMethods = Set.empty[ReachableMethod]
 
         for (
-            dm ← declaredMethods.declaredMethods
-            //TODO THIS IS BROKEN FIX IT
-            if((!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
-                (dm.hasSingleDefinedMethod && dm.definedMethod.classFile.thisType == dm.declaringClassType))
+            dm ← declaredMethods.declaredMethods //TODO THIS IS BROKEN FIX IT
+            if (!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
+                (dm.hasSingleDefinedMethod && dm.definedMethod.classFile.thisType == dm.declaringClassType)
         ) {
             val m = createMethodObject(dm)
             ps(dm, Callees.key) match {
@@ -122,7 +128,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     reachableMethods += ReachableMethod(m, Set.empty)
                 case FinalEP(_, cs: Callees) ⇒
                     val body = dm.definedMethod.body.get
-                    val callSites = cs.callees.flatMap {
+                    val callSites = cs.callSites(onlyEventualCallees = false).flatMap {
                         case (pc, callees) ⇒
                             createCallSites(body, pc, callees)
                     }.toSet
@@ -145,7 +151,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
     private def createCallSites(
         body:    Code,
         pc:      Int,
-        callees: Set[DeclaredMethod]
+        callees: Iterator[DeclaredMethod]
     ): Seq[CallSite] = {
         val declaredO = body.instructions(pc) match {
             case MethodInvocationInstruction(dc, _, name, desc) ⇒ Some(dc, name, desc)
@@ -169,14 +175,14 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     callee.descriptor.parametersCount == desc.parametersCount
             }
 
-            indirectCallees.iterator.map(createIndividualCallSite(_, line)).toSeq :+
+            indirectCallees.map(createIndividualCallSite(_, line)).toSeq :+
                 CallSite(
                     declaredTarget,
                     line,
-                    directCallees.iterator.map(createMethodObject).toSet
+                    directCallees.map(createMethodObject).toSet
                 )
         } else {
-            callees.iterator.map(createIndividualCallSite(_, line)).toSeq
+            callees.map(createIndividualCallSite(_, line)).toSeq
         }
     }
 
