@@ -1,20 +1,22 @@
 #Java8DefaultInterfaceMethods
 Tests the resolution of Java 8 default methods.
 
-##J8PC1
-[//]: # (MAIN: j8pc1.Class)
-Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and
-inherits the method from the inherited interface.
+##J8DIM1
+[//]: # (MAIN: j8dim.Class)
+Tests the resolution of a polymorphic call when a class (cf.```j8dim.Class``` ) implements an
+interface (cf. ```j8dim.Interface```) which declares a default method (cf. ```j8dim.Interface.method()```)and
+inherits this default method from the inherited interface. A call on ```j8dim.Class.method()``` must
+then be resolved to ```j8dim.Interface.method()```.
 
 ```java
-// j8pc1/Class.java
-package j8pc1;
+// j8dim/Class.java
+package j8dim;
 
 import lib.annotations.callgraph.DirectCall;
 
 class Class implements Interface {
 
-    @DirectCall(name = "method", line = 10, resolvedTargets = "Lj8pc1/Interface;")
+    @DirectCall(name = "method", line = 10, resolvedTargets = "Lj8dim/Interface;")
     public static void main(String[] args){
         Interface i = new Class();
         i.method();
@@ -29,16 +31,17 @@ interface Interface {
 ```
 [//]: # (END)
 
-##J8PC2
-[//]: # (MAIN: j8pc2.SuperClass)
-Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
-where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
-define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
-called on the interface**.
+##J8DIM2
+[//]: # (MAIN: j8dim.SuperClass)
+Tests the resolution of a polymorphic call when a class (cf. ```j8dim.SubClass```) implements an
+interface with default method (cf. ```j8dim.Interface```) and extends a class (cf. ```j8dim.SuperClass```)
+where the interface and the class define a method with the same signature, namely ```method```.
+The subclass, inheriting from both, doesn't define a method with that signature, hence, the method
+call on that class must be dispatched to the superclass's method when called on ```j8dim.Interface```.
 
 ```java
-// j8pc2/SuperClass.java
-package j8pc2;
+// j8dim/SuperClass.java
+package j8dim;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -51,8 +54,8 @@ class SuperClass {
     @DirectCall(
             name = "method",
             line = 19,
-            resolvedTargets = "Lj8pc2/SuperClass;",
-            prohibitedTargets = {"Lj8pc2/Interface;"}
+            resolvedTargets = "Lj8dim/SuperClass;",
+            prohibitedTargets = {"Lj8dim/Interface;"}
     )
     public static void main(String[] args){
         Interface i = new SubClass();
@@ -72,16 +75,18 @@ class SubClass extends SuperClass implements Interface {
 ```
 [//]: # (END)
 
-##J8PC3
-[//]: # (MAIN: j8pc3.SuperClass)
-Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
-where the interface and the class define a method with the same signature. The subclass - inheriting from both - does not
-define a method with that signature, hence, the method call on that class must be dispatched to the superclass's method **when
-called on the class**.
+##J8DIM3
+[//]: # (MAIN: j8dim.SuperClass)
+Tests the resolution of a polymorphic call when a class (cf. ```j8dim.SubClass```) implements an
+interface with default method (cf. ```j8dim.Interface```) and extends a class (cf. ```j8dim.SuperClass```)
+where the interface and the class define a method with the same signature, namely ```method```.
+The subclass, inheriting from both, doesn't define a method with that signature, hence, the method
+call on that class must be dispatched to the superclass's method when called on ```j8dim.SuperClass```.
+
 
 ```java
-// j8pc3/SuperClass.java
-package j8pc3;
+// j8dim/SuperClass.java
+package j8dim;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -94,8 +99,8 @@ class SuperClass {
     @DirectCall(
             name = "method",
             line = 19,
-            resolvedTargets = "Lj8pc3/SuperClass;",
-            prohibitedTargets = {"Lj8pc3/Interface;"}
+            resolvedTargets = "Lj8dim/SuperClass;",
+            prohibitedTargets = {"Lj8dim/Interface;"}
     )
     public static void main(String[] args){
         SuperClass superClass = new SubClass();
@@ -115,14 +120,17 @@ class SubClass extends SuperClass implements Interface {
 ```
 [//]: # (END)
 
-##J8PC4
-[//]: # (MAIN: j8pc4.SuperClass)
-Tests the resolution of a polymorphic calls when a class implements an interface (with default method) and extends a class
-where the method is only defined in the interface.
+##J8DIM4
+[//]: # (MAIN: j8dim.SuperClass)
+Tests the resolution of a polymorphic call when a class (cf. ```j8dim.SubClass```) implements an
+interface with default method (cf. ```j8dim.Interface```) and extends a class (cf. ```j8dim.SuperClass```)
+which doesn't provide a method with the same signature as the interface's default method, namely ```method```.
+The subclass, inheriting from both, doesn't define a method with that signature, hence, the method
+call on that class must be dispatched to the interface's method when called on ```j8dim.SubClass```.
 
 ```java
-// j8pc4/SuperClass.java
-package j8pc4;
+// j8dim/SuperClass.java
+package j8dim;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -131,7 +139,7 @@ class SuperClass {
     @DirectCall(
             name = "method",
             line = 14,
-            resolvedTargets = "Lj8pc4/Interface;"
+            resolvedTargets = "Lj8dim/Interface;"
     )
     public static void main(String[] args){
         SubClass subClass = new SubClass();
@@ -151,18 +159,23 @@ class SubClass extends SuperClass implements Interface {
 ```
 [//]: # (END)
 
-##J8PC5
-[//]: # (MAIN: j8pc5.SuperClass)
-Tests the resolution of a polymorphic calls when a class extends an abstract class that declares an abstract method.
+##J8DIM5
+[//]: # (MAIN: j8dim.SuperClass)
+Tests the resolution of a polymorphic call when a class (cf. ```j8dim.Class```) extends an abstract
+class (cf. ```j8dim.SuperClass```) that declares a method ```compute()``` and implements
+several interfaces that are again in an inheritance relationship where all interfaces define a 
+default method called ```method```. Respective calls on the ```compute``` and ```method``` methods
+on ```j8dim.Class``` must then be dispatched to the correct methods. Since multiple interface define
+the same method, the maximally specific methods must be computed (see JVM spec.). 
 
 ```java
-// j8pc5/SuperClass.java
-package j8pc5;
+// j8dim/SuperClass.java
+package j8dim;
 
 import lib.annotations.callgraph.DirectCalls;
 import lib.annotations.callgraph.DirectCall;
 
-class SuperClass {
+abstract class SuperClass {
 
     public void compute(){ /* do something*/ }
 
@@ -170,14 +183,14 @@ class SuperClass {
         @DirectCall(
                 name = "method",
                 line = 26,
-                resolvedTargets = "Lj8pc5/DirectInterface;",
-                prohibitedTargets = {"Lj8pc5/Interface1;", "Lj8pc5/Interface2;"}
+                resolvedTargets = "Lj8dim/DirectInterface;",
+                prohibitedTargets = {"Lj8dim/Interface1;", "Lj8dim/Interface2;"}
         ),
         @DirectCall(
                 name = "compute",
                 line = 27,
-                resolvedTargets = "Lj8pc5/SuperClass;",
-                prohibitedTargets = {"Lj8pc5/Interface1;","Lj8pc5/Interface2;"}
+                resolvedTargets = "Lj8dim/SuperClass;",
+                prohibitedTargets = {"Lj8dim/Interface1;","Lj8dim/Interface2;"}
         )
     })
     public static void main(String[] args){
