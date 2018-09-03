@@ -6,7 +6,8 @@ reasonable amount.
 
 ##MR1
 [//]: # (MAIN: id.Class)
-Tests method reference that deals with interface default methods (Java 8 or higher).
+Tests method reference that deals with interface default methods (Java 8 or higher) which leads to
+invokedynamics that use *INVOKEINTERFACE* methods handles.
 
 ```java
 // id/Class.java
@@ -41,7 +42,8 @@ interface Interface {
 
 ##MR2
 [//]: # (MAIN: id.Class)
-Tests method reference that result in an *INVOKESPECIAL* call issued by calling a private method.
+Tests a method reference that results in a invokedyamic that uses an *INVOKESPECIAL* method handle which
+is issued by calling a private method.
 
 ```java
 // id/Class.java
@@ -71,8 +73,9 @@ class Class {
 
 ##MR3
 [//]: # (MAIN: id.Class)
-Tests method reference that result in an *INVOKESPECIAL* call issued by calling a protected method
-from a super class.
+Tests a method reference that results in a invokedyamic that uses an *INVOKESPECIAL* method handle which
+is issued by calling a protected method from a super class that is resolved to a syntatic bridge
+method compiled in ```id.Class```.
 
 ```java
 // id/Class.java
@@ -104,8 +107,8 @@ class SuperClass{
 
 ##MR4
 [//]: # (MAIN: id.Class)
-Tests method reference that result in an *INVOKESPECIAL* call issued by calling a static method
-from a super class.
+Tests a method reference that results in an *INOVKESTATIC* method handle where the target method doesn't
+have any formal arguments. The call is issued by calling a static method from a super class.
 
 ```java
 // id/Class.java
@@ -131,8 +134,8 @@ class Class {
 
 ##MR5
 [//]: # (MAIN: id.Class)
-Tests method reference dealing with primitive type parameters.
-from a super class.
+Tests a method reference that results in an *INOVKESTATIC* method handle where the target method has
+primitive formal arguments. The call is issued by a call on a functional interface.
 
 ```java
 // id/Class.java
