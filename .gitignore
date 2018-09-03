@@ -22,3 +22,4 @@ result/
 /evaluation
 jre.conf
 local.sbt
+*/build.properties
