@@ -35,14 +35,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Container of the {@link CallSite} annotation.
+ * Container of the {@link DirectCall} annotation.
  * 
  * @author Florian Kuebler
  */
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface CallSites {
+public @interface DirectCalls {
 	
-	CallSite[] value();
+	DirectCall[] value();
 
 }

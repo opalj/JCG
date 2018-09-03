@@ -20,8 +20,8 @@ import play.api.libs.json.Json
 
 object CGMatcher {
 
-    val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/CallSite")
-    val callSitesAnnotationType = ObjectType("lib/annotations/callgraph/CallSites")
+    val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/DirectCall")
+    val callSitesAnnotationType = ObjectType("lib/annotations/callgraph/DirectCalls")
     val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
     val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
 
@@ -254,39 +254,39 @@ object CGMatcher {
     //
     // UTILITY FUNCTIONS
     //
-    def getAnnotations(callSites: Annotation, label: String): Seq[Annotation] = { //@CallSites -> @CallSite[]
+    def getAnnotations(callSites: Annotation, label: String): Seq[Annotation] = { //@DirectCalls -> @DirectCall[]
         val avs = callSites.elementValuePairs collectFirst {
             case ElementValuePair(`label`, ArrayValue(array)) ⇒ array
         }
         avs.getOrElse(IndexedSeq.empty).map { cs ⇒ cs.asInstanceOf[AnnotationValue].annotation }
     }
 
-    def getName(callSite: Annotation): String = { //@CallSite -> String
+    def getName(callSite: Annotation): String = { //@DirectCall -> String
         val sv = callSite.elementValuePairs collectFirst {
             case ElementValuePair("name", StringValue(string)) ⇒ string
         }
         sv.get
     }
 
-    def getLineNumber(callSite: Annotation): Int = { //@CallSite -> int
+    def getLineNumber(callSite: Annotation): Int = { //@DirectCall -> int
         val iv = callSite.elementValuePairs collectFirst {
             case ElementValuePair("line", IntValue(int)) ⇒ int
         }
         iv.getOrElse(-1)
     }
 
-    def getType(annotation: Annotation, label: String): Type = { //@CallSite -> Type
+    def getType(annotation: Annotation, label: String): Type = { //@DirectCall -> Type
         val cv = annotation.elementValuePairs collectFirst {
             case ElementValuePair(`label`, ClassValue(declaringType)) ⇒ declaringType
         }
         cv.getOrElse(VoidType)
     }
 
-    def getReturnType(annotation: Annotation): Type = { //@CallSite -> Type
+    def getReturnType(annotation: Annotation): Type = { //@DirectCall -> Type
         getType(annotation, "returnType")
     }
 
-    def getParameterList(callSite: Annotation): List[Type] = { //@CallSite -> Seq[FieldType]
+    def getParameterList(callSite: Annotation): List[Type] = { //@DirectCall -> Seq[FieldType]
         val av = callSite.elementValuePairs collectFirst {
             case ElementValuePair("parameterTypes", ArrayValue(ab)) ⇒
                 ab.toIndexedSeq.map(ev ⇒

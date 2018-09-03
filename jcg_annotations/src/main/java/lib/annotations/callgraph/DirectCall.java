@@ -37,17 +37,20 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Describes a method call as call site with different {@link ResolvedMethod}s.
- * For types see the {@link TargetResolution} enum.
+ * Describes a method call at a specific call site and states which {@link ResolvedMethod}s
+ * the call must be resolved to. Using this annotation implies that the call edges must be
+ * directly available within the call graph from the specified call site. Therefore, this annoation
+ * can be used to specify monomorphic or polymorphic method calls but are not suited to specify
+ * indirect call targets, e.g., reflective call targets.
+ *
  *
  * @author Florian Kuebler
+ * @author Michael Reif
  */
 @Retention(RUNTIME)
 @Target({METHOD, CONSTRUCTOR})
-@Repeatable(CallSites.class)
-public @interface CallSite {
-
-    TargetResolution resolution() default TargetResolution.DEFAULT;
+@Repeatable(DirectCalls.class)
+public @interface DirectCall {
 
     String name();
 
