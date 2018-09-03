@@ -9,13 +9,13 @@ Tests a virtually dispatched method call which is in fact monomorphic.
 // bpc1/Class.java
 package bpc1;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class Class {
 
     public void method(){ }
 
-    @CallSite(name = "method", line = 12, resolvedTargets = "Lbpc1/Class;")
+    @DirectCall(name = "method", line = 12, resolvedTargets = "Lbpc1/Class;")
     public static void main(String[] args){
         Class cls = new Class();
         cls.method();
@@ -32,13 +32,13 @@ Tests a virtually dispatched method call when a simple type hierarchy is present
 // bpc/Class.java
 package bpc;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class Class {
 
     public void method(){ }
 
-    @CallSite(name = "method", line = 11, resolvedTargets = "Lbpc/SubClass;")
+    @DirectCall(name = "method", line = 11, resolvedTargets = "Lbpc/SubClass;")
     public static void callMethod(Class cls) {
         cls.method();
     }
@@ -63,7 +63,7 @@ Tests a virtually dispatched method call when the receiver is an interface type.
 // bpc3/Class.java
 package bpc3;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 interface Interface {
     void method();
@@ -73,7 +73,7 @@ class Class {
 
     public void method(){ }
 
-    @CallSite(name = "method", line = 15, resolvedTargets = {"Lbpc3/ClassImpl;"}, prohibitedTargets ={"Lbpc3/Class;"})
+    @DirectCall(name = "method", line = 15, resolvedTargets = {"Lbpc3/ClassImpl;"}, prohibitedTargets ={"Lbpc3/Class;"})
     public static void callOnInterface(Interface i){
         i.method();
     }
@@ -97,7 +97,7 @@ Tests a virtually dispatched method call when the receiver is loaded from an arr
 // bpc4/Class.java
 package bpc4;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 interface Interface {
     void method();
@@ -109,7 +109,7 @@ class Class implements Interface {
 
     public void method(){ }
 
-    @CallSite(name = "method", line = 18, resolvedTargets = "Lbpc4/Class;")
+    @DirectCall(name = "method", line = 18, resolvedTargets = "Lbpc4/Class;")
     public static void main(String[] args){
         Interface i = types[0];
         i.method();

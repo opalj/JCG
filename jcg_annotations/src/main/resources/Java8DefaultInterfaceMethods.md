@@ -10,11 +10,11 @@ inherits the method from the inherited interface.
 // j8pc1/Class.java
 package j8pc1;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class Class implements Interface {
 
-    @CallSite(name = "method", line = 10, resolvedTargets = "Lj8pc1/Interface;")
+    @DirectCall(name = "method", line = 10, resolvedTargets = "Lj8pc1/Interface;")
     public static void main(String[] args){
         Interface i = new Class();
         i.method();
@@ -40,7 +40,7 @@ called on the interface**.
 // j8pc2/SuperClass.java
 package j8pc2;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class SuperClass {
 
@@ -48,7 +48,7 @@ class SuperClass {
         // do something
     }
 
-    @CallSite(
+    @DirectCall(
             name = "method",
             line = 19,
             resolvedTargets = "Lj8pc2/SuperClass;",
@@ -83,7 +83,7 @@ called on the class**.
 // j8pc3/SuperClass.java
 package j8pc3;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class SuperClass {
 
@@ -91,7 +91,7 @@ class SuperClass {
         // do something
     }
 
-    @CallSite(
+    @DirectCall(
             name = "method",
             line = 19,
             resolvedTargets = "Lj8pc3/SuperClass;",
@@ -124,11 +124,11 @@ where the method is only defined in the interface.
 // j8pc4/SuperClass.java
 package j8pc4;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class SuperClass {
 
-    @CallSite(
+    @DirectCall(
             name = "method",
             line = 14,
             resolvedTargets = "Lj8pc4/Interface;"
@@ -159,21 +159,21 @@ Tests the resolution of a polymorphic calls when a class extends an abstract cla
 // j8pc5/SuperClass.java
 package j8pc5;
 
-import lib.annotations.callgraph.CallSites;
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCalls;
+import lib.annotations.callgraph.DirectCall;
 
 class SuperClass {
 
     public void compute(){ /* do something*/ }
 
-    @CallSites({
-        @CallSite(
+    @DirectCalls({
+        @DirectCall(
                 name = "method",
                 line = 26,
                 resolvedTargets = "Lj8pc5/DirectInterface;",
                 prohibitedTargets = {"Lj8pc5/Interface1;", "Lj8pc5/Interface2;"}
         ),
-        @CallSite(
+        @DirectCall(
                 name = "compute",
                 line = 27,
                 resolvedTargets = "Lj8pc5/SuperClass;",

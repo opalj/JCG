@@ -8,7 +8,7 @@ Type narrowing due to previous cast.
 // simplecast/Demo.java
 package simplecast;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Demo {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
@@ -17,7 +17,7 @@ class Demo {
           m(new Demo());
     }
 
-    @CallSite(
+    @DirectCall(
         name = "toString", returnType = String.class, line = 18,
         resolvedTargets = "Lsimplecast/Target;"
     )
@@ -43,7 +43,7 @@ Type narrowing due to previous cast using java class API.
 // castclassapi/Demo.java
 package castclassapi;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Demo {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
@@ -52,7 +52,7 @@ class Demo {
           m(Demo.class, new Demo());
     }
 
-    @CallSite(
+    @DirectCall(
         name = "toString", returnType = String.class, line = 18,
         resolvedTargets = "Lcastclassapi/Target;"
     )
@@ -86,7 +86,7 @@ must be of type ```Target```.
 // classeq/Demo.java
 package classeq;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Demo{ 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
@@ -95,7 +95,7 @@ class Demo{
           m(new Demo());
     }
 
-    @CallSite(
+    @DirectCall(
         name = "toString", returnType = String.class, line = 18,
         resolvedTargets = "Lclasseq/Target;"
     )
@@ -122,7 +122,7 @@ Type narrowing due to previous instance of check.
 // instanceofcheck/Demo.java
 package instanceofcheck;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Demo{ 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
@@ -131,7 +131,7 @@ class Demo{
           m(new Demo());
     }
 
-    @CallSite(
+    @DirectCall(
         name = "toString", returnType = String.class, line = 18,
         resolvedTargets = "Linstanceofcheck/Target;"
     )
@@ -157,7 +157,7 @@ Type narrowing due to previous instance of check.
 // instanceofclassapi/Demo.java
 package instanceofclassapi;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Demo{ 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
@@ -166,7 +166,7 @@ class Demo{
           m(new Demo());
     }
 
-    @CallSite(
+    @DirectCall(
         name = "toString", returnType = String.class, line = 18,
         resolvedTargets = "Linstanceofclassapi/Target;"
     )
@@ -193,7 +193,7 @@ Type narrowing due to previous is assignable.
 // isssignable/Demo.java
 package isssignable;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Demo{ 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) 
@@ -202,7 +202,7 @@ class Demo{
           m(new Demo());
     }
 
-    @CallSite(
+    @DirectCall(
         name = "toString", returnType = String.class, line = 18,
         resolvedTargets = "Lisssignable/Target;"
     )

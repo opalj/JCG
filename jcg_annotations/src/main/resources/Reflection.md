@@ -105,11 +105,11 @@ Test reflection with respect to constructors.
 // tr6/Foo.java
 package tr6;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public static void verifyCall(){ /* do something */ }
 
-    @CallSite(name="verifyCall", line=8, resolvedTargets = "Ltr6/Foo;")
+    @DirectCall(name="verifyCall", line=8, resolvedTargets = "Ltr6/Foo;")
     public Foo(String s) { Foo.verifyCall(); }
 
     public static void main(String[] args) throws Exception {
@@ -128,11 +128,11 @@ Test reflection with respect to the default constructor.
 // tr7/Foo.java
 package tr7;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public static void verifyCall(){ /* do something */ }
 
-    @CallSite(name="verifyCall", line=8, resolvedTargets = "Ltr7/Foo;")
+    @DirectCall(name="verifyCall", line=8, resolvedTargets = "Ltr7/Foo;")
     public Foo() { Foo.verifyCall(); }
 
     public static void main(String[] args) throws Exception {
@@ -216,7 +216,7 @@ Test reflection with respect to forName.
 // tr10/Foo.java
 package tr10;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public static void verifyCall(){ /* do something */ }
 
@@ -230,7 +230,7 @@ class Bar {
         staticInitializerCalled();
     }
 
-    @CallSite(name="verifyCall", line=19, resolvedTargets = "Ltr10/Foo;")
+    @DirectCall(name="verifyCall", line=19, resolvedTargets = "Ltr10/Foo;")
     static private void staticInitializerCalled(){
         Foo.verifyCall();
     }
@@ -249,7 +249,7 @@ Test reflection where the target class is dynamically decided.
 // lrr1/Foo.java
 package lrr1;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public static void verifyCall(){ /* do something */ }
 
@@ -267,7 +267,7 @@ class Bar {
         staticInitializerCalled();
     }
 
-    @CallSite(name="verifyCall", line=23, resolvedTargets = "Llrr1/Foo;")
+    @DirectCall(name="verifyCall", line=23, resolvedTargets = "Llrr1/Foo;")
     static private void staticInitializerCalled(){
         Foo.verifyCall();
     }
@@ -279,7 +279,7 @@ class Baz {
         staticInitializerCalled();
     }
 
-    @CallSite(name="verifyCall", line=35, resolvedTargets = "Llrr1/Foo;")
+    @DirectCall(name="verifyCall", line=35, resolvedTargets = "Llrr1/Foo;")
     static private void staticInitializerCalled(){
         Foo.verifyCall();
     }
@@ -295,7 +295,7 @@ Tests reflection where the target class is dynamically decided and the result of
 // lrr2/Foo.java
 package lrr2;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public static void verifyCall(){ /* do something */ }
 
@@ -318,7 +318,7 @@ class Bar {
          staticInitializerCalled();
      }
 
-     @CallSite(name="verifyCall", line=28, resolvedTargets = "Llrr2/Foo;")
+     @DirectCall(name="verifyCall", line=28, resolvedTargets = "Llrr2/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
@@ -330,7 +330,7 @@ class Bar {
          staticInitializerCalled();
      }
 
-     @CallSite(name="verifyCall", line=40, resolvedTargets = "Llrr2/Foo;")
+     @DirectCall(name="verifyCall", line=40, resolvedTargets = "Llrr2/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
@@ -346,7 +346,7 @@ Test reflection where the target class is dynamically decided from a locally set
 // lrr3/Foo.java
 package lrr3;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     private String className;
 
@@ -364,7 +364,7 @@ class Bar {
          staticInitializerCalled();
      }
 
-     @CallSite(name="verifyCall", line=23, resolvedTargets = "Llrr3/Foo;")
+     @DirectCall(name="verifyCall", line=23, resolvedTargets = "Llrr3/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
@@ -383,7 +383,7 @@ The class name is passed as an argument.
 // csr1/Foo.java
 package csr1;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public static void verifyCall(){ /* do something */ }
 
@@ -401,7 +401,7 @@ class Bar {
          staticInitializerCalled();
      }
 
-     @CallSite(name="verifyCall", line=23, resolvedTargets = "Lcsr1/Foo;")
+     @DirectCall(name="verifyCall", line=23, resolvedTargets = "Lcsr1/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
@@ -417,7 +417,7 @@ The class name is unknown.
 // csr2/Foo.java
 package csr2;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public class Foo {
     public static void verifyCall(){ /* do something */ }
 
@@ -435,7 +435,7 @@ class Bar {
          staticInitializerCalled();
      }
 
-     @CallSite(name="verifyCall", line=23, resolvedTargets = "Lcsr2/Foo;")
+     @DirectCall(name="verifyCall", line=23, resolvedTargets = "Lcsr2/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
@@ -451,7 +451,7 @@ Test reflection with respect to a public static field.
 // csr3/Foo.java
 package csr3;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public static String className;
 
@@ -472,7 +472,7 @@ class Bar {
          staticInitializerCalled();
      }
 
-     @CallSite(name="verifyCall", line=22, resolvedTargets = "Lcsr3/Foo;")
+     @DirectCall(name="verifyCall", line=22, resolvedTargets = "Lcsr3/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
@@ -489,7 +489,7 @@ Test reflection with respect to System properties.
 // csr4/Foo.java
 package csr4;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public static String className;
 
@@ -513,7 +513,7 @@ class Bar {
          staticInitializerCalled();
      }
 
-     @CallSite(name="verifyCall", line=22, resolvedTargets = "Lcsr4/Foo;")
+     @DirectCall(name="verifyCall", line=22, resolvedTargets = "Lcsr4/Foo;")
      static private void staticInitializerCalled(){
          Foo.verifyCall();
      }
@@ -534,13 +534,13 @@ that is instantiated is __incompatible__ with the cast such that the operation r
 // cl/Demo.java
 package cl;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
 
     public static void verifyCall(){ /* do something */ }
 
-    @CallSite(name="verifyCall", line = 15, resolvedTargets = "Lcl/Demo;")
+    @DirectCall(name="verifyCall", line = 15, resolvedTargets = "Lcl/Demo;")
 	public static void main(String[] args){
 	    try {
 	        Class cls = Class.forName("cl.DeceptiveClass");
@@ -574,13 +574,13 @@ which is handled in one of the catch blocks.
 // cl/Demo.java
 package cl;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
 
     public static void verifyCall(){ /* do something */ }
 
-    @CallSite(name="verifyCall", line = 18, resolvedTargets = "Lcl/Demo;")
+    @DirectCall(name="verifyCall", line = 18, resolvedTargets = "Lcl/Demo;")
 	public static void main(String[] args){
 	    try {
 	        Class cls = Class.forName("cl.CatchMeIfYouCan");
@@ -610,7 +610,7 @@ static initializer. When a class is loaded, its static initializer must be calle
 // cl/Demo.java
 package cl;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
 
@@ -636,7 +636,7 @@ class LoadedClass {
         staticInitializerCalled();
     }
 
-    @CallSite(name="verifyCall", line=31, resolvedTargets = "Lcl/Demo;")
+    @DirectCall(name="verifyCall", line=31, resolvedTargets = "Lcl/Demo;")
     static private void staticInitializerCalled(){
         Demo.verifyCall();
     }
@@ -653,7 +653,7 @@ initializers of potential super classes.
 // cl/Demo.java
 package cl;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
 
@@ -683,7 +683,7 @@ class RootClass {
         staticInitializerCalled();
     }
 
-    @CallSite(name="verifyCall", line=35, resolvedTargets = "Lcl/Demo;")
+    @DirectCall(name="verifyCall", line=35, resolvedTargets = "Lcl/Demo;")
     static private void staticInitializerCalled(){
         Demo.verifyCall();
     }

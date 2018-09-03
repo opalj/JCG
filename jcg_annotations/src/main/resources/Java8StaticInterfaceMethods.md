@@ -10,11 +10,11 @@ Tests the resolution of static interface methods.
 // j8pc6/Class.java
 package j8pc6;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class Class {
 
-    @CallSite(name = "method", line = 9, resolvedTargets = "Lj8pc6/Interface;")
+    @DirectCall(name = "method", line = 9, resolvedTargets = "Lj8pc6/Interface;")
     public static void main(String[] args){
         Interface.method();
     }

@@ -18,7 +18,7 @@ package jvmc;
 import java.lang.System;
 import java.lang.Runtime;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
 
@@ -32,7 +32,7 @@ public class Demo {
 
 class TargetRunnable implements Runnable {
     
-    @CallSite(name = "callback", line = 22, resolvedTargets = "Ljvmc/Demo;")
+    @DirectCall(name = "callback", line = 22, resolvedTargets = "Ljvmc/Demo;")
     public void run(){
         Demo.callback();
     }
@@ -49,7 +49,7 @@ garbage collection.
 package jvmc;
 
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
 
@@ -61,7 +61,7 @@ public class Demo {
           }
 	}
 	
-	@CallSite(name="callback", line=18, resolvedTargets = "Ljvmc/Demo;")
+	@DirectCall(name="callback", line=18, resolvedTargets = "Ljvmc/Demo;")
     public void finalize() throws java.lang.Throwable {
         callback();
         super.finalize();
@@ -139,7 +139,7 @@ to ```Thread.dispatchUncaughtException``` method that is intended to be called b
 // jvmc/Demo.java
 package jvmc;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
 
@@ -163,7 +163,7 @@ class ExceptionalExceptionHandler implements Thread.UncaughtExceptionHandler {
  
     private static void callback() { /* do something */ }
     
-    @CallSite(name="callback", line= 29, resolvedTargets = "Ljvmc/ExceptionalExceptionHandler;")
+    @DirectCall(name="callback", line= 29, resolvedTargets = "Ljvmc/ExceptionalExceptionHandler;")
      public void uncaughtException(Thread t, Throwable e){
         callback();
         // Handle the uncaught Exception (IllegalArgumentException)

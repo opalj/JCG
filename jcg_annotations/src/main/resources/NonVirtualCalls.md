@@ -13,14 +13,14 @@ different signature is presence.
 // dc1/Class.java
 package dc1;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class Class {
 
     public static void method(){ /* do something*/}
     public static void method(int param){ /* do something*/}
 
-    @CallSite(name = "method", parameterTypes = int.class, line = 12, resolvedTargets = "Ldc1/Class;")
+    @DirectCall(name = "method", parameterTypes = int.class, line = 12, resolvedTargets = "Ldc1/Class;")
     public static void main(String[] args){
         Class.method();
     }
@@ -59,14 +59,14 @@ different signature is presence.
 // dc/Class.java
 package dc;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class Class {
 
     private void method(){ /* do something*/}
     private void method(int num){ /* do something*/}
 
-    @CallSite(name = "method", line = 13, resolvedTargets = "Ldc/Class;")
+    @DirectCall(name = "method", line = 13, resolvedTargets = "Ldc/Class;")
     public static void main(String[] args){
         Class cls = new Class();
         cls.method();
@@ -83,11 +83,11 @@ only be propagated to the immediate super class.
 // dc/Class.java
 package dc;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 class Class extends Superclass {
 
-    @CallSite(name = "method", line = 9, resolvedTargets = "Ldc/Superclass;", prohibitedTargets = "Ldc/Rootclass;")
+    @DirectCall(name = "method", line = 9, resolvedTargets = "Ldc/Superclass;", prohibitedTargets = "Ldc/Rootclass;")
     protected void method(){
         super.method();
     }

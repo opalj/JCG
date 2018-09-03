@@ -13,12 +13,12 @@ package unsafe;
 import sun.misc.Unsafe;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
     private TargetInterface objectVar = null;
 
-	@CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
+	@DirectCall(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -62,12 +62,12 @@ package unsafe;
 import sun.misc.Unsafe;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
     private TargetInterface objectVar = null;
 
-	@CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
+	@DirectCall(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 22)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -111,12 +111,12 @@ package unsafe;
 import sun.misc.Unsafe;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
     private Object objectVar = null;
 
-	@CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 23)
+	@DirectCall(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 23)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -162,15 +162,15 @@ package unsafe;
 import sun.misc.Unsafe;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.CallSite;
-import lib.annotations.callgraph.CallSites;
+import lib.annotations.callgraph.DirectCall;
+import lib.annotations.callgraph.DirectCalls;
 
 public class Demo {
     private Object objectVar = null;
     
-    @CallSites({
-	    @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 29),
-        @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 30)
+    @DirectCalls({
+	    @DirectCall(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 29),
+        @DirectCall(name = "targetMethod", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 30)
     })
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
@@ -220,12 +220,12 @@ package unsafe;
 import sun.misc.Unsafe;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
+    @DirectCall(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -273,12 +273,12 @@ package unsafe;
 import sun.misc.Unsafe;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 24)
+    @DirectCall(name = "targetMethod", resolvedTargets = "Lunsafe/SafeTarget;", returnType = String.class, line = 24)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);
@@ -325,12 +325,12 @@ package unsafe;
 import sun.misc.Unsafe;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
     private Object objectVar = null;
     
-    @CallSite(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
+    @DirectCall(name = "targetMethod", resolvedTargets = "Lunsafe/UnsafeTarget;", returnType = String.class, line = 25)
     public static void main(String[] args) throws Exception {
         Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
         unsafeConstructor.setAccessible(true);

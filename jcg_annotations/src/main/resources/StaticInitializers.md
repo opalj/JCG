@@ -9,12 +9,12 @@ A static initializer should be triggered when a non-constant field is referenced
 // si/Demo.java
 package si;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public interface Demo {
 
 	static String name = init();
 
-    @CallSite(name = "callback", line = 10, resolvedTargets = "Lsi/Demo;")
+    @DirectCall(name = "callback", line = 10, resolvedTargets = "Lsi/Demo;")
 	static String init() {
 		callback();
 		return "Demo";
@@ -37,12 +37,12 @@ A static initializer should be triggered when a static interface method is invok
 // si/Interface.java
 package si;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public interface Interface {
 
 	static String name = init();
 
-    @CallSite(name = "callback", line = 10, resolvedTargets = "Lsi/Interface;")
+    @DirectCall(name = "callback", line = 10, resolvedTargets = "Lsi/Interface;")
 	static String init() {
 		callback();
 		return "Demo";
@@ -66,12 +66,12 @@ Static initializer of an interface with a default method.
 // si/Interface.java
 package si;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public interface Interface {
 
 	static String name = init();
 
-    @CallSite(name = "callback", line = 10, resolvedTargets = "Lsi/Interface;")
+    @DirectCall(name = "callback", line = 10, resolvedTargets = "Lsi/Interface;")
 	static String init() {
 		callback();
 		return "Demo";
@@ -98,7 +98,7 @@ and non-String type is referenced.
 // si/Demo.java
 package si;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public class Demo {
 	public static void main(String[] args) {
 		Interface.referenceMe.toString();
@@ -110,7 +110,7 @@ interface Interface {
     static String testHook = init();
     static final Demo referenceMe = new Demo();
 
-    @CallSite(name = "callback", line = 17, resolvedTargets = "Lsi/Interface;")
+    @DirectCall(name = "callback", line = 17, resolvedTargets = "Lsi/Interface;")
     static String init() {
         callback();
         return "Interface";
@@ -129,7 +129,7 @@ Static initializer block of a class.
 // si/Demo.java
 package si;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public class Demo {
 
 	public static void main(String[] args) {
@@ -143,7 +143,7 @@ class Foo {
 		init();
 	}
 
-    @CallSite(name = "callback", line = 19, resolvedTargets = "Lsi/Foo;")
+    @DirectCall(name = "callback", line = 19, resolvedTargets = "Lsi/Foo;")
 	static void init() {
 		callback();
 	}
@@ -161,7 +161,7 @@ Static initializer method call in declaration of a class.
 // si/Demo.java
 package si;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public class Demo {
 
 	public static void main(String[] args) {
@@ -172,7 +172,7 @@ public class Demo {
 class Foo {
 	static String name = init();
 
-    @CallSite(name = "callback", line = 16, resolvedTargets = "Lsi/Foo;")
+    @DirectCall(name = "callback", line = 16, resolvedTargets = "Lsi/Foo;")
 	static String init() {
 		callback();
 		return "Demo";
@@ -191,7 +191,7 @@ Static initializer method call in declaration of a class.
 // si/Demo.java
 package si;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public class Demo {
 
 	public static void main(String[] args) {
@@ -204,7 +204,7 @@ class Foo {
 
     static int assignMe;
 
-    @CallSite(name = "callback", line = 18, resolvedTargets = "Lsi/Foo;")
+    @DirectCall(name = "callback", line = 18, resolvedTargets = "Lsi/Foo;")
 	static String init() {
 		callback();
 		return "Foo";
@@ -223,7 +223,7 @@ When a class is initialized, its super classes are also initialized.
 // si/Class.java
 package si;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 public class Class{
 
 	public static void main(String[] args) {
@@ -234,7 +234,7 @@ public class Class{
 class SubClass extends SuperClass {
 	static String name = init();
 
-    @CallSite(name = "callback", line = 16, resolvedTargets = "Lsi/SubClass;")
+    @DirectCall(name = "callback", line = 16, resolvedTargets = "Lsi/SubClass;")
 	static String init() {
 		callback();
 		return "SubClass";
@@ -249,7 +249,7 @@ class SuperClass extends RootClass {
         superInit();
     }
 
-    @CallSite(name = "callback", line = 31, resolvedTargets = "Lsi/SuperClass;")
+    @DirectCall(name = "callback", line = 31, resolvedTargets = "Lsi/SuperClass;")
     static void superInit(){
         callback();
     }
@@ -263,7 +263,7 @@ class RootClass {
         rootInit();
     }
 
-    @CallSite(name = "callback", line = 45, resolvedTargets = "Lsi/RootClass;")
+    @DirectCall(name = "callback", line = 45, resolvedTargets = "Lsi/RootClass;")
     static void rootInit(){
       callback();
     }

@@ -71,7 +71,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
 
     public static void main(String[] args) throws Throwable {
@@ -80,7 +80,7 @@ class Foo {
         Foo f = (Foo) handle.invokeExact();
     }
 
-    @CallSite(name="verifyCall", line=18, resolvedTargets = "Ltmr3/Foo;")
+    @DirectCall(name="verifyCall", line=18, resolvedTargets = "Ltmr3/Foo;")
     public Foo() {
         Foo.verifyCall();
     }
@@ -101,13 +101,13 @@ package tmr4;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public String toString() { return "FOO"; }
 
     public static Foo f = new Foo();
 
-    @CallSite(
+    @DirectCall(
         name = "toString", returnType = String.class,
         line = 18, resolvedTargets = "Ltmr4/Foo;"
     )
@@ -132,7 +132,7 @@ package tmr5;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 class Foo {
     public String toString() { return "Foo"; }
 
@@ -142,7 +142,7 @@ class Foo {
         this.f = this;
     }
 
-    @CallSite(
+    @DirectCall(
         name = "toString", returnType = String.class,
         line = 22, resolvedTargets = "Ltmr5/Foo;"
     )
