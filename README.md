@@ -6,8 +6,11 @@ runtime (JVM) callbacks. Not supporting those features/APIs will render the call
 
 The project's structure and usage are explained in the following.
 
-## The Annotations Project
-The subproject `jcg_annotations` is test suite's s core project. It holds the test files as well as the annotations that
+## The Testcase Project
+The subproject `jcg_testcases` is test suite's s core project. It holds the test files along with 
+the test cases extractor which is used to parse the test cases and compile them to jars. 
+
+The project depends on `jcg_annotation` which contains the annotations that
 are required to express the test case's expectations.
 
 ### Annotating Test Expectations
