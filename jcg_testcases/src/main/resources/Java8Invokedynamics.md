@@ -42,7 +42,7 @@ interface Interface {
 
 ##MR2
 [//]: # (MAIN: id.Class)
-Tests a method reference that results in a invokedyamic that uses an *INVOKESPECIAL* method handle which
+Tests a method reference that results in an invokedynamic that uses an *INVOKESPECIAL* method handle which
 is issued by calling a private method.
 
 ```java
@@ -73,7 +73,7 @@ class Class {
 
 ##MR3
 [//]: # (MAIN: id.Class)
-Tests a method reference that results in a invokedyamic that uses an *INVOKESPECIAL* method handle which
+Tests a method reference that results in an invokedynamic that uses an *INVOKESPECIAL* method handle which
 is issued by calling a protected method from a super class that is resolved to a syntatic bridge
 method compiled in ```id.Class```.
 
@@ -165,7 +165,9 @@ class Class {
 
 ##MR6
 [//]: # (MAIN: id.Class)
-Tests method reference that result in a constructor call.
+Tests a method reference that results in an invokedynamic that uses an *NEWINVOKESPECIAL* method handle
+which is given by the method reference of ```id.Class::new```. Calling this method references
+results in a constructor call to ```id.Class```.
 
 ```java
 // id/Class.java
@@ -190,7 +192,9 @@ class Class {
 
 ##MR7
 [//]: # (MAIN: id.Class)
-Tests method reference that result in a method invocation where the method is defined in a super class.
+Tests a method reference that results in an invokedynamic that uses an *INVOKEVIRTUAL* method handle
+which is given by the method reference of ```cls::version``` where the actually called method is
+implentend with ```id.Class```'s superclass ```id.SuperClass```.
 
 ```java
 // id/Class.java
@@ -221,8 +225,9 @@ Test cases in the presence of lambdas.
 
 ##Lambda1
 [//]: # (MAIN: id.Class)
-Tests the invocation of a lambda with a integer boxing.
-
+Tests the invocation of a lamdba that results in an invokedynamic with an *INVOKESTATIC* method handle
+which points to an synthetic method. Please not that all primitive integers are autoboxed to
+```java.lang.Integer``` which then fits the lambdas (cf. ```isEven```) type.
 ```java
 // id/Class.java
 package id;
@@ -250,7 +255,10 @@ class Class {
 
 ##Lambda2
 [//]: # (MAIN: id.Class)
-Tests the invocation on an object receiver captured in a lambda.
+Tests an invokedynamic invocation where the object receiver is captured in a lambda function.
+Declaring a lambda function in another class (cf. ```id.LambdaProvider```) as it is invoked
+(cf. ```id.Class```) leads to an *INVOKESTATIC* method handle where the receiver is not declared
+within the same class.
 
 ```java
 // id/Class.java
@@ -265,7 +273,6 @@ class Class {
     @IndirectCall(name = "doSomething", line = 17, resolvedTargets = "Lid/LambdaProvider;")
     public static void main(String[] args) {
         Runnable lambda = LambdaProvider.getRunnable();
-
         lambda.run();
     }
 }
@@ -293,7 +300,9 @@ package id;
 
 ##Lambda3
 [//]: # (MAIN: id.Class)
-Tests the invocation of a lambda when it was written to an array and later retrieved and applied.
+Tests the invocation of a lambda that was first written to and then retrieved from an array. This 
+case results in an invokedynamic with an *INVOKESTATIC* method handle where the receiver argument
+is read by *AASTORE* instruction form an array before the method invocation takes place.
 
 ```java
 // id/Class.java
@@ -313,12 +322,11 @@ class Class {
 
     public static Runnable[] lambdaArray = new Runnable[10];
 
-    @IndirectCall(name = "doSomething", line = 25, resolvedTargets = "Lid/Class;")
+    @IndirectCall(name = "doSomething", line = 22, resolvedTargets = "Lid/Class;")
     public static void main(String[] args) {
         Runnable r1 = () -> doSomething();
         lambdaArray[0] = r1;
         Runnable same = lambdaArray[0];
-
         same.run();
     }
 }
@@ -333,7 +341,9 @@ final class Math {
 
 ##Lambda4
 [//]: # (MAIN: id.Class)
-Tests the invocation of an intersection type lambda.
+Tests the invocation of an intersection type lambda. This is special because the JVM does then use
+the ```AltLambdaMetaFactory``` instead of the ```LambdaMetaFactory``` which is used for all the
+previously defined cases. 
 
 ```java
 // id/Class.java
