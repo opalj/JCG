@@ -35,7 +35,7 @@ Tests the resolution of a constructor call (<init>)
 // dc/Class.java
 package dc;
 
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.DirectCall;
 
 public class Class {
 
@@ -43,7 +43,7 @@ public class Class {
 
     }
 
-    @IndirectCall(name = "<init>", line = 13, resolvedTargets = "Ldc/Class;")
+    @DirectCall(name = "<init>", line = 13, resolvedTargets = "Ldc/Class;")
     public static void main(String[] args){
         Class cls = new Class();
     }
