@@ -236,8 +236,7 @@ import lib.annotations.callgraph.IndirectCall;
 import java.util.function.Function;
 
 class Class {
-    @IndirectCall(
-       name = "doSomething", line = 11, resolvedTargets = "Lid/Class;")
+    @IndirectCall(name = "doSomething", line = 13, resolvedTargets = "Lid/Class;")
     public static void main(String[] args){
         Function<Integer, Boolean> isEven = (Integer a) -> {
             doSomething();
@@ -247,7 +246,7 @@ class Class {
     }
 
     private static void doSomething(){
-        // call in id
+        // call in lambda
     }
 }
 ```
@@ -270,7 +269,7 @@ class Class {
 
     public static void doSomething(){ }
 
-    @IndirectCall(name = "doSomething", line = 17, resolvedTargets = "Lid/LambdaProvider;")
+    @IndirectCall(name = "doSomething", line = 12, resolvedTargets = "Lid/LambdaProvider;")
     public static void main(String[] args) {
         Runnable lambda = LambdaProvider.getRunnable();
         lambda.run();
