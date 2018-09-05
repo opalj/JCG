@@ -20,8 +20,8 @@ import play.api.libs.json.Json
 
 object CGMatcher {
 
-    val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/DirectCall")
-    val callSitesAnnotationType = ObjectType("lib/annotations/callgraph/DirectCalls")
+    val directCallAnnotationType = ObjectType("lib/annotations/callgraph/DirectCall")
+    val directCallsAnnotationType = ObjectType("lib/annotations/callgraph/DirectCalls")
     val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
     val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
 
@@ -49,18 +49,20 @@ object CGMatcher {
         } {
             // check if the call site might not be ambiguous
             if (method.annotations.exists { a ⇒
-                a.annotationType == callSiteAnnotationType ||
-                    a.annotationType == callSitesAnnotationType ||
+                a.annotationType == directCallsAnnotationType ||
+                    a.annotationType == directCallsAnnotationType ||
                     a.annotationType == indirectCallAnnotationType ||
                     a.annotationType == indirectCallsAnnotationType
             }) {
                 val body = method.body.get
-                val invokations = body.instructions.zipWithIndex.filter { case (instr, pc) ⇒ instr != null && instr.isInvocationInstruction }
-                val lines = invokations.map {
+                val invocations = body.instructions.zipWithIndex filter { case (instr, pc) ⇒
+                    instr != null && instr.isInvocationInstruction
+                }
+                val lines = invocations.map {
                     case (instr, pc) ⇒
                         (body.lineNumber(pc), instr.asInvocationInstruction.name)
                 }.toSet
-                if (lines.size != invokations.length) {
+                if (lines.size != invocations.length) {
                     throw new RuntimeException(s"Multiple call sites with same name in the same line ${projectSpec.name}, ${method.name}")
                 }
             }
@@ -70,14 +72,14 @@ object CGMatcher {
             for (annotation ← method.annotations) {
 
                 val callSiteAnnotations =
-                    if (annotation.annotationType == callSiteAnnotationType)
+                    if (annotation.annotationType == directCallsAnnotationType)
                         Seq(annotation)
-                    else if (annotation.annotationType == callSitesAnnotationType)
+                    else if (annotation.annotationType == directCallsAnnotationType)
                         getAnnotations(annotation, "value")
                     else
                         Seq.empty
 
-                val csAssessment = handleCallSiteAnnotations(
+                val csAssessment = handleDirectCallAnnotations(
                     computedReachableMethods.getOrElse(annotatedMethod, Set.empty), //todo is this correct for wala
                     annotatedMethod,
                     method,
@@ -129,14 +131,14 @@ object CGMatcher {
             throw new RuntimeException(s"There is no call to $tgtName in line $annotatedLineNumber")
     }
 
-    private def handleCallSiteAnnotations(
-        computedCallSites:   Set[CallSite],
-        annotatedMethod:     Method,
-        method:              br.Method,
-        callSiteAnnotations: Seq[Annotation],
-        verbose:             Boolean
+    private def handleDirectCallAnnotations(
+        computedCallSites:     Set[CallSite],
+        annotatedMethod:       Method,
+        method:                br.Method,
+        directCallAnnotations: Seq[Annotation],
+        verbose:               Boolean
     )(implicit p: SomeProject): Assessment = {
-        for (callSiteAnnotation ← callSiteAnnotations) {
+        for (callSiteAnnotation ← directCallAnnotations) {
             val line = getLineNumber(callSiteAnnotation)
             val name = getName(callSiteAnnotation)
             val returnType = getType(callSiteAnnotation, "returnType")
@@ -246,7 +248,7 @@ object CGMatcher {
         val name = method.name
         val declaringClass = method.classFile.thisType.toJVMTypeName
         val returnType = method.returnType.toJVMTypeName
-        val parameterTypes = method.parameterTypes.map(_.toJVMTypeName).toList
+        val parameterTypes = method.parameterTypes.toList.map(_.toJVMTypeName)
 
         Method(name, declaringClass, returnType, parameterTypes)
     }

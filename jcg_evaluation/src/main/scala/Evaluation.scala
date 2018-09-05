@@ -117,7 +117,7 @@ object Evaluation {
                         val featureName = featureId.replace("\"", "")
                         val className = classString.replace("\"", "")
                         val md = MethodDescriptor(mdString.replace("\"", ""))
-                        val params = md.parameterTypes.map(_.toJVMTypeName).toList
+                        val params = md.parameterTypes.map[String](_.toJVMTypeName).toList
                         val returnType = md.returnType.toJVMTypeName
                         (projectName, featureName, Method(methodName, className, returnType, params))
                     }).groupBy(_._1).map {
