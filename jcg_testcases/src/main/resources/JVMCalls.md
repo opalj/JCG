@@ -1,16 +1,15 @@
 #JVMCalls
 JVM calls or callbacks must be treated as (on-the-fly) entry points and explicitly modelled for correct
-call-graph construction, i.e. when certain operations are performed like creating an object or 
-adding an ShutdownHook. 
+call-graph construction, i.e., when certain operations are performed like creating an object or 
+adding an ```ShutdownHook```. 
 
-Please note that Java's Serialization feature is a similar mechanism. However, Serialization is
-substantial feature and is thus handled as own category.
+Please note that Java's Serialization feature is a similar mechanism. However, Serialization is a
+substantial feature and is thus handled in a separate category.
 
 ##JVMC1
 [//]: # (MAIN: jvmc.Demo)
-This tests covers a callback that can be introduced to the program, namely ```Runtime.addShutdownHook```.
-It allows the program to pass a customizable thread to the JVM that is called by the JVM when it
-shuts down. 
+This tests covers a callback that can be introduced to the program by calling```Runtime.addShutdownHook```.
+It allows the program to pass a customizable thread to the JVM that is called on the JVM's shut down. 
 ```java
 // jvmc/Demo.java
 package jvmc;
@@ -42,7 +41,7 @@ class TargetRunnable implements Runnable {
 
 ##JVMC2
 [//]: # (MAIN: jvmc.Demo)
-This test case covers the ```finalize``` method, which __can__ be called by the JVM during
+This test case covers the ```finalize``` method which __might__ be called by the JVM during
 garbage collection.
 ```java
 // jvmc/Demo.java
@@ -104,7 +103,7 @@ class TargetRunnable implements Runnable {
 ##JVMC4
 [//]: # (MAIN: jvmc.Demo)
 This cases tests the implicitly introduced call edge from ```Thread.start``` to the transitively
-reachable ```Thread.exit``` method that is also called by the JVM.
+reachable ```Thread.exit``` method that is also called by the JVM on a thread's exit.
 ```java
 // jvmc/Demo.java
 package jvmc;
