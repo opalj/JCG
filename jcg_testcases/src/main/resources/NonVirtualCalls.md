@@ -5,13 +5,13 @@ super method calls, and private method calls.
 Static initializers are found in their own category due to the inherent complexity of resolving them
 in a meaningful manner.
 
-##DC1
-[//]: # (MAIN: dc1.Class)
+##NVC1
+[//]: # (MAIN: nvc.Class)
 Tests the resolution of a static method call when another static method with the same name but
 different signature is presence.
 ```java
-// dc1/Class.java
-package dc1;
+// nvc/Class.java
+package nvc;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -20,7 +20,7 @@ class Class {
     public static void method(){ /* do something*/}
     public static void method(int param){ /* do something*/}
 
-    @DirectCall(name = "method", parameterTypes = int.class, line = 12, resolvedTargets = "Ldc1/Class;")
+    @DirectCall(name = "method", parameterTypes = int.class, line = 12, resolvedTargets = "Lnvc/Class;")
     public static void main(String[] args){
         Class.method();
     }
@@ -28,12 +28,12 @@ class Class {
 ```
 [//]: # (END)
 
-##DC2
-[//]: # (MAIN: dc.Class)
+##NVC2
+[//]: # (MAIN: nvc.Class)
 Tests the resolution of a constructor call (<init>)
 ```java
-// dc/Class.java
-package dc;
+// nvc/Class.java
+package nvc;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -43,7 +43,7 @@ public class Class {
 
     }
 
-    @DirectCall(name = "<init>", line = 13, resolvedTargets = "Ldc/Class;")
+    @DirectCall(name = "<init>", line = 13, resolvedTargets = "Lnvc/Class;")
     public static void main(String[] args){
         Class cls = new Class();
     }
@@ -51,13 +51,13 @@ public class Class {
 ```
 [//]: # (END)
 
-##DC3
-[//]: # (MAIN: dc.Class)
+##NVC3
+[//]: # (MAIN: nvc.Class)
 Tests the resolution of a private method call when another method with the same name but
 different signature is presence.
 ```java
-// dc/Class.java
-package dc;
+// nvc/Class.java
+package nvc;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -66,7 +66,7 @@ class Class {
     private void method(){ /* do something*/}
     private void method(int num){ /* do something*/}
 
-    @DirectCall(name = "method", line = 13, resolvedTargets = "Ldc/Class;")
+    @DirectCall(name = "method", line = 13, resolvedTargets = "Lnvc/Class;")
     public static void main(String[] args){
         Class cls = new Class();
         cls.method();
@@ -75,19 +75,19 @@ class Class {
 ```
 [//]: # (END)
 
-##DC4
-[//]: # (MAIN: dc.Class)
+##NVC4
+[//]: # (MAIN: nvc.Class)
 Tests the resolution of a super call in the form `super.<methodName>`. The method call should
 only be propagated to the immediate super class.
 ```java
-// dc/Class.java
-package dc;
+// nvc/Class.java
+package nvc;
 
 import lib.annotations.callgraph.DirectCall;
 
 class Class extends Superclass {
 
-    @DirectCall(name = "method", line = 9, resolvedTargets = "Ldc/Superclass;", prohibitedTargets = "Ldc/Rootclass;")
+    @DirectCall(name = "method", line = 9, resolvedTargets = "Lnvc/Superclass;", prohibitedTargets = "Lnvc/Rootclass;")
     protected void method(){
         super.method();
     }
