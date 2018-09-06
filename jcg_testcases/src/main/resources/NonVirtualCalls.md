@@ -20,7 +20,7 @@ class Class {
     public static void method(){ /* do something*/}
     public static void method(int param){ /* do something*/}
 
-    @DirectCall(name = "method", parameterTypes = int.class, line = 12, resolvedTargets = "Lnvc/Class;")
+    @DirectCall(name = "method", line = 12, resolvedTargets = "Lnvc/Class;")
     public static void main(String[] args){
         Class.method();
     }
@@ -30,7 +30,9 @@ class Class {
 
 ##NVC2
 [//]: # (MAIN: nvc.Class)
-Tests the resolution of a constructor call (<init>)
+Tests the call resolution of default constructors which is caused by using Java's ```NEW``` keyword. The resulting 
+bytecode contains a *INVOKESPECIAL* instruction which must be resolved to ```nvc.Class```'s ```<init>``` method, i.e.,
+the default name for a constructor.
 ```java
 // nvc/Class.java
 package nvc;
