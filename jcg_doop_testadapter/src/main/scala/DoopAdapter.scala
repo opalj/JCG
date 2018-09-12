@@ -13,7 +13,7 @@ import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.SomeProject
 import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
-import org.opalj.log.GlobalLogContext
+import org.opalj.collection.immutable.RefArray
 import org.opalj.log.LogContext
 import org.opalj.log.LogMessage
 import org.opalj.log.OPALLogger
@@ -98,7 +98,7 @@ object DoopAdapter extends JCGTestAdapter {
         val firstTgt = toMethod(tgts.head)
         val tgtReturnType = ReturnType(firstTgt.returnType)
         val tgtParamTypes = firstTgt.parameterTypes.map(FieldType.apply)
-        val tgtMD = MethodDescriptor(tgtParamTypes.toIndexedSeq, tgtReturnType)
+        val tgtMD = MethodDescriptor(new RefArray[FieldType](tgtParamTypes.toArray), tgtReturnType)
         val split = declaredTgt.split("""\.""")
         val declaredType = s"L${split.slice(0, split.size - 1).mkString("/")};"
         val name = split.last.replace("'", "")
@@ -143,7 +143,9 @@ object DoopAdapter extends JCGTestAdapter {
                     implicit val classFile: ClassFile = cf
                     val returnType = ReturnType(callerMethod.returnType)
                     val parameterTypes = callerMethod.parameterTypes.map(FieldType.apply)
-                    val md = MethodDescriptor(parameterTypes.toIndexedSeq, returnType)
+                    val md = MethodDescriptor(
+                        new RefArray[FieldType](parameterTypes.toArray), returnType
+                    )
 
                     cf.findMethod(callerMethod.name, md) match {
                         case Some(callerOpal) if callerOpal.body.isDefined ⇒
@@ -242,10 +244,10 @@ object DoopAdapter extends JCGTestAdapter {
     }
 
     override def serializeCG(
-        algorithm: String,
-        target:    String,
-        mainClass: String,
-        classPath: Array[String],
+        algorithm:    String,
+        target:       String,
+        mainClass:    String,
+        classPath:    Array[String],
         jreLocations: String,
         jreVersion:   Int,
         outputFile:   String

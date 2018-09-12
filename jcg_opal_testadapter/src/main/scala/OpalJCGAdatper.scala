@@ -7,6 +7,7 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
 import org.opalj.br.DeclaredMethod
 import org.opalj.br.Code
+import org.opalj.br.FieldType
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.DeclaredMethodsKey
 import org.opalj.br.analyses.DeclaredMethods
@@ -167,7 +168,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     name,
                     dc.toJVMTypeName,
                     desc.returnType.toJVMTypeName,
-                    desc.parameterTypes.iterator.map(_.toJVMTypeName).toList
+                    desc.parameterTypes.map(_.toJVMTypeName).toList
                 )
 
             val (directCallees, indirectCallees) = callees.partition { callee ⇒
@@ -202,7 +203,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
             method.name,
             method.declaringClassType.toJVMTypeName,
             method.descriptor.returnType.toJVMTypeName,
-            method.descriptor.parameterTypes.iterator.map(_.toJVMTypeName).toList
+            method.descriptor.parameterTypes.map(_.toJVMTypeName).toList
         )
     }
 }
