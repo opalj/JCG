@@ -1,6 +1,10 @@
 import java.io.File
 import java.io.FileInputStream
 
+import lib.annotations.callgraph.DirectCall
+import lib.annotations.callgraph.DirectCalls
+import lib.annotations.callgraph.IndirectCall
+import lib.annotations.callgraph.IndirectCalls
 import org.opalj.br
 import org.opalj.br.Annotation
 import org.opalj.br.AnnotationValue
@@ -18,16 +22,26 @@ import org.opalj.log.GlobalLogContext
 import org.opalj.log.OPALLogger
 import play.api.libs.json.Json
 
+/**
+ * For a given project and a computed (serialized as json representation of [[ReachableMethods]])
+ * it computes an [[Assessment]] whether the computed call graph is Sound/Unsound or Imprecise.
+ *
+ * @author Florian Kuebler
+ */
 object CGMatcher {
 
-    val directCallAnnotationType = ObjectType("lib/annotations/callgraph/DirectCall")
-    val directCallsAnnotationType = ObjectType("lib/annotations/callgraph/DirectCalls")
-    val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
-    val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
+    private val directCallAnnotationType =
+        ObjectType(classOf[DirectCall].getName.replace(".", "/"))
+    private val directCallsAnnotationType =
+        ObjectType(classOf[DirectCalls].getName.replace(".", "/"))
+    private val indirectCallAnnotationType =
+        ObjectType(classOf[IndirectCall].getName.replace(".", "/"))
+    private val indirectCallsAnnotationType =
+        ObjectType(classOf[IndirectCalls].getName.replace(".", "/"))
 
     def matchCallSites(
         projectSpec:  ProjectSpecification,
-        jRELocations: Map[Int, Array[File]],
+        JRELocations: Map[Int, Array[File]],
         parent:       File,
         jsonPath:     String,
         verbose:      Boolean               = false
@@ -36,7 +50,7 @@ object CGMatcher {
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
         implicit val p: SomeProject = Project(
-            Array(projectSpec.target(parent)) ++ projectSpec.allClassPathEntryFiles(parent) ++ jRELocations(projectSpec.java),
+            Array(projectSpec.target(parent)) ++ projectSpec.allClassPathEntryFiles(parent) ++ JRELocations(projectSpec.java),
             Array.empty[File]
         )
 
@@ -49,14 +63,15 @@ object CGMatcher {
         } {
             // check if the call site might not be ambiguous
             if (method.annotations.exists { a ⇒
-                a.annotationType == directCallsAnnotationType ||
+                a.annotationType == directCallAnnotationType ||
                     a.annotationType == directCallsAnnotationType ||
                     a.annotationType == indirectCallAnnotationType ||
                     a.annotationType == indirectCallsAnnotationType
             }) {
                 val body = method.body.get
-                val invocations = body.instructions.zipWithIndex filter { case (instr, pc) ⇒
-                    instr != null && instr.isInvocationInstruction
+                val invocations = body.instructions.zipWithIndex filter {
+                    case (instr, _) ⇒
+                        instr != null && instr.isInvocationInstruction
                 }
                 val lines = invocations.map {
                     case (instr, pc) ⇒
@@ -141,8 +156,8 @@ object CGMatcher {
         for (callSiteAnnotation ← directCallAnnotations) {
             val line = getLineNumber(callSiteAnnotation)
             val name = getName(callSiteAnnotation)
-            val returnType = getType(callSiteAnnotation, "returnType")
-            val parameterTypes = getParameterList(callSiteAnnotation)
+            // todo val returnType = getType(callSiteAnnotation, "returnType")
+            // todo val parameterTypes = getParameterList(callSiteAnnotation)
             verifyCallSite(line, method, name)
 
             computedCallSites.find { cs ⇒
@@ -244,7 +259,7 @@ object CGMatcher {
         false
     }
 
-    def convertMethod(method: org.opalj.br.Method): Method = {
+    private def convertMethod(method: org.opalj.br.Method): Method = {
         val name = method.name
         val declaringClass = method.classFile.thisType.toJVMTypeName
         val returnType = method.returnType.toJVMTypeName
@@ -256,39 +271,39 @@ object CGMatcher {
     //
     // UTILITY FUNCTIONS
     //
-    def getAnnotations(callSites: Annotation, label: String): Seq[Annotation] = { //@DirectCalls -> @DirectCall[]
+    private def getAnnotations(callSites: Annotation, label: String): Seq[Annotation] = { //@DirectCalls -> @DirectCall[]
         val avs = callSites.elementValuePairs collectFirst {
             case ElementValuePair(`label`, ArrayValue(array)) ⇒ array
         }
         avs.getOrElse(IndexedSeq.empty).map { cs ⇒ cs.asInstanceOf[AnnotationValue].annotation }
     }
 
-    def getName(callSite: Annotation): String = { //@DirectCall -> String
+    private def getName(callSite: Annotation): String = { //@DirectCall -> String
         val sv = callSite.elementValuePairs collectFirst {
             case ElementValuePair("name", StringValue(string)) ⇒ string
         }
         sv.get
     }
 
-    def getLineNumber(callSite: Annotation): Int = { //@DirectCall -> int
+    private def getLineNumber(callSite: Annotation): Int = { //@DirectCall -> int
         val iv = callSite.elementValuePairs collectFirst {
             case ElementValuePair("line", IntValue(int)) ⇒ int
         }
         iv.getOrElse(-1)
     }
 
-    def getType(annotation: Annotation, label: String): Type = { //@DirectCall -> Type
+    private def getType(annotation: Annotation, label: String): Type = { //@DirectCall -> Type
         val cv = annotation.elementValuePairs collectFirst {
             case ElementValuePair(`label`, ClassValue(declaringType)) ⇒ declaringType
         }
         cv.getOrElse(VoidType)
     }
 
-    def getReturnType(annotation: Annotation): Type = { //@DirectCall -> Type
+    private def getReturnType(annotation: Annotation): Type = { //@DirectCall -> Type
         getType(annotation, "returnType")
     }
 
-    def getParameterList(callSite: Annotation): List[Type] = { //@DirectCall -> Seq[FieldType]
+    private def getParameterList(callSite: Annotation): List[Type] = { //@DirectCall -> Seq[FieldType]
         val av = callSite.elementValuePairs collectFirst {
             case ElementValuePair("parameterTypes", ArrayValue(ab)) ⇒
                 ab.toIndexedSeq.map(ev ⇒
@@ -297,7 +312,7 @@ object CGMatcher {
         av.getOrElse(List()).toList
     }
 
-    def getResolvedTargets(annotation: Annotation)(implicit p: SomeProject): List[String] = {
+    private def getResolvedTargets(annotation: Annotation)(implicit p: SomeProject): List[String] = {
         val av = annotation.elementValuePairs collectFirst {
             case ElementValuePair("resolvedTargets", ArrayValue(ab)) ⇒
                 ab.toIndexedSeq.map(_.asInstanceOf[StringValue].value)
@@ -307,7 +322,7 @@ object CGMatcher {
         callTargets
     }
 
-    def getProhibitedTargets(annotation: Annotation)(implicit p: SomeProject): List[String] = {
+    private def getProhibitedTargets(annotation: Annotation)(implicit p: SomeProject): List[String] = {
         val av = annotation.elementValuePairs collectFirst {
             case ElementValuePair("prohibitedTargets", ArrayValue(ab)) ⇒
                 ab.toIndexedSeq.map(_.asInstanceOf[StringValue].value)
@@ -317,7 +332,7 @@ object CGMatcher {
         callTargets
     }
 
-    def checkJVMTypeString(callTargets: List[String])(implicit p: SomeProject): Unit = {
+    private def checkJVMTypeString(callTargets: List[String])(implicit p: SomeProject): Unit = {
         if (!callTargets.forall { ct ⇒
             val re = "L([^;]*);".r
             re findFirstMatchIn ct match {
