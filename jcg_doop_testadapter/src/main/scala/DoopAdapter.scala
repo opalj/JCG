@@ -5,6 +5,7 @@ import java.net.URL
 
 import org.opalj.br.ClassFile
 import org.opalj.br.FieldType
+import org.opalj.br.FieldTypes
 import org.opalj.br.MethodDescriptor
 import org.opalj.br.ObjectType
 import org.opalj.br.ReferenceType
@@ -97,8 +98,9 @@ object DoopAdapter extends JCGTestAdapter {
         assert(tgts.nonEmpty)
         val firstTgt = toMethod(tgts.head)
         val tgtReturnType = ReturnType(firstTgt.returnType)
-        val tgtParamTypes = firstTgt.parameterTypes.map(FieldType.apply)
-        val tgtMD = MethodDescriptor(RefArray.from[FieldType](tgtParamTypes.toArray), tgtReturnType)
+        val tgtParamTypes: FieldTypes =
+            RefArray.from(firstTgt.parameterTypes.map(FieldType.apply).toArray)
+        val tgtMD = MethodDescriptor(tgtParamTypes, tgtReturnType)
         val split = declaredTgt.split("""\.""")
         val declaredType = s"L${split.slice(0, split.size - 1).mkString("/")};"
         val name = split.last.replace("'", "")
@@ -142,10 +144,9 @@ object DoopAdapter extends JCGTestAdapter {
                 case Some(cf) ⇒
                     implicit val classFile: ClassFile = cf
                     val returnType = ReturnType(callerMethod.returnType)
-                    val parameterTypes = callerMethod.parameterTypes.map(FieldType.apply)
-                    val md = MethodDescriptor(
-                        RefArray.from[FieldType](parameterTypes.toArray), returnType
-                    )
+                    val parameterTypes: FieldTypes =
+                        RefArray.from(callerMethod.parameterTypes.map(FieldType.apply).toArray)
+                    val md = MethodDescriptor(parameterTypes, returnType)
 
                     cf.findMethod(callerMethod.name, md) match {
                         case Some(callerOpal) if callerOpal.body.isDefined ⇒
@@ -179,7 +180,7 @@ object DoopAdapter extends JCGTestAdapter {
     }
 
     def extractDoopCG(doopResult: Source): Map[String, Map[(String, Int), Set[String]]] = {
-        val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(s ⇒ mutable.OpenHashMap.empty.withDefault(s ⇒ mutable.Set.empty))
+        val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(_ ⇒ mutable.OpenHashMap.empty.withDefault(_ ⇒ mutable.Set.empty))
 
         val re = """\[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>/([^/]+)/(\d+), \[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r ////([^/]+)/(\d+), \[\d+\\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r
         for (line ← doopResult.getLines()) {
