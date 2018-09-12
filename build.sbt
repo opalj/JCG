@@ -19,23 +19,29 @@ lazy val jcg_annotations = project.settings(
     compileOrder := CompileOrder.Mixed
 )
 
-lazy val jcg_testcases = project.settings(
+lazy val jcg_data_format = project.settings(
     commonSettings,
-    name := "JCG Test Cases",
+    name := "JCG Data Format",
+    aggregate in assembly := false,
     libraryDependencies += "commons-io" % "commons-io" % "2.5",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     libraryDependencies += "io.get-coursier" %% "coursier" % "1.0.3",
-    libraryDependencies += "io.get-coursier" %% "coursier-cache" % "1.0.3",
+    libraryDependencies += "io.get-coursier" %% "coursier-cache" % "1.0.3"
+)
+
+lazy val jcg_testcases = project.settings(
+    commonSettings,
+    name := "JCG Test Cases",
     aggregate in assembly := false,
     compileOrder := CompileOrder.Mixed
-).dependsOn(jcg_annotations)
+).dependsOn(jcg_annotations, jcg_data_format)
 
 lazy val jcg_annotation_matcher = project.settings(
     commonSettings,
     name := "JCG Annotation Matcher",
     libraryDependencies += "de.opal-project" %% "bytecode-representation" % "1.1.0-SNAPSHOT",
     aggregate in assembly := false
-).dependsOn(jcg_annotations, jcg_testcases, jcg_testadapter_commons)
+).dependsOn(jcg_annotations, jcg_data_format, jcg_testadapter_commons)
 
 lazy val jcg_wala_testadapter = project.settings(
     commonSettings,
@@ -47,7 +53,7 @@ lazy val jcg_wala_testadapter = project.settings(
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
-).dependsOn(jcg_annotations, jcg_testcases, jcg_testadapter_commons)
+).dependsOn(jcg_data_format, jcg_testadapter_commons)
 
 lazy val jcg_soot_testadapter = project.settings(
     commonSettings,
@@ -58,7 +64,7 @@ lazy val jcg_soot_testadapter = project.settings(
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
-).dependsOn(jcg_annotations, jcg_testcases, jcg_testadapter_commons)
+).dependsOn(jcg_data_format, jcg_testadapter_commons)
 
 lazy val jcg_opal_testadapter = project.settings(
     commonSettings,
@@ -68,7 +74,7 @@ lazy val jcg_opal_testadapter = project.settings(
     aggregate in assembly := false,
     publishArtifact := false
 ).dependsOn(
-    jcg_testcases,
+    jcg_data_format,
     jcg_annotation_matcher, // TODO
     jcg_testadapter_commons
 )
@@ -87,7 +93,7 @@ lazy val jcg_doop_testadapter = project.settings(
     aggregate in assembly := false,
     publishArtifact := false
 ).dependsOn(
-    jcg_testcases,
+    jcg_data_format,
     jcg_annotation_matcher, // TODO
     jcg_testadapter_commons
 )
@@ -107,8 +113,8 @@ lazy val jcg_evaluation = project.settings(
     libraryDependencies += "de.opal-project" %% "opal-developer-tools" % "1.1.0-SNAPSHOT",
     publishArtifact := false
 ).dependsOn(
-    jcg_annotations,
     jcg_testcases,
+    jcg_data_format,
     jcg_annotation_matcher,
     //    jcg_opal_testadapter,
     jcg_wala_testadapter,
