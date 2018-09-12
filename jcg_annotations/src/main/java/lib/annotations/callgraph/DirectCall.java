@@ -37,11 +37,13 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Describes a method call at a specific call site and states which {@link ResolvedMethod}s
- * the call must be resolved to. Using this annotation implies that the call edges must be
+ * Describes a method call at a specific call site and states which methods
+ * the call must be resolved to.
+ * Using this annotation implies that the call edges must be
  * directly available within the call graph from the specified call site. Therefore, this annoation
  * can be used to specify monomorphic or polymorphic method calls but are not suited to specify
  * indirect call targets, e.g., reflective call targets.
+ * Furthermore, it is possible to exclude certain target methods.
  *
  *
  * @author Florian Kuebler
@@ -60,7 +62,13 @@ public @interface DirectCall {
 
     int line() default -1;
 
+    /**
+     * Must be given in JVM binary notation (e.g. Ljava/lang/Object;)
+     */
     String[] resolvedTargets();
 
+    /**
+     * Must be given in JVM binary notation (e.g. Ljava/lang/Object;)
+     */
     String[] prohibitedTargets() default {};
 }
