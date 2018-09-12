@@ -98,7 +98,7 @@ object DoopAdapter extends JCGTestAdapter {
         val firstTgt = toMethod(tgts.head)
         val tgtReturnType = ReturnType(firstTgt.returnType)
         val tgtParamTypes = firstTgt.parameterTypes.map(FieldType.apply)
-        val tgtMD = MethodDescriptor(new RefArray[FieldType](tgtParamTypes.toArray), tgtReturnType)
+        val tgtMD = MethodDescriptor(RefArray.from[FieldType](tgtParamTypes.toArray), tgtReturnType)
         val split = declaredTgt.split("""\.""")
         val declaredType = s"L${split.slice(0, split.size - 1).mkString("/")};"
         val name = split.last.replace("'", "")
@@ -144,7 +144,7 @@ object DoopAdapter extends JCGTestAdapter {
                     val returnType = ReturnType(callerMethod.returnType)
                     val parameterTypes = callerMethod.parameterTypes.map(FieldType.apply)
                     val md = MethodDescriptor(
-                        new RefArray[FieldType](parameterTypes.toArray), returnType
+                        RefArray.from[FieldType](parameterTypes.toArray), returnType
                     )
 
                     cf.findMethod(callerMethod.name, md) match {
