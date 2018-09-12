@@ -106,7 +106,11 @@ object TestCaseExtractor {
                 }
 
                 val projectSpec = ProjectSpecification(
-                    name = projectName, target = new File(bin, outPathCompiler.getPath).getCanonicalPath, main = mainOpt, java = 8, cp = None
+                    name = projectName,
+                    target = new File(bin, outPathCompiler.getPath).getCanonicalPath,
+                    main = mainOpt,
+                    java = 8,
+                    cp = None
                 )
 
                 val projectSpecJson: JsValue = Json.toJson(projectSpec)
