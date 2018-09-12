@@ -16,6 +16,8 @@ import scalaz.\/
 
 /**
  * Specifies a target project.
+ *
+ * @author Florian Kuebler
  */
 case class ProjectSpecification(
         name:               String,
@@ -24,6 +26,13 @@ case class ProjectSpecification(
         private val target: String,
         private val cp:     Option[Array[ClassPathEntry]]
 ) {
+    /**
+     * For the specified [[ClassPathEntry]]s it computes all concrete class path entries.
+     *
+     * @param parent
+     *               In case any locations are specified as relative path, `parent` is used as
+     *               root directory.
+     */
     def allClassPathEntryFiles(parent: File): Array[File] = {
         cp.getOrElse(Array.empty).flatMap(_.getLocations.map { location ⇒
             if (location.isAbsolute)
@@ -33,6 +42,13 @@ case class ProjectSpecification(
         })
     }
 
+    /**
+     * Retrieves the file of the specified target.
+     *
+     * @param parent In case the location of the target is specified as relative path, `parent`
+     *               is used as root directory to get the correct file.
+     * @return
+     */
     def target(parent: File): File = {
         val tgtFile = new File(target)
         if (tgtFile.isAbsolute)
@@ -47,6 +63,15 @@ object ProjectSpecification {
     implicit val writer: OWrites[ProjectSpecification] = Json.writes[ProjectSpecification]
 }
 
+/**
+ * A single class path entry can contain multiple *real* class path entry files (locations).
+ * As an example a [[MavenClassPathEntry]] may contain consist out of the specified project and its
+ * dependencies.
+ *
+ * @note currently only [[LocalClassPathEntry]] and [[MavenClassPathEntry]] as supported.
+ *       Adding other kinds of entries must result in changes of the reads/writes of the companion
+ *       object.
+ */
 sealed trait ClassPathEntry {
     def getLocations: Array[File]
 }
@@ -61,6 +86,9 @@ object ClassPathEntry {
     }
 }
 
+/**
+ * Specifies an artifact (including its dependencies) in the maven central repository.
+ */
 case class MavenClassPathEntry(org: String, id: String, version: String) extends ClassPathEntry {
     override def getLocations: Array[File] = {
         val start = Resolution(Set(Dependency(Module(org, id), version)))
