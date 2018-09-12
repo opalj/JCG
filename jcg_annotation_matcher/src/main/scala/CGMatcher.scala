@@ -39,12 +39,19 @@ object CGMatcher {
     private val indirectCallsAnnotationType =
         ObjectType(classOf[IndirectCalls].getName.replace(".", "/"))
 
+    /**
+     * Computes whether computed call graph (represented as a json file of [[ReachableMethods]])
+     * is sound/unsound/imprecise with regards to the annotations in the specified target project.
+     *
+     * @param parent in case any specified location is a relative path, the `parent` will be used
+     *               as root.
+     */
     def matchCallSites(
-        projectSpec:  ProjectSpecification,
-        JRELocations: Map[Int, Array[File]],
-        parent:       File,
-        jsonPath:     String,
-        verbose:      Boolean               = false
+        projectSpec:           ProjectSpecification,
+        JRELocations:          Map[Int, Array[File]],
+        parent:                File,
+        computedCallGraphPath: String,
+        verbose:               Boolean               = false
     ): Assessment = {
         if (!verbose)
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
@@ -54,9 +61,11 @@ object CGMatcher {
             Array.empty[File]
         )
 
-        val json = Json.parse(new FileInputStream(new File(jsonPath)))
+        val json = Json.parse(new FileInputStream(new File(computedCallGraphPath)))
         val computedReachableMethods =
-            json.validate[ReachableMethods].getOrElse(throw new RuntimeException("unable to parse json")).toMap
+            json.validate[ReachableMethods].getOrElse(
+                throw new RuntimeException("unable to parse json")
+            ).toMap
         for {
             clazz ← p.allProjectClassFiles
             method ← clazz.methodsWithBody
