@@ -15,15 +15,13 @@ lazy val commonSettings = Seq(
 lazy val jcg_annotations = project.settings(
     commonSettings,
     name := "JCG Annotations",
-    aggregate in assembly := false,
-    compileOrder := CompileOrder.Mixed
+    aggregate in assembly := false
 )
 
 lazy val jcg_data_format = project.settings(
     commonSettings,
     name := "JCG Data Format",
     aggregate in assembly := false,
-    libraryDependencies += "commons-io" % "commons-io" % "2.5",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     libraryDependencies += "io.get-coursier" %% "coursier" % "1.0.3",
     libraryDependencies += "io.get-coursier" %% "coursier-cache" % "1.0.3"
@@ -32,6 +30,7 @@ lazy val jcg_data_format = project.settings(
 lazy val jcg_testcases = project.settings(
     commonSettings,
     name := "JCG Test Cases",
+    libraryDependencies += "commons-io" % "commons-io" % "2.5",
     aggregate in assembly := false,
     compileOrder := CompileOrder.Mixed
 ).dependsOn(jcg_annotations, jcg_data_format)
