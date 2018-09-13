@@ -5,35 +5,40 @@ import java.net.URL
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import org.opalj.br.DeclaredMethod
 import org.opalj.br.Code
-import org.opalj.br.FieldType
-import org.opalj.br.analyses.Project
-import org.opalj.br.analyses.DeclaredMethodsKey
+import org.opalj.br.DeclaredMethod
 import org.opalj.br.analyses.DeclaredMethods
+import org.opalj.br.analyses.DeclaredMethodsKey
+import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.Project.JavaClassFileReader
 import org.opalj.br.instructions.MethodInvocationInstruction
-import org.opalj.fpcf.PropertyStoreKey
 import org.opalj.fpcf.FPCFAnalysesManagerKey
 import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
+import org.opalj.fpcf.PropertyStoreKey
+import org.opalj.fpcf.analyses.cg.EagerFinalizerAnalysisScheduler
+import org.opalj.fpcf.analyses.cg.EagerLoadedClassesAnalysis
 import org.opalj.fpcf.analyses.cg.EagerRTACallGraphAnalysisScheduler
+import org.opalj.fpcf.analyses.cg.EagerReflectionRelatedCallsAnalysis
 import org.opalj.fpcf.analyses.cg.EagerSerializationRelatedCallsAnalysis
 import org.opalj.fpcf.analyses.cg.EagerThreadRelatedCallsAnalysis
-import org.opalj.fpcf.analyses.cg.EagerLoadedClassesAnalysis
-import org.opalj.fpcf.analyses.cg.EagerFinalizerAnalysisScheduler
 import org.opalj.fpcf.analyses.cg.LazyCalleesAnalysis
-import org.opalj.fpcf.analyses.cg.EagerReflectionRelatedCallsAnalysis
-import org.opalj.fpcf.cg.properties.StandardInvokeCallees
 import org.opalj.fpcf.cg.properties.Callees
-import org.opalj.fpcf.cg.properties.SerializationRelatedCallees
 import org.opalj.fpcf.cg.properties.NoCallees
 import org.opalj.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
 import org.opalj.fpcf.cg.properties.ReflectionRelatedCallees
+import org.opalj.fpcf.cg.properties.SerializationRelatedCallees
+import org.opalj.fpcf.cg.properties.StandardInvokeCallees
 import play.api.libs.json.Json
 
 import scala.collection.JavaConverters._
 
+/**
+ * A [[JCGTestAdapter]] for the FPCF based call graph analyses of OPAL.
+ *
+ * @author Dominik Helm
+ * @author Florian Kuebler
+ */
 object OpalJCGAdatper extends JCGTestAdapter {
 
     def possibleAlgorithms(): Array[String] = Array[String]("RTA")
@@ -55,6 +60,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
             ConfigValueFactory.fromAnyRef(true)
         )
 
+        // configure the initial entry points
         implicit val config: Config =
             if (mainClass eq null) {
                 baseConfig.withValue(
@@ -73,6 +79,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     )
             }
 
+        // gather the class files to be loaded
         val cfReader = JavaClassFileReader(theConfig = config)
         val targetClassFiles = cfReader.ClassFiles(new File(target)).toIterator
         val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_))).toIterator
@@ -89,6 +96,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         implicit val ps: PropertyStore = project.get(PropertyStoreKey)
 
+        // run RTA call graph, along with extra analyses e.g. for reflection
         val manager = project.get(FPCFAnalysesManagerKey)
         manager.runAll(
             EagerRTACallGraphAnalysisScheduler,
@@ -106,6 +114,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
             )
         )
 
+        // start the computation of the call graph
         implicit val declaredMethods: DeclaredMethods = project.get(DeclaredMethodsKey)
         for (dm ← declaredMethods.declaredMethods) {
             ps.force(dm, Callees.key)
@@ -118,8 +127,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
         var reachableMethods = Set.empty[ReachableMethod]
 
         for (
-            dm ← declaredMethods.declaredMethods //TODO THIS IS BROKEN FIX IT
-            if (!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
+            dm ← declaredMethods.declaredMethods if (!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
                 (dm.hasSingleDefinedMethod && dm.definedMethod.classFile.thisType == dm.declaringClassType)
         ) {
             val m = createMethodObject(dm)
@@ -136,8 +144,6 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     reachableMethods += ReachableMethod(m, callSites)
             }
         }
-
-        println(reachableMethods.size)
 
         ps.shutdown()
 

@@ -15,19 +15,20 @@ import org.opalj.br.analyses.SomeProject
 import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.collection.immutable.RefArray
-import org.opalj.log.LogContext
-import org.opalj.log.LogMessage
-import org.opalj.log.OPALLogger
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 
 import scala.collection.mutable
 import scala.io.Source
 
-class DevNullLogger extends OPALLogger {
-    override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
-}
-
+/**
+ * This is an experimental stage [[JCGTestAdapter]] as it is not possible to run Doop without
+ * installing it (and a data-log engine).
+ * Therefore, this object has the capability of converting the output of the CallGraphEdge table
+ * into the [[ReachableMethods]] data-format.
+ *
+ * @author Florian Kuebler
+ */
 object DoopAdapter extends JCGTestAdapter {
 
     override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
@@ -71,7 +72,7 @@ object DoopAdapter extends JCGTestAdapter {
         outFile
     }
 
-    def resolveBridgeMethod(
+    private def resolveBridgeMethod(
         bridgeMethod: org.opalj.br.Method
     )(implicit classFile: ClassFile, p: SomeProject): org.opalj.br.Method = {
         val methods = classFile.findMethod(bridgeMethod.name).filter { m ⇒
@@ -86,7 +87,7 @@ object DoopAdapter extends JCGTestAdapter {
         methods.head
     }
 
-    def computeCallSite(
+    private def computeCallSite(
         declaredTgt:  String,
         number:       Int,
         tgts:         Set[String],
@@ -128,7 +129,7 @@ object DoopAdapter extends JCGTestAdapter {
         }
     }
 
-    def convertToReachableMethods(
+    private def convertToReachableMethods(
         callGraph: Map[String, Map[(String, Int), Set[String]]]
     )(implicit project: Project[URL]): ReachableMethods = {
         var reachableMethods = Set.empty[ReachableMethod]
@@ -179,7 +180,7 @@ object DoopAdapter extends JCGTestAdapter {
         ReachableMethods(reachableMethods)
     }
 
-    def extractDoopCG(doopResult: Source): Map[String, Map[(String, Int), Set[String]]] = {
+    private def extractDoopCG(doopResult: Source): Map[String, Map[(String, Int), Set[String]]] = {
         val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(_ ⇒ mutable.OpenHashMap.empty.withDefault(_ ⇒ mutable.Set.empty))
 
         val re = """\[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>/([^/]+)/(\d+), \[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r ////([^/]+)/(\d+), \[\d+\\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r
