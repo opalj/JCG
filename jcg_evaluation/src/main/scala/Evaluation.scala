@@ -15,25 +15,26 @@ import scala.io.Source
 
 object Evaluation {
 
-    var debug = true
-    var runHermes = false
-    var projectSpecificEvaluation = false
-    var runAnalyses = true
-    var isAnnotatedProject = true
+    private var debug = true
+    private var runHermes = false
+    private var projectSpecificEvaluation = false
+    private var runAnalyses = true
+    private var isAnnotatedProject = true
 
-    var RESULTS_DIR_PATH = "evaluation/"
-    val JRE_LOCATIONS_FILE = "jre.conf"
-    val EVALUATION_RESULT_FILE = "evaluation-result.tsv"
+    private var RESULTS_DIR_PATH = "evaluation/"
+    private var INPUT_DIR = ""
+    private val JRE_LOCATIONS_FILE = "jre.conf"
+    private val EVALUATION_RESULT_FILE = "evaluation-result.tsv"
 
-    val EVALUATION_ADAPTERS = List(OpalJCGAdatper) //SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
+    private var PROJECT_FILTER = ""
+
+    private val EVALUATION_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
 
     def main(args: Array[String]): Unit = {
-        var input = ""
-        var jarFilter = ""
         args.sliding(2, 2).toList.collect {
-            case Array("--input", i: String)                ⇒ input = i
+            case Array("--input", i: String)                ⇒ INPUT_DIR = i
             case Array("--output-dir", t: String)           ⇒ RESULTS_DIR_PATH = t
-            case Array("--filter", name: String)            ⇒ jarFilter = name
+            case Array("--filter", name: String)            ⇒ PROJECT_FILTER = name
             case Array("--debug", value: String)            ⇒ debug = value.toBoolean
             case Array("--hermes", value: String)           ⇒ runHermes = value.toBoolean
             case Array("--analyze", value: String)          ⇒ runAnalyses = value.toBoolean
@@ -47,8 +48,8 @@ object Evaluation {
         if (isAnnotatedProject)
             assert(runAnalyses, "`--analyze` must be set to true on `--testcase true`")
 
-        assert(input.nonEmpty, "no input directory specified")
-        val projectsDir = new File(input)
+        assert(INPUT_DIR.nonEmpty, "no input directory specified")
+        val projectsDir = new File(INPUT_DIR)
 
         assert(projectsDir.exists(), s"${projectsDir.getPath} does not exists")
         assert(projectsDir.isDirectory, s"${projectsDir.getPath} is not a directory")
@@ -69,35 +70,10 @@ object Evaluation {
         if (runHermes) {
             performHermesRun(projectsDir, jreLocations)
         }
-        val locations: Map[String, Map[String, Set[Method]]] =
-            if (projectSpecificEvaluation) {
-                if (debug)
-                    println("create locations mapping")
-                (for {
-                    projectLocation ← resultsDir.listFiles(_.getName.endsWith(".tsv"))
-                    line ← Source.fromFile(projectLocation).getLines().drop(1)
-                    lineSplit = line.split("\t", -1)
-                    if lineSplit.size == 9
-                    Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = lineSplit
-                    if methodName.nonEmpty && mdString.nonEmpty
-                } yield {
-                    val projectName = projectId.replace("\"", "")
-                    val featureName = featureId.replace("\"", "")
-                    val className = classString.replace("\"", "")
-                    val md = MethodDescriptor(mdString.replace("\"", ""))
-                    val params = md.parameterTypes.map[String](_.toJVMTypeName).toList
-                    val returnType = md.returnType.toJVMTypeName
-                    (projectName, featureName, Method(methodName, className, returnType, params))
-                }).groupBy(_._1).map {
-                    case (pId, group1) ⇒ pId → group1.map { case (_, f, m) ⇒ f → m }.groupBy(_._1).map {
-                        case (fId, group2) ⇒ fId → group2.map(_._2).toSet
-                    }
-                }
-            } else
-                Map.empty
+        val locations: Map[String, Map[String, Set[Method]]] = createLocationsMapping(resultsDir)
 
         if (runAnalyses) {
-            runAnalyses(projectsDir, resultsDir, jarFilter, ow, jreLocations, locations)
+            runAnalyses(projectsDir, resultsDir, ow, jreLocations, locations)
         }
 
         ow.flush()
@@ -139,15 +115,46 @@ object Evaluation {
         hermesFile.delete()
     }
 
+    private def createLocationsMapping(resultsDir: File): Map[String, Map[String, Set[Method]]] = {
+        val locations: Map[String, Map[String, Set[Method]]] =
+            if (projectSpecificEvaluation) {
+                println("create locations mapping")
+                (for {
+                    projectLocation ← resultsDir.listFiles(_.getName.endsWith(".tsv"))
+                    line ← Source.fromFile(projectLocation).getLines().drop(1)
+                    lineSplit = line.split("\t", -1)
+                    if lineSplit.size == 9
+                    Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = lineSplit
+                    if methodName.nonEmpty && mdString.nonEmpty
+                } yield {
+                    val projectName = projectId.replace("\"", "")
+                    val featureName = featureId.replace("\"", "")
+                    val className = classString.replace("\"", "")
+                    val md = MethodDescriptor(mdString.replace("\"", ""))
+                    val params = md.parameterTypes.map[String](_.toJVMTypeName).toList
+                    val returnType = md.returnType.toJVMTypeName
+                    (projectName, featureName, Method(methodName, className, returnType, params))
+                }).groupBy(_._1).map {
+                    case (pId, group1) ⇒ pId → group1.map { case (_, f, m) ⇒ f → m }.groupBy(_._1).map {
+                        case (fId, group2) ⇒ fId → group2.map(_._2).toSet
+                    }
+                }
+            } else
+                Map.empty
+        locations
+    }
+
     private def runAnalyses(
-        projectsDir:   File,
-        resultsDir:    File,
-        projectFilter: String,
-        ow:            BufferedWriter,
-        jreLocations:  Map[Int, Array[File]],
-        locationsMap:  Map[String, Map[String, Set[Method]]]
+        projectsDir:  File,
+        resultsDir:   File,
+        ow:           BufferedWriter,
+        jreLocations: Map[Int, Array[File]],
+        locationsMap: Map[String, Map[String, Set[Method]]]
     ): Unit = {
-        val projectSpecFiles = projectsDir.listFiles((_, name) ⇒ name.endsWith(".conf")).filter(_.getName.startsWith(projectFilter)).sorted
+        val projectSpecFiles = projectsDir.listFiles { (_, name) ⇒
+            name.endsWith(".conf") && name.startsWith(PROJECT_FILTER)
+        }.sorted
+
         printHeader(ow, projectSpecFiles)
 
         for {
@@ -168,7 +175,9 @@ object Evaluation {
                 val outDir = new File(resultsDir, s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo")
                 outDir.mkdirs()
 
-                val jsFile = new File(outDir, "cg.json")
+                val cgFile = new File(outDir, "cg.json")
+                assert(!cgFile.exists(), s"$cgFile already exists")
+
                 try {
                     val cp = projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
 
@@ -179,40 +188,21 @@ object Evaluation {
                         cp,
                         JRE_LOCATIONS_FILE,
                         projectSpec.java,
-                        jsFile.getPath
+                        cgFile.getPath
                     )
+                    assert(cgFile.exists(), "the adapter failed to write the call graph")
 
                     System.gc()
 
-                    val seconds = elapsed / 1000000000d
-                    val pw = new PrintWriter(new File(outDir, "timings.txt"))
-                    pw.write(s"$seconds sec.")
-                    pw.close()
-                    println(s"analysis took $seconds sec.")
+                    reportTiming(outDir, elapsed)
 
                     if (isAnnotatedProject) {
-                        val result = CGMatcher.matchCallSites(
-                            projectSpec,
-                            jreLocations,
-                            projectsDir,
-                            jsFile,
-                            debug
-                        )
+                        val result = CGMatcher.matchCallSites(projectSpec, jreLocations, projectsDir, cgFile, debug)
                         ow.write(s"\t${result.shortNotation}")
                     }
 
-                    if (projectSpecificEvaluation && jsFile.exists()) {
-                        val pw = new PrintWriter(new File(outDir, "pse.tsv"))
-                        val json = Json.parse(new FileInputStream(jsFile))
-                        val reachableMethods = json.validate[ReachableMethods].get.toMap
-                        for {
-                            (fId, locations) ← locationsMap(projectSpec.name)
-                            location ← locations
-                            if reachableMethods.contains(location) // we are unsound
-                        } {
-                            pw.println(s"${projectSpec.name}\t$fId\t$location)")
-                        }
-                        pw.close()
+                    if (projectSpecificEvaluation) {
+                        performProjectSpecificEvaluation(locationsMap, projectSpec, outDir, cgFile)
                     }
 
                 } catch {
@@ -228,6 +218,33 @@ object Evaluation {
             }
             ow.newLine()
         }
+    }
+
+    private def reportTiming(outDir: File, elapsed: Long): Unit = {
+        val seconds = elapsed / 1000000000d
+        val pw = new PrintWriter(new File(outDir, "timings.txt"))
+        pw.write(s"$seconds sec.")
+        pw.close()
+        println(s"analysis took $seconds sec.")
+    }
+
+    private def performProjectSpecificEvaluation(
+        locationsMap: Map[String, Map[String, Set[Method]]],
+        projectSpec:  ProjectSpecification,
+        outDir:       File,
+        jsFile:       File
+    ): Unit = {
+        val pw = new PrintWriter(new File(outDir, "pse.tsv"))
+        val json = Json.parse(new FileInputStream(jsFile))
+        val reachableMethods = json.validate[ReachableMethods].get.toMap
+        for {
+            (fId, locations) ← locationsMap(projectSpec.name)
+            location ← locations
+            if reachableMethods.contains(location)
+        } {
+            pw.println(s"${projectSpec.name}\t$fId\t$location)")
+        }
+        pw.close()
     }
 
     private def printHeader(ow: BufferedWriter, jars: Array[File]): Unit = {
