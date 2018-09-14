@@ -28,7 +28,7 @@ object Evaluation {
 
     private var PROJECT_FILTER = ""
 
-    private val EVALUATION_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
+    private var EVALUATION_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
 
     def main(args: Array[String]): Unit = {
         args.sliding(2, 2).toList.collect {
@@ -40,6 +40,9 @@ object Evaluation {
             case Array("--analyze", value: String)          ⇒ runAnalyses = value.toBoolean
             case Array("--project-specific", value: String) ⇒ projectSpecificEvaluation = value.toBoolean
             case Array("--testcase", value: String)         ⇒ isAnnotatedProject = value.toBoolean
+            case Array("--adapter", name: String) ⇒
+                EVALUATION_ADAPTERS = EVALUATION_ADAPTERS.filter(_.frameworkName() == name)
+                assert(EVALUATION_ADAPTERS.nonEmpty, s"$name is no known test adapter")
         }
 
         if (projectSpecificEvaluation)
