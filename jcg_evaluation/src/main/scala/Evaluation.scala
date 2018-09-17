@@ -51,14 +51,14 @@ object Evaluation {
 
     private def parseArguments(args: Array[String]): Unit = {
         args.sliding(2, 2).toList.collect {
-            case Array("--input", i: String) ⇒ INPUT_DIR = i
-            case Array("--output-dir", t: String) ⇒ RESULTS_DIR_PATH = t
-            case Array("--filter", name: String) ⇒ PROJECT_FILTER = name
-            case Array("--debug", value: String) ⇒ debug = value.toBoolean
-            case Array("--hermes", value: String) ⇒ runHermes = value.toBoolean
-            case Array("--analyze", value: String) ⇒ runAnalyses = value.toBoolean
+            case Array("--input", i: String)                ⇒ INPUT_DIR = i
+            case Array("--output-dir", t: String)           ⇒ RESULTS_DIR_PATH = t
+            case Array("--filter", name: String)            ⇒ PROJECT_FILTER = name
+            case Array("--debug", value: String)            ⇒ debug = value.toBoolean
+            case Array("--hermes", value: String)           ⇒ runHermes = value.toBoolean
+            case Array("--analyze", value: String)          ⇒ runAnalyses = value.toBoolean
             case Array("--project-specific", value: String) ⇒ projectSpecificEvaluation = value.toBoolean
-            case Array("--testcase", value: String) ⇒ isAnnotatedProject = value.toBoolean
+            case Array("--testcase", value: String)         ⇒ isAnnotatedProject = value.toBoolean
             case Array("--adapter", name: String) ⇒
                 EVALUATION_ADAPTERS = EVALUATION_ADAPTERS.filter(_.frameworkName() == name)
                 assert(EVALUATION_ADAPTERS.nonEmpty, s"$name is no known test adapter")
@@ -166,36 +166,36 @@ object Evaluation {
             name.endsWith(".conf") && name.startsWith(PROJECT_FILTER)
         }.sorted
 
-        val outputTarget = getOutputTarget(resultsDir)
-        val ow = new BufferedWriter(outputTarget)
+        val ow = new BufferedWriter(getOutputTarget(resultsDir))
 
-        printHeader(ow, projectSpecFiles)
+        if (isAnnotatedProject)
+            printHeader(ow, projectSpecFiles)
 
         for {
             adapter ← EVALUATION_ADAPTERS
             cgAlgo ← adapter.possibleAlgorithms()
         } {
             ow.write(s"${adapter.frameworkName()} $cgAlgo")
-            for (projectSpecFile ← projectSpecFiles) {
+            for (psf ← projectSpecFiles) {
 
-                val json = Json.parse(new FileInputStream(projectSpecFile))
-
-                val projectSpec = json.validate[ProjectSpecification].getOrElse {
-                    throw new IllegalArgumentException("invalid project.conf")
-                }
+                val projectSpec =
+                    Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
                 println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
 
-                val outDir = new File(resultsDir, s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo")
+                val outDir = new File(
+                    resultsDir,
+                    s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo"
+                )
                 outDir.mkdirs()
 
                 val cgFile = new File(outDir, "cg.json")
                 assert(!cgFile.exists(), s"$cgFile already exists")
 
-                try {
-                    val cp = projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
+                val cp = projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
 
-                    val elapsed = adapter.serializeCG(
+                val elapsed = try {
+                    adapter.serializeCG(
                         cgAlgo,
                         projectSpec.target(projectsDir).getCanonicalPath,
                         projectSpec.main.orNull,
@@ -204,21 +204,6 @@ object Evaluation {
                         projectSpec.java,
                         cgFile.getPath
                     )
-                    assert(cgFile.exists(), "the adapter failed to write the call graph")
-
-                    System.gc()
-
-                    reportTiming(outDir, elapsed)
-
-                    if (isAnnotatedProject) {
-                        val result = CGMatcher.matchCallSites(projectSpec, jreLocations, projectsDir, cgFile, debug)
-                        ow.write(s"\t${result.shortNotation}")
-                    }
-
-                    if (projectSpecificEvaluation) {
-                        performProjectSpecificEvaluation(locationsMap, projectSpec, outDir, cgFile)
-                    }
-
                 } catch {
                     case e: Throwable ⇒
                         println(s"exception in project ${projectSpec.name}")
@@ -227,6 +212,22 @@ object Evaluation {
                         }
                         if (isAnnotatedProject)
                             ow.write(s"\tE")
+                        -1
+                }
+
+                assert(cgFile.exists(), "the adapter failed to write the call graph")
+
+                System.gc()
+
+                reportTiming(outDir, elapsed)
+
+                if (isAnnotatedProject) {
+                    val result = CGMatcher.matchCallSites(projectSpec, jreLocations, projectsDir, cgFile, debug)
+                    ow.write(s"\t${result.shortNotation}")
+                }
+
+                if (projectSpecificEvaluation) {
+                    performProjectSpecificEvaluation(locationsMap, projectSpec, outDir, cgFile)
                 }
 
             }
