@@ -51,7 +51,14 @@ public @interface IndirectCall {
 
     int line() default -1;
 
+    /**
+     * Must be given in JVM binary notation (e.g. Ljava/lang/Object;)
+     */
     String[] resolvedTargets() default {};
+
+    /**
+     * Must be given in JVM binary notation (e.g. Ljava/lang/Object;)
+     */
     String[] prohibitedTargets() default {};
 
     Class<?> returnType() default Void.class;
