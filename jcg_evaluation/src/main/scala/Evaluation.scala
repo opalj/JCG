@@ -31,15 +31,34 @@ object Evaluation {
     private var EVALUATION_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
 
     def main(args: Array[String]): Unit = {
+        parseArguments(args)
+
+        val projectsDir = getProjectsDir
+
+        val jreLocations = getJRELocations
+
+        if (runHermes) {
+            performHermesRun(projectsDir, jreLocations)
+        }
+
+        if (runAnalyses) {
+            val resultsDir = new File(RESULTS_DIR_PATH)
+            resultsDir.mkdirs()
+            val locations: Map[String, Map[String, Set[Method]]] = createLocationsMapping(resultsDir)
+            runAnalyses(projectsDir, resultsDir, jreLocations, locations)
+        }
+    }
+
+    private def parseArguments(args: Array[String]): Unit = {
         args.sliding(2, 2).toList.collect {
-            case Array("--input", i: String)                ⇒ INPUT_DIR = i
-            case Array("--output-dir", t: String)           ⇒ RESULTS_DIR_PATH = t
-            case Array("--filter", name: String)            ⇒ PROJECT_FILTER = name
-            case Array("--debug", value: String)            ⇒ debug = value.toBoolean
-            case Array("--hermes", value: String)           ⇒ runHermes = value.toBoolean
-            case Array("--analyze", value: String)          ⇒ runAnalyses = value.toBoolean
+            case Array("--input", i: String) ⇒ INPUT_DIR = i
+            case Array("--output-dir", t: String) ⇒ RESULTS_DIR_PATH = t
+            case Array("--filter", name: String) ⇒ PROJECT_FILTER = name
+            case Array("--debug", value: String) ⇒ debug = value.toBoolean
+            case Array("--hermes", value: String) ⇒ runHermes = value.toBoolean
+            case Array("--analyze", value: String) ⇒ runAnalyses = value.toBoolean
             case Array("--project-specific", value: String) ⇒ projectSpecificEvaluation = value.toBoolean
-            case Array("--testcase", value: String)         ⇒ isAnnotatedProject = value.toBoolean
+            case Array("--testcase", value: String) ⇒ isAnnotatedProject = value.toBoolean
             case Array("--adapter", name: String) ⇒
                 EVALUATION_ADAPTERS = EVALUATION_ADAPTERS.filter(_.frameworkName() == name)
                 assert(EVALUATION_ADAPTERS.nonEmpty, s"$name is no known test adapter")
@@ -52,6 +71,9 @@ object Evaluation {
             assert(runAnalyses, "`--analyze` must be set to true on `--testcase true`")
 
         assert(INPUT_DIR.nonEmpty, "no input directory specified")
+    }
+
+    private def getProjectsDir: File = {
         val projectsDir = new File(INPUT_DIR)
 
         assert(projectsDir.exists(), s"${projectsDir.getPath} does not exists")
@@ -60,27 +82,14 @@ object Evaluation {
             projectsDir.listFiles(_.getName.endsWith(".conf")).nonEmpty,
             s"${projectsDir.getPath} does not contain *.conf files"
         )
-        val resultsDir = new File(RESULTS_DIR_PATH)
-        resultsDir.mkdirs()
+        projectsDir
+    }
 
+    private def getJRELocations: Map[Int, Array[File]] = {
         val jreLocationsFile = new File(JRE_LOCATIONS_FILE)
         assert(jreLocationsFile.exists(), "please provide a jre.conf file")
         val jreLocations = JRELocation.mapping(new File(JRE_LOCATIONS_FILE))
-
-        val outputTarget = getOutputTarget(resultsDir)
-        val ow = new BufferedWriter(outputTarget)
-
-        if (runHermes) {
-            performHermesRun(projectsDir, jreLocations)
-        }
-        val locations: Map[String, Map[String, Set[Method]]] = createLocationsMapping(resultsDir)
-
-        if (runAnalyses) {
-            runAnalyses(projectsDir, resultsDir, ow, jreLocations, locations)
-        }
-
-        ow.flush()
-        ow.close()
+        jreLocations
     }
 
     private def performHermesRun(projectsDir: File, jreLocations: Map[Int, Array[File]]): Unit = {
@@ -150,13 +159,15 @@ object Evaluation {
     private def runAnalyses(
         projectsDir:  File,
         resultsDir:   File,
-        ow:           BufferedWriter,
         jreLocations: Map[Int, Array[File]],
         locationsMap: Map[String, Map[String, Set[Method]]]
     ): Unit = {
         val projectSpecFiles = projectsDir.listFiles { (_, name) ⇒
             name.endsWith(".conf") && name.startsWith(PROJECT_FILTER)
         }.sorted
+
+        val outputTarget = getOutputTarget(resultsDir)
+        val ow = new BufferedWriter(outputTarget)
 
         printHeader(ow, projectSpecFiles)
 
@@ -221,6 +232,9 @@ object Evaluation {
             }
             ow.newLine()
         }
+
+        ow.flush()
+        ow.close()
     }
 
     private def reportTiming(outDir: File, elapsed: Long): Unit = {
