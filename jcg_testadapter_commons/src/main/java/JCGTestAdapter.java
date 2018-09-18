@@ -18,8 +18,7 @@ public interface JCGTestAdapter {
             String target,
             String mainClass,
             String[] classPath,
-            String jreLocations,
-            int jreVersion,
+            String JREPath,
             String outputFile) throws Exception;
 
     String[] possibleAlgorithms();

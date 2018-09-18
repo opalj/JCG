@@ -27,13 +27,12 @@ object SootJCGAdapter extends JCGTestAdapter {
     override def frameworkName(): String = "Soot"
 
     override def serializeCG(
-        algorithm:    String,
-        target:       String,
-        mainClass:    String,
-        classPath:    Array[String],
-        jreLocations: String,
-        jreVersion:   Int,
-        outputFile:   String
+        algorithm:  String,
+        target:     String,
+        mainClass:  String,
+        classPath:  Array[String],
+        JREPath:    String,
+        outputFile: String
     ): Long = {
 
         val o = G.v().soot_options_Options()
@@ -43,8 +42,10 @@ object SootJCGAdapter extends JCGTestAdapter {
         o.set_include_all(true)
 
         o.set_process_dir(List(target).asJava)
-        val jreJars = JRELocation.mapping(new File(jreLocations))(jreVersion)
+
+        val jreJars = JRELocation.getAllJREJars(JREPath).map(_.getCanonicalPath)
         o.set_soot_classpath((classPath ++ jreJars).mkString(File.pathSeparator))
+
         o.set_output_format(Options.output_format_none)
 
         o.setPhaseOption("jb", "use-original-names:true")

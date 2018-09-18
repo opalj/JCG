@@ -43,14 +43,12 @@ object JRELocation {
 
     /**
      * From the give JRE locations specification file, this method creates a mapping from java
-     * version to all .jar and .jmod files corresponding to the JRE with that version.
+     * version the JRE root directory.
      */
-    def mapping(jreLocationsFile: File): Map[Int, Array[File]] = {
+    def mapping(jreLocationsFile: File): Map[Int, String] = {
         Json.parse(new FileInputStream(jreLocationsFile)).validate[Array[JRELocation]] match {
             case JsSuccess(location, _) ⇒
-                location.map(
-                    jreLocation ⇒ jreLocation.version → getAllJREJars(new File(jreLocation.path))
-                ).toMap
+                location.map(jreLocation ⇒ jreLocation.version → jreLocation.path).toMap
             case _ ⇒
                 throw new IllegalArgumentException("invalid jre location specification")
         }
@@ -59,11 +57,12 @@ object JRELocation {
     /**
      * Returns all .jar and .jmod files in the given directory and all transitive subdirectories.
      */
-    private[this] def getAllJREJars(jreDir: File): Array[File] = {
+    def getAllJREJars(JREPath: String): Array[File] = {
+        val jreDir = new File(JREPath)
         val jars = jreDir.listFiles { file ⇒
             file.getName.endsWith(".jar") | file.getName.endsWith(".jmod")
         }
-        val jarsInSubDirs = jreDir.listFiles(_.isDirectory).flatMap(getAllJREJars)
+        val jarsInSubDirs = jreDir.listFiles(_.isDirectory).flatMap(f ⇒ getAllJREJars(f.getPath))
         jars ++ jarsInSubDirs
     }
 }

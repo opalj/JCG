@@ -48,16 +48,17 @@ object CGMatcher {
      */
     def matchCallSites(
         projectSpec:         ProjectSpecification,
-        JRELocations:        Map[Int, Array[File]],
+        JREPath:             String,
         parent:              File,
         serializedCallGraph: File,
-        verbose:             Boolean               = false
+        verbose:             Boolean              = false
     ): Assessment = {
         if (!verbose)
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
+        val jreFiles = JRELocation.getAllJREJars(JREPath)
         implicit val p: SomeProject = Project(
-            Array(projectSpec.target(parent)) ++ projectSpec.allClassPathEntryFiles(parent) ++ JRELocations(projectSpec.java),
+            Array(projectSpec.target(parent)) ++ projectSpec.allClassPathEntryFiles(parent) ++ jreFiles,
             Array.empty[File]
         )
 
@@ -176,9 +177,9 @@ object CGMatcher {
     }
 
     /**
-      * Checks whether the annotated indirect calls are present in the computed call graph and
-      * whether the prohibit call targets are not present in the computed call graph.
-      */
+     * Checks whether the annotated indirect calls are present in the computed call graph and
+     * whether the prohibit call targets are not present in the computed call graph.
+     */
     private def handleIndirectCallAnnotations(
         reachableMethods:        Map[Method, Set[CallSite]],
         source:                  br.Method,
@@ -281,8 +282,8 @@ object CGMatcher {
     }
 
     /**
-      * Is there a path in the call graph from the `source` to the `annotatedTarget`?
-      */
+     * Is there a path in the call graph from the `source` to the `annotatedTarget`?
+     */
     private def callsIndirectly(
         reachableMethods: Map[Method, Set[CallSite]],
         source:           Method,

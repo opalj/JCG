@@ -20,13 +20,12 @@ import scala.collection.mutable
 
 object WalaJCGAdapter extends JCGTestAdapter {
     override def serializeCG(
-        algorithm:    String,
-        target:       String,
-        mainClass:    String,
-        classPath:    Array[String],
-        jreLocations: String,
-        jreVersion:   Int,
-        outputFile:   String
+        algorithm:  String,
+        target:     String,
+        mainClass:  String,
+        classPath:  Array[String],
+        JREPath:    String,
+        outputFile: String
     ): Long = {
         val before = System.nanoTime
         val cl = Thread.currentThread.getContextClassLoader
@@ -40,7 +39,6 @@ object WalaJCGAdapter extends JCGTestAdapter {
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
         println(scope)
         val classHierarchy = ClassHierarchyFactory.make(scope)
-
 
         val entrypoints =
             if (mainClass == null) {

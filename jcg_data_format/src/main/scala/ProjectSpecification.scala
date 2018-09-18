@@ -43,6 +43,18 @@ case class ProjectSpecification(
     }
 
     /**
+      * For the specified [[ClassPathEntry]]s it computes all concrete class path entries.
+      * The entries are given as canonical path.
+      *
+      * @param parent
+      *               In case any locations are specified as relative path, `parent` is used as
+      *               root directory.
+      */
+    def allClassPathEntryPaths(parent: File): Array[String] = {
+        allClassPathEntryFiles(parent).map(_.getCanonicalPath)
+    }
+
+    /**
      * Retrieves the file of the specified target.
      *
      * @param parent In case the location of the target is specified as relative path, `parent`

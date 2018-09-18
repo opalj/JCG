@@ -1,9 +1,6 @@
-import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileWriter
 import java.io.PrintWriter
-import java.io.Writer
 
 import org.opalj.br.MethodDescriptor
 import org.opalj.log.GlobalLogContext
@@ -14,91 +11,55 @@ import play.api.libs.json.Json
 import scala.io.Source
 
 object Evaluation {
-
-    private var debug = true
     private var runHermes = false
     private var projectSpecificEvaluation = false
     private var runAnalyses = true
-    private var isAnnotatedProject = true
 
-    private var RESULTS_DIR_PATH = "evaluation/"
-    private var INPUT_DIR = ""
-    private val JRE_LOCATIONS_FILE = "jre.conf"
-    private val EVALUATION_RESULT_FILE = "evaluation-result.tsv"
-
-    private var PROJECT_FILTER = ""
-
-    private var EVALUATION_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
+    private var FINGERPRINT_DIR = ""
 
     def main(args: Array[String]): Unit = {
+        CommonEvaluationConfig.processArguments(args)
+        val config = CommonEvaluationConfig.processArguments(args)
         parseArguments(args)
 
-        val projectsDir = getProjectsDir
+        val projectsDir = EvaluationHelper.getProjectsDir(config.INPUT_DIR_PATH)
 
-        val jreLocations = getJRELocations
+        val jreLocations = EvaluationHelper.getJRELocations(config.JRE_LOCATIONS_FILE)
 
         if (runHermes) {
-            performHermesRun(projectsDir, jreLocations)
+            performHermesRun(projectsDir, jreLocations, config)
         }
 
         if (runAnalyses) {
-            val resultsDir = new File(RESULTS_DIR_PATH)
+            val resultsDir = new File(config.OUTPUT_DIR_PATH)
             resultsDir.mkdirs()
             val locations: Map[String, Map[String, Set[Method]]] = createLocationsMapping(resultsDir)
-            runAnalyses(projectsDir, resultsDir, jreLocations, locations)
+            runAnalyses(projectsDir, resultsDir, jreLocations, locations, config)
         }
     }
 
     private def parseArguments(args: Array[String]): Unit = {
-        args.sliding(2, 2).toList.collect {
-            case Array("--input", i: String)                ⇒ INPUT_DIR = i
-            case Array("--output-dir", t: String)           ⇒ RESULTS_DIR_PATH = t
-            case Array("--filter", name: String)            ⇒ PROJECT_FILTER = name
-            case Array("--debug", value: String)            ⇒ debug = value.toBoolean
-            case Array("--hermes", value: String)           ⇒ runHermes = value.toBoolean
-            case Array("--analyze", value: String)          ⇒ runAnalyses = value.toBoolean
-            case Array("--project-specific", value: String) ⇒ projectSpecificEvaluation = value.toBoolean
-            case Array("--testcase", value: String)         ⇒ isAnnotatedProject = value.toBoolean
-            case Array("--adapter", name: String) ⇒
-                EVALUATION_ADAPTERS = EVALUATION_ADAPTERS.filter(_.frameworkName() == name)
-                assert(EVALUATION_ADAPTERS.nonEmpty, s"$name is no known test adapter")
+        args.sliding(2, 1).toList.collect {
+            case Array("--analyze", value: String) ⇒ runAnalyses = value.toBoolean
+            case Array("--hermes")                 ⇒ runHermes = true
+            case Array("--project-specific")       ⇒ projectSpecificEvaluation = true
         }
 
-        if (projectSpecificEvaluation)
+        if (projectSpecificEvaluation) {
             assert(runAnalyses, "`--analyze` must be set to true on `--project-specific true`")
-
-        if (isAnnotatedProject)
-            assert(runAnalyses, "`--analyze` must be set to true on `--testcase true`")
-
-        assert(INPUT_DIR.nonEmpty, "no input directory specified")
+            assert(FINGERPRINT_DIR.nonEmpty, "no fingerprint directory specified")
+        }
     }
 
-    private def getProjectsDir: File = {
-        val projectsDir = new File(INPUT_DIR)
-
-        assert(projectsDir.exists(), s"${projectsDir.getPath} does not exists")
-        assert(projectsDir.isDirectory, s"${projectsDir.getPath} is not a directory")
-        assert(
-            projectsDir.listFiles(_.getName.endsWith(".conf")).nonEmpty,
-            s"${projectsDir.getPath} does not contain *.conf files"
-        )
-        projectsDir
-    }
-
-    private def getJRELocations: Map[Int, Array[File]] = {
-        val jreLocationsFile = new File(JRE_LOCATIONS_FILE)
-        assert(jreLocationsFile.exists(), "please provide a jre.conf file")
-        val jreLocations = JRELocation.mapping(new File(JRE_LOCATIONS_FILE))
-        jreLocations
-    }
-
-    private def performHermesRun(projectsDir: File, jreLocations: Map[Int, Array[File]]): Unit = {
+    private def performHermesRun(
+        projectsDir: File, jreLocations: Map[Int, String], config: CommonEvaluationConfig
+    ): Unit = {
         println("running hermes")
 
         val hermesFile = new File("hermes.json")
         assert(!hermesFile.exists(), "there is already a hermes.json file")
 
-        if (!debug)
+        if (!config.DEBUG)
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
         TestCaseHermesJsonExtractor.createHermesJsonFile(
@@ -107,12 +68,12 @@ object Evaluation {
 
         val hermesDefaultArgs = Array(
             "-config", hermesFile.getPath,
-            "-statistics", s"$RESULTS_DIR_PATH${File.separator}hermes.csv"
+            "-statistics", s"${config.OUTPUT_DIR_PATH}${File.separator}hermes.csv"
         )
         val writeLocationsArgs =
             if (projectSpecificEvaluation)
                 Array(
-                    "-writeLocations", RESULTS_DIR_PATH
+                    "-writeLocations", config.OUTPUT_DIR_PATH
                 )
             else Array.empty[String]
 
@@ -159,83 +120,61 @@ object Evaluation {
     private def runAnalyses(
         projectsDir:  File,
         resultsDir:   File,
-        jreLocations: Map[Int, Array[File]],
-        locationsMap: Map[String, Map[String, Set[Method]]]
+        jreLocations: Map[Int, String],
+        locationsMap: Map[String, Map[String, Set[Method]]],
+        config:       CommonEvaluationConfig
     ): Unit = {
         val projectSpecFiles = projectsDir.listFiles { (_, name) ⇒
-            name.endsWith(".conf") && name.startsWith(PROJECT_FILTER)
+            name.endsWith(".conf") && name.startsWith(config.PROJECT_PREFIX_FILTER)
         }.sorted
 
-        val ow = new BufferedWriter(getOutputTarget(resultsDir))
-
-        if (isAnnotatedProject)
-            printHeader(ow, projectSpecFiles)
-
         for {
-            adapter ← EVALUATION_ADAPTERS
-            cgAlgo ← adapter.possibleAlgorithms()
+            adapter ← config.EVALUATION_ADAPTERS
+            cgAlgo ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
+            psf ← projectSpecFiles
         } {
-            ow.write(s"${adapter.frameworkName()} $cgAlgo")
-            for (psf ← projectSpecFiles) {
 
-                val projectSpec =
-                    Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
+            val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
-                println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
+            println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
 
-                val outDir = new File(
-                    resultsDir,
-                    s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo"
+            val outDir = new File(
+                resultsDir,
+                s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo"
+            )
+            outDir.mkdirs()
+
+            val cgFile = new File(outDir, "cg.json")
+            assert(!cgFile.exists(), s"$cgFile already exists")
+
+            val elapsed = try {
+                adapter.serializeCG(
+                    cgAlgo,
+                    projectSpec.target(projectsDir).getCanonicalPath,
+                    projectSpec.main.orNull,
+                    projectSpec.allClassPathEntryPaths(projectsDir),
+                    jreLocations(projectSpec.java),
+                    cgFile.getPath
                 )
-                outDir.mkdirs()
-
-                val cgFile = new File(outDir, "cg.json")
-                assert(!cgFile.exists(), s"$cgFile already exists")
-
-                val cp = projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
-
-                val elapsed = try {
-                    adapter.serializeCG(
-                        cgAlgo,
-                        projectSpec.target(projectsDir).getCanonicalPath,
-                        projectSpec.main.orNull,
-                        cp,
-                        JRE_LOCATIONS_FILE,
-                        projectSpec.java,
-                        cgFile.getPath
-                    )
-                } catch {
-                    case e: Throwable ⇒
-                        println(s"exception in project ${projectSpec.name}")
-                        if (debug) {
-                            println(e.printStackTrace())
-                        }
-                        if (isAnnotatedProject)
-                            ow.write(s"\tE")
-                        -1
-                }
-
-                assert(cgFile.exists(), "the adapter failed to write the call graph")
-
-                System.gc()
-
-                reportTiming(outDir, elapsed)
-
-                if (isAnnotatedProject) {
-                    val result = CGMatcher.matchCallSites(projectSpec, jreLocations, projectsDir, cgFile, debug)
-                    ow.write(s"\t${result.shortNotation}")
-                }
-
-                if (projectSpecificEvaluation) {
-                    performProjectSpecificEvaluation(locationsMap, projectSpec, outDir, cgFile)
-                }
-
+            } catch {
+                case e: Throwable ⇒
+                    println(s"exception in project ${projectSpec.name}")
+                    if (config.DEBUG) {
+                        println(e.printStackTrace())
+                    }
+                    -1
             }
-            ow.newLine()
-        }
 
-        ow.flush()
-        ow.close()
+            assert(cgFile.exists(), "the adapter failed to write the call graph")
+
+            System.gc()
+
+            reportTiming(outDir, elapsed)
+
+            if (projectSpecificEvaluation) {
+                performProjectSpecificEvaluation(locationsMap, projectSpec, outDir, cgFile)
+            }
+        }
     }
 
     private def reportTiming(outDir: File, elapsed: Long): Unit = {
@@ -263,23 +202,5 @@ object Evaluation {
             pw.println(s"${projectSpec.name}\t$fId\t$location)")
         }
         pw.close()
-    }
-
-    private def printHeader(ow: BufferedWriter, jars: Array[File]): Unit = {
-        ow.write("algorithm")
-        for (tgt ← jars) {
-            ow.write(s"\t$tgt")
-        }
-        ow.newLine()
-    }
-
-    private def getOutputTarget(resultsDir: File): Writer = {
-        val outputFile = new File(resultsDir, EVALUATION_RESULT_FILE)
-        if (outputFile.exists()) {
-            outputFile.delete()
-            outputFile.createNewFile()
-        }
-
-        new FileWriter(outputFile, false)
     }
 }
