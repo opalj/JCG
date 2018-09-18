@@ -3,9 +3,6 @@ import java.io.FileInputStream
 import java.io.PrintWriter
 
 import org.opalj.br.MethodDescriptor
-import org.opalj.log.GlobalLogContext
-import org.opalj.log.OPALLogger
-import org.opalj.util.PerformanceEvaluation.time
 import play.api.libs.json.Json
 
 import scala.io.Source
@@ -27,7 +24,9 @@ object Evaluation {
         val jreLocations = EvaluationHelper.getJRELocations(config.JRE_LOCATIONS_FILE)
 
         if (runHermes) {
-            performHermesRun(projectsDir, jreLocations, config)
+            TestCaseHermesJsonExtractor.performHermesRun(
+                projectsDir, jreLocations, config, new File(FINGERPRINT_DIR), projectSpecificEvaluation
+            )
         }
 
         if (runAnalyses) {
@@ -40,52 +39,18 @@ object Evaluation {
 
     private def parseArguments(args: Array[String]): Unit = {
         args.sliding(2, 1).toList.collect {
+            case Array("--fingerprint-dir", dir) ⇒
+                assert(FINGERPRINT_DIR.isEmpty, "multiple fingerprint directories specified")
+                FINGERPRINT_DIR = dir
             case Array("--analyze", value: String) ⇒ runAnalyses = value.toBoolean
-            case Array("--hermes")                 ⇒ runHermes = true
-            case Array("--project-specific")       ⇒ projectSpecificEvaluation = true
+            case Array("--hermes", _)              ⇒ runHermes = true
+            case Array("--project-specific", _)    ⇒ projectSpecificEvaluation = true
         }
 
         if (projectSpecificEvaluation) {
             assert(runAnalyses, "`--analyze` must be set to true on `--project-specific true`")
             assert(FINGERPRINT_DIR.nonEmpty, "no fingerprint directory specified")
         }
-    }
-
-    private def performHermesRun(
-        projectsDir: File, jreLocations: Map[Int, String], config: CommonEvaluationConfig
-    ): Unit = {
-        println("running hermes")
-
-        val hermesFile = new File("hermes.json")
-        assert(!hermesFile.exists(), "there is already a hermes.json file")
-
-        if (!config.DEBUG)
-            OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
-
-        TestCaseHermesJsonExtractor.createHermesJsonFile(
-            projectsDir, jreLocations, hermesFile
-        )
-
-        val hermesDefaultArgs = Array(
-            "-config", hermesFile.getPath,
-            "-statistics", s"${config.OUTPUT_DIR_PATH}${File.separator}hermes.csv"
-        )
-        val writeLocationsArgs =
-            if (projectSpecificEvaluation)
-                Array(
-                    "-writeLocations", config.OUTPUT_DIR_PATH
-                )
-            else Array.empty[String]
-
-        time {
-            org.opalj.hermes.HermesCLI.main(
-                hermesDefaultArgs ++ writeLocationsArgs
-            )
-        } { t ⇒
-            println(s"hermes run took ${t.toSeconds} seconds")
-        }
-
-        hermesFile.delete()
     }
 
     private def createLocationsMapping(resultsDir: File): Map[String, Map[String, Set[Method]]] = {
@@ -138,13 +103,10 @@ object Evaluation {
 
             println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
 
-            val outDir = new File(
-                resultsDir,
-                s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$cgAlgo"
-            )
+            val outDir = config.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
             outDir.mkdirs()
 
-            val cgFile = new File(outDir, "cg.json")
+            val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
             assert(!cgFile.exists(), s"$cgFile already exists")
 
             val elapsed = try {
@@ -172,7 +134,9 @@ object Evaluation {
             reportTiming(outDir, elapsed)
 
             if (projectSpecificEvaluation) {
-                performProjectSpecificEvaluation(locationsMap, projectSpec, outDir, cgFile)
+                performProjectSpecificEvaluation(
+                    projectSpec, adapter, cgAlgo, locationsMap, outDir, cgFile
+                )
             }
         }
     }
@@ -186,20 +150,24 @@ object Evaluation {
     }
 
     private def performProjectSpecificEvaluation(
-        locationsMap: Map[String, Map[String, Set[Method]]],
         projectSpec:  ProjectSpecification,
+        adapter:      JCGTestAdapter,
+        algorithm:    String,
+        locationsMap: Map[String, Map[String, Set[Method]]],
         outDir:       File,
         jsFile:       File
     ): Unit = {
+        val fingerprint = FingerprintExtractor.parseFingerprints(adapter, algorithm, new File(FINGERPRINT_DIR))
+        val locations = locationsMap(projectSpec.name)
+        val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.toMap
+
+        val projectSpecificLocations = ProjectSpecificEvaluator.projectSpecificEvaluation(
+            reachableMethods.keySet, locations, fingerprint
+        )
+
         val pw = new PrintWriter(new File(outDir, "pse.tsv"))
-        val json = Json.parse(new FileInputStream(jsFile))
-        val reachableMethods = json.validate[ReachableMethods].get.toMap
-        for {
-            (fId, locations) ← locationsMap(projectSpec.name)
-            location ← locations
-            if reachableMethods.contains(location)
-        } {
-            pw.println(s"${projectSpec.name}\t$fId\t$location)")
+        for ((location, fID) ← projectSpecificLocations) {
+            pw.println(s"${projectSpec.name}\t$fID\t$location")
         }
         pw.close()
     }

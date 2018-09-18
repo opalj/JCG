@@ -11,6 +11,17 @@ class CommonEvaluationConfig(
 ) {
     val JRE_LOCATIONS_FILE = "jre.conf"
 
+    val SERIALIZATION_FILE_NAME = "cg.json"
+
+    def getOutputDirectory(
+        adapter:     JCGTestAdapter,
+        algorithm:   String,
+        projectSpec: ProjectSpecification,
+        resultsDir:  File
+    ): File = {
+        val dirName = s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$algorithm"
+        new File(resultsDir, dirName)
+    }
 }
 
 object CommonEvaluationConfig {
@@ -44,7 +55,7 @@ object CommonEvaluationConfig {
                 val adapter = ALL_ADAPTERS.find(_.frameworkName() == name)
                 assert(adapter.nonEmpty, s"'$name' is not a valid framework adapter")
                 EVALUATION_ADAPTERS ++= adapter
-            case Array("--debug") ⇒ DEBUG = true
+            case Array("--debug", _) ⇒ DEBUG = true
         }
 
         assert(INPUT_DIR_PATH.nonEmpty, "no input directory specified")
