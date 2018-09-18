@@ -41,7 +41,9 @@ object FingerprintExtractor {
             cgAlgo ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
         } {
             val fingerprintFile = getFingerprintFile(adapter, cgAlgo, resultsDir)
-            assert(!fingerprintFile.exists())
+            if (fingerprintFile.exists()) {
+                fingerprintFile.delete()
+            }
             val fingerprintWriter = new PrintWriter(fingerprintFile)
             for (psf ← projectSpecFiles) {
                 val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
