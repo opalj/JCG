@@ -201,11 +201,11 @@ interface Target {
 }
 
 class CallTarget implements Target {
-    void target(){ /* do something */ }
+    public void target(){ /* do something */ }
 }
 
 class NeverInstantiated implements Target {
-    void target(){ /* do something */ }
+    public void target(){ /* do something */ }
 }
 ```
 [//]: # (END)
@@ -248,11 +248,11 @@ interface Target {
 }
 
 class CallTarget implements Target {
-    void target(){ /* do something */ }
+    public void target(){ /* do something */ }
 }
 
 class NeverInstantiated implements Target {
-    void target(){ /* do something */ }
+    public void target(){ /* do something */ }
 }
 ```
 [//]: # (END)
