@@ -191,7 +191,7 @@ public class Demo {
         demo.field = new CallTarget();
 
         Field field = Demo.class.getDeclaredField("field");
-        Target target = field.get(demo);
+        Target target = (Target) field.get(demo);
         target.target();
     }
 }
@@ -235,10 +235,10 @@ public class Demo {
     )
     public static void main(String[] args) throws Exception {
         Demo demo = new Demo();
-        demo.field = new Demo();
+        demo.field = new CallTarget();
 
         Field field = Demo.class.getField("field");
-        Target t = field.get(demo);
+        Target t = (Target) field.get(demo);
         t.target();
     }
 }
@@ -572,7 +572,9 @@ properties would help to resolve this case soundly and better precision.
 // csr/Demo.java
 package csr;
 
+import java.util.Properties;
 import lib.annotations.callgraph.DirectCall;
+
 class Demo {
 
     public static void verifyCall(){ /* do something */ }
@@ -596,7 +598,7 @@ class TargetClass {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=29, resolvedTargets = "Lcsr/Demo;")
+     @DirectCall(name="verifyCall", line=31, resolvedTargets = "Lcsr/Demo;")
      static private void staticInitializerCalled(){
          Demo.verifyCall();
      }
@@ -616,7 +618,7 @@ that is instantiated is __incompatible__ with the cast such that the operation r
 ```ClassCastException```.
 ```java
 // cfne/Demo.java
-package cl;
+package cfne;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -656,7 +658,7 @@ over ```Class.forName(...)```. Since the class __can't be found__ the operation 
 which is handled in one of the catch blocks.
 ```java
 // cfne/Demo.java
-package cl;
+package cfne;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -692,7 +694,7 @@ This case targets a concerns not only loading of classes but also the execution 
 static initializer. When a class is loaded, its static initializer must be called.
 ```java
 // cfne/Demo.java
-package cl;
+package cfne;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -735,7 +737,7 @@ static initializer. When a class is loaded, its static initializer must be calle
 initializers of potential super classes.
 ```java
 // cfne/Demo.java
-package cl;
+package cfne;
 
 import lib.annotations.callgraph.DirectCall;
 

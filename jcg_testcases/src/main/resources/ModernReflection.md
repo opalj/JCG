@@ -115,17 +115,17 @@ import java.lang.invoke.MethodHandles;
 
 import lib.annotations.callgraph.DirectCall;
 class Demo {
-    public String target() { return "42"; }
+    public String toString() { return "42"; }
 
     public static Demo field = new Demo();
 
     @DirectCall(
-        name = "target", returnType = String.class,
+        name = "toString", returnType = String.class,
         line = 18, resolvedTargets = "Ltmr/Demo;"
     )
     public static void main(String[] args) throws Throwable {
         MethodHandle handle = MethodHandles.lookup().findStaticGetter(Demo.class, "field", Demo.class);
-        handle.invoke().target();
+        handle.invoke().toString();
     }
 }
 
@@ -149,7 +149,7 @@ import java.lang.invoke.MethodHandles;
 
 import lib.annotations.callgraph.DirectCall;
 class Demo {
-    public String target() { return "42"; }
+    public String toString() { return "42"; }
 
     public Demo field;
 
@@ -158,12 +158,12 @@ class Demo {
     }
 
     @DirectCall(
-        name = target, returnType = String.class,
+        name = "toString", returnType = String.class,
         line = 22, resolvedTargets = "Ltmr/Demo;"
     )
     public static void main(String[] args) throws Throwable {
         MethodHandle handle = MethodHandles.lookup().findGetter(Demo.class, "field", Demo.class);
-        handle.invoke(new Demo()).target();
+        handle.invoke(new Demo()).toString();
     }
 }
 ```
