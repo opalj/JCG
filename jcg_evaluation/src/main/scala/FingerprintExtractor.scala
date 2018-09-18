@@ -7,24 +7,15 @@ import java.io.Writer
 
 import play.api.libs.json.Json
 
-class FingerprintExtractor {
+import scala.io.Source
+
+object FingerprintExtractor {
 
     val EVALUATION_RESULT_FILE_NAME = "evaluation-result.tsv"
-    val SERIALIZATION_FILE_NAME = "cg.json"
 
     def getFingerprintFile(adapter: JCGTestAdapter, algorithm: String, resultsDir: File): File = {
         val fileName = s"${adapter.frameworkName()}-$algorithm.profile"
         new File(resultsDir, fileName)
-    }
-
-    def getOutputDirectory(
-        adapter:     JCGTestAdapter,
-        algorithm:   String,
-        projectSpec: ProjectSpecification,
-        resultsDir:  File
-    ): File = {
-        val dirName = s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$algorithm"
-        new File(resultsDir, dirName)
     }
 
     def main(args: Array[String]): Unit = {
@@ -55,10 +46,10 @@ class FingerprintExtractor {
             for (psf ← projectSpecFiles) {
                 val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
-                val outDir = getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
+                val outDir = config.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
                 outDir.mkdirs()
 
-                val cgFile = new File(outDir, "cg.json")
+                val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
                 assert(!cgFile.exists(), s"$cgFile already exists")
 
                 try {
@@ -93,6 +84,19 @@ class FingerprintExtractor {
 
         ow.flush()
         ow.close()
+    }
+
+    def parseFingerprints(
+        adapter:        JCGTestAdapter,
+        algorithm:      String,
+        fingerprintDir: File
+    ): Set[String] = {
+        val fingerprintFile = FingerprintExtractor.getFingerprintFile(adapter, algorithm, fingerprintDir)
+        assert(fingerprintFile.exists(), s"${fingerprintFile.getPath} does not exists")
+
+        Source.fromFile(fingerprintFile).getLines().map(_.split("\t")).collect {
+            case Array(featureID, result) if result == Sound.shortNotation ⇒ featureID
+        }.toSet
     }
 
     private def printHeader(ow: BufferedWriter, jars: Array[File]): Unit = {

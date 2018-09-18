@@ -2,23 +2,54 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.PrintWriter
 
-import play.api.libs.json.JsValue
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigObject
+import com.typesafe.config.ConfigRenderOptions
+import com.typesafe.config.ConfigValueFactory
+import org.opalj.hermes.Hermes
+import org.opalj.log.GlobalLogContext
+import org.opalj.log.OPALLogger
+import org.opalj.util.PerformanceEvaluation.time
 import play.api.libs.json.Json
-import play.api.libs.json.Writes
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-
-private case class ORG(org: OPALJ)
-private case class OPALJ(opalj: HERMES)
-private case class HERMES(hermes: HermesProjects)
-private case class HermesProjects(projects: Array[HermesProject])
-private case class HermesProject(id: String, cp: String)
+import scala.io.Source
 
 object TestCaseHermesJsonExtractor {
 
-    def createHermesJsonFile(
-        projectsDir: File, jreLocations: Map[Int, String], outputFile: File
+    private val HERMES_FILE_NAME = "hermes.json"
+    private val HERMES_RESULT_FILE_NAME = "hermes.csv"
+
+    def createHermesConfig(
+        projectsDir:       File,
+        supportedFeatures: Set[String],
+        jreLocations:      Map[Int, String],
+        outputFile:        File
     ): Unit = {
+        val allQueries = Hermes.featureQueries.toSet
+        val requiredQueries = Hermes.featureQueries.filterNot(_.featureIDs.forall(supportedFeatures.contains))
+
+        val baseConfig: Config = ConfigFactory.load().withValue(
+            "org.opalj.br.reader.ClassFileReader.Invokedynamic.rewrite",
+            ConfigValueFactory.fromAnyRef(true)
+        ).withValue(
+                "org.opalj.hermes.maxLocations",
+                ConfigValueFactory.fromAnyRef(Int.MaxValue)
+            )
+
+        val toBeRegistered = allQueries.foldRight(List.empty[ConfigObject]) { (query, configValues) ⇒
+            ConfigValueFactory.fromMap(Map(
+                "query" → query.getClass, "activate" → requiredQueries.contains(query)
+            ).asJava) :: configValues
+        }
+
+        val hermesConfig = baseConfig.withValue(
+            "org.opalh.hermes.queries.registered",
+            ConfigValueFactory.fromIterable(toBeRegistered.asJava)
+        )
+
         assert(projectsDir.exists() && projectsDir.isDirectory)
 
         val projectSpecFiles = projectsDir.listFiles((_, name) ⇒ name.endsWith(".conf")).sorted
@@ -32,26 +63,68 @@ object TestCaseHermesJsonExtractor {
             val allTargets = ArrayBuffer(projectSpec.target(projectsDir).getCanonicalPath)
             allTargets ++= JRELocation.getAllJREJars(jreLocations(projectSpec.java)).map(_.getCanonicalPath)
             allTargets ++= projectSpec.allClassPathEntryFiles(projectsDir).map(_.getCanonicalPath)
-            HermesProject(projectSpec.name, allTargets.mkString(File.pathSeparator))
-
+            ConfigValueFactory.fromMap(Map(
+                "id" → projectSpec.name,
+                "cp" → allTargets.mkString(File.pathSeparator)
+            ).asJava)
         }
 
-        implicit val projectWrites: Writes[HermesProject] = Json.writes[HermesProject]
-        implicit val projectsWrites: Writes[HermesProjects] = Json.writes[HermesProjects]
+        val config = hermesConfig.withValue(
+            "org.opalj.hermes.projects",
+            ConfigValueFactory.fromIterable(projects.toSeq.asJava)
+        )
 
-        implicit val hermesWrites: Writes[HERMES] = Json.writes[HERMES]
-        implicit val opaljWrites: Writes[OPALJ] = Json.writes[OPALJ]
-        implicit val orgWrites: Writes[ORG] = Json.writes[ORG]
+        val configValue = config.root().render(ConfigRenderOptions.concise())
 
-        val json: JsValue = Json.toJson(ORG(OPALJ(HERMES(HermesProjects(projects)))))
         val pw = new PrintWriter(outputFile)
-        pw.write(Json.prettyPrint(json))
+        pw.write(configValue)
         pw.close()
     }
 
-    def main(args: Array[String]): Unit = {
-        val jreLocations = JRELocation.mapping(new File(args(1)))
-        createHermesJsonFile(new File(args(0)), jreLocations, new File(args(2)))
-    }
+    def performHermesRun(
+        projectsDir:               File,
+        jreLocations:              Map[Int, String],
+        config:                    CommonEvaluationConfig,
+        fingerprintDir:            File,
+        projectSpecificEvaluation: Boolean
+    ): Unit = {
+        println("running hermes")
 
+        val hermesFile = new File(HERMES_FILE_NAME)
+        assert(!hermesFile.exists(), s"there is already a $HERMES_FILE_NAME file")
+
+        if (!config.DEBUG)
+            OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
+
+        val supportedFeatures = config.EVALUATION_ADAPTERS.flatMap { adapter ⇒
+            adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER)).flatMap { algorithm ⇒
+                FingerprintExtractor.parseFingerprints(adapter, algorithm, fingerprintDir)
+            }
+        }.toSet
+
+        TestCaseHermesJsonExtractor.createHermesConfig(
+            projectsDir, supportedFeatures, jreLocations, hermesFile
+        )
+
+        val hermesDefaultArgs = Array(
+            "-config", hermesFile.getPath,
+            "-statistics", s"${config.OUTPUT_DIR_PATH}${File.separator}$HERMES_RESULT_FILE_NAME"
+        )
+        val writeLocationsArgs =
+            if (projectSpecificEvaluation)
+                Array(
+                    "-writeLocations", config.OUTPUT_DIR_PATH
+                )
+            else Array.empty[String]
+
+        time {
+            org.opalj.hermes.HermesCLI.main(
+                hermesDefaultArgs ++ writeLocationsArgs
+            )
+        } { t ⇒
+            println(s"hermes run took ${t.toSeconds} seconds")
+        }
+
+        hermesFile.delete()
+    }
 }
