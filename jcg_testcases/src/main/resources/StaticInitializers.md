@@ -1,5 +1,5 @@
 #StaticInitializers
-Static initializers have to be treated as entry points.
+Static initializers have to be treated as (on-the-fly) entry points.
 
 ##SI1
 [//]: # (MAIN: si.Bar)
