@@ -42,7 +42,6 @@ object WalaJCGAdapter extends JCGTestAdapter {
         }
 
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
-        println(scope)
         val classHierarchy = ClassHierarchyFactory.make(scope)
 
         val entrypoints =
