@@ -60,6 +60,10 @@ object CommonEvaluationConfig {
 
         assert(INPUT_DIR_PATH.nonEmpty, "no input directory specified")
         assert(OUTPUT_DIR_PATH.nonEmpty, "no output directory specified")
+        val outputDir = new File(OUTPUT_DIR_PATH)
+        if (!outputDir.exists()) {
+            outputDir.mkdirs()
+        }
 
         new CommonEvaluationConfig(
             DEBUG,
