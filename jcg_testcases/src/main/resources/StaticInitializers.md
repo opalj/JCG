@@ -182,7 +182,7 @@ import lib.annotations.callgraph.DirectCall;
 public class Main {
 
 	public static void main(String[] args) {
-		Foo.callback();
+		Demo.callback();
 	}
 }
 
@@ -213,7 +213,7 @@ import lib.annotations.callgraph.DirectCall;
 public class Main {
 
 	public static void main(String[] args) {
-		Foo.assignMe = 42;
+		Demo.assignMe = 42;
 	}
 }
 
