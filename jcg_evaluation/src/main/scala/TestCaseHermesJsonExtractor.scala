@@ -49,7 +49,7 @@ object TestCaseHermesJsonExtractor {
         }
 
         val hermesConfig = baseConfig.withValue(
-            "org.opalh.hermes.queries.registered",
+            "org.opalj.hermes.queries.registered",
             ConfigValueFactory.fromIterable(toBeRegistered.asJava)
         )
 
