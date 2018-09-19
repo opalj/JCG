@@ -1,5 +1,8 @@
 import java.io.File
 import java.io.FileWriter
+import java.io.PrintWriter
+import java.net.URL
+import java.net.URLClassLoader
 import java.util
 import java.util.stream.Collectors
 
@@ -8,6 +11,7 @@ import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
 import com.ibm.wala.ipa.callgraph.impl.Util
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory
+import com.ibm.wala.properties.WalaProperties
 import com.ibm.wala.types.MethodReference
 import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
@@ -33,15 +37,35 @@ object WalaJCGAdapter extends JCGTestAdapter {
         var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
         cp = target + File.pathSeparator + cp
 
+        // write wala.properties with the specified JDK and store it in the classpath
+        val tmp = new File("tmp")
+        tmp.mkdirs()
+        val walaPropertiesFile = new File(tmp, "wala.properties")
+        val pw = new PrintWriter(walaPropertiesFile)
+        pw.println(s"java_runtime_dir = $JDKPath")
+        pw.close()
+
+        val sysloader = classOf[WalaProperties].getClassLoader.asInstanceOf[URLClassLoader]
+        val sysclass = classOf[URLClassLoader]
+        val m = sysclass.getDeclaredMethod("addURL", classOf[URL])
+        m.setAccessible(true)
+        m.invoke(sysloader, tmp.toURI.toURL)
+
         val ex = if (analyzeJDK) {
             new File(cl.getResource("no-exclusions.txt").getFile)
-            //TODO here the default JRE is added to the classpath -> somehow modify the wala.properties
         } else {
             // TODO exclude more of the jdk
             new File(cl.getResource("Java60RegressionExclusions.txt").getFile)
         }
 
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
+
+        // we do not need the wala.properties anymore!
+        walaPropertiesFile.delete()
+        tmp.delete()
+
+        println(scope)
+
         val classHierarchy = ClassHierarchyFactory.make(scope)
 
         val entrypoints =
