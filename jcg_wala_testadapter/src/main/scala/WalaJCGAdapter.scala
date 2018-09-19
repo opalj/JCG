@@ -64,8 +64,6 @@ object WalaJCGAdapter extends JCGTestAdapter {
         walaPropertiesFile.delete()
         tmp.delete()
 
-        println(scope)
-
         val classHierarchy = ClassHierarchyFactory.make(scope)
 
         val entrypoints =
