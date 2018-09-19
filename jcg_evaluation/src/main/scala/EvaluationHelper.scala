@@ -38,8 +38,8 @@ object CommonEvaluationConfig {
         var PROJECT_PREFIX_FILTER = ""
         var ALGORITHM_PREFIX_FILTER = ""
 
-        args.sliding(2, 1).collect {
-            case Array("--input", i: String) ⇒
+        args.sliding(2, 1).toList.collect {
+            case Array("--input", i) ⇒
                 assert(INPUT_DIR_PATH.isEmpty, "multiple input directories specified")
                 INPUT_DIR_PATH = i
             case Array("--output", o) ⇒
