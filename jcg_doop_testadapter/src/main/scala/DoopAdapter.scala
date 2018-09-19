@@ -250,7 +250,8 @@ object DoopAdapter extends JCGTestAdapter {
         target:     String,
         mainClass:  String,
         classPath:  Array[String],
-        JREPath:    String,
+        JDKPath:    String,
+        analyzeJDK: Boolean,
         outputFile: String
     ): Long = ???
 }

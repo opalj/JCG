@@ -50,7 +50,8 @@ object OpalJCGAdatper extends JCGTestAdapter {
         target:     String,
         mainClass:  String,
         classPath:  Array[String],
-        JREPath:    String,
+        JDKPath:    String,
+        analyzeJDK: Boolean,
         outputFile: String
     ): Long = {
         val before = System.nanoTime()
@@ -80,15 +81,15 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         // gather the class files to be loaded
         val cfReader = JavaClassFileReader(theConfig = config)
-        val targetClassFiles = cfReader.ClassFiles(new File(target)).toIterator
-        val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_))).toIterator
-        val jreJars = JRELocation.getAllJREJars(JREPath)
+        val targetClassFiles = cfReader.ClassFiles(new File(target))
+        val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_)))
+        val jreJars = JRELocation.getAllJREJars(JDKPath)
         val jre = cfReader.AllClassFiles(jreJars)
-        val allClassFiles = targetClassFiles ++ cpClassFiles ++ jre
+        val allClassFiles = targetClassFiles ++ cpClassFiles ++ (if (analyzeJDK) jre else Seq.empty)
 
         val project: Project[URL] = Project(
-            allClassFiles.toTraversable,
-            Seq.empty,
+            allClassFiles,
+            if (analyzeJDK) Seq.empty else jre,
             libraryClassFilesAreInterfacesOnly = true,
             Seq.empty
         )

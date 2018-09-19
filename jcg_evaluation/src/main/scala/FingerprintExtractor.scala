@@ -5,6 +5,8 @@ import java.io.FileWriter
 import java.io.PrintWriter
 import java.io.Writer
 
+import org.opalj.log.GlobalLogContext
+import org.opalj.log.OPALLogger
 import play.api.libs.json.Json
 
 import scala.io.Source
@@ -20,6 +22,9 @@ object FingerprintExtractor {
 
     def main(args: Array[String]): Unit = {
         val config = CommonEvaluationConfig.processArguments(args)
+
+        if (!config.DEBUG)
+            OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
         val projectsDir = EvaluationHelper.getProjectsDir(config.INPUT_DIR_PATH)
         val resultsDir = new File(config.OUTPUT_DIR_PATH)
@@ -38,9 +43,10 @@ object FingerprintExtractor {
 
         for {
             adapter ← config.EVALUATION_ADAPTERS
-            cgAlgo ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
+            cgAlgorithm ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
         } {
-            val fingerprintFile = getFingerprintFile(adapter, cgAlgo, resultsDir)
+            println(s"creating fingerprint for ${adapter.frameworkName()} $cgAlgorithm")
+            val fingerprintFile = getFingerprintFile(adapter, cgAlgorithm, resultsDir)
             if (fingerprintFile.exists()) {
                 fingerprintFile.delete()
             }
@@ -48,19 +54,23 @@ object FingerprintExtractor {
             for (psf ← projectSpecFiles) {
                 val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
-                val outDir = config.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
+                val outDir = config.getOutputDirectory(adapter, cgAlgorithm, projectSpec, resultsDir)
                 outDir.mkdirs()
 
                 val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
-                assert(!cgFile.exists(), s"$cgFile already exists")
+                if (cgFile.exists()) {
+                    cgFile.delete()
+                }
 
+                println(s"performing testcase ${projectSpec.name}")
                 try {
                     adapter.serializeCG(
-                        cgAlgo,
+                        cgAlgorithm,
                         projectSpec.target(projectsDir).getCanonicalPath,
                         projectSpec.main.orNull,
                         projectSpec.allClassPathEntryPaths(projectsDir),
                         jreLocations(projectSpec.java),
+                        false,
                         cgFile.getPath
                     )
                 } catch {
