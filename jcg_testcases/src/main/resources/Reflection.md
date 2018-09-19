@@ -551,7 +551,7 @@ class CallTarget {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=23, resolvedTargets = "Lcsr/Demo;")
+     @DirectCall(name="verifyCall", line=27, resolvedTargets = "Lcsr/Demo;")
      static private void staticInitializerCalled(){
          Demo.verifyCall();
      }
