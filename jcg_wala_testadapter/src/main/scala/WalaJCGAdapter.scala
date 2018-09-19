@@ -8,7 +8,6 @@ import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
 import com.ibm.wala.ipa.callgraph.impl.Util
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory
-import com.ibm.wala.properties.WalaProperties
 import com.ibm.wala.types.MethodReference
 import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
@@ -24,7 +23,8 @@ object WalaJCGAdapter extends JCGTestAdapter {
         target:     String,
         mainClass:  String,
         classPath:  Array[String],
-        JREPath:    String,
+        JDKPath:    String,
+        analyzeJDK: Boolean,
         outputFile: String
     ): Long = {
         val before = System.nanoTime
@@ -33,9 +33,14 @@ object WalaJCGAdapter extends JCGTestAdapter {
         var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
         cp = target + File.pathSeparator + cp
 
-        //TODO here the default JRE is added to the classpath -> somehow modify the wala.properties
+        val ex = if (analyzeJDK) {
+            new File(cl.getResource("no-exclusions.txt").getFile)
+            //TODO here the default JRE is added to the classpath -> somehow modify the wala.properties
+        } else {
+            // TODO exclude more of the jdk
+            new File(cl.getResource("Java60RegressionExclusions.txt").getFile)
+        }
 
-        val ex = new File(cl.getResource("exclusions.txt").getFile)
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
         println(scope)
         val classHierarchy = ClassHierarchyFactory.make(scope)

@@ -70,6 +70,7 @@ object FingerprintExtractor {
                         projectSpec.main.orNull,
                         projectSpec.allClassPathEntryPaths(projectsDir),
                         jreLocations(projectSpec.java),
+                        false,
                         cgFile.getPath
                     )
                 } catch {

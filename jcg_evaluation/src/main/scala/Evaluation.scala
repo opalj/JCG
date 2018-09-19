@@ -116,6 +116,7 @@ object Evaluation {
                     projectSpec.main.orNull,
                     projectSpec.allClassPathEntryPaths(projectsDir),
                     jreLocations(projectSpec.java),
+                    true,
                     cgFile.getPath
                 )
             } catch {

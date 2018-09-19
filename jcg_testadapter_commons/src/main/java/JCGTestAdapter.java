@@ -10,7 +10,7 @@ public interface JCGTestAdapter {
      * ({@link ReachableMethods}) into the specified output file and return the elapsed time in
      * nanoseconds
      *
-     * @param mainClass the main-class to be analysed (x.y.Foo) or null in case of a library
+     * @param mainClass the main-class to be analysed (x.y.Foo) or `null` in case of a library
      * @return the elapsed nanoseconds
      */
     long serializeCG(
@@ -18,7 +18,8 @@ public interface JCGTestAdapter {
             String target,
             String mainClass,
             String[] classPath,
-            String JREPath,
+            String JDKPath,
+            boolean analyzeJDK,
             String outputFile) throws Exception;
 
     String[] possibleAlgorithms();

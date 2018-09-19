@@ -31,7 +31,8 @@ object SootJCGAdapter extends JCGTestAdapter {
         target:     String,
         mainClass:  String,
         classPath:  Array[String],
-        JREPath:    String,
+        JDKPath:    String,
+        analyzeJDK: Boolean,
         outputFile: String
     ): Long = {
 
@@ -39,11 +40,14 @@ object SootJCGAdapter extends JCGTestAdapter {
         o.set_whole_program(true)
         o.set_keep_line_number(true)
         o.set_allow_phantom_refs(true)
-        o.set_include_all(true)
+        o.set_include_all(analyzeJDK)
+
+        // todo no-bodies-for-excluded in case of !analyzeJDK
 
         o.set_process_dir(List(target).asJava)
 
-        val jreJars = JRELocation.getAllJREJars(JREPath).map(_.getCanonicalPath)
+        val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
+
         o.set_soot_classpath((classPath ++ jreJars).mkString(File.pathSeparator))
 
         o.set_output_format(Options.output_format_none)
