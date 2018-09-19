@@ -607,6 +607,7 @@ public @FunctionalInterface interface Test extends Serializable{
     String concat(Integer seconds);
 }
 ```
+
 ```java
 // serlam/DoDeserialization.java
 package serlam;
@@ -620,7 +621,7 @@ public class DoDeserialization {
 
     @IndirectCall(
             name = "readResolve",
-            line = 28,
+            line = 18,
             resolvedTargets = "Ljava/lang/invoke/SerializedLambda;")
     public static void main(String[] args) throws Exception {
         DoSerialization.main(args);
