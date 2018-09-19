@@ -28,8 +28,6 @@ object TestCaseHermesJsonExtractor {
         jreLocations:      Map[Int, String],
         outputFile:        File
     ): Unit = {
-        val allQueries = Hermes.featureQueries.toSet
-        val requiredQueries = Hermes.featureQueries.filterNot(_.featureIDs.forall(supportedFeatures.contains))
 
         val baseConfig: Config = ConfigFactory.load().withValue(
             "org.opalj.br.reader.ClassFileReader.Invokedynamic.rewrite",
@@ -39,9 +37,14 @@ object TestCaseHermesJsonExtractor {
                 ConfigValueFactory.fromAnyRef(Int.MaxValue)
             )
 
+        Hermes.setConfig(baseConfig)
+
+        val allQueries = Hermes.featureQueries.toSet
+        val requiredQueries = Hermes.featureQueries.filterNot(_.featureIDs.forall(supportedFeatures.contains))
+
         val toBeRegistered = allQueries.foldRight(List.empty[ConfigObject]) { (query, configValues) ⇒
             ConfigValueFactory.fromMap(Map(
-                "query" → query.getClass, "activate" → requiredQueries.contains(query)
+                "query" → query.getClass.getName, "activate" → requiredQueries.contains(query)
             ).asJava) :: configValues
         }
 
