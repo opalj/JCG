@@ -125,7 +125,7 @@ import lib.annotations.callgraph.DirectCall;
 public class Demo {
     
     public static void main(String[] args){
-      new Sub.method();
+      new Sub().method();
     }
 }
 
@@ -140,6 +140,7 @@ class Middle extends Super {
 }
 
 class Sub extends Middle {
+    
     @DirectCall(name="method", line=25, resolvedTargets = "Lnvc/Middle;")
     void method() { 
         super.method(); 
