@@ -26,10 +26,10 @@ object CompareCGs {
         val cg1 = Json.parse(new FileInputStream(cg1Path)).validate[ReachableMethods].get.toMap
         val cg2 = Json.parse(new FileInputStream(cg2Path)).validate[ReachableMethods].get.toMap
 
-
         //TODO output!
-        val additionalReachableMethods1 = cg1.filter(m ⇒ !cg2.contains(m._1))
-        val additionalReachableMethods2 = cg2.filter(m ⇒ !cg1.contains(m._1))
+        val additionalReachableMethods1 = extractAdditionalMethods(cg1, cg2)
+        val additionalReachableMethods2 = extractAdditionalMethods(cg2, cg1)
+
         val commonReachableMethods = cg1.filter(m ⇒ cg2.contains(m._1)).keySet
 
         val reachableInApp1 = extractReachableApplicationMethods(appPackages, cg1)
@@ -41,22 +41,24 @@ object CompareCGs {
         val boundaries2 = extractBoundaries(cg2, commonReachableMethods)
     }
 
+    private def extractAdditionalMethods(
+        baseCG: Map[Method, Set[CallSite]], comparedTo: Map[Method, Set[CallSite]]
+    ): Set[Method] = {
+        baseCG.filter(m ⇒ !comparedTo.contains(m._1)).keySet
+    }
+
     private def extractReachableApplicationMethods(
         appPackages: List[String], cg: Map[Method, Set[CallSite]]
     ): Set[Method] = {
-        for {
-            caller ← cg.keySet
-            if appPackages.exists(p ⇒ caller.declaringClass.startsWith(s"L$p/"))
-        } yield caller
+        cg.filter(rm ⇒ appPackages.exists(p ⇒ rm._1.declaringClass.startsWith(s"L$p/"))).keySet
     }
 
     private def extractBoundaries(
         cg: Map[Method, Set[CallSite]], commonReachableMethods: Set[Method]
     ): Set[Method] = {
-        for {
-            caller ← commonReachableMethods
-            callees = cg(caller).flatMap(_.targets)
-            if callees.exists(target ⇒ !commonReachableMethods.contains(target))
-        } yield caller
+        commonReachableMethods.filter { caller ⇒
+            val callees = cg(caller).flatMap(_.targets)
+            callees.exists(target ⇒ !commonReachableMethods.contains(target))
+        }
     }
 }
