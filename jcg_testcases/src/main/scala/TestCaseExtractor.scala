@@ -8,9 +8,23 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 
 /**
+ * This tool searches for '.md' files in the resources (or in the specified directory) to extracts
+ * the test cases.
+ * The extraction include, compiling, packaging and running (in order to find errors).
+ * For each extracted test case, a project specification file ([[ProjectSpecification]])
+ * is generated.
+ *
  * @author Michael Reif
+ * @author Florian Kuebler
  */
 object TestCaseExtractor {
+    /**
+     * Extracts the test cases.
+     * @param args possible arguments are:
+     *      '--rsrcDir dir', where 'dir' is the directory to search in. If this option is not
+     *          specified, the resource root directory will be used.
+     *      '--md filter', where 'filter' is a prefix of the filenames to be included.
+     */
     def main(args: Array[String]): Unit = {
 
         val tmp = new File("tmp")
@@ -30,6 +44,7 @@ object TestCaseExtractor {
             case Array("--rsrcDir", dir: String) ⇒ fileDir = dir
         }
 
+        // get all markdown files
         val resources = new File(fileDir).
             listFiles(_.getPath.endsWith(".md")).
             filter(_.getName.startsWith(mdFilter))
