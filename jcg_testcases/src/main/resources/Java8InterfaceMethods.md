@@ -228,3 +228,84 @@ interface DirectInterface extends Interface1, Interface2 {
 }
 ```
 [//]: # (END)
+
+##J8DIM5
+[//]: # (MAIN: j8dim.Demo)
+An interface which extends two other interfaces that declare the same default method, as
+```CombinedInterface``` does by extending ```SomeInterface``` and ```AnotherInterface```,
+and also declares a default method (i.e. ```CombinedInterface.method```) it is possible to use
+qualified super calls of the form ```SomeInterface.super.method()``` that must be resolved to the
+respective super class' method implementation. The super calls must be qualified by the targeted
+super interface since it is not unique otherwise. 
+```java
+// j8dim/Demo.java
+package j8dim;
+
+import lib.annotations.callgraph.DirectCalls;
+import lib.annotations.callgraph.DirectCall;
+
+class Demo {
+
+    public static void main(String[] args){
+        new CombinedInterface(){}.method();
+    }
+}
+
+interface SomeInterface {
+    default void method() {
+        // do something
+    }
+}
+
+interface AnotherInterface {
+    default void method() {
+        // do something
+    }
+}
+
+interface CombinedInterface extends SomeInterface, AnotherInterface {
+    
+    @DirectCalls({
+        @DirectCall(name = "method", line = 32, resolvedTargets = "Lj8dim/SomeInterface;"),
+        @DirectCall(name = "method", line = 33, resolvedTargets = "Lj8dim/AnotherInterface;")
+    })
+    default void method() {
+        SomeInterface.super.method();
+        AnotherInterface.super.method();
+    }
+}
+```
+[//]: # (END)
+
+#Java8StaticInterfaceMethods
+
+Tests the correct method resolution of static interface methods.
+
+Please note that the ```infrastructure_incompatible_testcases``` are more test cases w.r.t. to 
+static interface methods pertaining to Java 9 and higher versions.
+ 
+##J8SIM1
+[//]: # (MAIN: j8sim.Class)
+Tests the invocation of a static interface method ```j8sim.Interface``` in ```j8sim.Class```'s main
+method.
+```java
+// j8sim/Class.java
+package j8sim;
+
+import lib.annotations.callgraph.DirectCall;
+
+class Class {
+
+    @DirectCall(name = "method", line = 9, resolvedTargets = "Lj8sim/Interface;")
+    public static void main(String[] args){
+        Interface.method();
+    }
+}
+
+interface Interface {
+    static void method() {
+        // do something
+    }
+}
+```
+[//]: # (END)
