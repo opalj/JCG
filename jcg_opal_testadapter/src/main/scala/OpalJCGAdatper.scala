@@ -137,7 +137,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     reachableMethods += ReachableMethod(m, Set.empty)
                 case FinalEP(_, cs: Callees) ⇒
                     val body = dm.definedMethod.body.get
-                    val callSites = cs.callSites(onlyEventualCallees = false).flatMap {
+                    val callSites = cs.callSites(onlyIndirectCallees = false).flatMap {
                         case (pc, callees) ⇒
                             createCallSites(body, pc, callees)
                     }.toSet
