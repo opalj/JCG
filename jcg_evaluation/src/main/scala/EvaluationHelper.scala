@@ -55,7 +55,10 @@ object CommonEvaluationConfig {
                 val adapter = ALL_ADAPTERS.find(_.frameworkName() == name)
                 assert(adapter.nonEmpty, s"'$name' is not a valid framework adapter")
                 EVALUATION_ADAPTERS ++= adapter
-            case Array("--debug", _) ⇒ DEBUG = true
+        }
+
+        args.sliding(1, 1).toList.collect {
+            case Array("--debug") ⇒ DEBUG = true
         }
 
         assert(INPUT_DIR_PATH.nonEmpty, "no input directory specified")

@@ -10,6 +10,7 @@ import scala.io.Source
 object Evaluation {
     private var runHermes = false
     private var projectSpecificEvaluation = false
+    private var excludeJDK = false
     private var runAnalyses = true
 
     private var FINGERPRINT_DIR = ""
@@ -38,13 +39,16 @@ object Evaluation {
     }
 
     private def parseArguments(args: Array[String]): Unit = {
+        args.sliding(1, 1).toList.collect {
+            case Array("--hermes")           ⇒ runHermes = true
+            case Array("--project-specific") ⇒ projectSpecificEvaluation = true
+            case Array("--exclude-jdk")      ⇒ excludeJDK = true
+        }
         args.sliding(2, 1).toList.collect {
             case Array("--fingerprint-dir", dir) ⇒
                 assert(FINGERPRINT_DIR.isEmpty, "multiple fingerprint directories specified")
                 FINGERPRINT_DIR = dir
             case Array("--analyze", value: String) ⇒ runAnalyses = value.toBoolean
-            case Array("--hermes", _)              ⇒ runHermes = true
-            case Array("--project-specific", _)    ⇒ projectSpecificEvaluation = true
         }
 
         if (projectSpecificEvaluation) {
@@ -116,25 +120,24 @@ object Evaluation {
                     projectSpec.main.orNull,
                     projectSpec.allClassPathEntryPaths(projectsDir),
                     jreLocations(projectSpec.java),
-                    true,
+                    !excludeJDK,
                     cgFile.getPath
                 )
             } catch {
                 case e: Throwable ⇒
                     println(s"exception in project ${projectSpec.name}")
                     if (config.DEBUG) {
-                        println(e.printStackTrace())
+                        e.printStackTrace()
                     }
                     -1
             }
-
-            assert(cgFile.exists(), "the adapter failed to write the call graph")
 
             System.gc()
 
             reportTiming(outDir, elapsed)
 
             if (projectSpecificEvaluation) {
+                assert(cgFile.exists(), "the adapter failed to write the call graph")
                 performProjectSpecificEvaluation(
                     projectSpec, adapter, cgAlgo, locationsMap, outDir, cgFile
                 )
