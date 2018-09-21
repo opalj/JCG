@@ -45,6 +45,8 @@ object FingerprintExtractor {
             adapter ← config.EVALUATION_ADAPTERS
             cgAlgorithm ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
         } {
+            ow.write(s"${adapter.frameworkName()}-${cgAlgorithm}")
+
             println(s"creating fingerprint for ${adapter.frameworkName()} $cgAlgorithm")
             val fingerprintFile = getFingerprintFile(adapter, cgAlgorithm, resultsDir)
             if (fingerprintFile.exists()) {
