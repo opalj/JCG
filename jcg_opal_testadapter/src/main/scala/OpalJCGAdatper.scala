@@ -87,9 +87,15 @@ object OpalJCGAdatper extends JCGTestAdapter {
         val jre = cfReader.AllClassFiles(jreJars)
         val allClassFiles = targetClassFiles ++ cpClassFiles ++ (if (analyzeJDK) jre else Seq.empty)
 
+        val libClassFiles =
+            if (analyzeJDK)
+                Seq.empty
+            else
+                Project.JavaLibraryClassFileReader.AllClassFiles(jreJars)
+
         val project: Project[URL] = Project(
             allClassFiles,
-            if (analyzeJDK) Seq.empty else jre,
+            libClassFiles,
             libraryClassFilesAreInterfacesOnly = true,
             Seq.empty
         )
