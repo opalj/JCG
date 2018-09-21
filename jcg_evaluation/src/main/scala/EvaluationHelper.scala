@@ -52,7 +52,7 @@ object CommonEvaluationConfig {
                 assert(PROJECT_PREFIX_FILTER.isEmpty, "multiple algorithm filters specified")
                 ALGORITHM_PREFIX_FILTER = prefix
             case Array("--adapter", name) ⇒ // you can use this option multiple times
-                val adapter = ALL_ADAPTERS.find(_.frameworkName() == name)
+                val adapter = ALL_ADAPTERS.find(_.frameworkName().toLowerCase == name.toLowerCase)
                 assert(adapter.nonEmpty, s"'$name' is not a valid framework adapter")
                 EVALUATION_ADAPTERS ++= adapter
         }
@@ -72,7 +72,7 @@ object CommonEvaluationConfig {
             DEBUG,
             INPUT_DIR_PATH,
             OUTPUT_DIR_PATH,
-            EVALUATION_ADAPTERS,
+            if(EVALUATION_ADAPTERS.isEmpty) ALL_ADAPTERS else EVALUATION_ADAPTERS,
             PROJECT_PREFIX_FILTER,
             ALGORITHM_PREFIX_FILTER
         )
