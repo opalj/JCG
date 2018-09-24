@@ -30,11 +30,11 @@ import lib.annotations.callgraph.DirectCall;
  */
 
 interface SuperIntf {
-/* METHOD 1 */ //default void m(){ Helper.println("SuperIntf.m"); };
+/* METHOD 1 */ default void m(){ Helper.println("SuperIntf.m"); };
 }
 
 interface Intf extends SuperIntf {
-/* METHOD 2 */    static void m(){ Helper.println("Intf.m"); };
+/* METHOD 2 */  //  static void m(){ Helper.println("Intf.m"); };
 }
 
 interface SubIntf extends Intf {}
@@ -56,7 +56,7 @@ public class Main {
     @DirectCall(name = "m", line = 58, resolvedTargets = "Lnj/SuperIntf;", prohibitedTargets = "Lnj/Intf;")
     public static void run(SubIntf c) {
         // This invokes the default method from SuperIntf
-/* METHOD 3 */ //c.m();
+/* METHOD 3 */ c.m();
     }
 
 }
