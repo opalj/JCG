@@ -16,6 +16,7 @@ import org.opalj.fpcf.FPCFAnalysesManagerKey
 import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
 import org.opalj.fpcf.PropertyStoreKey
+import org.opalj.fpcf.analyses.SystemPropertiesAnalysis
 import org.opalj.fpcf.analyses.cg.EagerFinalizerAnalysisScheduler
 import org.opalj.fpcf.analyses.cg.EagerLoadedClassesAnalysis
 import org.opalj.fpcf.analyses.cg.EagerRTACallGraphAnalysisScheduler
@@ -111,6 +112,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
             EagerThreadRelatedCallsAnalysis,
             EagerSerializationRelatedCallsAnalysis,
             EagerReflectionRelatedCallsAnalysis,
+            SystemPropertiesAnalysis,
             new LazyCalleesAnalysis(
                 Set(
                     StandardInvokeCallees,
