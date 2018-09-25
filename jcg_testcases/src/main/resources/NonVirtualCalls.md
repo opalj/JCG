@@ -89,7 +89,7 @@ import lib.annotations.callgraph.DirectCall;
 
 class Class extends Superclass {
 
-    @DirectCall(name = "method", line = 9, resolvedTargets = "Lnvc/Superclass;", prohibitedTargets = "Lnvc/Rootclass;")
+    @DirectCall(name = "method", line = 9, resolvedTargets = "Lnvc/Rootclass;")
     protected void method(){
         super.method();
     }
@@ -101,11 +101,11 @@ class Class extends Superclass {
 }
 
 class Superclass extends Rootclass {
-    protected void method(){ /* do something relevant */ }
+    
 }
 
 class Rootclass {
-    protected void method(){ /* do something irrelevant */ }
+    protected void method(){ /* do something relevant */ }
 }
 ```
 [//]: # (END)
