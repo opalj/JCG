@@ -180,7 +180,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     name,
                     dc.toJVMTypeName,
                     desc.returnType.toJVMTypeName,
-                    desc.parameterTypes.map(_.toJVMTypeName).toList
+                    desc.parameterTypes.map[String](_.toJVMTypeName).toList
                 )
 
             val (directCallees, indirectCallees) = callees.partition { callee ⇒
@@ -215,7 +215,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
             method.name,
             method.declaringClassType.toJVMTypeName,
             method.descriptor.returnType.toJVMTypeName,
-            method.descriptor.parameterTypes.map(_.toJVMTypeName).toList
+            method.descriptor.parameterTypes.map[String](_.toJVMTypeName).toList
         )
     }
 }
