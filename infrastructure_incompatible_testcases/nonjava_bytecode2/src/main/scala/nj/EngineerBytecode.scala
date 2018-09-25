@@ -65,29 +65,35 @@ object EngineerBytecode {
                     RefArray[MethodAttributeBuilder](
                         RuntimeInvisibleAnnotationTable(RefArray(
                             Annotation(
-                                FieldType("Llib/annotation/callgraph/DirectCall;"),
-                                ElementValuePairs(
-                                    ElementValuePair("name", StringValue("method")),
-                                    ElementValuePair("line", IntValue(5)),
-                                    ElementValuePair("returnType", ClassValue(ObjectType("java/lang/Object"))),
-                                    ElementValuePair("resolvedTarget",
-                                        ArrayValue(RefArray(StringValue("Lnj/Target;"))))
-                                )
-                            ),
-                            Annotation(
-                                FieldType("Llib/annotation/callgraph/DirectCall;"),
-                                ElementValuePairs(
-                                    ElementValuePair("name", StringValue("method")),
-                                    ElementValuePair("line", IntValue(6)),
-                                    ElementValuePair("returnType", ClassValue(ObjectType("java/lang/String"))),
-                                    ElementValuePair("resolvedTarget",
-                                        ArrayValue(RefArray(StringValue("Lnj/Target;"))))
-                                )
+                                FieldType("Llib/annotation/callgraph/DirectCalls;"),
+                                ElementValuePair("value",
+                                    ArrayValue(RefArray(
+                                        AnnotationValue(Annotation(
+                                            FieldType("Llib/annotation/callgraph/DirectCall;"),
+                                            ElementValuePairs(
+                                                ElementValuePair("name", StringValue("method")),
+                                                ElementValuePair("line", IntValue(5)),
+                                                ElementValuePair("returnType", ClassValue(ObjectType("java/lang/Object"))),
+                                                ElementValuePair("resolvedTarget",
+                                                    ArrayValue(RefArray(StringValue("Lnj/Target;"))))
+                                            )
+                                        )),
+                                        AnnotationValue(Annotation(
+                                            FieldType("Llib/annotation/callgraph/DirectCall;"),
+                                            ElementValuePairs(
+                                                ElementValuePair("name", StringValue("method")),
+                                                ElementValuePair("line", IntValue(6)),
+                                                ElementValuePair("returnType", ClassValue(ObjectType("java/lang/String"))),
+                                                ElementValuePair("resolvedTarget",
+                                                    ArrayValue(RefArray(StringValue("Lnj/Target;"))))
+                                            )
+                                        ))
+                                    )))
                             )
-                    )))
-                )
-            )
-        )
+                        )
+                        )
+                    )
+                )))
     }
 
     //s Annotation(
