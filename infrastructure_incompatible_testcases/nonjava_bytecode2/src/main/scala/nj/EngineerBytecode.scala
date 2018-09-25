@@ -63,7 +63,7 @@ object EngineerBytecode {
                         RETURN
                     ),
                     RefArray[MethodAttributeBuilder](
-                        RuntimeInvisibleAnnotationTable(RefArray(
+                        RuntimeVisibleAnnotationTable(RefArray(
                             Annotation(
                                 FieldType("Llib/annotation/callgraph/DirectCalls;"),
                                 ElementValuePair("value",
