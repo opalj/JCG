@@ -65,11 +65,11 @@ object EngineerBytecode {
                     RefArray[MethodAttributeBuilder](
                         RuntimeVisibleAnnotationTable(RefArray(
                             Annotation(
-                                FieldType("Llib/annotation/callgraph/DirectCalls;"),
+                                FieldType("Llib/annotations/callgraph/DirectCalls;"),
                                 ElementValuePair("value",
                                     ArrayValue(RefArray(
                                         AnnotationValue(Annotation(
-                                            FieldType("Llib/annotation/callgraph/DirectCall;"),
+                                            FieldType("Llib/annotations/callgraph/DirectCall;"),
                                             ElementValuePairs(
                                                 ElementValuePair("name", StringValue("method")),
                                                 ElementValuePair("line", IntValue(5)),
@@ -79,7 +79,7 @@ object EngineerBytecode {
                                             )
                                         )),
                                         AnnotationValue(Annotation(
-                                            FieldType("Llib/annotation/callgraph/DirectCall;"),
+                                            FieldType("Llib/annotations/callgraph/DirectCall;"),
                                             ElementValuePairs(
                                                 ElementValuePair("name", StringValue("method")),
                                                 ElementValuePair("line", IntValue(6)),
