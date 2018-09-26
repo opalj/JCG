@@ -1,6 +1,6 @@
 package demo;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 /**
  * This test case tests a new language feature from Java 9, namely private interface methods.
@@ -21,7 +21,7 @@ class InterfaceImpl implements Interface {
 
 interface Interface {
 
-    @CallSite(
+    @DirectCall(
             name = "doSomething", line = 28,
             resolvedTargets = "Ldemo/Interface;")
     default void method(){

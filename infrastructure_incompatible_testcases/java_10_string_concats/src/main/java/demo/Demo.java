@@ -14,7 +14,7 @@ import lib.annotations.callgraph.IndirectCall;
 public class Demo {
 
     @IndirectCall(
-            line = 16, name = "makeConcatWithConstants",
+            line = 21, name = "makeConcatWithConstants",
             resolvedTargets = "Ljava/lang/invoke/StringConcatFactory;")
     public static void main(String[] args) {
         String s1 = "Java 10";
