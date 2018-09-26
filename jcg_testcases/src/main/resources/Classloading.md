@@ -19,12 +19,13 @@ import java.util.Comparator;
 
 public class Demo {
 
-	@IndirectCall(name = "compare", line = 13, resolvedTargets = "Llib/IntComparator;")
+	@IndirectCall(name = "compare", line = 14, resolvedTargets = "Llib/IntComparator;")
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         ClassLoader cl = new ByteClassLoader(ClassLoader.getSystemClassLoader());
         Class<?> cls = cl.loadClass("lib.IntComparator");
         Comparator<Integer> comparator = (Comparator<Integer>) cls.newInstance();
-        comparator.compare(1, 1);
+        Integer one = 1;
+        comparator.compare(one, one);
     }
 }
 ```
