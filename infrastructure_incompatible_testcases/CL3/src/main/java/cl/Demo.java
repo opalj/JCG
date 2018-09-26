@@ -33,15 +33,19 @@ public class Demo {
     }
 
     @IndirectCalls({
-        @IndirectCall(name = "compare", line = 50, resolvedTargets = "Llib/IntComparator;"),
-        @IndirectCall(name = "compare", line = 51, resolvedTargets = "Llib/IntCompare;")
+        @IndirectCall(name = "compare", line = 60, resolvedTargets = "Llib/IntComparator;"),
+        @IndirectCall(name = "compare", line = 61, resolvedTargets = "Llib/IntCompare;")
     })
     public static void main(String[] args)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        URLClassLoader oldVersionLoader = new URLClassLoader(new URL[] {CLv1},
-                Thread.currentThread().getContextClassLoader());
-        URLClassLoader newVersionLoader= new URLClassLoader(new URL[] {CLv2},
-                Thread.currentThread().getContextClassLoader());
+        ClassLoader oldParent = Thread.currentThread().getContextClassLoader();
+        ClassLoader newParent = Demo.class.getClassLoader();
+
+        URL[] oldResource = new URL[]{CLv1};
+        URL[] newResource = new URL[]{CLv2};
+
+        URLClassLoader oldVersionLoader = new URLClassLoader(oldResource, oldParent);
+        URLClassLoader newVersionLoader= new URLClassLoader(newResource, newParent);
 
         System.out.println(CLv1.toExternalForm());
 
@@ -51,7 +55,9 @@ public class Demo {
         Comparator<Integer> oldComparator = (Comparator<Integer>) oldClass.newInstance();
         Comparator<Integer> newComparator = (Comparator<Integer>) newClass.newInstance();
 
-        oldComparator.compare(0,1);
-        newComparator.compare(1,2);
+        Integer one = new Integer(1);
+
+        oldComparator.compare(one,one);
+        newComparator.compare(one,one);
     }
 }

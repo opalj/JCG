@@ -12,14 +12,14 @@ import java.util.Comparator;
  *
  * @author Michael Reif
  */
-public class Demo {
+public class Main {
 
     private static final String DIR = System.getProperty("user.dir") + "/resources/";
-    private static URL CLv1;
+    private static URL CLv2;
 
     static {
         try {
-            CLv1 = new URL("file://" + DIR + "classloading-version-1.jar");
+            CLv2 = new URL("file://" + DIR + "classloading-version-2.jar");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -27,14 +27,14 @@ public class Demo {
 
     private static final String CLS_NAME = "lib.IntComparator";
 
-    @IndirectCall(name = "compare", line = 39, resolvedTargets = "Llib/IntComparator;")
+    @IndirectCall(name = "compare", line = 39, resolvedTargets = "Llib/IntCompare;")
     public static void main(String[] args)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         ClassLoader parent = ClassLoader.getSystemClassLoader();
-        URL[] urls = new URL[]{CLv1};
+        URL[] urls = new URL[] { CLv2 };
         URLClassLoader cl = URLClassLoader.newInstance(urls, parent);
-        Class<?> cls = cl.loadClass(CLS_NAME);
-        Comparator<Integer> comparator = (Comparator<Integer>) cls.newInstance();
+        Class<Comparator<Integer>> cls = (Class<Comparator<Integer>>) cl.loadClass(CLS_NAME);
+        Comparator<Integer> comparator = cls.newInstance();
         Integer one = Integer.valueOf(1);
         comparator.compare(one, one);
     }

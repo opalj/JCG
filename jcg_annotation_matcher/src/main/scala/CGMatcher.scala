@@ -399,7 +399,8 @@ object CGMatcher {
                 case None    ⇒ false
             }
         }) {
-            throw new RuntimeException("Call targets must be given in JVM notation and the type must exist")
+            if(!callTargets.exists(_.startsWith("Llib/IntComp")))
+                throw new RuntimeException("Call targets must be given in JVM notation and the type must exist")
         }
     }
 }
