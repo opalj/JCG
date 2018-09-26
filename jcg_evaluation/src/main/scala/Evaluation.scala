@@ -55,6 +55,10 @@ object Evaluation {
             assert(runAnalyses, "`--analyze` must be set to true on `--project-specific true`")
             assert(FINGERPRINT_DIR.nonEmpty, "no fingerprint directory specified")
         }
+
+        if (runHermes) {
+            assert(FINGERPRINT_DIR.nonEmpty, "hermes requires the fingerprints")
+        }
     }
 
     private def createLocationsMapping(resultsDir: File): Map[String, Map[String, Set[Method]]] = {

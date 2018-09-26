@@ -26,7 +26,8 @@ object TestCaseHermesJsonExtractor {
         projectsDir:       File,
         supportedFeatures: Set[String],
         jreLocations:      Map[Int, String],
-        outputFile:        File
+        outputFile:        File,
+        evalConfig:        CommonEvaluationConfig
     ): Unit = {
 
         val baseConfig: Config = ConfigFactory.load().withValue(
@@ -55,13 +56,18 @@ object TestCaseHermesJsonExtractor {
 
         assert(projectsDir.exists() && projectsDir.isDirectory)
 
-        val projectSpecFiles = projectsDir.listFiles((_, name) ⇒ name.endsWith(".conf")).sorted
+        val projectSpecFiles = projectsDir.listFiles(
+            (_, name) ⇒ name.endsWith(".conf")
+        ).sorted
 
-        val projects = for (projectSpecFile ← projectSpecFiles) yield {
-            val json = Json.parse(new FileInputStream(projectSpecFile))
-            val projectSpec = json.validate[ProjectSpecification].getOrElse {
+        val projects = for {
+            projectSpecFile ← projectSpecFiles
+            json = Json.parse(new FileInputStream(projectSpecFile))
+            projectSpec = json.validate[ProjectSpecification].getOrElse {
                 throw new IllegalArgumentException("invalid project.conf")
             }
+            if projectSpec.name.startsWith(evalConfig.PROJECT_PREFIX_FILTER)
+        } yield {
 
             val allTargets = ArrayBuffer(projectSpec.target(projectsDir).getCanonicalPath)
             allTargets ++= JRELocation.getAllJREJars(jreLocations(projectSpec.java)).map(_.getCanonicalPath)
@@ -106,7 +112,7 @@ object TestCaseHermesJsonExtractor {
         }.toSet
 
         TestCaseHermesJsonExtractor.createHermesConfig(
-            projectsDir, supportedFeatures, jreLocations, hermesFile
+            projectsDir, supportedFeatures, jreLocations, hermesFile, config
         )
 
         val hermesDefaultArgs = Array(
