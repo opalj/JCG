@@ -3,6 +3,13 @@ import java.io.FileInputStream
 
 import play.api.libs.json.Json
 
+/**
+ * A small command line tool, to verify the annotated projects.
+ * For usage see [[CommonEvaluationConfig]].
+ * Verification is done using the [[AnnotationVerifier]].
+ *
+ * @author Florian Kuebler
+ */
 object ProjectVerifier {
 
     def main(args: Array[String]): Unit = {

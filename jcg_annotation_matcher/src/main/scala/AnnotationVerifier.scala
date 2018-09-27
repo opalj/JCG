@@ -6,7 +6,17 @@ import org.opalj.br.Annotation
 import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
 
+/**
+ * Provides methods, to verify the correctness of the annotations to specify the call graph behavior.
+ *
+ * @author Florian Kuebler
+ */
 object AnnotationVerifier {
+
+    /**
+     * Verify the correctness of all call annotations ([[lib.annotations.callgraph.DirectCall]],
+     * [[lib.annotations.callgraph.IndirectCall]], and the wrappers) in the given project.
+     */
     def verifyProject(projectSpecification: ProjectSpecification, parent: File): Unit = {
         implicit val project: Project[URL] = Project(projectSpecification.target(parent))
 
@@ -47,6 +57,9 @@ object AnnotationVerifier {
         }
     }
 
+    /**
+     * Instead of throwing an [[AssertionError]], this method prints the message.
+     */
     private def printAssertionError(methodName: String, projectName: String)(f: ⇒ Unit): Unit = {
         try {
             f
