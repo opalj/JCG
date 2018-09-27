@@ -84,7 +84,6 @@ object FingerprintExtractor {
                         fingerprintWriter.println(s"${projectSpec.name}\tE")
                 }
 
-                assert(cgFile.exists(), "the adapter failed to write the call graph")
                 System.gc()
 
                 val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.DEBUG)
