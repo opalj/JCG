@@ -16,7 +16,7 @@ public interface NonConstantFieldRef {
 
 	static String nonConstantField = init();
 
-    @DirectCall(name = "callback", line = 10, resolvedTargets = "Lsi/Demo;")
+    @DirectCall(name = "callback", line = 10, resolvedTargets = "Lsi/NonConstantFieldRef;")
 	static String init() {
 		callback();
 		return "Demo";
