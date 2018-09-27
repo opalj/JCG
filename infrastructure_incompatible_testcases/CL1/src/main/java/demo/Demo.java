@@ -27,7 +27,7 @@ public class Demo {
 
     private static final String CLS_NAME = "lib.IntComparator";
 
-    @IndirectCall(name = "compare", line = 39, resolvedTargets = "Llib/IntComparator;")
+    @IndirectCall(name = "compareTo", returnType = int.class, line = 39, resolvedTargets = "Ljava/lang/Integer;")
     public static void main(String[] args)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         ClassLoader parent = ClassLoader.getSystemClassLoader();

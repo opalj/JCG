@@ -33,8 +33,8 @@ public class Demo {
     }
 
     @IndirectCalls({
-        @IndirectCall(name = "compare", line = 60, resolvedTargets = "Llib/IntComparator;"),
-        @IndirectCall(name = "compare", line = 61, resolvedTargets = "Llib/IntCompare;")
+        @IndirectCall(name = "compare", line = 60, returnType = int.class, resolvedTargets = "Ljava/lang/Integer;"),
+        @IndirectCall(name = "gc", line = 61, resolvedTargets = "Ljava/lang/System;")
     })
     public static void main(String[] args)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
