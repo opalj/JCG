@@ -64,7 +64,7 @@ object FingerprintExtractor {
                     cgFile.delete()
                 }
 
-                println(s"performing testcase ${projectSpec.name}")
+                println(s"performing test case: ${projectSpec.name}")
                 try {
                     adapter.serializeCG(
                         cgAlgorithm,
