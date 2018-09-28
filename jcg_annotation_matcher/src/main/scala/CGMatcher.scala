@@ -62,6 +62,10 @@ object CGMatcher {
             Array.empty[File]
         )
 
+        if(!serializedCallGraph.exists()){
+            return Error;
+        }
+
         val computedReachableMethods =
             Json.parse(new FileInputStream(serializedCallGraph)).validate[ReachableMethods].get.toMap
 

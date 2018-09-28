@@ -39,3 +39,11 @@ object Unsound extends Assessment {
     override def toString: String = "Unsound"
     override def shortNotation: String = "U"
 }
+
+object Error extends Assessment {
+    override def isSound: Boolean = false
+    override def isUnsound: Boolean = false
+    override def combine(other: Assessment): Assessment = Error
+    override def toString: String = "Error"
+    override def shortNotation: String = "E"
+}
