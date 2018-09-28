@@ -122,7 +122,7 @@ proceed with the following steps to obtain all class files required by the test 
 Step one:
 Compile the Main.java as is with the method with the markers *METHOD 1* (LINE 33) and *METHOD 3*
 (LINE 58) uncommented and the method with the marker *METHOD 2* (LINE 37) commented. Then take the
-resulting class files of ```C```, ```Helper```, ```SuperIntf```, ```SubIntf```, and "Main" and put tom into a
+resulting class files of ```C```, ```Helper```, ```SuperIntf```, ```SubIntf```, and "Main" and put them into a
 folder named ```nj```.
  
 Step two:
@@ -133,7 +133,8 @@ named ```nj```.
 Step three:
 Next to the folder ```nj``` add a folder named "META-INF" with the respective "MANIFEST.MF" file which
 declares ```nj/Main``` as main class.
- *
+
+ /*
 Step four:
 Compress both folders and create an executeable ".jar" file.
  */
@@ -204,20 +205,22 @@ public class Demo {
     })
     public static void main(String[] args) {
         Target t = new Target();
-        t.method("42");
-        t.method("42");
+        t.method("ResolvedToObject");
+        t.method("ResolvedToString");
     }
 }
 
 class Target {
 
     public Object method(String s){
+        System.out.println(" -- Object --");
         System.out.println(s);
-        System.out.println("Object");
         return s;
     }
 
     public String method(String s){
+        System.out.println(" -- String --");
+        System.out.println(s);
         return s;
     }
 }
