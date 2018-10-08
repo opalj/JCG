@@ -100,9 +100,41 @@ public class Demo {
 ```
 
 ##TMR9 (load_method_handle)
+[//]: # (MAIN: nj.Demo)
 This test case tests the proper handling of a method handle that is saved within a class file's
 constant pool via ```CONSTANT_MethodHandle_info``` attribute. Hence, no API calls are required to
 retrieve the method handle, instead it is just loaded over the ```ldc``` bytecode instruction.
+
+>Please note: The project ```tmr9```, contained in the
+```infrastructure_incompatible_testcases```, provides in ```scala/tmr/EngineerBytecode``` a class 
+that is meant to engineer an instance of this case using OPAL's bytecode engineering DSL.  
+```java
+// tmr/Demo.java
+package tmr;
+
+import lib.annotations.callgraph.DirectCall;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
+public class Demo {
+
+    @DirectCall(name="target", line=16, returnType = int.class, resolvedTargets = "Ltmr/Demo;")
+    public static void main(String[] args) throws Throwable {
+        // The method handle is stored in the constant pool instead of acquired at runtime!
+        MethodType mt = MethodType.methodType(int.class);
+        MethodHandle mh = MethodHandles.lookup().findStatic(Demo.class, "target", mt);
+        int result = (int) mh.invokeExact();
+        System.out.println(result);
+    }
+    
+    public static int target() {
+        return 3;
+    }
+}
+```
+[//]: # (END)
 
 #NonJavaBytecode
 This category groups test cases that must be created manually and cannot be created from compiling
@@ -122,7 +154,7 @@ proceed with the following steps to obtain all class files required by the test 
 Step one:
 Compile the Main.java as is with the method with the markers *METHOD 1* (LINE 33) and *METHOD 3*
 (LINE 58) uncommented and the method with the marker *METHOD 2* (LINE 37) commented. Then take the
-resulting class files of ```C```, ```Helper```, ```SuperIntf```, ```SubIntf```, and "Main" and put tom into a
+resulting class files of ```C```, ```Helper```, ```SuperIntf```, ```SubIntf```, and "Main" and put them into a
 folder named ```nj```.
  
 Step two:
@@ -133,7 +165,8 @@ named ```nj```.
 Step three:
 Next to the folder ```nj``` add a folder named "META-INF" with the respective "MANIFEST.MF" file which
 declares ```nj/Main``` as main class.
- *
+
+ /*
 Step four:
 Compress both folders and create an executeable ".jar" file.
  */
@@ -204,20 +237,22 @@ public class Demo {
     })
     public static void main(String[] args) {
         Target t = new Target();
-        t.method("42");
-        t.method("42");
+        t.method("ResolvedToObject");
+        t.method("ResolvedToString");
     }
 }
 
 class Target {
 
     public Object method(String s){
+        System.out.println(" -- Object --");
         System.out.println(s);
-        System.out.println("Object");
         return s;
     }
 
     public String method(String s){
+        System.out.println(" -- String --");
+        System.out.println(s);
         return s;
     }
 }
