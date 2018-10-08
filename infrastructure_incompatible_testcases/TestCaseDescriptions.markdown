@@ -240,7 +240,7 @@ package: ```"org/codehaus/groovy"```.
 Please note that even if there is no test case yet, the respective Hermes query does check for Groovy
 invokedynamics with this particular pattern.
 ##Lambda10 (scala_2.12.6_invokedynamic_method_reference)
-This test cases triggers a standard Scala invokedynamic 
+This test cases triggers a standard Scala invokedynamic which using Java's compile strategy. 
            
 ```scala
 package demo
@@ -261,5 +261,4 @@ object Demo {
        new Demo().m(twice)
    }
 }
-
 ```
