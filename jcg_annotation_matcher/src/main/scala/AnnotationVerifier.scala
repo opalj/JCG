@@ -5,6 +5,7 @@ import org.opalj.br
 import org.opalj.br.Annotation
 import org.opalj.br.ObjectType
 import org.opalj.br.analyses.Project
+import org.opalj.br.analyses.SomeProject
 
 /**
  * Provides methods, to verify the correctness of the annotations to specify the call graph behavior.
@@ -137,7 +138,7 @@ object AnnotationVerifier {
     /**
      * Checks whether the `types` are given in JVM binary notation and whether they exists in project.
      */
-    def verifyJVMTypes(types: List[String])(implicit p: Project[URL]): Unit = {
+    def verifyJVMTypes(types: List[String])(implicit p: SomeProject): Unit = {
         types.foreach { ct ⇒
             val re = "L([^;]*);".r
             re findFirstMatchIn ct match {
