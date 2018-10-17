@@ -15,6 +15,8 @@ import org.opalj.br.analyses.SomeProject
 import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.collection.immutable.RefArray
+import org.opalj.log.GlobalLogContext
+import org.opalj.log.OPALLogger
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 
@@ -36,7 +38,7 @@ object DoopAdapter extends JCGTestAdapter {
 
     def main(args: Array[String]): Unit = {
 
-        /*val doopResults = new File(args(0)).listFiles(f ⇒ f.isFile && f.getName.endsWith(".jar.txt"))
+        val doopResults = new File(args(0)).listFiles(f ⇒ f.isFile && f.getName.endsWith(".jar.txt"))
         val jreDir = new File(args(1))
 
         if (!jreDir.exists())
@@ -50,10 +52,20 @@ object DoopAdapter extends JCGTestAdapter {
             if (!tgtJar.exists()) {
                 throw new IllegalArgumentException(s"${tgtJar.getAbsolutePath} does not exist")
             }
+            val projectSpec: ProjectSpecification = ProjectSpecification(
+                doopResult.getName.replace(".jar.txt", ""), // name of the jar
+                -1, // ignore java version
+                None, // ignore main
+                tgtJar.getAbsolutePath, // path to jar
+                None // ignore other class path entries
+            )
+
             println(s"${tgtJar.getName}")
             val outFile = createJsonRepresentation(source, tgtJar, jreDir)
-            println(CGMatcher.matchCallSites(tgtJar.getAbsolutePath, outFile.getAbsolutePath))
-        }*/
+            println(CGMatcher.matchCallSites(
+                projectSpec, jreDir.getAbsolutePath, new File(""), outFile
+            ))
+        }
 
     }
 
