@@ -12,6 +12,7 @@ object Evaluation {
     private var projectSpecificEvaluation = false
     private var excludeJDK = false
     private var runAnalyses = true
+    private var allQueries = false
 
     private var FINGERPRINT_DIR = ""
 
@@ -26,7 +27,12 @@ object Evaluation {
 
         if (runHermes) {
             TestCaseHermesJsonExtractor.performHermesRun(
-                projectsDir, jreLocations, config, new File(FINGERPRINT_DIR), projectSpecificEvaluation
+                projectsDir,
+                jreLocations,
+                config,
+                new File(FINGERPRINT_DIR),
+                allQueries,
+                projectSpecificEvaluation
             )
         }
 
@@ -43,6 +49,7 @@ object Evaluation {
             case Array("--hermes")           ⇒ runHermes = true
             case Array("--project-specific") ⇒ projectSpecificEvaluation = true
             case Array("--exclude-jdk")      ⇒ excludeJDK = true
+            case Array("--all-queries")      ⇒ allQueries = true
         }
         args.sliding(2, 1).toList.collect {
             case Array("--fingerprint-dir", dir) ⇒
@@ -57,7 +64,7 @@ object Evaluation {
         }
 
         if (runHermes) {
-            assert(FINGERPRINT_DIR.nonEmpty, "hermes requires the fingerprints")
+            assert(FINGERPRINT_DIR.nonEmpty || allQueries, "hermes requires the fingerprints or `--all-queries` must be set")
         }
     }
 

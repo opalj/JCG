@@ -95,6 +95,7 @@ object TestCaseHermesJsonExtractor {
         jreLocations:              Map[Int, String],
         config:                    CommonEvaluationConfig,
         fingerprintDir:            File,
+        runAllQueries:             Boolean,
         projectSpecificEvaluation: Boolean
     ): Unit = {
         println("running hermes")
@@ -105,12 +106,16 @@ object TestCaseHermesJsonExtractor {
         if (!config.DEBUG)
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
-        val supportedFeatures = config.EVALUATION_ADAPTERS.flatMap { adapter ⇒
-            adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER)).flatMap { algorithm ⇒
-                FingerprintExtractor.parseFingerprints(adapter, algorithm, fingerprintDir)
-            }
-        }.toSet
+        val supportedFeatures = if (runAllQueries) {
+            Set.empty[String]
+        } else {
+            config.EVALUATION_ADAPTERS.flatMap { adapter ⇒
+                adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER)).flatMap { algorithm ⇒
+                    FingerprintExtractor.parseFingerprints(adapter, algorithm, fingerprintDir)
+                }
+            }.toSet
 
+        }
         TestCaseHermesJsonExtractor.createHermesConfig(
             projectsDir, supportedFeatures, jreLocations, hermesFile, config
         )
