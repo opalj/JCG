@@ -37,14 +37,16 @@ object DoopAdapter extends JCGTestAdapter {
     override def frameworkName(): String = "Doop"
 
     def main(args: Array[String]): Unit = {
+        OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
-        val doopResults = new File(args(0)).listFiles(f ⇒ f.isFile && f.getName.endsWith(".jar.txt"))
+        val doopResults = new File(args(0)).listFiles{ f ⇒
+            f.isFile && f.getName.endsWith(".jar.txt")
+        }
         val jreDir = new File(args(1))
 
         if (!jreDir.exists())
-            throw new IllegalArgumentException()
-
-        OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
+            throw new IllegalArgumentException("Please specify the path to the JRE as 2nd" +
+                "command line argument")
 
         for (doopResult ← doopResults.sorted) {
             val source = Source.fromFile(doopResult)
@@ -62,11 +64,11 @@ object DoopAdapter extends JCGTestAdapter {
 
             println(s"${tgtJar.getName}")
             val outFile = createJsonRepresentation(source, tgtJar, jreDir)
-            println(CGMatcher.matchCallSites(
+            val matchingResult = CGMatcher.matchCallSites(
                 projectSpec, jreDir.getAbsolutePath, new File(""), outFile
-            ))
+            )
+            println(matchingResult.shortNotation)
         }
-
     }
 
     def createJsonRepresentation(doopResult: Source, tgtJar: File, jreDir: File): File = {
