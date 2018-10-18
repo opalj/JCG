@@ -79,7 +79,10 @@ object DoopAdapter extends JCGTestAdapter {
         val reachableMe: ReachableMethods = convertToReachableMethods(callGraph)
 
         val callSitesJson: JsValue = Json.toJson(reachableMe)
-        val outFile = new File(s"${tgtJar.getName.replace(".jar", ".json")}")
+        val jarName = tgtJar.getName
+        val dn = jarName.replace(".jar", "")
+        val fn = jarName.replace(".jar", ".json")
+        val outFile = new File(s"tmp/DOOP/$dn/${fn}")
         val pw = new PrintWriter(outFile)
         pw.write(Json.prettyPrint(callSitesJson))
         pw.close()
