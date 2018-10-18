@@ -82,7 +82,12 @@ object DoopAdapter extends JCGTestAdapter {
         val jarName = tgtJar.getName
         val dn = jarName.replace(".jar", "")
         val fn = jarName.replace(".jar", ".json")
-        val outFile = new File(s"tmp/DOOP/$dn/${fn}")
+        val dir = new File(s"tmp/DOOP/$dn")
+        if(!dir.exists()){
+            dir.mkdirs()
+        }
+
+        val outFile = new File(s"${dir.getAbsolutePath}/${fn}")
         val pw = new PrintWriter(outFile)
         pw.write(Json.prettyPrint(callSitesJson))
         pw.close()
