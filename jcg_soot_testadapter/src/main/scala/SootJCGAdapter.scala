@@ -22,7 +22,7 @@ object SootJCGAdapter extends JCGTestAdapter {
     private val VTA = "VTA"
     private val Spark = "SPARK"
 
-    override def possibleAlgorithms(): Array[String] = Array( /*CHA,*/ RTA /*, VTA, Spark */ )
+    override def possibleAlgorithms(): Array[String] = Array( CHA, RTA , VTA, Spark)
 
     override def frameworkName(): String = "Soot"
 
