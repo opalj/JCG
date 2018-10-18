@@ -1,21 +1,8 @@
 import java.io.File
 import java.io.FileInputStream
 
-import lib.annotations.callgraph.DirectCall
-import lib.annotations.callgraph.DirectCalls
-import lib.annotations.callgraph.IndirectCall
-import lib.annotations.callgraph.IndirectCalls
 import org.opalj.br
 import org.opalj.br.Annotation
-import org.opalj.br.AnnotationValue
-import org.opalj.br.ArrayValue
-import org.opalj.br.ClassValue
-import org.opalj.br.ElementValuePair
-import org.opalj.br.IntValue
-import org.opalj.br.ObjectType
-import org.opalj.br.StringValue
-import org.opalj.br.Type
-import org.opalj.br.VoidType
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.SomeProject
 import org.opalj.log.GlobalLogContext
