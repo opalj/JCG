@@ -49,7 +49,7 @@ object CommonEvaluationConfig {
                 assert(PROJECT_PREFIX_FILTER.isEmpty, "multiple project filters specified")
                 PROJECT_PREFIX_FILTER = prefix
             case Array("--algorithm-prefix", prefix) ⇒
-                assert(PROJECT_PREFIX_FILTER.isEmpty, "multiple algorithm filters specified")
+                assert(ALGORITHM_PREFIX_FILTER.isEmpty, "multiple algorithm filters specified")
                 ALGORITHM_PREFIX_FILTER = prefix
             case Array("--adapter", name) ⇒ // you can use this option multiple times
                 val adapter = ALL_ADAPTERS.find(_.frameworkName().toLowerCase == name.toLowerCase)
