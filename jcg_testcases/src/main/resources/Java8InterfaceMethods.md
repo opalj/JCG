@@ -229,7 +229,7 @@ interface DirectInterface extends Interface1, Interface2 {
 ```
 [//]: # (END)
 
-##J8DIM5
+##J8DIM6
 [//]: # (MAIN: j8dim.Demo)
 An interface which extends two other interfaces that declare the same default method, as
 ```CombinedInterface``` does by extending ```SomeInterface``` and ```AnotherInterface```,
