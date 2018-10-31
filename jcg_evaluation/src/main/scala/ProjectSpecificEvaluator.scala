@@ -26,13 +26,13 @@ object ProjectSpecificEvaluator {
 
     // todo document "CSR1+CSR2" -> ["CSR1", "CSR2"]
     def distinctFeatureIDs(queryFeatureID: String): Array[String] = {
-        queryFeatureID split "+"
+        queryFeatureID split "\\+"
     }
 
     // todo document "TMR1.1" -> "TMR1"
     def correspondingTestCaseID(featureID: String): String = {
-        val split = featureID split "."
-        assert(split.size >= 2) // either 1 or 2
+        val split = featureID split "\\."
+        assert(split.size <= 2)
         split(0)
     }
 }

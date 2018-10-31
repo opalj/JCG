@@ -30,6 +30,7 @@ import org.opalj.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
 import org.opalj.fpcf.cg.properties.ReflectionRelatedCallees
 import org.opalj.fpcf.cg.properties.SerializationRelatedCallees
 import org.opalj.fpcf.cg.properties.StandardInvokeCallees
+import org.opalj.tac.fpcf.analyses.LazyL0TACAIAnalysis
 import play.api.libs.json.Json
 
 import scala.collection.JavaConverters._
@@ -67,7 +68,10 @@ object OpalJCGAdatper extends JCGTestAdapter {
                 baseConfig.withValue(
                     "org.opalj.br.analyses.cg.InitialEntryPointsKey.analysis",
                     ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.LibraryEntryPointsFinder")
-                )
+                ).withValue(
+                        "org.opalj.br.analyses.cg.InitialInstantiatedTypesKey.analysis",
+                        ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.LibraryInstantiatedTypesFinder")
+                    )
             } else {
                 baseConfig.withValue(
                     "org.opalj.br.analyses.cg.InitialEntryPointsKey.analysis",
@@ -77,7 +81,10 @@ object OpalJCGAdatper extends JCGTestAdapter {
                         ConfigValueFactory.fromIterable(Seq(ConfigValueFactory.fromMap(Map(
                             "declaringClass" → mainClass.replace('.', '/'), "name" → "main"
                         ).asJava)).asJava)
-                    )
+                    ).withValue(
+                            "org.opalj.br.analyses.cg.InitialInstantiatedTypesKey.analysis",
+                            ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.ApplicationInstantiatedTypesFinder")
+                        )
             }
 
         // gather the class files to be loaded
@@ -113,6 +120,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
             EagerSerializationRelatedCallsAnalysis,
             EagerReflectionRelatedCallsAnalysis,
             SystemPropertiesAnalysis,
+            LazyL0TACAIAnalysis,
             new LazyCalleesAnalysis(
                 Set(
                     StandardInvokeCallees,
