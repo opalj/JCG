@@ -32,7 +32,7 @@ object ProjectSpecificEvaluator {
     // todo document "TMR1.1" -> "TMR1"
     def correspondingTestCaseID(featureID: String): String = {
         val split = featureID split "\\."
-        assert(split.size >= 2) // either 1 or 2
+        assert(split.size <= 2)
         split(0)
     }
 }
