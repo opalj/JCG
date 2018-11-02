@@ -152,7 +152,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                 case FinalEP(_, NoCallees) ⇒
                     reachableMethods += ReachableMethod(m, Set.empty)
                 case FinalEP(_, cs: Callees) ⇒
-                    val body = dm.definedMethod.body.get
+                    val body = dm.definedMethod.body
                     val callSites = cs.callSites().flatMap {
                         case (pc, callees) ⇒
                             createCallSites(body, pc, callees)
@@ -172,41 +172,43 @@ object OpalJCGAdatper extends JCGTestAdapter {
     }
 
     private def createCallSites(
-        body:    Code,
+        bodyO:   Option[Code],
         pc:      Int,
         callees: Iterator[DeclaredMethod]
-    ): Seq[CallSite] = {
-        val declaredO = body.instructions(pc) match {
-            case MethodInvocationInstruction(dc, _, name, desc) ⇒ Some(dc, name, desc)
-            case _                                              ⇒ None
-        }
-
-        val line = body.lineNumber(pc).getOrElse(-1)
-
-        if (declaredO.isDefined) {
-            val (dc, name, desc) = declaredO.get
-            val declaredTarget =
-                Method(
-                    name,
-                    dc.toJVMTypeName,
-                    desc.returnType.toJVMTypeName,
-                    desc.parameterTypes.map[String](_.toJVMTypeName).toList
-                )
-
-            val (directCallees, indirectCallees) = callees.partition { callee ⇒
-                callee.name == name && // TODO check descriptor correctly for refinement
-                    callee.descriptor.parametersCount == desc.parametersCount
+    ): Seq[CallSite] = bodyO match {
+        case None ⇒ callees.map(createIndividualCallSite(_, -1)).toSeq
+        case Some(body) ⇒
+            val declaredO = body.instructions(pc) match {
+                case MethodInvocationInstruction(dc, _, name, desc) ⇒ Some(dc, name, desc)
+                case _                                              ⇒ None
             }
 
-            indirectCallees.map(createIndividualCallSite(_, line)).toSeq :+
-                CallSite(
-                    declaredTarget,
-                    line,
-                    directCallees.map(createMethodObject).toSet
-                )
-        } else {
-            callees.map(createIndividualCallSite(_, line)).toSeq
-        }
+            val line = body.lineNumber(pc).getOrElse(-1)
+
+            if (declaredO.isDefined) {
+                val (dc, name, desc) = declaredO.get
+                val declaredTarget =
+                    Method(
+                        name,
+                        dc.toJVMTypeName,
+                        desc.returnType.toJVMTypeName,
+                        desc.parameterTypes.map[String](_.toJVMTypeName).toList
+                    )
+
+                val (directCallees, indirectCallees) = callees.partition { callee ⇒
+                    callee.name == name && // TODO check descriptor correctly for refinement
+                        callee.descriptor.parametersCount == desc.parametersCount
+                }
+
+                indirectCallees.map(createIndividualCallSite(_, line)).toSeq :+
+                    CallSite(
+                        declaredTarget,
+                        line,
+                        directCallees.map(createMethodObject).toSet
+                    )
+            } else {
+                callees.map(createIndividualCallSite(_, line)).toSeq
+            }
     }
 
     def createIndividualCallSite(
