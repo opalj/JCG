@@ -27,9 +27,10 @@ object CallGraphSize {
                 target ← i.listFiles(_.isDirectory).sorted
                 framework ← target.listFiles(_.isDirectory)
                 algo ← framework.listFiles(_.isDirectory)
+                callgraph = s"$framework $algo"
                 file ← algo.listFiles(_.getName.endsWith(".json"))
             } {
-                printStatistic(file)
+                printStatistic(file, callgraph)
             }
 
             // for all .json files in the given directory
@@ -42,11 +43,14 @@ object CallGraphSize {
             printStatistic(i)
         }
     }
-    def printStatistic(jsFile: File): Unit = {
+    def printStatistic(jsFile: File, callGraphName : String = ""): Unit = {
         val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.reachableMethods
 
         val edgeCount = reachableMethods.flatMap(_.callSites.map(_.targets.size)).sum
-        println(s"${jsFile.getName} - ${reachableMethods.size} reachable methods - $edgeCount call graph edges")
+
+        val outputName = if(callGraphName.isEmpty) jsFile.getName else callGraphName
+
+        println(s"$outputName - ${reachableMethods.size} reachable methods - $edgeCount call graph edges")
 
     }
 }
