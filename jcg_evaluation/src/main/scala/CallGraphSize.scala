@@ -16,26 +16,28 @@ object CallGraphSize {
      * @param args
      *      args[0] must be either a path to a serialized call graph or the path to the result
      *      directory. The stucture of the directory case must be the following:
-     *      resultDir/target/framework/algorithm/\*.json
+     *      resultDir/target/framework/algorithm/\*.json or a directory with the .json files in it.
      */
     def main(args: Array[String]): Unit = {
         val i = new File(args(0))
         assert(i.exists())
         if (i.isDirectory) {
+            // for structures like target/framework/algorithm
             for {
                 target ← i.listFiles(_.isDirectory).sorted
                 framework ← target.listFiles(_.isDirectory)
                 algo ← framework.listFiles(_.isDirectory)
                 file ← algo.listFiles(_.getName.endsWith(".json"))
             } {
-                val size = Json.parse(new FileInputStream(file)).validate[ReachableMethods].get.reachableMethods.size
-                println(s"${target.getName} ${framework.getName} ${algo.getName} ${file.getName} - $size")
+                printStatistic(file)
             }
 
+            // for all .json files in the given directory
             for (file ← i.listFiles(_.getName.endsWith(".json"))) {
                 printStatistic(file)
             }
         } else {
+            // for a given .json file
             assert(i.getName.endsWith(".json"))
             printStatistic(i)
         }
