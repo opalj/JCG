@@ -27,7 +27,7 @@ object CallGraphSize {
                 target ← i.listFiles(_.isDirectory).sorted
                 framework ← target.listFiles(_.isDirectory)
                 algo ← framework.listFiles(_.isDirectory)
-                callgraph = s"$framework $algo"
+                callgraph = s"${framework.getName} ${algo.getName}"
                 file ← algo.listFiles(_.getName.endsWith(".json"))
             } {
                 printStatistic(file, callgraph)
