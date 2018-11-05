@@ -17,6 +17,7 @@ object CompareCGs {
         var showCommon = false
         var showReachable = false
         var showAdditional = false
+        var maxFindings = Int.MaxValue
 
         args.sliding(2, 2).toList.collect {
             case Array("--input1", cg) ⇒
@@ -35,14 +36,16 @@ object CompareCGs {
                 showReachable = reachable == "t"
             case Array("--showAdditional", additional) ⇒
                 showAdditional = additional == "t"
+            case Array("--maxFindings", max) ⇒
+                maxFindings = max.toInt
         }
 
         val cg1 = Json.parse(new FileInputStream(cg1Path)).validate[ReachableMethods].get.toMap
         val cg2 = Json.parse(new FileInputStream(cg2Path)).validate[ReachableMethods].get.toMap
 
         if (showAdditional) {
-            val additionalReachableMethods1 = extractAdditionalMethods(cg1, cg2)
-            val additionalReachableMethods2 = extractAdditionalMethods(cg2, cg1)
+            val additionalReachableMethods1 = extractAdditionalMethods(cg1, cg2).toSeq.sorted.take(maxFindings)
+            val additionalReachableMethods2 = extractAdditionalMethods(cg2, cg1).toSeq.sorted.take(maxFindings)
 
             println(additionalReachableMethods1.mkString(" ##### Additional Methods - Input 1 #####\n\n", "\n\t", "\n\n"))
             println(additionalReachableMethods2.mkString(" ##### Additional Methods - Input 2 #####\n\n", "\n\t", "\n\n"))
@@ -54,12 +57,12 @@ object CompareCGs {
             Set.empty[Method]
 
         if(showCommon) {
-            println(commonReachableMethods.mkString(" ##### Common Methods #####\n\n", "\n\t", "\n\n"))
+            println(commonReachableMethods.toSeq.sorted.take(maxFindings).mkString(" ##### Common Methods #####\n\n", "\n\t", "\n\n"))
         }
 
         if(showReachable) {
-            val reachableInApp1 = extractReachableApplicationMethods(appPackages, cg1)
-            val reachableInApp2 = extractReachableApplicationMethods(appPackages, cg2)
+            val reachableInApp1 = extractReachableApplicationMethods(appPackages, cg1).toSeq.sorted.take(maxFindings)
+            val reachableInApp2 = extractReachableApplicationMethods(appPackages, cg2).toSeq.sorted.take(maxFindings)
 
             println(reachableInApp1.mkString(" ##### Reachable Application Methods - Input 1 #####\n\n", "\n\t", "\n\n"))
             println(reachableInApp2.mkString(" ##### Reachable Application Methods - Input 2 #####\n\n", "\n\t", "\n\n"))
@@ -67,8 +70,8 @@ object CompareCGs {
         }
 
         if (showBoundaries) {
-            val boundaries1 = extractBoundaries(cg1, commonReachableMethods)
-            val boundaries2 = extractBoundaries(cg2, commonReachableMethods)
+            val boundaries1 = extractBoundaries(cg1, commonReachableMethods).toSeq.sorted.take(maxFindings)
+            val boundaries2 = extractBoundaries(cg2, commonReachableMethods).toSeq.sorted.take(maxFindings)
 
             println(boundaries1.mkString(" ##### Boundary Methods - Input 1 #####\n\n", "\n\t", "\n\n"))
             println(boundaries2.mkString(" ##### Boundary Methods - Input 2 #####\n\n", "\n\t", "\n\n"))
