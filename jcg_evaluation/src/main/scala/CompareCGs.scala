@@ -19,6 +19,8 @@ object CompareCGs {
         var showAdditional = false
         var maxFindings = Int.MaxValue
 
+        var inPackage = ""
+
         args.sliding(2, 2).toList.collect {
             case Array("--input1", cg) ⇒
                 assert(cg1Path.isEmpty, "--input1 is specified multiple times")
@@ -38,6 +40,8 @@ object CompareCGs {
                 showAdditional = additional == "t"
             case Array("--maxFindings", max) ⇒
                 maxFindings = max.toInt
+            case Array("--inPackage", pkg) =>
+                inPackage = pkg
         }
 
         val cg1 = Json.parse(new FileInputStream(cg1Path)).validate[ReachableMethods].get.toMap
@@ -70,8 +74,8 @@ object CompareCGs {
         }
 
         if (showBoundaries) {
-            val boundaries1 = extractBoundaries(cg1, commonReachableMethods).toSeq.sortBy(_.declaringClass).take(maxFindings)
-            val boundaries2 = extractBoundaries(cg2, commonReachableMethods).toSeq.sortBy(_.declaringClass).take(maxFindings)
+            val boundaries1 = extractBoundaries(cg1, commonReachableMethods, inPackage).toSeq.sortBy(_.declaringClass).take(maxFindings)
+            val boundaries2 = extractBoundaries(cg2, commonReachableMethods, inPackage).toSeq.sortBy(_.declaringClass).take(maxFindings)
 
             println(boundaries1.mkString(" ##### Boundary Methods - Input 1 #####\n\n", "\n\t", "\n\n"))
             println(boundaries2.mkString(" ##### Boundary Methods - Input 2 #####\n\n", "\n\t", "\n\n"))
@@ -91,11 +95,15 @@ object CompareCGs {
     }
 
     private def extractBoundaries(
-        cg: Map[Method, Set[CallSite]], commonReachableMethods: Set[Method]
+        cg: Map[Method, Set[CallSite]], commonReachableMethods: Set[Method], inPackage: List[String]
     ): Set[Method] = {
         commonReachableMethods.filter { caller ⇒
-            val callees = cg(caller).flatMap(_.targets)
-            callees.exists(target ⇒ !commonReachableMethods.contains(target))
+            if(caller.declaringClass.startsWith(inPackage)){
+                val callees = cg(caller).flatMap(_.targets)
+                callees.exists(target ⇒ !commonReachableMethods.contains(target))
+            } else {
+                false
+            }
         }
     }
 }
