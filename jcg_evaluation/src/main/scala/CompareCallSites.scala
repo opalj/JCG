@@ -71,11 +71,13 @@ object CompareCallSites {
 
         val resultInput1 = cg1targets.filter(!cg2targets.contains(_))
         val resultInput2 = cg2targets.filter(!cg1targets.contains(_))
+        val common = cg1targets.intersect(resultInput2)
 
         println("################################################################")
         println(s"####### Callsite: ${method.toString} #######")
         println("################################################################\n\n\n")
 
+        println(common.mkString("############ Common #############\n\n\t", "\n\t", "\n\n"))
         println(resultInput1.mkString("############ CG 1 #############\n\n\t", "\n\t", "\n\n"))
         println(resultInput2.mkString("############ CG 2 #############\n\n\t", "\n\t", "\n\n"))
     }
