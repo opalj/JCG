@@ -56,7 +56,7 @@ object CompareCallSites {
             val sizeDiff = (cg1targets.size, cg2targets.size) match {
                 case (x, y) if x == y => 0
                 case (x, y) if x > y => x - y
-                case (x, y) if y == x => y - x
+                case (x, y) if x < y => y - x
             }
 
             sizeDiff match {
