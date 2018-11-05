@@ -95,7 +95,7 @@ object CompareCGs {
     }
 
     private def extractBoundaries(
-        cg: Map[Method, Set[CallSite]], commonReachableMethods: Set[Method], inPackage: List[String]
+        cg: Map[Method, Set[CallSite]], commonReachableMethods: Set[Method], inPackage: String
     ): Set[Method] = {
         commonReachableMethods.filter { caller ⇒
             if(caller.declaringClass.startsWith(inPackage)){
