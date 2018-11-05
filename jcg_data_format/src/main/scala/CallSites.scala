@@ -50,7 +50,12 @@ object CallSite {
  * A method is represented using the `name`, the `declaringClass`, its `returnType` and its
  * `parameterTypes`.
  */
-case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String])
+case class Method(name: String, declaringClass: String, returnType: String, parameterTypes: List[String]) {
+
+    override def toString: String = {
+        s"$declaringClass { $returnType $name(${parameterTypes.mkString(", ")})}"
+    }
+}
 
 object Method {
     implicit val methodReads: Reads[Method] = Json.reads[Method]
