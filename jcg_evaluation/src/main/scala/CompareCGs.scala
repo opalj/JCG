@@ -5,6 +5,7 @@ import play.api.libs.json.Json
 /**
  * @author Dominik Helm
  * @author Florian Kuebler
+ * @author Michael Reif
  */
 object CompareCGs {
 
