@@ -43,10 +43,13 @@ object CallGraphSize {
             printStatistic(i)
         }
     }
+
     def printStatistic(jsFile: File, callGraphName : String = ""): Unit = {
         val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.reachableMethods
 
-        val edgeCount = reachableMethods.flatMap(_.callSites.map(_.targets.size)).sum
+        val edgeCount = reachableMethods.foldLeft(0){ (acc, rm) =>
+            acc + rm.callSites.foldLeft(0)((acc,cs) => acc + cs.targets.size)
+        }
 
         val outputName = if(callGraphName.isEmpty) jsFile.getName else callGraphName
 

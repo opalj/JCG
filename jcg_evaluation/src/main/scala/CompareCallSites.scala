@@ -8,8 +8,6 @@ import play.api.libs.json.Json
  */
 object CompareCallSites {
 
-    val NoFilter : Method => Boolean = _ => true
-
     def main(args: Array[String]): Unit = {
         var cg1Path = ""
         var cg2Path = ""
@@ -39,13 +37,12 @@ object CompareCallSites {
 
         val commonReachableMethods = cg1.filter(m ⇒ cg2.contains(m._1)).keySet
 
-        val NameFilter : Method => Boolean = {
-            m => m.name == methodName && m.declaringClass == declaringClassName
+        val methodFilter = (methodName, declaringClassName) match {
+            case ("", "") => (m: Method) => true
+            case (_,"") => (m: Method) => m.name == methodName
+            case ("",_) => (m: Method) => m.declaringClass == declaringClassName
+            case _ => (m: Method) => m.name == methodName && m.declaringClass == declaringClassName
         }
-
-        val methodFilter = if(methodName.nonEmpty && declaringClassName.nonEmpty){
-            NameFilter
-        } else NoFilter
 
 
         for {
