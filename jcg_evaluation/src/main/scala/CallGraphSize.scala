@@ -55,7 +55,7 @@ object CallGraphSize {
         val appMethods = reachableMethods.filter { rm =>
             val declClass = rm.method.declaringClass
             appPackages.exists { pkg =>
-                declClass.startsWith(pkg)
+                declClass.startsWith(s"L$pkg")
             }
         }.size
 
