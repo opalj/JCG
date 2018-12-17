@@ -65,7 +65,6 @@ object CallGraphSize {
 
         val outputName = if(callGraphName.isEmpty) jsFile.getName else callGraphName
 
-        println(s"$outputName - ${reachableMethods.size} reachable methods - $edgeCount call graph edges")
-
+        println(s"$outputName - ${reachableMethods.size} reachable methods - $edgeCount call graph edges [application methods: $appMethods]")
     }
 }
