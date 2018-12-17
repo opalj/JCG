@@ -7,6 +7,7 @@ import play.api.libs.json.Json
  * A small helper to get the size information of computed (serialized) call graphs.
  *
  * @author Florian Kuebler
+ * @author Michael Reif
  */
 object CallGraphSize {
 
@@ -21,6 +22,10 @@ object CallGraphSize {
     def main(args: Array[String]): Unit = {
         val i = new File(args(0))
         assert(i.exists())
+
+        // take all arguments except the first one as parameter
+        val pgkPrefixes = args.takeRight(args.length - 1).toList
+
         if (i.isDirectory) {
             // for structures like target/framework/algorithm
             for {
@@ -30,22 +35,29 @@ object CallGraphSize {
                 callgraph = s"${framework.getName} ${algo.getName}"
                 file ← algo.listFiles(_.getName.endsWith(".json"))
             } {
-                printStatistic(file, callgraph)
+                printStatistic(file, pgkPrefixes, callgraph)
             }
 
             // for all .json files in the given directory
             for (file ← i.listFiles(_.getName.endsWith(".json"))) {
-                printStatistic(file)
+                printStatistic(file, pgkPrefixes)
             }
         } else {
             // for a given .json file
             assert(i.getName.endsWith(".json"))
-            printStatistic(i)
+            printStatistic(i, pgkPrefixes)
         }
     }
 
-    def printStatistic(jsFile: File, callGraphName : String = ""): Unit = {
+    def printStatistic(jsFile: File, appPackages: List[String], callGraphName : String = ""): Unit = {
         val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.reachableMethods
+
+        val appMethods = reachableMethods.filter { rm =>
+            val declClass = rm.method.declaringClass
+            appPackages.exists { pkg =>
+                declClass.startsWith(pkg)
+            }
+        }.size
 
         val edgeCount = reachableMethods.foldLeft(0){ (acc, rm) =>
             acc + rm.callSites.foldLeft(0)((acc,cs) => acc + cs.targets.size)
