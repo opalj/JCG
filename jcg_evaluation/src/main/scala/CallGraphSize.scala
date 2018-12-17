@@ -52,12 +52,12 @@ object CallGraphSize {
     def printStatistic(jsFile: File, appPackages: List[String], callGraphName : String = ""): Unit = {
         val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.reachableMethods
 
-        val appMethods = reachableMethods.filter { rm =>
+        val appMethods = reachableMethods.count { rm =>
             val declClass = rm.method.declaringClass
             appPackages.exists { pkg =>
                 declClass.startsWith(s"L$pkg")
             }
-        }.size
+        }
 
         val edgeCount = reachableMethods.foldLeft(0){ (acc, rm) =>
             acc + rm.callSites.foldLeft(0)((acc,cs) => acc + cs.targets.size)
