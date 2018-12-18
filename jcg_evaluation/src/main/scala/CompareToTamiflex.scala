@@ -10,6 +10,8 @@ object CompareToTamiflex {
     def main(args: Array[String]): Unit = {
         var callGraphFile = ""
         var tamiflexOutput = ""
+        var typeFilter = ""
+        var printMethods = false
 
         args.sliding(2, 2).toList.collect {
             case Array("--callgraph", cg) ⇒
@@ -18,10 +20,23 @@ object CompareToTamiflex {
             case Array("--tamiflex", cg) ⇒
                 assert(tamiflexOutput.isEmpty, "--tamiflex is specified multiple times")
                 tamiflexOutput = cg
+            case Array("--typefilter", tf) ⇒
+                typeFilter = tf
+            case Array("--printmethods", pm) ⇒
+                printMethods = pm == "t"
         }
 
-        val reachableMethods = parseCallGraph(callGraphFile).keySet
-        val tamiflexResults = parseTamiflexResults(tamiflexOutput)
+        var tf : Method => Boolean = _ => true
+        if(typeFilter.nonEmpty){
+            tf = m => m.declaringClass == typeFilter
+        }
+
+        val reachableMethods = parseCallGraph(callGraphFile).keySet.filter(tf)
+        val tamiflexResults = parseTamiflexResults(tamiflexOutput).filter(tf)
+
+        if(printMethods){
+            reachableMethods.mkString("ReachableMethods: \n\n","\n", "\n\n")
+        }
 
         var i = 0
         tamiflexResults.foreach { method =>
