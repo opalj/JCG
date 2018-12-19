@@ -12,6 +12,7 @@ object CompareToTamiflex {
         var tamiflexOutput = ""
         var typeFilter = ""
         var printMethods = false
+        var debug = false
 
         args.sliding(2, 2).toList.collect {
             case Array("--callgraph", cg) ⇒
@@ -24,31 +25,50 @@ object CompareToTamiflex {
                 typeFilter = tf
             case Array("--printmethods", pm) ⇒
                 printMethods = pm == "t"
+            case Array("--debug", d) ⇒
+                debug = d == "t"
         }
 
         var tf : Method => Boolean = m => true
         if(typeFilter.nonEmpty){
-            tf = m => m.declaringClass == typeFilter
+            tf = m => {
+                    if(debug){
+                        println(s"\t${m.declaringClass} ?==? $typeFilter")
+                    }
+                    m.declaringClass == typeFilter
+                }
         }
 
-        val reachableMethods = parseCallGraph(callGraphFile).keySet.filter(_.declaringClass == tf)
-        val tamiflexResults = parseTamiflexResults(tamiflexOutput).filter(_.declaringClass == tf)
+        if(debug) {
+            println("1. processing call graph")
+        }
+
+        val reachableMethods = parseCallGraph(callGraphFile).keySet.filter(tf)
+
+        if(debug) {
+            println("2. processing tamiflex results")
+        }
+
+        val tamiflexResults = parseTamiflexResults(tamiflexOutput).filter(tf)
 
         if(printMethods){
-            reachableMethods.mkString("ReachableMethods: \n\n","\n", "\n\n")
+            reachableMethods.mkString("\tReachableMethods: \n\n","\n\t", "\n\n")
+        }
+
+        if(debug) {
+            println("3. Doing the comparision")
         }
 
         var i = 0
         tamiflexResults.foreach { method =>
             if(!reachableMethods.contains(method)){
-                println(s"Unreachable: ${method.toString}")
+                println(s"\tUnreachable: ${method.toString}")
             } else {
                 i = i + 1;
             }
         }
 
         println(s"\n\n$i of ${tamiflexResults.size} all methods are reachable")
-
     }
 
     private def parseCallGraph(callGraphFile: String) = {
