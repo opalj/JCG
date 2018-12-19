@@ -17,13 +17,15 @@ import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
 import org.opalj.fpcf.PropertyStoreKey
 import org.opalj.fpcf.analyses.SystemPropertiesAnalysis
+import org.opalj.fpcf.analyses.cg.EagerConfiguredNativeMethodsAnalysis
 import org.opalj.fpcf.analyses.cg.EagerFinalizerAnalysisScheduler
+import org.opalj.fpcf.analyses.cg.EagerInstantiatedTypesAnalysis
 import org.opalj.fpcf.analyses.cg.EagerLoadedClassesAnalysis
 import org.opalj.fpcf.analyses.cg.EagerRTACallGraphAnalysisScheduler
-import org.opalj.fpcf.analyses.cg.EagerReflectionRelatedCallsAnalysis
 import org.opalj.fpcf.analyses.cg.EagerSerializationRelatedCallsAnalysis
 import org.opalj.fpcf.analyses.cg.EagerThreadRelatedCallsAnalysis
 import org.opalj.fpcf.analyses.cg.LazyCalleesAnalysis
+import org.opalj.fpcf.analyses.cg.reflection.EagerReflectionRelatedCallsAnalysis
 import org.opalj.fpcf.cg.properties.Callees
 import org.opalj.fpcf.cg.properties.NoCallees
 import org.opalj.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
@@ -120,6 +122,8 @@ object OpalJCGAdatper extends JCGTestAdapter {
             EagerSerializationRelatedCallsAnalysis,
             EagerReflectionRelatedCallsAnalysis,
             SystemPropertiesAnalysis,
+            EagerConfiguredNativeMethodsAnalysis,
+            EagerInstantiatedTypesAnalysis,
             LazyL0TACAIAnalysis,
             new LazyCalleesAnalysis(
                 Set(
