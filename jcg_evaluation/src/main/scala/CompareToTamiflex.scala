@@ -31,8 +31,8 @@ object CompareToTamiflex {
             tf = m => m.declaringClass == typeFilter
         }
 
-        val reachableMethods = parseCallGraph(callGraphFile).keySet.filter(tf)
-        val tamiflexResults = parseTamiflexResults(tamiflexOutput).filter(tf)
+        val reachableMethods = parseCallGraph(callGraphFile).keySet.filter(_.declaringClass == tf)
+        val tamiflexResults = parseTamiflexResults(tamiflexOutput).filter(_.declaringClass == tf)
 
         if(printMethods){
             reachableMethods.mkString("ReachableMethods: \n\n","\n", "\n\n")
