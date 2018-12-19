@@ -26,7 +26,7 @@ object CompareToTamiflex {
                 printMethods = pm == "t"
         }
 
-        var tf : Method => Boolean = _ => true
+        var tf : Method => Boolean = m => true
         if(typeFilter.nonEmpty){
             tf = m => m.declaringClass == typeFilter
         }
@@ -60,9 +60,9 @@ object CompareToTamiflex {
         if(isDeclTypeOnly){
             val isForName = reflectionType.equals("Class.forName")
             if(isForName)
-                MethodFactory.createStaticInitializer(targetInfo)
+                MethodFactory.createStaticInitializer(convertTypeToJVMNotation(targetInfo))
             else
-                MethodFactory.createDefaultInitializer(targetInfo)
+                MethodFactory.createDefaultInitializer(convertTypeToJVMNotation(targetInfo))
         } else {
             // we have declType and method information
             //<org.apache.xpath.functions.FuncQname: void <init>()>
@@ -126,25 +126,3 @@ object MethodFactory {
 //        s"$declaringClass { $returnType $name(${parameterTypes.mkString(", ")})}"
 //    }
 //}
-
-/*
-Class.newInstance;org.apache.xalan.templates.ElemApplyTemplates;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemAttribute;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemCallTemplate;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemChoose;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemCopyOf;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemElement;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemForEach;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemIf;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemLiteralResult;org.apache.xalan.processor.ProcessorLRE.startElement;254;;
-Class.newInstance;org.apache.xalan.templates.ElemMessage;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemOtherwise;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemParam;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemSort;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemTemplate;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemText;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemValueOf;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemVariable;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemWhen;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
-Class.newInstance;org.apache.xalan.templates.ElemWithParam;org.apache.xalan.processor.ProcessorTemplateElem.startElement;63;;
- */
