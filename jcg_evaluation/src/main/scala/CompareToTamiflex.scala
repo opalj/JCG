@@ -65,6 +65,7 @@ object CompareToTamiflex {
             if(!reachableMethods.contains(method)){
                 println(s"\tUnreachable: ${method.toString}")
             } else {
+                println(s"\t\t\tReachable: ${method.toString}")
                 i = i + 1;
             }
         }
