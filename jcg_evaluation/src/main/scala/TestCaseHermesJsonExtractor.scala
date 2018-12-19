@@ -40,7 +40,7 @@ object TestCaseHermesJsonExtractor {
 
         Hermes.setConfig(baseConfig)
 
-        val allQueries = Hermes.featureQueries.toSet
+        val allQueries = Hermes.featureQueries.sortBy(_.id)
         val requiredQueries = Hermes.featureQueries.filterNot(_.featureIDs.forall(supportedFeatures.contains))
 
         val toBeRegistered = allQueries.foldRight(List.empty[ConfigObject]) { (query, configValues) ⇒
