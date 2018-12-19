@@ -97,7 +97,15 @@ object CompareToTamiflex {
             val methodParts = methodInfo.split(" ")
             val returnType = convertTypeToJVMNotation(methodParts(0))
             val methodName = methodParts(1)
-            val methodArgs = methodParts.takeRight(methodParts.length - 2).map(convertTypeToJVMNotation(_)).toList
+
+            @inline def extractArguments() : List[String] = {
+                if(methodParts.size == 2) {
+                    List.empty
+                } else {
+                    methodParts(2).split(",").map(convertTypeToJVMNotation(_)).toList
+                }
+            }
+            val methodArgs = extractArguments()
             Method(methodName, declCls, returnType, methodArgs)
         }
     }
@@ -137,10 +145,12 @@ object MethodFactory {
             case "long" => "J"
             case "double" => "D"
             case "float" => "F"
-            case t => {
-                val prefix = if(t.endsWith("]")) "[L" else "L"
-                s"$prefix${typeString.replace('.', '/')};"
+            case t if t.endsWith(("]")) => {
+                val baseType = t.substring(0, t.length-2)
+                s"[${convertTypeToJVMNotation(baseType)}"
             }
+            case _ => s"L${typeString.replace('.', '/')};"
+
         }
     }
 }
