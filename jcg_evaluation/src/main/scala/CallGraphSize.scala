@@ -7,6 +7,7 @@ import play.api.libs.json.Json
  * A small helper to get the size information of computed (serialized) call graphs.
  *
  * @author Florian Kuebler
+ * @author Michael Reif
  */
 object CallGraphSize {
 
@@ -21,6 +22,10 @@ object CallGraphSize {
     def main(args: Array[String]): Unit = {
         val i = new File(args(0))
         assert(i.exists())
+
+        // take all arguments except the first one as parameter
+        val pgkPrefixes = args.takeRight(args.length - 1).toList
+
         if (i.isDirectory) {
             // for structures like target/framework/algorithm
             for {
@@ -30,27 +35,36 @@ object CallGraphSize {
                 callgraph = s"${framework.getName} ${algo.getName}"
                 file ← algo.listFiles(_.getName.endsWith(".json"))
             } {
-                printStatistic(file, callgraph)
+                printStatistic(file, pgkPrefixes, callgraph)
             }
 
             // for all .json files in the given directory
             for (file ← i.listFiles(_.getName.endsWith(".json"))) {
-                printStatistic(file)
+                printStatistic(file, pgkPrefixes)
             }
         } else {
             // for a given .json file
             assert(i.getName.endsWith(".json"))
-            printStatistic(i)
+            printStatistic(i, pgkPrefixes)
         }
     }
-    def printStatistic(jsFile: File, callGraphName : String = ""): Unit = {
+
+    def printStatistic(jsFile: File, appPackages: List[String], callGraphName : String = ""): Unit = {
         val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.reachableMethods
 
-        val edgeCount = reachableMethods.flatMap(_.callSites.map(_.targets.size)).sum
+        val appMethods = reachableMethods.count { rm =>
+            val declClass = rm.method.declaringClass
+            appPackages.exists { pkg =>
+                declClass.startsWith(s"L$pkg")
+            }
+        }
+
+        val edgeCount = reachableMethods.foldLeft(0){ (acc, rm) =>
+            acc + rm.callSites.foldLeft(0)((acc,cs) => acc + cs.targets.size)
+        }
 
         val outputName = if(callGraphName.isEmpty) jsFile.getName else callGraphName
 
-        println(s"$outputName - ${reachableMethods.size} reachable methods - $edgeCount call graph edges")
-
+        println(s"$outputName - ${reachableMethods.size} reachable methods - $edgeCount call graph edges [application methods: $appMethods]")
     }
 }
