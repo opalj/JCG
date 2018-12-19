@@ -79,7 +79,7 @@ object AnnotationVerifier {
         val body = method.body.get
         val invocationsWithPC = body.instructions.zipWithIndex filter {
             case (instr, _) ⇒
-                instr != null && instr.isInvocationInstruction
+                instr != null && instr.isMethodInvocationInstruction
         }
 
         val namesAndLines = invocationsWithPC.map {
