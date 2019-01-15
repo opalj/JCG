@@ -2,40 +2,43 @@ import java.io.File
 import java.io.FileWriter
 import java.net.URL
 
+import scala.collection.JavaConverters._
+
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
+import play.api.libs.json.Json
+
+import org.opalj.fpcf.FinalEP
+import org.opalj.fpcf.PropertyStore
 import org.opalj.br.Code
 import org.opalj.br.DeclaredMethod
 import org.opalj.br.analyses.DeclaredMethods
 import org.opalj.br.analyses.DeclaredMethodsKey
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.Project.JavaClassFileReader
+import org.opalj.br.fpcf.cg.properties.ReflectionRelatedCallees
+import org.opalj.br.fpcf.cg.properties.SerializationRelatedCallees
+import org.opalj.br.fpcf.cg.properties.StandardInvokeCallees
+import org.opalj.br.fpcf.cg.properties.ThreadRelatedIncompleteCallSites
+import org.opalj.br.fpcf.FPCFAnalysesManagerKey
+import org.opalj.br.fpcf.PropertyStoreKey
+import org.opalj.br.fpcf.cg.properties.Callees
+import org.opalj.br.fpcf.cg.properties.NoCallees
+import org.opalj.br.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
-import org.opalj.fpcf.FPCFAnalysesManagerKey
-import org.opalj.fpcf.FinalEP
-import org.opalj.fpcf.PropertyStore
-import org.opalj.fpcf.PropertyStoreKey
-import org.opalj.fpcf.analyses.SystemPropertiesAnalysis
-import org.opalj.fpcf.analyses.cg.EagerConfiguredNativeMethodsAnalysis
-import org.opalj.fpcf.analyses.cg.EagerFinalizerAnalysisScheduler
-import org.opalj.fpcf.analyses.cg.EagerInstantiatedTypesAnalysis
-import org.opalj.fpcf.analyses.cg.EagerLoadedClassesAnalysis
-import org.opalj.fpcf.analyses.cg.EagerRTACallGraphAnalysisScheduler
-import org.opalj.fpcf.analyses.cg.EagerSerializationRelatedCallsAnalysis
-import org.opalj.fpcf.analyses.cg.EagerThreadRelatedCallsAnalysis
-import org.opalj.fpcf.analyses.cg.LazyCalleesAnalysis
-import org.opalj.fpcf.analyses.cg.reflection.EagerReflectionRelatedCallsAnalysis
-import org.opalj.fpcf.cg.properties.Callees
-import org.opalj.fpcf.cg.properties.NoCallees
-import org.opalj.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
-import org.opalj.fpcf.cg.properties.ReflectionRelatedCallees
-import org.opalj.fpcf.cg.properties.SerializationRelatedCallees
-import org.opalj.fpcf.cg.properties.StandardInvokeCallees
-import org.opalj.tac.fpcf.analyses.LazyL0TACAIAnalysis
-import play.api.libs.json.Json
-
-import scala.collection.JavaConverters._
+import org.opalj.tac.fpcf.analyses.cg.LazyCalleesAnalysis
+import org.opalj.tac.fpcf.analyses.TriggeredSystemPropertiesAnalysis
+import org.opalj.tac.fpcf.analyses.cg.reflection.TriggeredReflectionRelatedCallsAnalysis
+import org.opalj.tac.fpcf.analyses.cg.TriggeredLoadedClassesAnalysis
+import org.opalj.tac.fpcf.analyses.cg.TriggeredSerializationRelatedCallsAnalysis
+import org.opalj.tac.fpcf.analyses.cg.TriggeredThreadRelatedCallsAnalysis
+import org.opalj.tac.fpcf.analyses.LazyTACAIProvider
+import org.opalj.tac.fpcf.analyses.cg.RTACallGraphAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.TriggeredConfiguredNativeMethodsAnalysis
+import org.opalj.tac.fpcf.analyses.cg.TriggeredFinalizerAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.TriggeredInstantiatedTypesAnalysis
+import org.opalj.tac.fpcf.analyses.cg.TriggeredStaticInitializerAnalysis
 
 /**
  * A [[JCGTestAdapter]] for the FPCF based call graph analyses of OPAL.
@@ -115,21 +118,25 @@ object OpalJCGAdatper extends JCGTestAdapter {
         // run RTA call graph, along with extra analyses e.g. for reflection
         val manager = project.get(FPCFAnalysesManagerKey)
         manager.runAll(
-            EagerRTACallGraphAnalysisScheduler,
-            EagerLoadedClassesAnalysis,
-            EagerFinalizerAnalysisScheduler,
-            EagerThreadRelatedCallsAnalysis,
-            EagerSerializationRelatedCallsAnalysis,
-            EagerReflectionRelatedCallsAnalysis,
-            SystemPropertiesAnalysis,
-            EagerConfiguredNativeMethodsAnalysis,
-            EagerInstantiatedTypesAnalysis,
-            LazyL0TACAIAnalysis,
-            new LazyCalleesAnalysis(
+            RTACallGraphAnalysisScheduler,
+            TriggeredStaticInitializerAnalysis,
+            TriggeredLoadedClassesAnalysis,
+            TriggeredFinalizerAnalysisScheduler,
+            TriggeredThreadRelatedCallsAnalysis,
+            TriggeredSerializationRelatedCallsAnalysis,
+            TriggeredReflectionRelatedCallsAnalysis,
+            TriggeredInstantiatedTypesAnalysis,
+            TriggeredConfiguredNativeMethodsAnalysis,
+            TriggeredSystemPropertiesAnalysis,
+            // LazyL0BaseAIAnalysis,
+            // TACAITransformer,
+            LazyTACAIProvider,
+            LazyCalleesAnalysis(
                 Set(
                     StandardInvokeCallees,
                     SerializationRelatedCallees,
-                    ReflectionRelatedCallees
+                    ReflectionRelatedCallees,
+                    ThreadRelatedIncompleteCallSites
                 )
             )
         )
