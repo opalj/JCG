@@ -55,6 +55,10 @@ case class Method(name: String, declaringClass: String, returnType: String, para
     override def toString: String = {
         s"$declaringClass { $returnType $name(${parameterTypes.mkString(", ")})}"
     }
+
+    def nameBasedEquals(other: Method): Boolean = {
+        other.name == this.name && other.declaringClass == this.declaringClass
+    }
 }
 
 object Method {

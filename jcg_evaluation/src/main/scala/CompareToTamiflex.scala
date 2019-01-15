@@ -53,7 +53,7 @@ object CompareToTamiflex {
         val tamiflexResults = parseTamiflexResults(tamiflexOutput).filter(tf)
 
         if(printMethods){
-            reachableMethods.mkString("\tReachableMethods: \n\n","\n\t", "\n\n")
+            println(reachableMethods.mkString("\tReachableMethods: \n\n","\n\t", "\n\n"))
         }
 
         if(debug) {
