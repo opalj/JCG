@@ -38,7 +38,7 @@ lazy val jcg_testcases = project.settings(
 lazy val jcg_annotation_matcher = project.settings(
     commonSettings,
     name := "JCG Annotation Matcher",
-    libraryDependencies += "de.opal-project" %% "bytecode-representation" % "2.1.0-SNAPSHOT",
+    libraryDependencies += "de.opal-project" %% "bytecode-representation" % "3.0.0-SNAPSHOT",
     aggregate in assembly := false
 ).dependsOn(jcg_annotations, jcg_testadapter_commons)
 
@@ -68,7 +68,7 @@ lazy val jcg_soot_testadapter = project.settings(
 lazy val jcg_opal_testadapter = project.settings(
     commonSettings,
     name := "JCG OPAL Test Adapter",
-    libraryDependencies += "de.opal-project" %% "abstract-interpretation-framework" % "2.1.0-SNAPSHOT",
+    libraryDependencies += "de.opal-project" %% "three-address-code" % "3.0.0-SNAPSHOT",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
@@ -86,7 +86,7 @@ lazy val jcg_opal_testadapter = project.settings(
 lazy val jcg_doop_testadapter = project.settings(
     commonSettings,
     name := "JCG DOOP Test Adapter",
-    libraryDependencies += "de.opal-project" %% "bytecode-representation" % "2.1.0-SNAPSHOT",
+    libraryDependencies += "de.opal-project" %% "bytecode-representation" % "3.0.0-SNAPSHOT",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
@@ -107,7 +107,7 @@ lazy val jcg_evaluation = project.settings(
     resolvers += "soot snapshot" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-snapshot/",
     resolvers += "soot release" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-release/",
     resolvers += Resolver.mavenLocal,
-    libraryDependencies += "de.opal-project" %% "opal-developer-tools" % "2.1.0-SNAPSHOT",
+    libraryDependencies += "de.opal-project" %% "hermes" % "3.0.0-SNAPSHOT",
     publishArtifact := false
 ).dependsOn(
     jcg_testcases,

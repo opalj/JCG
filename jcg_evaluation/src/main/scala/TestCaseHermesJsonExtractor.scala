@@ -7,15 +7,15 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigObject
 import com.typesafe.config.ConfigRenderOptions
 import com.typesafe.config.ConfigValueFactory
-import org.opalj.hermes.Hermes
+
 import org.opalj.log.GlobalLogContext
 import org.opalj.log.OPALLogger
 import org.opalj.util.PerformanceEvaluation.time
 import play.api.libs.json.Json
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-import scala.io.Source
+
+import org.opalj.hermes.HermesCLI.Hermes
 
 object TestCaseHermesJsonExtractor {
 
