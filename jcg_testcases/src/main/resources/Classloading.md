@@ -8,18 +8,155 @@ This test case uses an `URLClassLoader` in order to load classes from an externa
 That class will be instantiated using `Class<?>.newInstance`.
 Afterwards, it calls the `compare` on the `Comparator` interface, which will resolve to the `IntComparator` 
 from the given *.jar* at runtime.
-The sources can be found in the infrastructure incompatible testcases directory.
+
+```java
+package demo;
+
+import lib.annotations.callgraph.IndirectCall;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Comparator;
+
+public class Demo {
+
+    private static final String DIR = System.getProperty("user.dir") + "/resources/";
+    private static URL CLv1;
+
+    static {
+        try {
+            CLv1 = new URL("file://" + DIR + "classloading-version-1.jar");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static final String CLS_NAME = "lib.IntComparator";
+
+    @IndirectCall(name = "compareTo", returnType = int.class, line = 34, resolvedTargets = "Ljava/lang/Integer;")
+    public static void main(String[] args)
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        ClassLoader parent = ClassLoader.getSystemClassLoader();
+        URL[] urls = new URL[] { CLv1 };
+        URLClassLoader cl = URLClassLoader.newInstance(urls, parent);
+        Class<?> cls = cl.loadClass(CLS_NAME);
+        Comparator<Integer> comparator = (Comparator<Integer>) cls.newInstance();
+        Integer one = Integer.valueOf(1);
+        comparator.compare(one, one);
+    }
+}
+
+```
 
 ## CL2
 This test case is basically the same as CL1. In contrast to this the generic type of the class is 
 already specified before calling `Class<Comparator<Integer>>.newInstance`.
-The sources can be found in the infrastructure incompatible testcases directory.
+
+```java
+package demo;
+
+import lib.annotations.callgraph.IndirectCall;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Comparator;
+
+public class Main {
+
+    private static final String DIR = System.getProperty("user.dir") + "/resources/";
+    private static URL CLv2;
+
+    static {
+        try {
+            CLv2 = new URL("file://" + DIR + "classloading-version-2.jar");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static final String CLS_NAME = "lib.IntComparator";
+
+    @IndirectCall(name = "compareTo", returnType = int.class, line = 35, resolvedTargets = "Ljava/lang/Integer;")
+    public static void main(String[] args)
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        ClassLoader parent = ClassLoader.getSystemClassLoader();
+        URL[] urls = new URL[] { CLv2 };
+        URLClassLoader cl = URLClassLoader.newInstance(urls, parent);
+        Class<Comparator<Integer>> cls = (Class<Comparator<Integer>>) cl.loadClass(CLS_NAME);
+        Comparator<Integer> comparator = cls.newInstance();
+        Integer one = Integer.valueOf(1);
+        comparator.compare(one, one);
+    }
+}
+```
+
 
 ## CL3
-In this test case, to different versions of a class are loaded using an `URLClassLoaded`.
-On both versions a call to `<Comparator<Integer>>.compare` is performed. The test case ensures, that
-both versions are in the call graph.
-The sources can be found in the infrastructure incompatible testcases directory.
+In this test case, to different versions of a class are loaded using an `URLClassLoader`.
+On both versions a call to `<Comparator<Integer>>.compare` is performed.
+After those different versioned classes are loaded, methods are called on the classes which must
+be resolved to different targets.
+
+```java
+package cl;
+
+import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.IndirectCalls;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Comparator;
+
+public class Demo {
+
+    //private static final String DIR = System.getProperty("user.dir") + "/resources/";
+    private static final String DIR = "/Users/mreif/Programming/git/jcg/infrastructure_incompatible_testcases/CL3/src/resources/";
+    private static URL CLv1;
+    private static URL CLv2;
+    private static final String CLS_NAME = "lib.IntComparator";
+
+    static {
+        try {
+            CLv1 = new URL("file://" + DIR + "classloading-version-1.jar");
+            CLv2 = new URL("file://" + DIR + "classloading-version-2.jar");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @IndirectCalls({
+        @IndirectCall(name = "compare", line = 53, returnType = int.class, resolvedTargets = "Ljava/lang/Integer;"),
+        @IndirectCall(name = "gc", line = 54, resolvedTargets = "Ljava/lang/System;")
+    })
+    public static void main(String[] args)
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        ClassLoader oldParent = Thread.currentThread().getContextClassLoader();
+        ClassLoader newParent = Demo.class.getClassLoader();
+
+        URL[] oldResource = new URL[]{CLv1};
+        URL[] newResource = new URL[]{CLv2};
+
+        URLClassLoader oldVersionLoader = new URLClassLoader(oldResource, oldParent);
+        URLClassLoader newVersionLoader= new URLClassLoader(newResource, newParent);
+
+        System.out.println(CLv1.toExternalForm());
+
+        Class<?> oldClass = oldVersionLoader.loadClass(CLS_NAME);
+        Class<?> newClass = newVersionLoader.loadClass(CLS_NAME);
+
+        Comparator<Integer> oldComparator = (Comparator<Integer>) oldClass.newInstance();
+        Comparator<Integer> newComparator = (Comparator<Integer>) newClass.newInstance();
+
+        Integer one = new Integer(1);
+
+        oldComparator.compare(one,one);
+        newComparator.compare(one,one);
+    }
+}
+```
 
 ## CL4
 [//]: # (MAIN: cl4.Demo)
