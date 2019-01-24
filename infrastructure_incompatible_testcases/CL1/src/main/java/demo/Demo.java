@@ -31,7 +31,7 @@ public class Demo {
     public static void main(String[] args)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         ClassLoader parent = ClassLoader.getSystemClassLoader();
-        URL[] urls = new URL[]{CLv1};
+        URL[] urls = new URL[] { CLv1 };
         URLClassLoader cl = URLClassLoader.newInstance(urls, parent);
         Class<?> cls = cl.loadClass(CLS_NAME);
         Comparator<Integer> comparator = (Comparator<Integer>) cls.newInstance();
