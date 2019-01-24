@@ -7,17 +7,21 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigObject
 import com.typesafe.config.ConfigRenderOptions
 import com.typesafe.config.ConfigValueFactory
-
+import org.opalj.hermes.HermesCore
 import org.opalj.log.GlobalLogContext
 import org.opalj.log.OPALLogger
 import org.opalj.util.PerformanceEvaluation.time
 import play.api.libs.json.Json
+
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
-import org.opalj.hermes.HermesCLI.Hermes
-
 object TestCaseHermesJsonExtractor {
+
+    object Hermes extends HermesCore {
+        override def updateProjectData(f: ⇒ Unit): Unit = Hermes.synchronized { f }
+        override def reportProgress(f: ⇒ Double): Unit = Hermes.synchronized { f }
+    }
 
     private val HERMES_FILE_NAME = "hermes.json"
     private val HERMES_RESULT_FILE_NAME = "hermes.csv"
@@ -116,6 +120,7 @@ object TestCaseHermesJsonExtractor {
             }.toSet
 
         }
+
         TestCaseHermesJsonExtractor.createHermesConfig(
             projectsDir, supportedFeatures, jreLocations, hermesFile, config
         )
