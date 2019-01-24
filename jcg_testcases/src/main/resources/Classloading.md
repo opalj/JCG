@@ -4,11 +4,22 @@ Tests related to the usage of `java.lang.ClassLoader`s. The following test cases
 listed in the `infrastructure incompatible testcases`
 
 ## CL1
+This test case uses an `URLClassLoader` in order to load classes from an external *.jar* file.
+That class will be instantiated using `Class<?>.newInstance`.
+Afterwards, it calls the `compare` on the `Comparator` interface, which will resolve to the `IntComparator` 
+from the given *.jar* at runtime.
+The sources can be found in the infrastructure incompatible testcases directory.
+
 ## CL2
+This test case is basically the same as CL1. In contrast to this the generic type of the class is 
+already specified before calling `Class<Comparator<Integer>>.newInstance`.
+The sources can be found in the infrastructure incompatible testcases directory.
+
 ## CL3
-- __CL1__ - TODO
-- __CL2__ - TODO
-- __CL3__ - TODO
+In this test case, to different versions of a class are loaded using an `URLClassLoaded`.
+On both versions a call to `<Comparator<Integer>>.compare` is performed. The test case ensures, that
+both versions are in the call graph.
+The sources can be found in the infrastructure incompatible testcases directory.
 
 ## CL4
 [//]: # (MAIN: cl4.Demo)
