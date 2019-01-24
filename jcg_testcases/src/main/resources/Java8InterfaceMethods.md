@@ -1,7 +1,7 @@
-#Java8DefaultInterfaceMethods
+# Java8DefaultInterfaceMethods
 Tests the resolution of Java 8 default methods.
 
-##J8DIM1
+## J8DIM1
 [//]: # (MAIN: j8dim.Class)
 Tests the resolution of a polymorphic call when a class (cf.```j8dim.Class``` ) implements an
 interface (cf. ```j8dim.Interface```) which declares a default method (cf. ```j8dim.Interface.method()```)and
@@ -31,7 +31,7 @@ interface Interface {
 ```
 [//]: # (END)
 
-##J8DIM2
+## J8DIM2
 [//]: # (MAIN: j8dim.SuperClass)
 Tests the resolution of a polymorphic call when a class (cf. ```j8dim.SubClass```) implements an
 interface with default method (cf. ```j8dim.Interface```) and extends a class (cf. ```j8dim.SuperClass```)
@@ -75,7 +75,7 @@ class SubClass extends SuperClass implements Interface {
 ```
 [//]: # (END)
 
-##J8DIM3
+## J8DIM3
 [//]: # (MAIN: j8dim.SuperClass)
 Tests the resolution of a polymorphic call when a class (cf. ```j8dim.SubClass```) implements an
 interface with default method (cf. ```j8dim.Interface```) and extends a class (cf. ```j8dim.SuperClass```)
@@ -120,7 +120,7 @@ class SubClass extends SuperClass implements Interface {
 ```
 [//]: # (END)
 
-##J8DIM4
+## J8DIM4
 [//]: # (MAIN: j8dim.SuperClass)
 Tests the resolution of a polymorphic call when a class (cf. ```j8dim.SubClass```) implements an
 interface with default method (cf. ```j8dim.Interface```) and extends a class (cf. ```j8dim.SuperClass```)
@@ -159,7 +159,7 @@ class SubClass extends SuperClass implements Interface {
 ```
 [//]: # (END)
 
-##J8DIM5
+## J8DIM5
 [//]: # (MAIN: j8dim.SuperClass)
 Tests the resolution of a polymorphic call when a class (cf. ```j8dim.Class```) extends an abstract
 class (cf. ```j8dim.SuperClass```) that declares a method ```compute()``` and implements
@@ -229,7 +229,7 @@ interface DirectInterface extends Interface1, Interface2 {
 ```
 [//]: # (END)
 
-##J8DIM6
+## J8DIM6
 [//]: # (MAIN: j8dim.Demo)
 An interface which extends two other interfaces that declare the same default method, as
 ```CombinedInterface``` does by extending ```SomeInterface``` and ```AnotherInterface```,
@@ -277,14 +277,14 @@ interface CombinedInterface extends SomeInterface, AnotherInterface {
 ```
 [//]: # (END)
 
-#Java8StaticInterfaceMethods
+# Java8StaticInterfaceMethods
 
 Tests the correct method resolution of static interface methods.
 
 Please note that the ```infrastructure_incompatible_testcases``` are more test cases w.r.t. to 
 static interface methods pertaining to Java 9 and higher versions.
  
-##J8SIM1
+## J8SIM1
 [//]: # (MAIN: j8sim.Class)
 Tests the invocation of a static interface method ```j8sim.Interface``` in ```j8sim.Class```'s main
 method.

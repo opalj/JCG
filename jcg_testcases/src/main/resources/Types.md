@@ -1,7 +1,7 @@
-#TypeCasts
+# TypeCasts
 Using local information to get better type information. Even if those APIs and instructions do have
 no visible effect on the soundness they still must be supported by the frameworks. 
-##TC1
+## TC1
 [//]: # (MAIN: simplecast.Demo)
 This case shows type narrowing due to previous cast. The method ```simplecast.Demo.castToTarget``` takes an
 object, casts it to ```simplecast.Target```, and then calls ```target``` on the casted object which
@@ -36,7 +36,7 @@ class Target {
 ```
 [//]: # (END)
 
-##TC2
+## TC2
 [//]: # (MAIN: castclassapi.Demo)
 Type narrowing due to previous cast using Java's class API. The method ```castclassapi.Demo.castToTarget```
 takes a class object that is parameterized over the type the cast should be performed to and an object
@@ -80,7 +80,7 @@ public class Target {
 ```
 [//]: # (END)
 
-##TC3
+## TC3
 [//]: # (MAIN: classeq.Demo)
 Type narrowing due to a equality check of two ```java.lang.Class``` objects. Within the ```this```
 branch of ```classeq.Demo.callIfInstanceOfTarget``` it is thus known that the passed object ```o```
@@ -117,7 +117,7 @@ class Target {
 [//]: # (END)
 
 
-##TC4
+## TC4
 [//]: # (MAIN: instanceofcheck.Demo)
 Type narrowing due to Java's built-in ```instanceof``` check of the given object ```o``` and the 
 ```Target``` class. Within the ```this``` branch of ```Demo.callIfInstanceOfTarget``` it is thus
@@ -154,7 +154,7 @@ class Target {
 ```
 [//]: # (END)
 
-##TC5
+## TC5
 [//]: # (MAIN: instanceofclassapi.Demo)
 Type narrowing due to Java's ```java.lang.Class.isInstance``` API call that checks whether a given
 object (i.e. ```o```) is of the same type the class instance is parameterized over, i.e.,
@@ -193,7 +193,7 @@ class Target {
 [//]: # (END)
 
 
-##TC6
+## TC6
 [//]: # (MAIN: tc.Demo)
 Type narrowing due to Java's ```java.lang.Class.isAssignableFrom``` API call that checks whether a given
 object (i.e. ```o```) can be assign to variable of the type the class instance is parameterized over, i.e.,

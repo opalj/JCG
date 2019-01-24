@@ -1,4 +1,4 @@
-#JVMCalls
+# JVMCalls
 JVM calls or callbacks must be treated as (on-the-fly) entry points and explicitly modelled for correct
 call-graph construction, i.e., when certain operations are performed like creating an object or 
 adding an ```ShutdownHook```. 
@@ -6,7 +6,7 @@ adding an ```ShutdownHook```.
 Please note that Java's Serialization feature is a similar mechanism. However, Serialization is a
 substantial feature and is thus handled in a separate category.
 
-##JVMC1
+## JVMC1
 [//]: # (MAIN: jvmc.Demo)
 This tests covers a callback that can be introduced to the program by calling```Runtime.addShutdownHook```.
 It allows the program to pass a customizable thread to the JVM that is called on the JVM's shut down. 
@@ -39,7 +39,7 @@ class TargetRunnable implements Runnable {
 ```
 [//]: # (END)
 
-##JVMC2
+## JVMC2
 [//]: # (MAIN: jvmc.Demo)
 This test case covers the ```finalize``` method which __might__ be called by the JVM during
 garbage collection.
@@ -69,7 +69,7 @@ public class Demo {
 ```
 [//]: # (END)
 
-##JVMC3
+## JVMC3
 [//]: # (MAIN: jvmc.Demo)
 This cases tests the implicitly introduced call edge from ```Thread.start``` to ```Thread.run```.
 Please note that this test tests this feature indirectly by validating that the run method of
@@ -103,7 +103,7 @@ class TargetRunnable implements Runnable {
 ```
 [//]: # (END)
 
-##JVMC4
+## JVMC4
 [//]: # (MAIN: jvmc.Demo)
 This cases tests the implicitly introduced call edge from ```Thread.start``` to the transitively
 reachable ```Thread.exit``` method that is also called by the JVM on a thread's exit.
@@ -133,7 +133,7 @@ class TargetRunnable implements Runnable {
 ```
 [//]: # (END)
 
-##JVMC5
+## JVMC5
 [//]: # (MAIN: jvmc.Demo)
 This cases tests the implicitly introduced call edge from ```Thread.setUncaughtExceptionHandler```
 to ```Thread.dispatchUncaughtException``` method that is intended to be called by the JVM.

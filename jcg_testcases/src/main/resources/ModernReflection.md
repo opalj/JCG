@@ -1,9 +1,9 @@
-#TrivialModernReflection
+# TrivialModernReflection
 Reflective calls using the ```java.lang.invoke.*``` APIs and Java 7’s ```MethodHandle``` API which
 are not signature polymorphic.
 
 All strings and constants are directly available and thus no control- or data-flow analysis is required.
-##TMR1
+## TMR1
 [//]: # (MAIN: tmr.Demo)
 Tests modern reflection by performing a ```findStatic``` method handle lookup where the
 declaring class type, the static method's name, and the method's return type is given within the
@@ -34,7 +34,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TMR2
+## TMR2
 [//]: # (MAIN: tmr.Demo)
 Tests modern reflection by performing a ```findVirtual``` method handle lookup where the
 declaring class type, the instance method's name, and the method's method type object is given within the
@@ -65,7 +65,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TMR3
+## TMR3
 [//]: # (MAIN: tmr.Demo)
 Tests modern reflection by performing a ```findConstructor``` method handle lookup where the
 declaring class type and the method's method type object is given within the
@@ -100,7 +100,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TMR4
+## TMR4
 [//]: # (MAIN: tmr.Demo)
 Tests modern reflection by performing a ```findStaticGetter``` method handle lookup where the
 declaring class type, the field's name, and the static field's type is given within the
@@ -133,7 +133,7 @@ class Demo {
 
 [//]: # (END)
 
-##TMR5
+## TMR5
 [//]: # (MAIN: tmr.Demo)
 Tests modern reflection by performing a ```findGetter``` method handle lookup where the
 declaring class type, the field's name, and the field's type is given within the
@@ -170,7 +170,7 @@ class Demo {
 
 [//]: # (END)
 
-##TMR6
+## TMR6
 [//]: # (MAIN: tmr.Demo)
 Tests modern reflection by performing a ```findSpecial``` method handle lookup where the
 declaring class type, the method's name and signature, and the special caller are passed to method.
@@ -206,7 +206,7 @@ class Superclass {
 ```
 [//]: # (END)
 
-##TMR7
+## TMR7
 [//]: # (MAIN: tmr.Demo)
 Tests modern reflection by performing a ```findStatic``` method handle lookup where the
 declaring class type, the static method's name, and the method's signature is given within the
@@ -239,7 +239,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TMR8
+## TMR8
 [//]: # (MAIN: tmr.Demo)
 Tests modern reflection by performing a ```findStatic``` method handle lookup where the
 declaring class type, the static method's name, and the method's signature is given within the

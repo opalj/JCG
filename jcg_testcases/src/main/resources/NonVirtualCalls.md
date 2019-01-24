@@ -1,11 +1,11 @@
-#Non-virtual Calls
+# Non-virtual Calls
 Tests related to non-virtual methods: static method calls, constructor calls (initializers),
 super method calls, and private method calls.
 
 Static initializers are found in their own category due to the inherent complexity of resolving them
 in a meaningful manner.
 
-##NVC1
+## NVC1
 [//]: # (MAIN: nvc.Class)
 Tests the resolution of a static method call when another static method with the same name but
 different signature is presence.
@@ -28,7 +28,7 @@ class Class {
 ```
 [//]: # (END)
 
-##NVC2
+## NVC2
 [//]: # (MAIN: nvc.Class)
 Tests the call resolution of default constructors which is caused by using Java's ```NEW``` keyword. The resulting 
 bytecode contains a *INVOKESPECIAL* instruction which must be resolved to ```nvc.Class```'s ```<init>``` method, i.e.,
@@ -53,7 +53,7 @@ public class Class {
 ```
 [//]: # (END)
 
-##NVC3
+## NVC3
 [//]: # (MAIN: nvc.Class)
 Tests the resolution of a private method call when another method with the same name but
 different signature is presence.
@@ -77,7 +77,7 @@ class Class {
 ```
 [//]: # (END)
 
-##NVC4
+## NVC4
 [//]: # (MAIN: nvc.Class)
 Tests the resolution of a super call in the form `super.<methodName>`. The method call should
 only be propagated to the immediate super class.
@@ -110,7 +110,7 @@ class Rootclass {
 ```
 [//]: # (END)
 
-##NVC5
+## NVC5
 [//]: # (MAIN: nvc.Demo)
 Tests the resolution of a super call in a larger type hierarchy. In a class hierarchy like below,
 with ```nvc.Sub <: nvc.Middle <: nvc.Super```, the super call in ```nvc.Sub.method``` will always invoke

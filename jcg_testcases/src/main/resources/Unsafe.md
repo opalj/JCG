@@ -1,8 +1,8 @@
-#Usage of `sun.misc.Unsafe`
+# Usage of `sun.misc.Unsafe`
 Test cases related to the usage of `sun.misc.Unsafe`. This API provided methods to manipulate
 the content of fields.
 
-##Unsafe1
+## Unsafe1
 [//]: # (MAIN: unsafe.Demo)
 Using ```Unsafe.compareAndSwapObject``` to set the value in a private field.
 
@@ -51,7 +51,7 @@ class SafeTarget implements TargetInterface {
 ```
 [//]: # (END)
 
-##Unsafe2
+## Unsafe2
 [//]: # (MAIN: unsafe.Demo)
 Using ```Unsafe.putObject``` to set the value in a private field.
 
@@ -100,7 +100,7 @@ class SafeTarget implements TargetInterface {
 ```
 [//]: # (END)
 
-##Unsafe3
+## Unsafe3
 [//]: # (MAIN: unsafe.Demo)
 Using ```Unsafe.getObject``` to retrieve a value of a private field.
 
@@ -150,7 +150,7 @@ class SafeTarget implements TargetInterface {
 ```
 [//]: # (END)
 
-##Unsafe4
+## Unsafe4
 [//]: # (MAIN: unsafe.Demo)
 Here, ```Unsafe.getAndSetObject``` is used to retrieve an object from a field and set a new object in parallel. 
 Using getObject to retrieve a value of a private field.
@@ -208,7 +208,7 @@ class SafeTarget implements TargetInterface {
 ```
 [//]: # (END)
 
-##Unsafe5
+## Unsafe5
 [//]: # (MAIN: unsafe.Demo)
 Here, ```Unsafe.putOrderedObject``` is used to put an object into a field. A call on that field must
 be resolved to the newly written object.
@@ -261,7 +261,7 @@ class SafeTarget implements TargetInterface {
 ```
 [//]: # (END)
 
-##Unsafe6
+## Unsafe6
 [//]: # (MAIN: unsafe.Demo)
 Here, ```Unsafe.getObjectVolatile``` is used to retrieve an object from a class' field. The retrieved
 object is then used to call ```toString``` on it.
@@ -313,7 +313,7 @@ class SafeTarget implements TargetInterface {
 ```
 [//]: # (END)
 
-##Unsafe7
+## Unsafe7
 [//]: # (MAIN: unsafe.Demo)
 Here, ```Unsafe.putObjectVolatile``` is used to write an object to a class' field. The written
 object is then used to call ```toString``` on it.

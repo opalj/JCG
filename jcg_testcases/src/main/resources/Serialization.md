@@ -1,9 +1,9 @@
-#SerializableClasses
+# SerializableClasses
 These category comprises test cases that model callbacks that must be handled when dealing with 
 ```java.io.Serializable``` classes. As soon as object (de-)serialization is found within a program
 those mechanism can be used and all related methods must therefore be considered as on-the-fly
 entry points.
-##Ser1
+## Ser1
 [//]: # (MAIN: ser.Demo)
 This test pertains to the ```writeObject``` callback method that can be implemented when a class
 implements ```java.io.Serializable``` as ```ser.Demo``` does. Overriding ```writeObject``` forces
@@ -42,7 +42,7 @@ public class Demo implements Serializable {
 ```
 [//]: # (END)
 
-##Ser2
+## Ser2
 [//]: # (MAIN: ser.Demo)
 This test pertains to the ```writeObject``` callback method that can be implemented when a class
 implements ```java.io.Serializable``` as ```ser.Demo``` does. Overriding ```writeObject``` forces
@@ -89,7 +89,7 @@ class AnotherSerializableClass implements Serializable {}
 ```
 [//]: # (END)
 
-##Ser3
+## Ser3
 [//]: # (MAIN: ser.Demo)
 This test pertains to the ```writeObject``` callback method that can be implemented when a class
 implements ```java.io.Serializable``` as ```ser.Demo``` does. Overriding ```writeObject``` forces
@@ -132,7 +132,7 @@ public class Demo implements Serializable {
 ```
 [//]: # (END)
 
-##Ser4
+## Ser4
 [//]: # (MAIN: ser.Demo)
 This test pertains to the ```readObject``` callback method that can be implemented when a class
 implements ```java.io.Serializable``` as ```ser.Demo``` does. Overriding ```readObject``` forces
@@ -170,7 +170,7 @@ public class Demo implements Serializable {
 ```
 [//]: # (END)
 
-##Ser5
+## Ser5
 [//]: # (MAIN: ser.Demo)
 This test pertains to the ```readObject``` callback method that can be implemented when a class
 implements ```java.io.Serializable``` as ```ser.Demo``` does. Overriding ```readObject``` forces
@@ -210,7 +210,7 @@ public class Demo implements Serializable {
 ```
 [//]: # (END)
 
-##Ser6
+## Ser6
 [//]: # (MAIN: ser.Demo)
 This test pertains to the ```writeReplace``` callback method that can be implemented when a class
 implements ```java.io.Serializable``` as ```ser.Demo``` does. Overriding ```writeReplace``` forces
@@ -250,7 +250,7 @@ public class Demo implements Serializable {
 ```
 [//]: # (END)
 
-##Ser7
+## Ser7
 [//]: # (MAIN: ser.Demo)
 This test pertains to the ```readResolve``` callback method that can be implemented when a class
 implements ```java.io.Serializable``` as ```ser.Demo``` does. Overriding ```readResolve``` forces
@@ -289,7 +289,7 @@ public class Demo implements Serializable {
 ```
 [//]: # (END)
 
-##Ser8
+## Ser8
 [//]: # (MAIN: ser.Demo)
 This test pertains to the ```validateObject``` callback method that can be implemented when a class
 implements ```java.io.Serializable``` as ```ser.Demo``` does. Overriding ```validateObject``` implies
@@ -333,7 +333,7 @@ public class Demo implements Serializable, ObjectInputValidation {
 ```
 [//]: # (END)
 
-##Ser9
+## Ser9
 [//]: # (MAIN: ser.Demo)
 This scenario tests whether the constructor calls w.r.t. serializable classes are handled soundly.
 During deserialization, the JVM calls the first constructor that neither has any formal parameter nor
@@ -383,9 +383,9 @@ public class Demo extends Superclass implements Serializable {
 ```
 [//]: # (END)
 
-#ExternalizableClasses
+# ExternalizableClasses
 Callback methods related to ```java.io.Externalizable``` classes.
-##ExtSer1
+## ExtSer1
 [//]: # (MAIN: extser.Demo)
 This test pertains to the ```writeExternal``` callback method that can be implemented when a class
 implements ```java.io.Externalizable``` as ```ser.Demo``` does. Overriding ```writeExternal``` forces
@@ -432,7 +432,7 @@ public class Demo implements Externalizable {
 ```
 [//]: # (END)
 
-##ExtSer2
+## ExtSer2
 [//]: # (MAIN: extser.Demo)
 This test pertains to the ```readExternal``` callback method that can be implemented when a class
 implements ```java.io.Externalizable``` as ```ser.Demo``` does. Overriding ```readExternal``` forces
@@ -478,7 +478,7 @@ public class Demo implements Externalizable {
 ```
 [//]: # (END)
 
-##ExtSer3
+## ExtSer3
 [//]: # (MAIN: extser.Demo)
 This scenario tests whether the constructor calls w.r.t. externalizable classes are handled soundly.
 During deserialization, the JVM calls the no-argument constructor of the ```Externalizable``` class.
@@ -523,10 +523,10 @@ public class Demo implements Externalizable {
 ```
 [//]: # (END)
 
-#Serialization and Lambdas
+# Serialization and Lambdas
 Tests Java's serialization mechanism when Lambdas are (de)serialized, i.e., de(serialization) of Lambdas
 causes the JVM to use ```java.lang.invoke.SerializedLambda```.
-##SerLam1
+## SerLam1
 [//]: # (MAIN: serlam.DoSerialization)
 Tests whether the serialization of lambdas that implement a functional interface is modelled correctly.
 ```java
@@ -572,7 +572,7 @@ public class DoSerialization {
 ```
 [//]: # (END)
 
-##SerLam2
+## SerLam2
 [//]: # (MAIN: serlam.DoDeserialization)
 Tests whether the deserialization of lambdas that implement a functional interface is modelled correctly.
 ```java

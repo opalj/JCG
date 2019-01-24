@@ -1,8 +1,8 @@
-#DynamicProxies
+# Dynamic Proxies
 Using `java.lang.reflect.InvocationHandler` type-safe proxy classes can be generated at runtime.
 These proxy classes use reflection to forward the calls to a previously configured handler class.
 
-##DP1
+## DP1
 [//]: # (MAIN: dp.Main)
 Tests the dynamic proxy API by implementing the ```dp.DebugProxy``` class that implements ```java.lang.reflect.Invocationhandler```
 and provides a ```newInstance``` method that can than be used to instantiate a dynamic proxy object.

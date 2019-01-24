@@ -1,13 +1,16 @@
-#Classloading
+# Classloading
 
 Tests related to the usage of `java.lang.ClassLoader`s. The following test cases are available and
 listed in the `infrastructure incompatible testcases`
 
+## CL1
+## CL2
+## CL3
 - __CL1__ - TODO
 - __CL2__ - TODO
 - __CL3__ - TODO
 
-##CL4
+## CL4
 [//]: # (MAIN: cl4.Demo)
 This test case defines a custom classloader, that loads the class `lib.IntComparator` from a byte array.
 The array *bytes* contains the bytes of the following class:

@@ -1,10 +1,10 @@
-#Java8Invokedynamics
+# Java8Invokedynamics
 Tests related to the invokedynamic instructions created by Java 8 method references and lambda expressions.
 Please note, that the Scala compiler hijacks Java's infrastructure and analyses which support 
 Java8's invokedynamics, i.e., those using `(Alt)LambdaMetaFactory`) will also support Scala to a
 reasonable amount.
 
-##MR1
+## MR1
 [//]: # (MAIN: id.Class)
 Tests method reference that deals with interface default methods (Java 8 or higher) which leads to
 invokedynamics that use *INVOKEINTERFACE* methods handles.
@@ -40,7 +40,7 @@ interface Interface {
 ```
 [//]: # (END)
 
-##MR2
+## MR2
 [//]: # (MAIN: id.Class)
 Tests a method reference that results in an invokedynamic that uses an *INVOKESPECIAL* method handle which
 is issued by calling a private method.
@@ -71,7 +71,7 @@ class Class {
 ```
 [//]: # (END)
 
-##MR3
+## MR3
 [//]: # (MAIN: id.Class)
 Tests a method reference that results in an invokedynamic that uses an *INVOKESPECIAL* method handle which
 is issued by calling a protected method from a super class that is resolved to a syntatic bridge
@@ -105,7 +105,7 @@ class SuperClass{
 ```
 [//]: # (END)
 
-##MR4
+## MR4
 [//]: # (MAIN: id.Class)
 Tests a method reference that results in an *INOVKESTATIC* method handle where the target method doesn't
 have any formal arguments. The call is issued by calling a static method from a super class.
@@ -132,7 +132,7 @@ class Class {
 ```
 [//]: # (END)
 
-##MR5
+## MR5
 [//]: # (MAIN: id.Class)
 Tests a method reference that results in an *INOVKESTATIC* method handle where the target method has
 primitive formal arguments. The call is issued by a call on a functional interface.
@@ -163,7 +163,7 @@ class Class {
 ```
 [//]: # (END)
 
-##MR6
+## MR6
 [//]: # (MAIN: id.Class)
 Tests a method reference that results in an invokedynamic that uses an *NEWINVOKESPECIAL* method handle
 which is given by the method reference of ```id.Class::new```. Calling this method references
@@ -190,7 +190,7 @@ class Class {
 ```
 [//]: # (END)
 
-##MR7
+## MR7
 [//]: # (MAIN: id.Class)
 Tests a method reference that results in an invokedynamic that uses an *INVOKEVIRTUAL* method handle
 which is given by the method reference of ```cls::version``` where the actually called method is
@@ -220,10 +220,10 @@ class SuperClass {
 ```
 [//]: # (END)
 
-#Lambdas
+# Lambdas
 Test cases in the presence of lambdas.
 
-##Lambda1
+## Lambda1
 [//]: # (MAIN: id.Class)
 Tests the invocation of a lamdba that results in an invokedynamic with an *INVOKESTATIC* method handle
 which points to an synthetic method. Please not that all primitive integers are autoboxed to
@@ -252,7 +252,7 @@ class Class {
 ```
 [//]: # (END)
 
-##Lambda2
+## Lambda2
 [//]: # (MAIN: id.Class)
 Tests an invokedynamic invocation where the object receiver is captured in a lambda function.
 Declaring a lambda function in another class (cf. ```id.LambdaProvider```) as it is invoked
@@ -297,7 +297,7 @@ package id;
 ```
 [//]: # (END)
 
-##Lambda3
+## Lambda3
 [//]: # (MAIN: id.Class)
 Tests the invocation of a lambda that was first written to and then retrieved from an array. This 
 case results in an invokedynamic with an *INVOKESTATIC* method handle where the receiver argument
@@ -338,7 +338,7 @@ final class Math {
 ```
 [//]: # (END)
 
-##Lambda4
+## Lambda4
 [//]: # (MAIN: id.Class)
 Tests the invocation of an intersection type lambda. This is special because the JVM does then use
 the ```AltLambdaMetaFactory``` instead of the ```LambdaMetaFactory``` which is used for all the

@@ -1,7 +1,7 @@
-#StaticInitializers
+# StaticInitializers
 Static initializers have to be treated as (on-the-fly) entry points as they are called by the JVM
 when a class is loaded. More details can be found in the JVM spec (§12.4.1 - When initialization occurs). 
-##SI1
+## SI1
 [//]: # (MAIN: si.Main)
 A static initializer should be triggered when a *non-constant static field* is referenced. The scenario below
 shows an interface ```si.NonConstantFieldRef``` which declares a static non-constant field that is referenced
@@ -33,7 +33,7 @@ class Main {
 ```
 [//]: # (END)
 
-##SI2
+## SI2
 [//]: # (MAIN: si.Demo)
 A static initializer should be triggered when a *static interface method* is invoked. The scenario below
 shows an interface ```si.Interface``` which declares a static method (```callback```) which is called in the
@@ -67,7 +67,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##SI3
+## SI3
 [//]: # (MAIN: si.Demo)
 Static initializer of an interface with a default method. An interface's static initializer is also
 triggered when 1) *a subtype is initialized* and 2) *the interface has a default method*. Where as 1)
@@ -102,7 +102,7 @@ class Demo implements Interface {
 ```
 [//]: # (END)
 
-##SI4
+## SI4
 [//]: # (MAIN: si.Demo)
 An interface static initializer should be triggered when a *final static field* with a *non-primitive type*
 and *non-String type* is referenced. The scenario below shows an interface ```si.Interface``` which
@@ -136,7 +136,7 @@ interface Interface {
 ```
 [//]: # (END)
 
-##SI5
+## SI5
 [//]: # (MAIN: si.Main)
 The instantiation of a class should trigger its static initializer. The class ```si.Demo``` has an
 explictly defined static initializer. When a new instance of the ```si.Demo``` class is created in
@@ -169,7 +169,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##SI6
+## SI6
 [//]: # (MAIN: si.Main)
 ```si.Demo``` declares a static method which is called in ```si.Main```'s main method. Calling a
 static method on a class receiver triggers the JVM to execute its static initializer when the class
@@ -200,7 +200,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##SI7
+## SI7
 [//]: # (MAIN: si.Main)
 Assigning a *non-final static field* (e.g. ```si.Demo.assignMe```) triggers the JVM to execute
 ```si.Demo``` static initializer. ```si.Demo.assignMe``` is assigned in ```si.Main```'s main method
@@ -233,7 +233,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##SI8
+## SI8
 [//]: # (MAIN: si.Main)
 When initialization of a class occurs during execution, all its super classes must be initialized
 beforehand. In ```si.Main```'s main method an instance of ```si.Subclass``` is created. Hence, all

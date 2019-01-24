@@ -1,6 +1,6 @@
-#VirtualCalls
+# VirtualCalls
 Tests related to the resolution of standard virtual methods. 
-##VC1
+## VC1
 [//]: # (MAIN: vc.Class)
 Tests a virtually dispatched method call which is in fact monomorphic.
 ```java
@@ -22,7 +22,7 @@ class Class {
 ```
 [//]: # (END)
 
-##VC2
+## VC2
 [//]: # (MAIN: vc.Class)
 Tests a virtually dispatched method call when a simple type hierarchy is present.
 ```java
@@ -52,7 +52,7 @@ class SubClass extends Class {
 ```
 [//]: # (END)
 
-##VC3
+## VC3
 [//]: # (MAIN: vc.Class)
 Tests a virtually dispatched method call when the receiver is an interface type.
 ```java
@@ -85,7 +85,7 @@ class ClassImpl implements Interface {
 ```
 [//]: # (END)
 
-##VC4
+## VC4
 [//]: # (MAIN: vc.Class)
 Tests a virtually dispatched method call when the receiver is loaded from an array.
 ```java

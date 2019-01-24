@@ -1,11 +1,11 @@
-#TrivialReflection
+# TrivialReflection
 This tests pertain to the Java's reflection API and comprise method call to
 ```java.lang.Class.getDeclaredMethod```, ```java.lang.Class.getMethod```,
 ```java.lang.Class.getField```, ```java.lang.reflect.Method.invoke```, and others. Cases that belong
 to this category are rather trivially resolvable as all API inputs are directly known and neither
 data-flow nor control-flow analyses are required. 
 
-##TR1
+## TR1
 [//]: # (MAIN: tr.Demo)
 Tests the reflective call resolution when an object of type ```java.lang.Class``` is used to find a
 declared method (```Class.getDeclaredMethod```) of this class. Afterwards, the found method is invoked.
@@ -31,7 +31,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TR2
+## TR2
 [//]: # (MAIN: tr.Demo)
 Tests the reflective call resolution when an object of type ```java.lang.Class``` is used to find a
 declared method (```Class.getDeclaredMethod```) of this class. Afterwards, the found method is invoked.
@@ -61,7 +61,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TR3
+## TR3
 [//]: # (MAIN: tr.Demo)
 Tests the reflective call resolution when an object of type ```java.lang.Class``` is used to find a
 method (```Class.getMethod```) of this class. Afterwards, the found method is invoked.
@@ -89,7 +89,7 @@ public class Demo {
 ```
 [//]: # (END)
 
-##TR4
+## TR4
 [//]: # (MAIN: tr.Demo)
 Tests the reflective call resolution when an object of type ```java.lang.Class``` is used to find a
 declared method (```Class.getDeclaredMethod```) of this class. Afterwards, the found method is invoked.
@@ -115,7 +115,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TR5
+## TR5
 [//]: # (MAIN: tr.Demo)
 Tests the reflective invocation of a constructor by retrieving ```Demo```'s default constructor via
 calling ```newInstance``` on ```tr.Demo```'s class object. This call must be resolved to Demo's 
@@ -139,7 +139,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TR6
+## TR6
 [//]: # (MAIN: tr.Demo)
 Tests the reflective invocation of a constructor by retrieving ```Demo```'s constructor with a 
 String argument via ```java.lang.Class```'s ```getConstructor``` method and then calling ```newInstance```
@@ -164,7 +164,7 @@ class Demo {
 ```
 [//]: # (END)
 
-##TR7
+## TR7
 [//]: # (MAIN: tr.Demo)
 Tests a reflective method invocation that is performed on a class' private field that is retrieved via the
 reflection API. In ```tr.Demo```'s main method a new ```tr.Demo``` object is created and an object
@@ -210,7 +210,7 @@ class NeverInstantiated implements Target {
 ```
 [//]: # (END)
 
-##TR8
+## TR8
 [//]: # (MAIN: tr.Demo)
 Tests a reflective method invocation that is performed on a class' public field that is retrieved via the
 reflection API. In ```tr.Demo```'s main method a new ```tr.Demo``` object is created and an object
@@ -257,7 +257,7 @@ class NeverInstantiated implements Target {
 ```
 [//]: # (END)
 
-##TR9
+## TR9
 [//]: # (MAIN: tr.Demo)
 This test cases concerns the reflection API as well as a class' static initializer. Within the main
 method of ```tr.Demo``` ```Class.forName``` is called trying to retrieve an object of
@@ -291,9 +291,9 @@ class InitializedClass {
 ```
 [//]: # (END)
 
-#LocallyResolvableReflection
+# LocallyResolvableReflection
 The complete information is locally (intra-procedurally) available.
-##LRR1
+## LRR1
 [//]: # (MAIN: lrr.Demo)
 This test cases concerns the reflection API as well as a class' static initializer. Within the main
 method of ```lrr.Demo``` ```Class.forName``` is called trying to retrieve an object of
@@ -342,7 +342,7 @@ class Right {
 ```
 [//]: # (END)
 
-##LRR2
+## LRR2
 [//]: # (MAIN: lrr.Demo)
 This test cases concerns the reflection API as well as a class' static initializer. Within the main
 method of ```lrr.Demo``` ```Class.forName``` is called trying to retrieve an object of
@@ -396,7 +396,7 @@ class IsEven {
 ```
 [//]: # (END)
 
-##LRR3
+## LRR3
 [//]: # (MAIN: lrr.Demo)
 This test cases concerns the reflection API as well as a class' static initializer. Within the main
 method of ```lrr.Demo``` ```Class.forName``` is called trying to retrieve an object of
@@ -437,10 +437,10 @@ class TargetClass {
 ```
 [//]: # (END)
 
-#ContextSensitiveReflection
+# ContextSensitiveReflection
 The concrete strings require information about the context.
 
-##CSR1
+## CSR1
 [//]: # (MAIN: csr.Demo)
 This test cases concerns the reflection API as well as a class' static initializer. Within the main
 method of ```csr.Demo``` a static method is called that receives the string constant
@@ -479,7 +479,7 @@ class TargetClass {
 ```
 [//]: # (END)
 
-##CSR2
+## CSR2
 [//]: # (MAIN: csr.Demo)
 This test cases concerns the reflection API as well as a class' static initializer. Within the main
 method of ```csr.Demo``` a static method is called that receives the string constant
@@ -518,7 +518,7 @@ class TargetClass {
 ```
 [//]: # (END)
 
-##CSR3
+## CSR3
 [//]: # (MAIN: csr.Demo)
 This test cases concerns the reflection API as well as a class' static initializer. Within the main
 method of ```csr.Demo``` a static method is called reads the value from a static field which is
@@ -560,7 +560,7 @@ class CallTarget {
 ```
 [//]: # (END)
 
-##CSR4
+## CSR4
 [//]: # (MAIN: csr.Demo)
 This test cases concerns the reflection API as well as a class' static initializer. Within the main
 method the methods ```java.lang.System.getProperties``` and ```java.lang.System.setProperties``` are
@@ -607,11 +607,11 @@ class TargetClass {
 ```
 [//]: # (END)
 
-#ClassForNameExceptions
+# ClassForNameExceptions
 Test cases w.r.t. to classloading using ```Class.forName(className:String)``` and its respective
 exceptions to test whether valid path might be ignored which leads to unsoundness.
 
-##CFNE1
+## CFNE1
 [//]: # (MAIN: cfne.Demo)
 This test case targets a common try catch pattern when classes are loaded. An existing class is loaded
 over ```Class.forName(...)```, instantiated and then casted to another class. Unfortunately, the class
@@ -652,7 +652,7 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CFNE2
+## CFNE2
 [//]: # (MAIN: cfne.Demo)
 This test case targets a common try catch pattern when classes are loaded. An absent class is loaded
 over ```Class.forName(...)```. Since the class __can't be found__ the operation results in a ```ClassNotFoundException```
@@ -689,7 +689,7 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CFNE3
+## CFNE3
 [//]: # (MAIN: cfne.Demo)
 This case targets a concerns not only loading of classes but also the execution of their
 static initializer. When a class is loaded, its static initializer must be called.
@@ -731,7 +731,7 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CFNE4
+## CFNE4
 [//]: # (MAIN: cfne.Demo)
 This case targets a concerns not only loading of classes but also the execution of their
 static initializer. When a class is loaded, its static initializer must be called. Also the static
