@@ -1,14 +1,16 @@
+import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileWriter
+import java.io.FileOutputStream
 import java.net.URL
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
+
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
-import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
 import play.api.libs.json.Json
+
 import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
 import org.opalj.br.Code
@@ -27,6 +29,8 @@ import org.opalj.br.fpcf.cg.properties.Callees
 import org.opalj.br.fpcf.cg.properties.NoCallees
 import org.opalj.br.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
+import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
+import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
 import org.opalj.tac.fpcf.analyses.cg.LazyCalleesAnalysis
 import org.opalj.tac.fpcf.analyses.TriggeredSystemPropertiesAnalysis
 import org.opalj.tac.fpcf.analyses.cg.reflection.TriggeredReflectionRelatedCallsAnalysis
@@ -393,12 +397,14 @@ object OpalJCGAdatper extends JCGTestAdapter {
         val after = System.nanoTime()
 
         var reachableMethods = Set.empty[ReachableMethod]
+        val methodCache = mutable.Map.empty[Method, Method]
+        val stringCache = mutable.Map.empty[String, String]
 
         for (
             dm ← declaredMethods.declaredMethods if (!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
                 (dm.hasSingleDefinedMethod && dm.definedMethod.classFile.thisType == dm.declaringClassType)
         ) {
-            val m = createMethodObject(dm)
+            val m = createMethodObject(dm, methodCache, stringCache)
             ps(dm, Callees.key) match {
                 case FinalEP(_, NoCalleesDueToNotReachableMethod) ⇒
                 case FinalEP(_, NoCallees) ⇒
@@ -407,7 +413,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     val body = dm.definedMethod.body
                     val callSites = cs.callSites().flatMap {
                         case (pc, callees) ⇒
-                            createCallSites(body, pc, callees)
+                            createCallSites(body, pc, callees, methodCache, stringCache)
                     }.toSet
                     reachableMethods += ReachableMethod(m, callSites)
             }
@@ -415,8 +421,8 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         ps.shutdown()
 
-        val file: FileWriter = new FileWriter(outputFile)
-        file.write(Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods))))
+        val file = new BufferedOutputStream(new FileOutputStream(outputFile))
+        file.write(Json.toBytes(Json.toJson(ReachableMethods(reachableMethods))))
         file.flush()
         file.close()
 
@@ -426,9 +432,11 @@ object OpalJCGAdatper extends JCGTestAdapter {
     private def createCallSites(
         bodyO:   Option[Code],
         pc:      Int,
-        callees: Iterator[DeclaredMethod]
+        callees: Iterator[DeclaredMethod],
+        methodCache: mutable.Map[Method, Method],
+        stringCache: mutable.Map[String, String]
     ): Seq[CallSite] = bodyO match {
-        case None ⇒ callees.map(createIndividualCallSite(_, -1)).toSeq
+        case None ⇒ callees.map(createIndividualCallSite(_, -1, methodCache, stringCache)).toSeq
         case Some(body) ⇒
             val declaredO = body.instructions(pc) match {
                 case MethodInvocationInstruction(dc, _, name, desc) ⇒ Some(dc, name, desc)
@@ -452,34 +460,57 @@ object OpalJCGAdatper extends JCGTestAdapter {
                         callee.descriptor.parametersCount == desc.parametersCount
                 }
 
-                indirectCallees.map(createIndividualCallSite(_, line)).toSeq :+
+                indirectCallees.map(createIndividualCallSite(_, line, methodCache, stringCache)).toSeq :+
                     CallSite(
                         declaredTarget,
                         line,
-                        directCallees.map(createMethodObject).toSet
+                        directCallees.map(createMethodObject(_, methodCache, stringCache)).toSet
                     )
             } else {
-                callees.map(createIndividualCallSite(_, line)).toSeq
+                callees.map(createIndividualCallSite(_, line, methodCache, stringCache)).toSeq
             }
     }
 
     def createIndividualCallSite(
         method: DeclaredMethod,
-        line:   Int
+        line:   Int,
+        methodCache: mutable.Map[Method, Method],
+        stringCache: mutable.Map[String, String]
     ): CallSite = {
         CallSite(
-            createMethodObject(method),
+            createMethodObject(method, methodCache, stringCache),
             line,
-            Set(createMethodObject(method))
+            Set(createMethodObject(method, methodCache, stringCache))
         )
     }
 
-    private def createMethodObject(method: DeclaredMethod): Method = {
-        Method(
-            method.name,
-            method.declaringClassType.toJVMTypeName,
-            method.descriptor.returnType.toJVMTypeName,
-            method.descriptor.parameterTypes.map[String](_.toJVMTypeName).toList
+    private def createMethodObject(
+        method: DeclaredMethod,
+        methodCache: mutable.Map[Method, Method],
+        stringCache: mutable.Map[String, String]
+    ): Method = {
+        val m = Method(
+            uniqueString(method.name, stringCache),
+            uniqueString(method.declaringClassType.toJVMTypeName, stringCache),
+            uniqueString(method.descriptor.returnType.toJVMTypeName, stringCache),
+            method.descriptor.parameterTypes.map[String]{
+                pt ⇒ uniqueString(pt.toJVMTypeName, stringCache)
+            }.toList
         )
+        if (methodCache.contains(m)) {
+             methodCache(m)
+        } else {
+            methodCache += (m → m)
+            m
+        }
+    }
+
+    private def uniqueString(s: String, stringCache: mutable.Map[String, String]):String = {
+        if (stringCache.contains(s))
+            stringCache(s)
+        else {
+            stringCache += (s → s)
+            s
+        }
     }
 }
