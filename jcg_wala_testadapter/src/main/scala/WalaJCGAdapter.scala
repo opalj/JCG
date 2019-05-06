@@ -127,7 +127,12 @@ object WalaJCGAdapter extends JCGTestAdapter {
                         case _: ArrayIndexOutOfBoundsException ⇒ -1
                     }
                     val tgts = tgtsWala.map(createMethodObject).toSet
-                    Some(CallSite(createMethodObject(declaredTarget), line, tgts))
+                    Some(CallSite(
+                        createMethodObject(declaredTarget),
+                        line,
+                        Some(cs.getProgramCounter),
+                        tgts
+                    ))
                 } else {
                     None
                 }

@@ -38,7 +38,7 @@ object ReachableMethod {
  * A call site has a `declaredTarget` method, is associated with a line number (-1 if unknown) and
  * contains the set of computed target methods (`targets`).
  */
-case class CallSite(declaredTarget: Method, line: Int, targets: Set[Method])
+case class CallSite(declaredTarget: Method, line: Int, pc: Option[Int], targets: Set[Method])
 
 object CallSite {
     implicit val callSiteReads: Reads[CallSite] = Json.reads[CallSite]
