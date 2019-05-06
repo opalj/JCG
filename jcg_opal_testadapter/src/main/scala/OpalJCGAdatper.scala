@@ -5,11 +5,9 @@ import java.io.Writer
 import java.net.URL
 
 import scala.collection.JavaConverters._
-
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-
 import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
 import org.opalj.br.DeclaredMethod
@@ -25,6 +23,8 @@ import org.opalj.br.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.br.ObjectType
 import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
+import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
+import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
 import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
 import org.opalj.tac.fpcf.analyses.TriggeredSystemPropertiesAnalysis
 import org.opalj.tac.fpcf.analyses.cg.reflection.TriggeredReflectionRelatedCallsAnalysis
@@ -113,13 +113,13 @@ object OpalJCGAdatper extends JCGTestAdapter {
             Seq.empty
         )
 
+        val performInvocationsDomain = classOf[DefaultPerformInvocationsDomainWithCFGAndDefUse[_]]
+
         project.updateProjectInformationKeyInitializationData(
-            AIDomainFactoryKey,
-            (i: Option[Set[Class[_ <: AnyRef]]]) ⇒ (i match {
-                case None               ⇒ Set(classOf[DefaultDomainWithCFGAndDefUse[_]])
-                case Some(requirements) ⇒ requirements + classOf[DefaultDomainWithCFGAndDefUse[_]]
-            }): Set[Class[_ <: AnyRef]]
-        )
+            AIDomainFactoryKey) {
+                case None               ⇒ Set(performInvocationsDomain)
+                case Some(requirements) ⇒ requirements + performInvocationsDomain
+            }
 
         implicit val ps: PropertyStore = project.get(PropertyStoreKey)
 
