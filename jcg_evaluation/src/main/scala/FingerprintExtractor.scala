@@ -80,8 +80,8 @@ object FingerprintExtractor {
                         if (config.DEBUG) {
                             println(e.printStackTrace())
                         }
-                        ow.write(s"\tE")
-                        fingerprintWriter.println(s"${projectSpec.name}\tE")
+//                        ow.write(s"\tE")
+//                        fingerprintWriter.println(s"${projectSpec.name}\tE")
                 }
 
                 System.gc()
