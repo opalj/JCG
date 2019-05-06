@@ -38,14 +38,17 @@ object TestCaseExtractor {
         result.mkdirs()
 
         var mdFilter = ""
-        var fileDir = getClass.getResource("/").getPath
+        var fileDir: Option[String]= None
+
         args.sliding(2, 2).toList.collect {
             case Array("--md", f: String)        ⇒ mdFilter = f
-            case Array("--rsrcDir", dir: String) ⇒ fileDir = dir
+            case Array("--rsrcDir", dir: String) ⇒ fileDir = Some(dir)
         }
 
+        val resourceDir = new File(fileDir.getOrElse(getClass.getResource("/").getPath))
+
         // get all markdown files
-        val resources = new File(fileDir).
+        val resources = resourceDir.
             listFiles(_.getPath.endsWith(".md")).
             filter(_.getName.startsWith(mdFilter))
 
