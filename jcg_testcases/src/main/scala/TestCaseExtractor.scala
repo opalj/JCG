@@ -27,6 +27,8 @@ object TestCaseExtractor {
      */
     def main(args: Array[String]): Unit = {
 
+        val userDir = System.getenv("user.dir")
+
         val tmp = new File("tmp")
         if (tmp.exists())
             FileUtils.deleteDirectory(tmp)
@@ -45,7 +47,7 @@ object TestCaseExtractor {
             case Array("--rsrcDir", dir: String) ⇒ fileDir = Some(dir)
         }
 
-        val resourceDir = new File(fileDir.getOrElse(getClass.getResource("/").getPath))
+        val resourceDir = new File(fileDir.getOrElse(userDir))
 
         // get all markdown files
         val resources = resourceDir.
@@ -102,6 +104,9 @@ object TestCaseExtractor {
 
                 val compiler = ToolProvider.getSystemJavaCompiler
 
+                // ##########
+                println(s"tmp: ${tmp.getAbsolutePath} , $projectName/bin/")
+
                 val bin = new File(tmp.getPath, s"$projectName/bin/")
                 bin.mkdirs()
 
@@ -113,6 +118,10 @@ object TestCaseExtractor {
                 val allClassFileNames = allClassFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
 
                 val jarOpts = Seq(if (main != null) "cfe" else "cf")
+
+                // ##########
+                println(s"output path: ../../../${result.getPath}/$projectName.jar")
+
                 val outPathCompiler = new File(s"../../../${result.getPath}/$projectName.jar")
                 val mainOpt = Option(main)
                 val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getPath) ++ mainOpt ++ allClassFileNames
