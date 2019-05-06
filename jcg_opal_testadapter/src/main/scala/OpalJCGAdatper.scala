@@ -22,8 +22,6 @@ import org.opalj.br.fpcf.cg.properties.NoCallees
 import org.opalj.br.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.br.ObjectType
-import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
-import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
 import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
 import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
 import org.opalj.tac.fpcf.analyses.TriggeredSystemPropertiesAnalysis
@@ -39,7 +37,7 @@ import org.opalj.tac.fpcf.analyses.cg.TriggeredInstantiatedTypesAnalysis
 import org.opalj.tac.fpcf.analyses.cg.TriggeredStaticInitializerAnalysis
 
 /**
- * A [[JCGTestAdapter]] for the FPCF based call graph analyses of OPAL.
+ * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
  *
  * @author Dominik Helm
  * @author Florian Kuebler
