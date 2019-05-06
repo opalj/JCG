@@ -37,38 +37,11 @@ object DoopAdapter extends JCGTestAdapter {
     override def frameworkName(): String = "Doop"
 
     def main(args: Array[String]): Unit = {
-        OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
-
-        val doopResults = new File(args(0)).listFiles{ f ⇒
-            f.isFile && f.getName.endsWith(".jar.txt")
-        }
-        val jreDir = new File(args(1))
-
-        if (!jreDir.exists())
-            throw new IllegalArgumentException("Please specify the path to the JRE as 2nd" +
-                "command line argument")
-
-        for (doopResult ← doopResults.sorted) {
-            val source = Source.fromFile(doopResult)
-            val tgtJar = new File(s"result/${doopResult.getName.replace(".txt", "")}")
-            if (!tgtJar.exists()) {
-                throw new IllegalArgumentException(s"${tgtJar.getAbsolutePath} does not exist")
-            }
-            val projectSpec: ProjectSpecification = ProjectSpecification(
-                doopResult.getName.replace(".jar.txt", ""), // name of the jar
-                -1, // ignore java version
-                None, // ignore main
-                tgtJar.getAbsolutePath, // path to jar
-                None // ignore other class path entries
-            )
-
-            println(s"${tgtJar.getName}")
-            val outFile = createJsonRepresentation(source, tgtJar, jreDir)
-            val matchingResult = CGMatcher.matchCallSites(
-                projectSpec, jreDir.getAbsolutePath, new File(""), outFile
-            )
-            println(matchingResult.shortNotation)
-        }
+        createJsonRepresentation(
+            Source.fromFile(args(0)),
+            new File(args(1)),
+            new File(args(2))
+        )
     }
 
     def createJsonRepresentation(doopResult: Source, tgtJar: File, jreDir: File): File = {
@@ -83,7 +56,7 @@ object DoopAdapter extends JCGTestAdapter {
         val dn = jarName.replace(".jar", "")
         val fn = jarName.replace(".jar", ".json")
         val dir = new File(s"tmp/DOOP/$dn")
-        if(!dir.exists()){
+        if (!dir.exists()) {
             dir.mkdirs()
         }
 
@@ -146,6 +119,7 @@ object DoopAdapter extends JCGTestAdapter {
             CallSite(
                 firstTgt.copy(declaringClass = declaredType),
                 lineNumber.getOrElse(-1),
+                Some(pc),
                 tgtMethods
             )
         }
@@ -207,24 +181,26 @@ object DoopAdapter extends JCGTestAdapter {
 
         val re = """\[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>/([^/]+)/(\d+), \[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r ////([^/]+)/(\d+), \[\d+\\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r
         for (line ← doopResult.getLines()) {
-            // there is at most one occurrence per line
+            val Array(_, callerDeclaredTgtNumber, _, tgtStr) = line.split("\t")
+            try {
+                val Array(callerStr, declaredTgt, numberString) = callerDeclaredTgtNumber.split("/")
+                val caller = callerStr.slice(1, callerStr.length - 1)
+                val tgt = tgtStr.slice(1, tgtStr.length - 1)
+                val number = numberString.toInt
+                // there is at most one occurrence per line
 
-            re.findFirstMatchIn(line) match {
-                case Some(x) ⇒
-                    val caller = x.group(1)
-                    val declaredTgt = x.group(3)
-                    val number = x.group(4).toInt
-                    val tgt = x.group(5)
+                val currentCallsites = callGraph(caller)
+                val callSite = declaredTgt → number
+                val currentCallees = currentCallsites(callSite)
 
-                    val currentCallsites = callGraph(caller)
-                    val callSite = declaredTgt → number
-                    val currentCallees = currentCallsites(callSite)
-
-                    currentCallees += tgt
-                    currentCallsites += (callSite → currentCallees)
-                    callGraph += (caller → currentCallsites)
-                case _ ⇒ // no match
+                currentCallees += tgt
+                currentCallsites += (callSite → currentCallees)
+                callGraph += (caller → currentCallsites)
+            } catch {
+                case _: Throwable ⇒
+                    println()
             }
+
         }
         doopResult.close()
         callGraph.map { case (k, v) ⇒ k → v.map { case (k, v) ⇒ k → v.toSet }.toMap }.toMap
