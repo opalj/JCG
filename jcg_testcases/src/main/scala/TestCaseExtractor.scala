@@ -105,8 +105,6 @@ object TestCaseExtractor {
                     file.getPath
                 }
 
-
-
                 val compiler = ToolProvider.getSystemJavaCompiler
 
                 // ##########
@@ -119,7 +117,7 @@ object TestCaseExtractor {
 
 
                 if(debug) {
-                    println(compilerArgs.mkString("Compiler args: \n\n", "\n", "\n\n"))
+                    println(compilerArgs.mkString("[DEBUG] Compiler args: \n\n", "\n", "\n\n"))
                 }
 
                 compiler.run(null, null, null, compilerArgs: _*)
@@ -137,7 +135,11 @@ object TestCaseExtractor {
                 val outPathCompiler = new File(s"${result.getAbsolutePath}/$projectName.jar")
                 val mainOpt = Option(main)
                 val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getAbsolutePath) ++ mainOpt ++ allClassFileNames
-                println(s"args: ${args.mkString(";")}")
+
+                println(args.mkString("[DEBUG] Jar args: \n\n", "\n", "\n\n"))
+                if(debug) {
+                }
+
                 sys.process.Process(args, bin).!
 
                 if (main != null) {
