@@ -32,9 +32,10 @@ object TestCaseExtractor {
         val tmp = new File("tmp")
         if (tmp.exists())
             FileUtils.deleteDirectory(tmp)
+
         tmp.mkdirs()
 
-        val result = new File("result")
+        val result = new File("testcaseJars")
         if (result.exists())
             FileUtils.deleteDirectory(result)
         result.mkdirs()
@@ -102,6 +103,8 @@ object TestCaseExtractor {
                     file.getPath
                 }
 
+
+
                 val compiler = ToolProvider.getSystemJavaCompiler
 
                 // ##########
@@ -110,7 +113,7 @@ object TestCaseExtractor {
                 val bin = new File(tmp.getPath, s"$projectName/bin/")
                 bin.mkdirs()
 
-                val compilerArgs = (srcFiles ++ Seq("-d", bin.getPath)).toSeq
+                val compilerArgs = (srcFiles ++ Seq("-d", bin.getAbsolutePath)).toSeq
 
                 compiler.run(null, null, null, compilerArgs: _*)
 
@@ -122,7 +125,7 @@ object TestCaseExtractor {
                 // ##########
                 println(s"output path: ../../../${result.getPath}/$projectName.jar")
 
-                val outPathCompiler = new File(s"../../../${result.getPath}/$projectName.jar")
+                val outPathCompiler = new File(s"${result.getAbsolutePath}/$projectName.jar")
                 val mainOpt = Option(main)
                 val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getPath) ++ mainOpt ++ allClassFileNames
                 sys.process.Process(args, bin).!
