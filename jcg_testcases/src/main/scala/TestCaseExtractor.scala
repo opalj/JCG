@@ -121,7 +121,7 @@ object TestCaseExtractor {
 
                 compiler.run(null, null, null, compilerArgs: _*)
 
-                val allClassFiles = recursiveListFiles(bin)
+                val allClassFiles = recursiveListFiles(bin.getAbsoluteFile)
 
                 if(debug) {
                     println(allClassFiles.mkString("[DEBUG] Produced class files: \n\n", "\n", "\n\n"))
