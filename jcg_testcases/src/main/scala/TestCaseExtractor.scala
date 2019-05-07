@@ -87,7 +87,7 @@ object TestCaseExtractor {
             val re = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
 
             reHeaders.findAllIn(lines).matchData.foreach { projectMatchResult ⇒
-                val projectName = projectMatchResult.group("projectName")
+                val projectName = projectMatchResult.group("projectName").trim
                 val main = projectMatchResult.group("mainClass")
                 assert(main == null || !main.contains("/"), "invalid main class, use '.' instead of '/'")
                 val srcFiles = re.findAllIn(projectMatchResult.group("body")).matchData.map { matchResult ⇒
@@ -123,6 +123,11 @@ object TestCaseExtractor {
                 compiler.run(null, null, null, compilerArgs: _*)
 
                 val allClassFiles = recursiveListFiles(bin)
+
+                if(debug) {
+                    println(allClassFiles.mkString("[DEBUG] Produced class files: \n\n", "\n", "\n\n"))
+                }
+
                 val allClassFileNames = allClassFiles.map(_.getAbsolutePath.replace(s"${tmp.getAbsolutePath}/$projectName/bin/", ""))
 
                 println(allClassFileNames.mkString("\n"))
