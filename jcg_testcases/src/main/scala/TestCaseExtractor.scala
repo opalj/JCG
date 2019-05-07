@@ -29,7 +29,7 @@ object TestCaseExtractor {
 
         val debug = true
 
-        val userDir = System.getenv("user.dir")
+        val userDir = getClass.getResource("/").getPath
 
         val tmp = new File("tmp")
         if (tmp.exists())
@@ -102,19 +102,18 @@ object TestCaseExtractor {
                     val pw = new PrintWriter(file)
                     pw.write(codeSnippet)
                     pw.close()
-                    file.getPath
+                    file.getAbsolutePath
                 }
 
                 val compiler = ToolProvider.getSystemJavaCompiler
 
-                // ##########
-                println(s"tmp: ${tmp.getAbsolutePath} , $projectName/bin/")
-
                 val bin = new File(tmp.getAbsolutePath, s"$projectName/bin/")
                 bin.mkdirs()
 
-                val compilerArgs = (srcFiles ++ Seq("-d", bin.getAbsolutePath)).toSeq
+                val targetDirs = findJCGTargetDirs()
+                val classPath = targetDirsToCP(targetDirs)
 
+                val compilerArgs = (srcFiles ++ Seq("-d", bin.getAbsolutePath, classPath)).toSeq
 
                 if(debug) {
                     println(compilerArgs.mkString("[DEBUG] Compiler args: \n\n", "\n", "\n\n"))
@@ -174,5 +173,29 @@ object TestCaseExtractor {
     def recursiveListFiles(f: File): Array[File] = {
         val these = f.listFiles((_, fil) ⇒ fil.endsWith(".class"))
         these ++ f.listFiles.filter(_.isDirectory).flatMap(recursiveListFiles)
+    }
+
+    def findJCGTargetDirs() : List[File] = {
+
+        val root = new File(System.getProperty("user.dir"))
+
+        val worklist = scala.collection.mutable.Queue(root)
+
+        val result = scala.collection.mutable.ArrayBuffer.empty[File]
+        while(worklist.nonEmpty){
+            val curElement = worklist.dequeue()
+            if(curElement.isDirectory){
+                if(curElement.getName == "target")
+                    result += curElement
+                else
+                    worklist ++= curElement.listFiles()
+            }
+        }
+
+        result.toList
+    }
+
+    def targetDirsToCP(dirs: List[File]) : String = {
+        s" -cp ${dirs.mkString(";")}"
     }
 }
