@@ -130,6 +130,7 @@ object TestCaseExtractor {
                 val outPathCompiler = new File(s"${result.getAbsolutePath}/$projectName.jar")
                 val mainOpt = Option(main)
                 val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getAbsolutePath) ++ mainOpt ++ allClassFileNames
+                println(s"args: ${args.mkString(";")}")
                 sys.process.Process(args, bin).!
 
                 if (main != null) {
