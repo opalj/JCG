@@ -27,6 +27,8 @@ object TestCaseExtractor {
      */
     def main(args: Array[String]): Unit = {
 
+        val debug = true
+
         val userDir = System.getenv("user.dir")
 
         val tmp = new File("tmp")
@@ -114,6 +116,11 @@ object TestCaseExtractor {
                 bin.mkdirs()
 
                 val compilerArgs = (srcFiles ++ Seq("-d", bin.getAbsolutePath)).toSeq
+
+
+                if(debug) {
+                    println(compilerArgs.mkString("Compiler args: \n\n", "\n", "\n\n"))
+                }
 
                 compiler.run(null, null, null, compilerArgs: _*)
 
