@@ -113,7 +113,7 @@ object TestCaseExtractor {
                 val targetDirs = findJCGTargetDirs().filter(_.getAbsolutePath.contains("jcg_annotations"))
                 val classPath = targetDirsToCP(targetDirs)
 
-                val compilerArgs = (srcFiles ++ Seq("-d", bin.getAbsolutePath, classPath)).toSeq
+                val compilerArgs = (Seq(classPath) ++ srcFiles ++ Seq("-d", bin.getAbsolutePath))
 
                 if(debug) {
                     println(compilerArgs.mkString("[DEBUG] Compiler args: \n\n", "\n", "\n\n"))
@@ -196,6 +196,6 @@ object TestCaseExtractor {
     }
 
     def targetDirsToCP(dirs: List[File]) : String = {
-        s"-cp ${dirs.mkString(";")}"
+        s"-classpath ${dirs.mkString(";")}"
     }
 }
