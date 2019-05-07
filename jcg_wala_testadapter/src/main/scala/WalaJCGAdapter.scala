@@ -167,10 +167,22 @@ object WalaJCGAdapter extends JCGTestAdapter {
     }
 
     private def toJVMString(typeReference: TypeReference): String =
-        if (typeReference.isClassType ||
-            (typeReference.isArrayType && typeReference.getArrayElementType.isClassType)) {
+        if (typeReference.isClassType || isArrayOfClassType(typeReference)) {
             typeReference.getName.toString+";"
         } else {
             typeReference.getName.toString
         }
+
+    private def isArrayOfClassType(typeReference: TypeReference): Boolean = {
+        if (typeReference.isArrayType) {
+            val elementType = typeReference.getArrayElementType
+            if (elementType.isClassType) {
+                true
+            } else {
+                isArrayOfClassType(elementType)
+            }
+        } else {
+            false
+        }
+    }
 }
