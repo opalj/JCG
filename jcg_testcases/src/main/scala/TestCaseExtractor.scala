@@ -93,7 +93,7 @@ object TestCaseExtractor {
                     val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
                     val codeSnippet = matchResult.group(4)
 
-                    val file = new File(tmp.getPath, fileName)
+                    val file = new File(tmp.getAbsolutePath, fileName)
                     file.getParentFile.mkdirs()
                     file.createNewFile()
 
@@ -110,7 +110,7 @@ object TestCaseExtractor {
                 // ##########
                 println(s"tmp: ${tmp.getAbsolutePath} , $projectName/bin/")
 
-                val bin = new File(tmp.getPath, s"$projectName/bin/")
+                val bin = new File(tmp.getAbsolutePath, s"$projectName/bin/")
                 bin.mkdirs()
 
                 val compilerArgs = (srcFiles ++ Seq("-d", bin.getAbsolutePath)).toSeq
@@ -118,7 +118,9 @@ object TestCaseExtractor {
                 compiler.run(null, null, null, compilerArgs: _*)
 
                 val allClassFiles = recursiveListFiles(bin)
-                val allClassFileNames = allClassFiles.map(_.getPath.replace(s"${tmp.getPath}/$projectName/bin/", ""))
+                val allClassFileNames = allClassFiles.map(_.getAbsolutePath.replace(s"${tmp.getAbsolutePath}/$projectName/bin/", ""))
+
+                println(allClassFileNames.mkString("\n"))
 
                 val jarOpts = Seq(if (main != null) "cfe" else "cf")
 
@@ -127,7 +129,7 @@ object TestCaseExtractor {
 
                 val outPathCompiler = new File(s"${result.getAbsolutePath}/$projectName.jar")
                 val mainOpt = Option(main)
-                val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getPath) ++ mainOpt ++ allClassFileNames
+                val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getAbsolutePath) ++ mainOpt ++ allClassFileNames
                 sys.process.Process(args, bin).!
 
                 if (main != null) {
