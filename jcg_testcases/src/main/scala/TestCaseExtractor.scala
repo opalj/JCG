@@ -29,7 +29,7 @@ object TestCaseExtractor {
 
         val debug = true
 
-        val userDir = getClass.getResource("/").getPath
+        val userDir = System.getProperty("user.dir")
 
         val tmp = new File("tmp")
         if (tmp.exists())
