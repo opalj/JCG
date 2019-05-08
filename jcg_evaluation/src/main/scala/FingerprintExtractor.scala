@@ -65,6 +65,9 @@ object FingerprintExtractor {
                 }
 
                 println(s"performing test case: ${projectSpec.name}")
+                println(s"required Java version: ${projectSpec.java}")
+                println(s"specified java path: ${jreLocations(projectSpec.java)}")
+
                 try {
                     adapter.serializeCG(
                         cgAlgorithm,
@@ -73,15 +76,13 @@ object FingerprintExtractor {
                         projectSpec.allClassPathEntryPaths(projectsDir),
                         jreLocations(projectSpec.java),
                         false,
-                        cgFile.getPath
+                        cgFile.getAbsolutePath
                     )
                 } catch {
                     case e: Throwable ⇒
                         if (config.DEBUG) {
                             println(e.printStackTrace())
                         }
-                        ow.write(s"\tE")
-                        fingerprintWriter.println(s"${projectSpec.name}\tE")
                 }
 
                 System.gc()

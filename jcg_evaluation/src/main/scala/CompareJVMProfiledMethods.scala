@@ -36,8 +36,7 @@ object CompareJVMProfiledMethods {
             unreachable.mkString("unreachable methods: \n\n","\t\n", "")
         )
 
-
-        println(s"\n\n $numProfiledMethods of ${numProfiledMethods - unreachable.size} all methods are reachable")
+        println(s"\n\n ${numProfiledMethods - unreachable.size} of $numProfiledMethods all methods are reachable")
     }
 
     private def parseCallGraph(callGraphFile: String) = {

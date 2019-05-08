@@ -5,11 +5,9 @@ import java.io.Writer
 import java.net.URL
 
 import scala.collection.JavaConverters._
-
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-
 import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
 import org.opalj.br.DeclaredMethod
@@ -17,10 +15,6 @@ import org.opalj.br.analyses.DeclaredMethods
 import org.opalj.br.analyses.DeclaredMethodsKey
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.Project.JavaClassFileReader
-import org.opalj.br.fpcf.cg.properties.ReflectionRelatedCallees
-import org.opalj.br.fpcf.cg.properties.SerializationRelatedCallees
-import org.opalj.br.fpcf.cg.properties.StandardInvokeCallees
-import org.opalj.br.fpcf.cg.properties.ThreadRelatedIncompleteCallSites
 import org.opalj.br.fpcf.FPCFAnalysesManagerKey
 import org.opalj.br.fpcf.PropertyStoreKey
 import org.opalj.br.fpcf.cg.properties.Callees
@@ -28,9 +22,8 @@ import org.opalj.br.fpcf.cg.properties.NoCallees
 import org.opalj.br.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.br.ObjectType
-import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse
+import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
 import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
-import org.opalj.tac.fpcf.analyses.cg.LazyCalleesAnalysis
 import org.opalj.tac.fpcf.analyses.TriggeredSystemPropertiesAnalysis
 import org.opalj.tac.fpcf.analyses.cg.reflection.TriggeredReflectionRelatedCallsAnalysis
 import org.opalj.tac.fpcf.analyses.cg.TriggeredLoadedClassesAnalysis
@@ -44,7 +37,7 @@ import org.opalj.tac.fpcf.analyses.cg.TriggeredInstantiatedTypesAnalysis
 import org.opalj.tac.fpcf.analyses.cg.TriggeredStaticInitializerAnalysis
 
 /**
- * A [[JCGTestAdapter]] for the FPCF based call graph analyses of OPAL.
+ * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
  *
  * @author Dominik Helm
  * @author Florian Kuebler
@@ -118,13 +111,13 @@ object OpalJCGAdatper extends JCGTestAdapter {
             Seq.empty
         )
 
+        val performInvocationsDomain = classOf[DefaultPerformInvocationsDomainWithCFGAndDefUse[_]]
+
         project.updateProjectInformationKeyInitializationData(
-            AIDomainFactoryKey,
-            (i: Option[Set[Class[_ <: AnyRef]]]) ⇒ (i match {
-                case None               ⇒ Set(classOf[DefaultDomainWithCFGAndDefUse[_]])
-                case Some(requirements) ⇒ requirements + classOf[DefaultDomainWithCFGAndDefUse[_]]
-            }): Set[Class[_ <: AnyRef]]
-        )
+            AIDomainFactoryKey) {
+                case None               ⇒ Set(performInvocationsDomain)
+                case Some(requirements) ⇒ requirements + performInvocationsDomain
+            }
 
         implicit val ps: PropertyStore = project.get(PropertyStoreKey)
 
@@ -143,15 +136,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
             TriggeredSystemPropertiesAnalysis,
             // LazyL0BaseAIAnalysis,
             // TACAITransformer,
-            LazyTACAIProvider,
-            LazyCalleesAnalysis(
-                Set(
-                    StandardInvokeCallees,
-                    SerializationRelatedCallees,
-                    ReflectionRelatedCallees,
-                    ThreadRelatedIncompleteCallSites
-                )
-            )
+            LazyTACAIProvider
         )
 
         // start the computation of the call graph
@@ -210,7 +195,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     for (tgt ← targets) {
                         if (first) first = false
                         else out.write(",")
-                        writeCallSite(tgt, -1, Iterator(tgt), out)
+                        writeCallSite(tgt, -1, pc, Iterator(tgt), out)
                     }
 
                 case Some(body) ⇒
@@ -241,19 +226,19 @@ object OpalJCGAdatper extends JCGTestAdapter {
                         for (tgt ← indirectCallees) {
                             if (first) first = false
                             else out.write(",")
-                            writeCallSite(tgt, line, Iterator(tgt), out)
+                            writeCallSite(tgt, line, pc, Iterator(tgt), out)
                         }
                         if (directCallees.nonEmpty) {
                             if (first) first = false
                             else out.write(",")
-                            writeCallSite(declaredTarget, line, directCallees, out)
+                            writeCallSite(declaredTarget, line, pc, directCallees, out)
                         }
 
                     } else {
                         for (tgt ← targets) {
                             if (first) first = false
                             else out.write(",")
-                            writeCallSite(tgt, line, Iterator(tgt), out)
+                            writeCallSite(tgt, line, pc, Iterator(tgt), out)
                         }
                     }
             }
@@ -263,6 +248,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
     private def writeCallSite(
         declaredTarget: DeclaredMethod,
         line:           Int,
+        pc:             Int,
         targets:        Iterator[DeclaredMethod],
         out:            Writer
     ): Unit = {
@@ -270,6 +256,8 @@ object OpalJCGAdatper extends JCGTestAdapter {
         writeMethodObject(declaredTarget, out)
         out.write(",\"line\":")
         out.write(line.toString)
+        out.write(",\"pc\":")
+        out.write(pc.toString)
         out.write(",\"targets\":[")
         var first = true
         for (tgt ← targets) {

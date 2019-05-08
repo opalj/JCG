@@ -22,7 +22,7 @@ object SootJCGAdapter extends JCGTestAdapter {
     private val VTA = "VTA"
     private val Spark = "SPARK"
 
-    override def possibleAlgorithms(): Array[String] = Array( CHA, RTA , VTA, Spark)
+    override def possibleAlgorithms(): Array[String] = Array(CHA, RTA, VTA, Spark)
 
     override def frameworkName(): String = "Soot"
 
@@ -136,7 +136,8 @@ object SootJCGAdapter extends JCGTestAdapter {
 
             val callSites = callSitesMap.map {
                 case ((declaredTgt, line), tgts) ⇒
-                    CallSite(createMethodObject(declaredTgt), line, tgts.map(createMethodObject))
+                    // todo: would be good to have the PC
+                    CallSite(createMethodObject(declaredTgt), line, None, tgts.map(createMethodObject))
             }.toSet
 
             val method = createMethodObject(currentMethod)

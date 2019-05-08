@@ -158,8 +158,11 @@ object Evaluation {
             val outDir = config.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
             outDir.mkdirs()
 
+
+
             val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
-            assert(!cgFile.exists(), s"$cgFile already exists")
+            if(cgFile.exists())
+                cgFile.delete()
 
             val elapsed = try {
                 adapter.serializeCG(

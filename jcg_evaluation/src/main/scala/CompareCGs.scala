@@ -52,8 +52,8 @@ object CompareCGs {
             val additionalReachableMethods1 = extractAdditionalMethods(cg1, cg2).toSeq.sortBy(_.declaringClass).take(maxFindings)
             val additionalReachableMethods2 = extractAdditionalMethods(cg2, cg1).toSeq.sortBy(_.declaringClass).take(maxFindings)
 
-            println(additionalReachableMethods1.mkString(" ##### Additional Methods - Input 1 #####\n\n", "\n\t", "\n\n"))
-            println(additionalReachableMethods2.mkString(" ##### Additional Methods - Input 2 #####\n\n", "\n\t", "\n\n"))
+            println(additionalReachableMethods1.mkString(" ##### Additional Methods - Input 1 #####\n\n\t", "\n\t", "\n\n"))
+            println(additionalReachableMethods2.mkString(" ##### Additional Methods - Input 2 #####\n\n\t", "\n\t", "\n\n"))
         }
 
         val commonReachableMethods = if (showCommon || showBoundaries) {
@@ -62,24 +62,24 @@ object CompareCGs {
             Set.empty[Method]
 
         if(showCommon) {
-            println(commonReachableMethods.toSeq.sortBy(_.declaringClass).take(maxFindings).mkString(" ##### Common Methods #####\n\n", "\n\t", "\n\n"))
+            println(commonReachableMethods.toSeq.sortBy(_.declaringClass).take(maxFindings).mkString(" ##### Common Methods #####\n\n\t", "\n\t", "\n\n"))
         }
 
         if(showReachable) {
             val reachableInApp1 = extractReachableApplicationMethods(appPackages, cg1).toSeq.sortBy(_.declaringClass).take(maxFindings)
             val reachableInApp2 = extractReachableApplicationMethods(appPackages, cg2).toSeq.sortBy(_.declaringClass).take(maxFindings)
 
-            println(reachableInApp1.mkString(" ##### Reachable Application Methods - Input 1 #####\n\n", "\n\t", "\n\n"))
-            println(reachableInApp2.mkString(" ##### Reachable Application Methods - Input 2 #####\n\n", "\n\t", "\n\n"))
+            println(reachableInApp1.mkString(" ##### Reachable Application Methods - Input 1 #####\n\n\t", "\n\t", "\n\n"))
+            println(reachableInApp2.mkString(" ##### Reachable Application Methods - Input 2 #####\n\n\t", "\n\t", "\n\n"))
 
         }
 
         if (showBoundaries) {
-            val boundaries1 = extractBoundaries(cg1, commonReachableMethods, inPackage).toSeq.sortBy(_.declaringClass).take(maxFindings)
-            val boundaries2 = extractBoundaries(cg2, commonReachableMethods, inPackage).toSeq.sortBy(_.declaringClass).take(maxFindings)
+            val boundaries1 = extractBoundaries(cg1, commonReachableMethods, inPackage).toSeq.sortBy(_._1.declaringClass).take(maxFindings)
+            val boundaries2 = extractBoundaries(cg2, commonReachableMethods, inPackage).toSeq.sortBy(_._1.declaringClass).take(maxFindings)
 
-            println(boundaries1.mkString(" ##### Boundary Methods - Input 1 #####\n\n", "\n\t", "\n\n"))
-            println(boundaries2.mkString(" ##### Boundary Methods - Input 2 #####\n\n", "\n\t", "\n\n"))
+            println(boundaries1.mkString(" ##### Boundary Methods - Input 1 #####\n\n\t", "\n\t", "\n\n"))
+            println(boundaries2.mkString(" ##### Boundary Methods - Input 2 #####\n\n\t", "\n\t", "\n\n"))
         }
     }
 
@@ -97,7 +97,7 @@ object CompareCGs {
 
     private def extractBoundaries(
         cg: Map[Method, Set[CallSite]], commonReachableMethods: Set[Method], inPackage: String
-    ): Set[Method] = {
+    ): Set[(Method, String)] = {
         commonReachableMethods.filter { caller ⇒
             if(caller.declaringClass.startsWith(inPackage)){
                 val callees = cg(caller).flatMap(_.targets)
@@ -105,6 +105,9 @@ object CompareCGs {
             } else {
                 false
             }
+        }.map {caller ⇒
+            val callees = cg(caller).flatMap(_.targets)
+            (caller, callees.diff(commonReachableMethods).mkString("\n\t\t","\n\t\t", ""))
         }
     }
 }
