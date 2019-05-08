@@ -111,7 +111,8 @@ object TestCaseExtractor {
                 bin.mkdirs()
 
                 val targetDirs = findJCGTargetDirs().filter(_.getAbsolutePath.contains("jcg_annotations"))
-                val classPath = targetDirsToCP(targetDirs) + ":" + System.getProperty("java.home")
+                //val classPath = targetDirsToCP(targetDirs) + ";" + System.getProperty("java.home")
+                val classPath = System.getProperty("java.class.path")
 
                 val compilerArgs = Seq("-cp", classPath, "-d", bin.getAbsolutePath) ++ srcFiles
 
