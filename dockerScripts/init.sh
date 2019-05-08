@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "[\n\t{\n" >> /artefactEvaluation/jre.conf
-echo "\"version\" : 8,\n" >> /artefactEvaluation/jre.conf
-echo "\"path\" : \"docker-java-home/jre/lib\"\n" >> /artefactEvaluation/jre.conf
-echo "\t}\n]" >> /artefactEvaluation/jre.conf
+echo "[{" >> /artefactEvaluation/jre.conf
+echo "\"version\" : 8," >> /artefactEvaluation/jre.conf
+echo "\"path\" : \"docker-java-home/jre/lib\"" >> /artefactEvaluation/jre.conf
+echo "}]" >> /artefactEvaluation/jre.conf
