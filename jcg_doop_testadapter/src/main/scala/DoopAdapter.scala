@@ -255,15 +255,12 @@ object DoopAdapter extends JCGTestAdapter {
         assert(algorithm == "context-insensitive")
         var args = Array("./doop", "-a", "context-insensitive", "-i", target) ++ classPath
 
-        if (mainClass != null)
-            args ++= Array("--main", mainClass)
+//        if (mainClass != null)
+//            args ++= Array("--main", mainClass)
 
         Process(Array("./gradlew", "tasks"), Some(doopHome)).!
 
         val before = System.nanoTime()
-
-        println(s"outdir exists: ${outDir.exists()}")
-        println(s"outdir is dir: ${outDir.isDirectory()}")
 
         Process(
             args,
@@ -273,9 +270,6 @@ object DoopAdapter extends JCGTestAdapter {
             "DOOP_PLATFORMS_LIB" → doopPlatformDirs.getAbsolutePath
         ).!
 
-        println(s"outdir exists: ${outDir.exists()}")
-        println(s"outdir is dir: ${outDir.isDirectory()}")
-        
         val after = System.nanoTime()
 
         val cgCsv = new File(doopHome, "last-analysis/CallGraphEdge.csv")
