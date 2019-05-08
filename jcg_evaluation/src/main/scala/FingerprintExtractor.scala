@@ -73,15 +73,13 @@ object FingerprintExtractor {
                         projectSpec.allClassPathEntryPaths(projectsDir),
                         jreLocations(projectSpec.java),
                         false,
-                        cgFile.getPath
+                        cgFile.getAbsolutePath
                     )
                 } catch {
                     case e: Throwable ⇒
                         if (config.DEBUG) {
                             println(e.printStackTrace())
                         }
-//                        ow.write(s"\tE")
-//                        fingerprintWriter.println(s"${projectSpec.name}\tE")
                 }
 
                 System.gc()
