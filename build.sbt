@@ -114,8 +114,8 @@ lazy val jcg_evaluation = project.settings(
     jcg_testcases,
     jcg_data_format,
     jcg_annotation_matcher,
-    //    jcg_opal_testadapter,
     jcg_wala_testadapter,
     jcg_soot_testadapter,
-    jcg_opal_testadapter
+    jcg_opal_testadapter,
+    jcg_doop_testadapter
 )

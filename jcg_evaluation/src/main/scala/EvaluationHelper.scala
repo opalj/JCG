@@ -26,7 +26,7 @@ class CommonEvaluationConfig(
 
 object CommonEvaluationConfig {
 
-    private val ALL_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper)
+    private val ALL_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
 
     def processArguments(args: Array[String]): CommonEvaluationConfig = {
         var DEBUG = false
