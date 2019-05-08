@@ -88,6 +88,7 @@ lazy val jcg_doop_testadapter = project.settings(
     name := "JCG DOOP Test Adapter",
     libraryDependencies += "de.opal-project" %% "bytecode-representation" % "3.0.0-SNAPSHOT",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
+    libraryDependencies += "commons-io" % "commons-io" % "2.6",
     aggregate in assembly := false,
     publishArtifact := false
 ).dependsOn(
