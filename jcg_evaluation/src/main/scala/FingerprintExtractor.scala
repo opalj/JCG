@@ -65,6 +65,9 @@ object FingerprintExtractor {
                 }
 
                 println(s"performing test case: ${projectSpec.name}")
+                println(s"required Java version: ${projectSpec.java}")
+                println(s"specified java path: ${jreLocations(projectSpec.java)}")
+
                 try {
                     adapter.serializeCG(
                         cgAlgorithm,
