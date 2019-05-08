@@ -38,11 +38,6 @@ object DoopAdapter extends JCGTestAdapter {
     override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
     override def frameworkName(): String = "Doop"
 
-    def main(args: Array[String]): Unit = {
-
-        DoopAdapter.serializeCG("context-insensitive", new File("result/TC1.jar").getAbsolutePath, null, Array.empty, "/Users/floriankuebler/Documents/files/doop-benchmarks/JREs/jre1.7.0_95_debug/lib/", false, "doopout.json")
-    }
-
     private def createJsonRepresentation(
         doopResult: Source, tgtJar: File, jreDir: File, outFile: File
     ): Unit = {
