@@ -251,7 +251,6 @@ object DoopAdapter extends JCGTestAdapter {
         FileUtils.copyDirectory(new File(JDKPath), doopJDKPath)
 
         val outDir = Files.createTempDirectory(null).toFile
-        outDir.deleteOnExit()
 
         assert(algorithm == "context-insensitive")
         var args = Array("./doop", "-a", "context-insensitive", "-i", target) ++ classPath
