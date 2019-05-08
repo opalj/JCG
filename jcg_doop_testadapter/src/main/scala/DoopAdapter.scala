@@ -262,6 +262,9 @@ object DoopAdapter extends JCGTestAdapter {
 
         val before = System.nanoTime()
 
+        println(s"outdir exists: ${outDir.exists()}")
+        println(s"outdir is dir: ${outDir.isDirectory()}")
+
         Process(
             args,
             Some(doopHome),
@@ -269,6 +272,10 @@ object DoopAdapter extends JCGTestAdapter {
             "DOOP_OUT" → outDir.getAbsolutePath,
             "DOOP_PLATFORMS_LIB" → doopPlatformDirs.getAbsolutePath
         ).!
+
+        println(s"outdir exists: ${outDir.exists()}")
+        println(s"outdir is dir: ${outDir.isDirectory()}")
+        
         val after = System.nanoTime()
 
         val cgCsv = new File(doopHome, "last-analysis/CallGraphEdge.csv")
