@@ -9,40 +9,6 @@ import play.api.libs.json.Json
 
 object Evaluation {
 
-    case class Config(
-         runHermes: Boolean = false,
-         pseval: Boolean= false,
-         excludeJDK: Boolean = false,
-         runAnalyses: Boolean = true,
-         allQueries: Boolean = false,
-         fingerprintDir: File = new File("")
-     )
-
-    def parseConfig(args: Array[String]): Config = {
-        import scopt.OParser
-        import builder._
-        val builder = OParser.builder[Config]
-        val parser = {
-            OParser.sequence(
-                programName("Java Call Graph Tests"),
-                head("JCG", "1.0.1"),
-                // option -f, --foo
-                opt[Unit]('h', "runHermes")
-                  .action((x, c) => c.copy(runHermes = true))
-                  .text("Hermes will be run on the target project"),
-                // more options here...
-            )
-        }
-
-       OParser.parse(parser, args, Config()) match {
-           case Some(config) =>
-           // do something
-           case _ =>
-           // arguments are bad, error message will have been displayed
-       }
-
-    }
-
     private var runHermes = false
     private var projectSpecificEvaluation = false
     private var excludeJDK = false
@@ -53,6 +19,7 @@ object Evaluation {
 
     def main(args: Array[String]): Unit = {
 
+        //val c = parseConfig(args)
 
         CommonEvaluationConfig.processArguments(args)
         val config = CommonEvaluationConfig.processArguments(args)

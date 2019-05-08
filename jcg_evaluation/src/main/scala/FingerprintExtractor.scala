@@ -21,13 +21,19 @@ object FingerprintExtractor {
     }
 
     def main(args: Array[String]): Unit = {
-        val config = CommonEvaluationConfig.processArguments(args)
 
-        if (!config.DEBUG)
+        var c = ConfigParser.parseConfig(args)
+        if(c.isEmpty)
+            System.exit(0)
+
+        val config = c.get
+
+
+        if (!config.debug)
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
-        val projectsDir = EvaluationHelper.getProjectsDir(config.INPUT_DIR_PATH)
-        val resultsDir = new File(config.OUTPUT_DIR_PATH)
+        val projectsDir = EvaluationHelper.getProjectsDir(config.inputDir.getAbsolutePath)
+        val resultsDir = config.outputDir
         resultsDir.mkdirs()
 
         val jreLocations = EvaluationHelper.getJRELocations(config.JRE_LOCATIONS_FILE)
@@ -36,14 +42,16 @@ object FingerprintExtractor {
         val ow = new BufferedWriter(getOutputTarget(resultsDir))
 
         val projectSpecFiles = projectsDir.listFiles { (_, name) ⇒
-            name.endsWith(".conf") && name.startsWith(config.PROJECT_PREFIX_FILTER)
+            name.endsWith(".conf") && name.startsWith(config.projectFilter)
         }.sorted
 
         printHeader(ow, projectSpecFiles)
 
+        val adapters = if(config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_ADAPTERS
+
         for {
-            adapter ← config.EVALUATION_ADAPTERS
-            cgAlgorithm ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
+            adapter ← adapters
+            cgAlgorithm ← adapter.possibleAlgorithms().filter(_.startsWith(config.algorithmFilter))
         } {
             ow.write(s"${adapter.frameworkName()}-${cgAlgorithm}")
 
@@ -65,8 +73,6 @@ object FingerprintExtractor {
                 }
 
                 println(s"performing test case: ${projectSpec.name}")
-                println(s"required Java version: ${projectSpec.java}")
-                println(s"specified java path: ${jreLocations(projectSpec.java)}")
 
                 try {
                     adapter.serializeCG(
@@ -80,14 +86,14 @@ object FingerprintExtractor {
                     )
                 } catch {
                     case e: Throwable ⇒
-                        if (config.DEBUG) {
+                        if (config.debug) {
                             println(e.printStackTrace())
                         }
                 }
 
                 System.gc()
 
-                val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.DEBUG)
+                val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.debug)
                 ow.write(s"\t${result.shortNotation}")
                 fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
 

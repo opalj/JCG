@@ -9,8 +9,8 @@ class CommonEvaluationConfig(
         val PROJECT_PREFIX_FILTER:   String,
         val ALGORITHM_PREFIX_FILTER: String
 ) {
-    val JRE_LOCATIONS_FILE = "jre.conf"
 
+    val JRE_LOCATIONS_FILE = "jre.conf"
     val SERIALIZATION_FILE_NAME = "cg.json"
 
     def getOutputDirectory(
@@ -24,9 +24,112 @@ class CommonEvaluationConfig(
     }
 }
 
+case class JCGConfig(
+                   inputDir: File = new File("."),
+                   outputDir: File = new File("."),
+                   adapters: List[JCGTestAdapter] = List.empty,
+                   projectFilter: String = "",
+                   algorithmFilter: String = "",
+                   runHermes: Boolean = false,
+                   pseval: Boolean= false,
+                   excludeJDK: Boolean = false,
+                   runAnalyses: Boolean = true,
+                   allQueries: Boolean = false,
+                   fingerprintDir: File = new File(""),
+                   debug: Boolean = false,
+                 ) {
+    val JRE_LOCATIONS_FILE = "jre.conf"
+    val SERIALIZATION_FILE_NAME = "cg.json"
+
+    def getOutputDirectory(
+                            adapter:     JCGTestAdapter,
+                            algorithm:   String,
+                            projectSpec: ProjectSpecification,
+                            resultsDir:  File
+                          ): File = {
+        val dirName = s"${projectSpec.name}${File.separator}${adapter.frameworkName()}${File.separator}$algorithm"
+        new File(resultsDir, dirName)
+    }
+}
+
+object ConfigParser {
+    val ALL_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
+
+    def parseConfig(args: Array[String]): Option[JCGConfig] = {
+        import scopt.OParser
+        val builder = OParser.builder[JCGConfig]
+        val parser = {
+            import builder._
+            OParser.sequence(
+                programName("Java Call Graph Tests"),
+                head("JCG", "0.4.0"),
+                opt[Unit]('h', "runHermes")
+                  .action((x, c) => c.copy(runHermes = true))
+                  .text("Hermes will be run on the target project")
+                .optional(),
+                opt[File]('i', "inputDir")
+                  .action((dir, c) => c.copy(inputDir = dir))
+                  .text("Defines the directory with the configuration files for the input projects.")
+                  .required().maxOccurs(1)
+                  .validate{dir =>
+                      if(dir.exists() && dir.isDirectory) success
+                      else failure(s"Value ${dir.getAbsolutePath} must exist and must be a directory.")
+                  }
+                  .validate{dir =>
+                      if(dir.listFiles(_.getName.endsWith(".conf")).nonEmpty) success
+                      else failure(s"${dir.getAbsolutePath} does not contain *.conf files")
+                  },
+                opt[File]('o', "outputDir")
+                  .action{(dir, c) =>
+                      if(!dir.exists()) dir.mkdirs()
+                      c.copy(outputDir = dir)
+                  }
+                  .text("Defines the output directory; all files will be placed here.")
+                  .required().maxOccurs(1),
+                opt[String]("project-prefix")
+                  .action((prefix, c) => c.copy(projectFilter = prefix))
+                  .text("Defines a prefix-based filter for the input project's name. If applied only projects starting with the <prefix> will be processed.")
+                  .valueName("prefix")
+                  .maxOccurs(1).optional(),
+                opt[String]("algorithm-prefix")
+                  .action((prefix, c) => c.copy(algorithmFilter = prefix))
+                  .text("Defines a prefix-based filter for the adapters call-graph algorithms names. (e.g. filter only for RTAs)")
+                  .valueName("prefix")
+                  .maxOccurs(1).optional(),
+                opt[String]('a', "adapter")
+                  .action{(adapterName, c) =>
+                      val adapter = ALL_ADAPTERS.find(_.frameworkName().toLowerCase == adapterName.toLowerCase)
+                      if(adapter.isEmpty) failure("The given <adapter> is not yet registered as valid adapter.")
+                      val newAdapters = c.adapters.::(adapter.get)
+                      c.copy(adapters = newAdapters)
+                  }
+                  .text("Run the pipeline for a selecton of adapters. (e.g., the <OPAL> to run the OPAL's algorithms)")
+                  .valueName("adapter")
+                  .optional()
+                  .unbounded(),
+                opt[Unit]('d', "debug")
+                  .action((_, c) => c.copy(debug = true))
+                  .hidden()
+                  .optional(),
+                opt[File]('f', "fingerprintDir")
+                  .action((dir, c) => c.copy(fingerprintDir = dir))
+                  .text("provide a fingerprint for a project-specific evaluation")
+                  .valueName("<path/to/dir>")
+                  .optional(),
+                checkConfig(_ => success)
+            )
+        }
+
+        OParser.parse(parser, args, JCGConfig())
+    }
+
+}
+
 object CommonEvaluationConfig {
 
-    private val ALL_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
+    val ALL_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
+
+
 
     def processArguments(args: Array[String]): CommonEvaluationConfig = {
         var DEBUG = false
