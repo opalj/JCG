@@ -255,8 +255,8 @@ object DoopAdapter extends JCGTestAdapter {
         assert(algorithm == "context-insensitive")
         var args = Array("./doop", "-a", "context-insensitive", "-i", target) ++ classPath
 
-//        if (mainClass != null)
-//            args ++= Array("--main", mainClass)
+        if (mainClass != null)
+            args ++= Array("--main", mainClass)
 
         Process(Array("./gradlew", "tasks"), Some(doopHome)).!
 
