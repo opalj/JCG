@@ -2,7 +2,17 @@
 import java.io.File
 import java.io.PrintWriter
 import java.net.URL
+import java.nio.file.Files
 
+import scala.collection.mutable
+import scala.io.Source
+import scala.sys.process.Process
+
+import org.apache.commons.io.FileUtils
+import play.api.libs.json.Json
+import play.api.libs.json.JsValue
+
+import org.opalj.collection.immutable.RefArray
 import org.opalj.br.ClassFile
 import org.opalj.br.FieldType
 import org.opalj.br.FieldTypes
@@ -14,14 +24,6 @@ import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.SomeProject
 import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
-import org.opalj.collection.immutable.RefArray
-import org.opalj.log.GlobalLogContext
-import org.opalj.log.OPALLogger
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-
-import scala.collection.mutable
-import scala.io.Source
 
 /**
  * This is an experimental stage [[JCGTestAdapter]] as it is not possible to run Doop without
@@ -37,14 +39,13 @@ object DoopAdapter extends JCGTestAdapter {
     override def frameworkName(): String = "Doop"
 
     def main(args: Array[String]): Unit = {
-        createJsonRepresentation(
-            Source.fromFile(args(0)),
-            new File(args(1)),
-            new File(args(2))
-        )
+
+        DoopAdapter.serializeCG("context-insensitive", new File("result/TC1.jar").getAbsolutePath, null, Array.empty, "/Users/floriankuebler/Documents/files/doop-benchmarks/JREs/jre1.7.0_95_debug/lib/", false, "doopout.json")
     }
 
-    def createJsonRepresentation(doopResult: Source, tgtJar: File, jreDir: File): File = {
+    private def createJsonRepresentation(
+        doopResult: Source, tgtJar: File, jreDir: File, outFile: File
+    ): Unit = {
         implicit val p: Project[URL] = Project(Array(tgtJar, jreDir), Array.empty[File])
 
         val callGraph = extractDoopCG(doopResult)
@@ -52,19 +53,10 @@ object DoopAdapter extends JCGTestAdapter {
         val reachableMe: ReachableMethods = convertToReachableMethods(callGraph)
 
         val callSitesJson: JsValue = Json.toJson(reachableMe)
-        val jarName = tgtJar.getName
-        val dn = jarName.replace(".jar", "")
-        val fn = jarName.replace(".jar", ".json")
-        val dir = new File(s"tmp/DOOP/$dn")
-        if (!dir.exists()) {
-            dir.mkdirs()
-        }
 
-        val outFile = new File(s"${dir.getAbsolutePath}/${fn}")
         val pw = new PrintWriter(outFile)
         pw.write(Json.prettyPrint(callSitesJson))
         pw.close()
-        outFile
     }
 
     private def resolveBridgeMethod(
@@ -179,7 +171,6 @@ object DoopAdapter extends JCGTestAdapter {
     private def extractDoopCG(doopResult: Source): Map[String, Map[(String, Int), Set[String]]] = {
         val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(_ ⇒ mutable.OpenHashMap.empty.withDefault(_ ⇒ mutable.Set.empty))
 
-        val re = """\[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>/([^/]+)/(\d+), \[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r ////([^/]+)/(\d+), \[\d+\\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r
         for (line ← doopResult.getLines()) {
             val Array(_, callerDeclaredTgtNumber, _, tgtStr) = line.split("\t")
             try {
@@ -206,7 +197,7 @@ object DoopAdapter extends JCGTestAdapter {
         callGraph.map { case (k, v) ⇒ k → v.map { case (k, v) ⇒ k → v.toSet }.toMap }.toMap
     }
 
-    def toMethod(methodStr: String): Method = {
+    private def toMethod(methodStr: String): Method = {
         """([^:]+): ([^ ]+) ([^\(]+)\(([^\)]*)\)""".r.findFirstMatchIn(methodStr) match {
             case Some(m) ⇒
                 val declClass = m.group(1)
@@ -220,7 +211,7 @@ object DoopAdapter extends JCGTestAdapter {
         }
     }
 
-    def toJVMType(t: String): String = {
+    private def toJVMType(t: String): String = {
         if (t.endsWith("[]"))
             s"[${toJVMType(t.substring(0, t.length - 2))}"
         else t match {
@@ -238,7 +229,7 @@ object DoopAdapter extends JCGTestAdapter {
         }
     }
 
-    def toObjectType(jvmRefType: String): ObjectType = {
+    private def toObjectType(jvmRefType: String): ObjectType = {
         assert(jvmRefType.length > 2)
         ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
@@ -251,5 +242,49 @@ object DoopAdapter extends JCGTestAdapter {
         JDKPath:    String,
         analyzeJDK: Boolean,
         outputFile: String
-    ): Long = ???
+    ): Long = {
+        val env = System.getenv
+
+        assert(env.containsKey("DOOP_HOME"))
+        val doopHome = new File(env.get("DOOP_HOME"))
+        assert(doopHome.exists())
+        assert(doopHome.isDirectory)
+
+        val doopPlatformDirs = Files.createTempDirectory(null).toFile
+        val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.8/lib/")
+        doopJDKPath.mkdirs()
+        FileUtils.copyDirectory(new File(JDKPath), doopJDKPath)
+
+        val outDir = Files.createTempDirectory(null).toFile
+        outDir.deleteOnExit()
+
+        assert(algorithm == "context-insensitive")
+        var args = Array("./doop", "-a", "context-insensitive", "-i", target) ++ classPath
+
+        if (mainClass != null)
+            args ++= Array("--main", mainClass)
+
+        Process(Array("./gradlew", "tasks"), Some(doopHome)).!
+
+        val before = System.nanoTime()
+
+        Process(
+            args,
+            Some(doopHome),
+            "DOOP_HOME" → doopHome.getAbsolutePath,
+            "DOOP_OUT" → outDir.getAbsolutePath,
+            "DOOP_PLATFORMS_LIB" → doopPlatformDirs.getAbsolutePath
+        ).!
+        val after = System.nanoTime()
+
+        val cgCsv = new File(doopHome, "last-analysis/CallGraphEdge.csv")
+        createJsonRepresentation(
+            Source.fromFile(cgCsv), new File(target), new File(JDKPath), new File(outputFile)
+        )
+
+        FileUtils.deleteDirectory(doopPlatformDirs)
+        FileUtils.deleteDirectory(outDir)
+
+        after - before
+    }
 }
