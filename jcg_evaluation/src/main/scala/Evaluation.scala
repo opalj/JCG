@@ -126,7 +126,6 @@ object Evaluation {
             val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
             if(cgFile.exists())
                 cgFile.delete()
-            //assert(!cgFile.exists(), s"$cgFile already exists")
 
             val elapsed = try {
                 adapter.serializeCG(

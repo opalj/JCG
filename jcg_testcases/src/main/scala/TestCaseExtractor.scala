@@ -151,7 +151,7 @@ object TestCaseExtractor {
 
                 val projectSpec = ProjectSpecification(
                     name = projectName,
-                    target = new File(bin, outPathCompiler.getPath).getCanonicalPath,
+                    target = new File(outPathCompiler.getAbsolutePath).getCanonicalPath,
                     main = mainOpt,
                     java = 8,
                     cp = None
