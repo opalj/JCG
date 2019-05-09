@@ -157,6 +157,23 @@ The `CGMatcher` in the `jcg_annotation_matcher` project, is given one `.jar` fil
 `.json` file of a serialized call graph and computes whether the call graph matches the expectations.
 Furthermore, it does some verification of the test case in order to avoid wrong annotations.
 
+## Use Static Analysis Framework Adapters
+
+Whereas it is straigth forward to use the WALA and SOOT adapter, we have to do a little bit of work
+to setup DOOP and OPAL.
+
+### DOOP
+To use the DOOP adapter, you need to setup DOOP. To do so, please have a look at DOOP's install instructions:
+
+https://bitbucket.org/yanniss/doop/src/master/
+
+### OPAL
+The current OPAL adapter builds on an development build of OPAL, to set it up do the following:
+
+First make sure to fulfill OPALs dependencies: (see [])
+
+``````
+
 ## Usage-ready Docker Container
 
 
