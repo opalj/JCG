@@ -31,10 +31,11 @@ import org.opalj.tac.fpcf.analyses.cg.TriggeredSerializationRelatedCallsAnalysis
 import org.opalj.tac.fpcf.analyses.cg.TriggeredThreadRelatedCallsAnalysis
 import org.opalj.tac.fpcf.analyses.LazyTACAIProvider
 import org.opalj.tac.fpcf.analyses.cg.RTACallGraphAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.TriggeredConfiguredNativeMethodsAnalysis
 import org.opalj.tac.fpcf.analyses.cg.TriggeredFinalizerAnalysisScheduler
 import org.opalj.tac.fpcf.analyses.cg.TriggeredInstantiatedTypesAnalysis
 import org.opalj.tac.fpcf.analyses.cg.TriggeredStaticInitializerAnalysis
+import org.opalj.tac.fpcf.analyses.cg.ConfiguredNativeMethodsCallGraphAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.TriggeredConfiguredNativeMethodsInstantiatedTypesAnalysis
 
 /**
  * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
@@ -113,11 +114,10 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         val performInvocationsDomain = classOf[DefaultPerformInvocationsDomainWithCFGAndDefUse[_]]
 
-        project.updateProjectInformationKeyInitializationData(
-            AIDomainFactoryKey) {
-                case None               ⇒ Set(performInvocationsDomain)
-                case Some(requirements) ⇒ requirements + performInvocationsDomain
-            }
+        project.updateProjectInformationKeyInitializationData(AIDomainFactoryKey) {
+            case None               ⇒ Set(performInvocationsDomain)
+            case Some(requirements) ⇒ requirements + performInvocationsDomain
+        }
 
         implicit val ps: PropertyStore = project.get(PropertyStoreKey)
 
@@ -132,7 +132,8 @@ object OpalJCGAdatper extends JCGTestAdapter {
             TriggeredSerializationRelatedCallsAnalysis,
             TriggeredReflectionRelatedCallsAnalysis,
             TriggeredInstantiatedTypesAnalysis,
-            TriggeredConfiguredNativeMethodsAnalysis,
+            ConfiguredNativeMethodsCallGraphAnalysisScheduler,
+            TriggeredConfiguredNativeMethodsInstantiatedTypesAnalysis,
             TriggeredSystemPropertiesAnalysis,
             // LazyL0BaseAIAnalysis,
             // TACAITransformer,
