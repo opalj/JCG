@@ -41,7 +41,7 @@ object CompareCGs {
                 showAdditional = additional == "t"
             case Array("--maxFindings", max) ⇒
                 maxFindings = max.toInt
-            case Array("--inPackage", pkg) =>
+            case Array("--inPackage", pkg) ⇒
                 inPackage = pkg
         }
 
@@ -61,11 +61,11 @@ object CompareCGs {
         } else
             Set.empty[Method]
 
-        if(showCommon) {
+        if (showCommon) {
             println(commonReachableMethods.toSeq.sortBy(_.declaringClass).take(maxFindings).mkString(" ##### Common Methods #####\n\n\t", "\n\t", "\n\n"))
         }
 
-        if(showReachable) {
+        if (showReachable) {
             val reachableInApp1 = extractReachableApplicationMethods(appPackages, cg1).toSeq.sortBy(_.declaringClass).take(maxFindings)
             val reachableInApp2 = extractReachableApplicationMethods(appPackages, cg2).toSeq.sortBy(_.declaringClass).take(maxFindings)
 
@@ -99,15 +99,38 @@ object CompareCGs {
         cg: Map[Method, Set[CallSite]], commonReachableMethods: Set[Method], inPackage: String
     ): Set[(Method, String)] = {
         commonReachableMethods.filter { caller ⇒
-            if(caller.declaringClass.startsWith(inPackage)){
+            if (caller.declaringClass.startsWith(inPackage)) {
                 val callees = cg(caller).flatMap(_.targets)
                 callees.exists(target ⇒ !commonReachableMethods.contains(target))
             } else {
                 false
             }
-        }.map {caller ⇒
+        }.map { caller ⇒
             val callees = cg(caller).flatMap(_.targets)
-            (caller, callees.diff(commonReachableMethods).mkString("\n\t\t","\n\t\t", ""))
+            (caller, callees.diff(commonReachableMethods).map(m ⇒ s"${transitiveHull(m, cg, commonReachableMethods)}: $m").mkString("\n\t\t", "\n\t\t", ""))
         }
+    }
+
+    private def transitiveHull(method: Method, cg: Map[Method, Set[CallSite]], commonReachableMethods: Set[Method]): (Int, Int) = {
+        var reachableMethods: Set[Method] = Set(method)
+        var nonCommon: Set[Method] = Set(method)
+        var worklist: List[Method] = List(method)
+
+        while (worklist.nonEmpty) {
+            val currentMethod = worklist.head
+            worklist = worklist.tail
+            for {
+                cs ← cg(currentMethod)
+                t ← cs.targets
+            } {
+                if (!reachableMethods.contains(t)) {
+                    if (!commonReachableMethods.contains(t))
+                        nonCommon += t
+                    reachableMethods += t
+                    worklist ::= t
+                }
+            }
+        }
+        (reachableMethods.size, nonCommon.size)
     }
 }
