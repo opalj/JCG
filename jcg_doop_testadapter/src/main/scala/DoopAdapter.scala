@@ -229,6 +229,18 @@ object DoopAdapter extends JCGTestAdapter {
         ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
 
+    def main(args: Array[String]): Unit = {
+        serializeCG(
+            "context-insensitive",
+            "/Users/floriankuebler/Documents/files/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
+            null,
+            Array.empty,
+            "/Users/floriankuebler/Documents/files/doop-benchmarks/JREs/jre1.7.0_95_debug/lib",
+        true,
+            "doop-jdk7.json"
+        )
+    }
+
     override def serializeCG(
         algorithm:  String,
         target:     String,
@@ -246,21 +258,23 @@ object DoopAdapter extends JCGTestAdapter {
         assert(doopHome.isDirectory)
 
         val doopPlatformDirs = Files.createTempDirectory(null).toFile
-        val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.8/lib/")
+        val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.7/lib/")
         doopJDKPath.mkdirs()
         FileUtils.copyDirectory(new File(JDKPath), doopJDKPath)
 
         val outDir = Files.createTempDirectory(null).toFile
 
         assert(algorithm == "context-insensitive")
-        var args = Array("./doop", "-a", "context-insensitive", "-i", target) ++ classPath
+        var args = Array("./doop", "-a", "context-insensitive","--platform", "java_7", "-i", target) ++ classPath
 
-        args ++= Array("--reflection-classic")
+        //args ++= Array("--reflection-classic")
 
         if (mainClass != null)
             args ++= Array("--main", mainClass)
 
-        Process(Array("./gradlew", "tasks"), Some(doopHome)).!
+        val status = Process(Array("./gradlew", "tasks"), Some(doopHome)).!
+        if (status != 0)
+            throw new RuntimeException("failed to run doop")
 
         val before = System.nanoTime()
 
