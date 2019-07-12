@@ -17,27 +17,15 @@ import org.opalj.br.analyses.DeclaredMethods
 import org.opalj.br.analyses.DeclaredMethodsKey
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.Project.JavaClassFileReader
-import org.opalj.br.fpcf.FPCFAnalysesManagerKey
 import org.opalj.br.fpcf.PropertyStoreKey
-import org.opalj.br.fpcf.properties.cg.Callees
-import org.opalj.br.fpcf.properties.cg.NoCallees
-import org.opalj.br.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
+import org.opalj.br.fpcf.cg.properties.Callees
+import org.opalj.br.fpcf.cg.properties.NoCallees
+import org.opalj.br.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.br.ObjectType
 import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
 import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
-import org.opalj.tac.fpcf.analyses.SystemPropertiesAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.reflection.ReflectionRelatedCallsAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.LoadedClassesAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.LazyTACAIProvider
-import org.opalj.tac.fpcf.analyses.cg.ConfiguredNativeMethodsCallGraphAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.SerializationRelatedCallsAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.StaticInitializerAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.ThreadRelatedCallsAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.rta.ConfiguredNativeMethodsInstantiatedTypesAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.rta.InstantiatedTypesAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.FinalizerAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.rta.RTACallGraphAnalysisScheduler
+import org.opalj.tac.cg.RTACallGraphKey
 
 /**
  * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
@@ -124,23 +112,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
         implicit val ps: PropertyStore = project.get(PropertyStoreKey)
 
         // run RTA call graph, along with extra analyses e.g. for reflection
-        val manager = project.get(FPCFAnalysesManagerKey)
-        manager.runAll(
-            RTACallGraphAnalysisScheduler,
-            StaticInitializerAnalysisScheduler,
-            LoadedClassesAnalysisScheduler,
-            FinalizerAnalysisScheduler,
-            ThreadRelatedCallsAnalysisScheduler,
-            SerializationRelatedCallsAnalysisScheduler,
-            ReflectionRelatedCallsAnalysisScheduler,
-            InstantiatedTypesAnalysisScheduler,
-            ConfiguredNativeMethodsCallGraphAnalysisScheduler,
-            ConfiguredNativeMethodsInstantiatedTypesAnalysisScheduler,
-            SystemPropertiesAnalysisScheduler,
-            // LazyL0BaseAIAnalysis,
-            // TACAITransformer,
-            LazyTACAIProvider
-        )
+        project.get(RTACallGraphKey)
 
         // start the computation of the call graph
         implicit val declaredMethods: DeclaredMethods = project.get(DeclaredMethodsKey)
