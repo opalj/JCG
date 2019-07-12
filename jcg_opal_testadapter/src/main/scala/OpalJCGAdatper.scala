@@ -5,9 +5,11 @@ import java.io.Writer
 import java.net.URL
 
 import scala.collection.JavaConverters._
+
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
+
 import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
 import org.opalj.br.DeclaredMethod
@@ -17,25 +19,25 @@ import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.Project.JavaClassFileReader
 import org.opalj.br.fpcf.FPCFAnalysesManagerKey
 import org.opalj.br.fpcf.PropertyStoreKey
-import org.opalj.br.fpcf.cg.properties.Callees
-import org.opalj.br.fpcf.cg.properties.NoCallees
-import org.opalj.br.fpcf.cg.properties.NoCalleesDueToNotReachableMethod
+import org.opalj.br.fpcf.properties.cg.Callees
+import org.opalj.br.fpcf.properties.cg.NoCallees
+import org.opalj.br.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.br.ObjectType
 import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
 import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
-import org.opalj.tac.fpcf.analyses.TriggeredSystemPropertiesAnalysis
-import org.opalj.tac.fpcf.analyses.cg.reflection.TriggeredReflectionRelatedCallsAnalysis
-import org.opalj.tac.fpcf.analyses.cg.TriggeredLoadedClassesAnalysis
-import org.opalj.tac.fpcf.analyses.cg.TriggeredSerializationRelatedCallsAnalysis
-import org.opalj.tac.fpcf.analyses.cg.TriggeredThreadRelatedCallsAnalysis
+import org.opalj.tac.fpcf.analyses.SystemPropertiesAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.reflection.ReflectionRelatedCallsAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.LoadedClassesAnalysisScheduler
 import org.opalj.tac.fpcf.analyses.LazyTACAIProvider
-import org.opalj.tac.fpcf.analyses.cg.RTACallGraphAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.TriggeredFinalizerAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.TriggeredInstantiatedTypesAnalysis
-import org.opalj.tac.fpcf.analyses.cg.TriggeredStaticInitializerAnalysis
 import org.opalj.tac.fpcf.analyses.cg.ConfiguredNativeMethodsCallGraphAnalysisScheduler
-import org.opalj.tac.fpcf.analyses.cg.TriggeredConfiguredNativeMethodsInstantiatedTypesAnalysis
+import org.opalj.tac.fpcf.analyses.cg.SerializationRelatedCallsAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.StaticInitializerAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.ThreadRelatedCallsAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.rta.ConfiguredNativeMethodsInstantiatedTypesAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.rta.InstantiatedTypesAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.FinalizerAnalysisScheduler
+import org.opalj.tac.fpcf.analyses.cg.rta.RTACallGraphAnalysisScheduler
 
 /**
  * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
@@ -125,16 +127,16 @@ object OpalJCGAdatper extends JCGTestAdapter {
         val manager = project.get(FPCFAnalysesManagerKey)
         manager.runAll(
             RTACallGraphAnalysisScheduler,
-            TriggeredStaticInitializerAnalysis,
-            TriggeredLoadedClassesAnalysis,
-            TriggeredFinalizerAnalysisScheduler,
-            TriggeredThreadRelatedCallsAnalysis,
-            TriggeredSerializationRelatedCallsAnalysis,
-            TriggeredReflectionRelatedCallsAnalysis,
-            TriggeredInstantiatedTypesAnalysis,
+            StaticInitializerAnalysisScheduler,
+            LoadedClassesAnalysisScheduler,
+            FinalizerAnalysisScheduler,
+            ThreadRelatedCallsAnalysisScheduler,
+            SerializationRelatedCallsAnalysisScheduler,
+            ReflectionRelatedCallsAnalysisScheduler,
+            InstantiatedTypesAnalysisScheduler,
             ConfiguredNativeMethodsCallGraphAnalysisScheduler,
-            TriggeredConfiguredNativeMethodsInstantiatedTypesAnalysis,
-            TriggeredSystemPropertiesAnalysis,
+            ConfiguredNativeMethodsInstantiatedTypesAnalysisScheduler,
+            SystemPropertiesAnalysisScheduler,
             // LazyL0BaseAIAnalysis,
             // TACAITransformer,
             LazyTACAIProvider
