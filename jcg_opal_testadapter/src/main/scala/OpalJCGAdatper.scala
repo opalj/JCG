@@ -145,6 +145,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                 case FinalEP(_, NoCallees) ⇒
                 case FinalEP(_, callees: Callees) ⇒
                     writeCallSites(dm, callees, out)
+                case _ ⇒ throw new RuntimeException()
             }
             out.write("]}")
         }
