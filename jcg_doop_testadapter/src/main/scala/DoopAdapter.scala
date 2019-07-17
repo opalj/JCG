@@ -89,9 +89,14 @@ object DoopAdapter extends JCGTestAdapter {
         val name = split.last.replace("'", "")
         val tgtMethods = tgts.map(toMethod)
         // todo what abot <clinit> etc where no call is in the bytecode
+        val declObjType = ReferenceType(declaredType)
         val calls = callerOpal.body.get.collect {
             // todo what about lambdas?
-            case instr: MethodInvocationInstruction if instr.name == name ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
+            case instr: MethodInvocationInstruction if (
+                instr.name == name &&
+                    (instr.declaringClass == declObjType ||
+                        declObjType == ObjectType.Object && instr.declaringClass.isArrayType)
+                ) ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
             case instr: INVOKEDYNAMIC                                     ⇒ instr
             //throw new Error()
         }
@@ -232,10 +237,10 @@ object DoopAdapter extends JCGTestAdapter {
     def main(args: Array[String]): Unit = {
         serializeCG(
             "context-insensitive",
-            "/Users/floriankuebler/Documents/files/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
+            "/home/dominik/Desktop/corps/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
             null,
             Array.empty,
-            "/Users/floriankuebler/Documents/files/doop-benchmarks/JREs/jre1.7.0_95_debug/lib",
+            "/home/dominik/Desktop/jre1.7.0_95_debug/lib",
         true,
             "doop-jdk7.json"
         )
