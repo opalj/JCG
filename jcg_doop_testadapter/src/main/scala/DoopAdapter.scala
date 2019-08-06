@@ -39,11 +39,11 @@ object DoopAdapter extends JCGTestAdapter {
     override def frameworkName(): String = "Doop"
 
     private def createJsonRepresentation(
-        doopResult: Source, tgtJar: File, jreDir: File, outFile: File
+        doopEdges: Source, doopReachable: Source, tgtJar: File, jreDir: File, outFile: File
     ): Unit = {
         implicit val p: Project[URL] = Project(Array(tgtJar, jreDir), Array.empty[File])
 
-        val callGraph = extractDoopCG(doopResult)
+        val callGraph = extractDoopCG(doopEdges, doopReachable)
 
         val reachableMe: ReachableMethods = convertToReachableMethods(callGraph)
 
@@ -89,15 +89,15 @@ object DoopAdapter extends JCGTestAdapter {
         val name = split.last.replace("'", "")
         val tgtMethods = tgts.map(toMethod)
         // todo what abot <clinit> etc where no call is in the bytecode
-        val declObjType = ReferenceType(declaredType)
+        val declObjType = FieldType(declaredType)
         val calls = callerOpal.body.get.collect {
             // todo what about lambdas?
             case instr: MethodInvocationInstruction if (
                 instr.name == name &&
-                    (instr.declaringClass == declObjType ||
-                        declObjType == ObjectType.Object && instr.declaringClass.isArrayType)
-                ) ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
-            case instr: INVOKEDYNAMIC                                     ⇒ instr
+                (instr.declaringClass == declObjType ||
+                    declObjType == ObjectType.Object && instr.declaringClass.isArrayType)
+            ) ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
+            case instr: INVOKEDYNAMIC ⇒ instr
             //throw new Error()
         }
 
@@ -140,9 +140,14 @@ object DoopAdapter extends JCGTestAdapter {
                     cf.findMethod(callerMethod.name, md) match {
                         case Some(callerOpal) if callerOpal.body.isDefined ⇒
                             for (((declaredTgt, number), tgts) ← callSites) {
-                                resultingCallSites += computeCallSite(
-                                    declaredTgt, number, tgts, callerMethod, callerOpal
-                                )
+                                try {
+                                    resultingCallSites += computeCallSite(
+                                        declaredTgt, number, tgts, callerMethod, callerOpal
+                                    )
+                                } catch {
+                                    case _: AssertionError ⇒
+                                        println(s"Callsite not found: $declaredTgt/$number in $callerMethod")
+                                }
 
                             }
                         case _ ⇒
@@ -168,13 +173,26 @@ object DoopAdapter extends JCGTestAdapter {
         ReachableMethods(reachableMethods)
     }
 
-    private def extractDoopCG(doopResult: Source): Map[String, Map[(String, Int), Set[String]]] = {
+    private def extractDoopCG(
+        doopEdges: Source, doopReachable: Source
+    ): Map[String, Map[(String, Int), Set[String]]] = {
         val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(_ ⇒ mutable.OpenHashMap.empty.withDefault(_ ⇒ mutable.Set.empty))
 
-        for (line ← doopResult.getLines()) {
+        for (line ← doopEdges.getLines()) {
             val Array(_, callerDeclaredTgtNumber, _, tgtStr) = line.split("\t")
             try {
-                val Array(callerStr, declaredTgt, numberString) = callerDeclaredTgtNumber.split("/")
+                val (callerStr, declaredTgt, numberString) =
+                    if (callerDeclaredTgtNumber.contains("native ")) {
+                        val Array(callerStr, declaredTgt) = callerDeclaredTgtNumber.split("/")
+                        (callerStr, declaredTgt, "0")
+                    } else if ("<main-thread-init>/0" == callerDeclaredTgtNumber) {
+                        ("<java.lang.Thread: java.lang.Thread currentThread()>", "java.lang.Thread.<init>", "0")
+                    } else if ("<thread-group-init>/0" == callerDeclaredTgtNumber) {
+                        ("<java.lang.Thread: java.lang.Thread currentThread()>", "java.lang.ThreadGroup.<init>", "0")
+                    } else {
+                        val Array(callerStr, declaredTgt, numberString) = callerDeclaredTgtNumber.split("/")
+                        (callerStr, declaredTgt, numberString)
+                    }
                 val caller = callerStr.slice(1, callerStr.length - 1)
                 val tgt = tgtStr.slice(1, tgtStr.length - 1)
                 val number = numberString.toInt
@@ -193,7 +211,15 @@ object DoopAdapter extends JCGTestAdapter {
             }
 
         }
-        doopResult.close()
+        doopEdges.close()
+
+        for (line ← doopReachable.getLines()) {
+            val tgt = line.slice(1, line.length - 1)
+            if (!callGraph.contains(tgt))
+                callGraph += (tgt → mutable.Map.empty)
+        }
+        doopReachable.close()
+
         callGraph.map { case (k, v) ⇒ k → v.map { case (k, v) ⇒ k → v.toSet }.toMap }.toMap
     }
 
@@ -235,15 +261,16 @@ object DoopAdapter extends JCGTestAdapter {
     }
 
     def main(args: Array[String]): Unit = {
-        serializeCG(
-            "context-insensitive",
-            "/home/dominik/Desktop/corps/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
-            null,
-            Array.empty,
-            "/home/dominik/Desktop/jre1.7.0_95_debug/lib",
-        true,
-            "doop-jdk7.json"
-        )
+        for (p ← List("antlr", "bloat", "chart", "eclipse", "fop", "hsqldb", "jython", "luindex", "lusearch", "pmd", "xalan"))
+            serializeCG(
+                "context-insensitive",
+                s"/home/dominik/Desktop/doop-benchmarks/dacapo-2006/$p.jar", //"/home/dominik/Desktop/corps/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
+                s"Harness",
+                Array.empty,
+                "/home/dominik/Desktop/java-se-7u75-ri/lib",
+                true,
+                s"doop-dacapo-$p.json"
+            )
     }
 
     override def serializeCG(
@@ -270,7 +297,7 @@ object DoopAdapter extends JCGTestAdapter {
         val outDir = Files.createTempDirectory(null).toFile
 
         assert(algorithm == "context-insensitive")
-        var args = Array("./doop", "-a", "context-insensitive","--platform", "java_7", "-i", target) ++ classPath
+        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", target) ++ classPath
 
         //args ++= Array("--reflection-classic")
 
@@ -294,8 +321,13 @@ object DoopAdapter extends JCGTestAdapter {
         val after = System.nanoTime()
 
         val cgCsv = new File(doopHome, "last-analysis/CallGraphEdge.csv")
+        val rmCsv = new File(doopHome, "last-analysis/Reachable.csv")
         createJsonRepresentation(
-            Source.fromFile(cgCsv), new File(target), new File(JDKPath), new File(outputFile)
+            Source.fromFile(cgCsv),
+            Source.fromFile(rmCsv),
+            new File(target),
+            new File(JDKPath),
+            new File(outputFile)
         )
 
         FileUtils.deleteDirectory(doopPlatformDirs)
