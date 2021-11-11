@@ -25,6 +25,7 @@ object CompareCGs {
         var showCommon = false
         var showReachable = false
         var showAdditional = false
+        var showAdditionalCalls = false
         var maxFindings = Int.MaxValue
 
         var inPackage = ""
@@ -48,6 +49,8 @@ object CompareCGs {
                 showReachable = reachable == "t"
             case Array("--showAdditional", additional) ⇒
                 showAdditional = additional == "t"
+            case Array("--showAdditionalCalls", additionalCalls) ⇒
+                showAdditionalCalls = additionalCalls == "t"
             case Array("--maxFindings", max) ⇒
                 maxFindings = max.toInt
             case Array("--inPackage", pkg) ⇒
@@ -56,6 +59,19 @@ object CompareCGs {
 
         val cg1 = Json.parse(new FileInputStream(cg1Path)).validate[ReachableMethods].get.toMap
         val cg2 = Json.parse(new FileInputStream(cg2Path)).validate[ReachableMethods].get.toMap
+
+        /*
+        for {
+            (m1, cs1) ← cg1
+        } {
+            val cs2 = cg2(m1)
+            if(cs1.size != cs2.size){
+                println(s" #### Method difference: ${m1.toString}")
+                println(cs1.mkString("[", ",", "]"))
+                println(cs2.mkString("[", ",", "]"))
+            }
+        }
+         */
 
         if (showAdditional) {
             val additionalReachableMethods1 = extractAdditionalMethods(cg1, cg2).toSeq.sortBy(_.declaringClass).take(maxFindings)
@@ -97,6 +113,14 @@ object CompareCGs {
 
             println(boundaries1.mkString(" ##### Boundary Methods - Input 1 #####\n\n\t", "\n\t", "\n\n"))
             println(boundaries2.mkString(" ##### Boundary Methods - Input 2 #####\n\n\t", "\n\t", "\n\n"))
+        }
+
+        if (showAdditionalCalls) {
+            val additional1 = extractAdditionalCalls(cg1, cg2, inPackage).toSeq.sortBy(_._1.declaringClass).take(maxFindings)
+            val additional2 = extractAdditionalCalls(cg2, cg1, inPackage).toSeq.sortBy(_._1.declaringClass).take(maxFindings)
+
+            println(additional1.mkString(" ##### Additional Calls - Input 1 #####\n\n\t", "\n\t", "\n\n"))
+            println(additional2.mkString(" ##### Additional Calls - Input 2 #####\n\n\t", "\n\t", "\n\n"))
         }
     }
 
@@ -149,6 +173,33 @@ object CompareCGs {
 //            val callees = cg(caller).flatMap(_.targets)
 //            (caller, callees.diff(commonReachableMethods).map(m ⇒ s"${transitiveHull(m, cg, commonReachableMethods)}: $m").mkString("\n\t\t", "\n\t\t", ""))
 //        }
+    }
+
+    private def extractAdditionalCalls(
+        cg: Map[Method, Set[CallSite]], otherCG: Map[Method, Set[CallSite]], inPackage: String
+    ): Set[(Method, String)] = {
+        var result = Set.empty[(Method, String)]
+        cg.foreach {
+            case (method, callSites) ⇒
+                val otherCallSites = otherCG.get(method)
+                if (otherCallSites.isDefined) {
+                    callSites.foreach {
+                        case CallSite(declared, line, pc, targets) ⇒
+                            val differingCSOpt = otherCallSites.get.find(cs ⇒ cs.declaredTarget == declared && cs.line == line && cs.pc == pc)
+                            if (differingCSOpt.isDefined) {
+                                val differingCS = differingCSOpt.get
+                                if (differingCS.targets.size < targets.size) {
+                                    val diffs = targets -- differingCS.targets
+                                    result += ((method, diffs.mkString("\n\t\t", "\n\t\t", "\n")))
+                                }
+                            } else {
+                                result += ((method, targets.mkString("\n\t\t", "\n\t\t", "")))
+                            }
+                    }
+                }
+        }
+
+        result
     }
 
     private def transitiveHull(method: Method, cg: Map[Method, Set[CallSite]], commonReachableMethods: JHashSet[Method]): (Int, Int) = {
