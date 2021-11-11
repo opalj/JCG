@@ -116,7 +116,7 @@ object TestCaseExtractor {
                 val targetDirs = findJCGTargetDirs()
                 val classPath = Seq(".", targetDirsToCP(targetDirs), System.getProperty("java.home")).mkString(s"$pathSeparator")
 
-                val compilerArgs = Seq("-cp", s"$classPath", "-d", bin.getAbsolutePath, "-encoding", "UTF-8", "-target", "1.8") ++ srcFiles
+                val compilerArgs = Seq("-cp", s"$classPath", "-d", bin.getAbsolutePath, "-encoding", "UTF-8", "-source", "1.8", "-target", "1.8") ++ srcFiles
 
                 if(debug) {
                     println(compilerArgs.mkString("[DEBUG] Compiler args: \n\n", "\n", "\n\n"))
