@@ -1,7 +1,9 @@
+import sbt.Keys.libraryDependencies
+
 javacOptions in ThisBuild ++= Seq("-encoding", "utf8", "-parameters")
 
 lazy val commonSettings = Seq(
-    scalaVersion := "2.12.6",
+    scalaVersion := "2.12.14",
     organization := "de.opal-project",
     homepage := Some(url("https://bitbucket.org/delors/jcg")),
     licenses := Seq("BSD-2-Clause" -> url("http://opensource.org/licenses/BSD-2-Clause")),
@@ -46,9 +48,9 @@ lazy val jcg_wala_testadapter = project.settings(
     commonSettings,
     name := "JCG WALA Test Adapter",
     resolvers += Resolver.sonatypeRepo("snapshots"),
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.core" % "1.5.4-SNAPSHOT",
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.5.4-SNAPSHOT",
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.5.4-SNAPSHOT",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.core" % "1.5.7",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.5.7",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.5.7",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
@@ -59,7 +61,7 @@ lazy val jcg_soot_testadapter = project.settings(
     name := "JCG Soot Test Adapter",
     resolvers += "soot snapshot" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-snapshot/",
     resolvers += "soot release" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-release/",
-    libraryDependencies += "ca.mcgill.sable" % "soot" % "3.1.0",
+    libraryDependencies += "ca.mcgill.sable" % "soot" % "3.3.0",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
@@ -68,7 +70,7 @@ lazy val jcg_soot_testadapter = project.settings(
 lazy val jcg_opal_testadapter = project.settings(
     commonSettings,
     name := "JCG OPAL Test Adapter",
-    libraryDependencies += "de.opal-project" %% "three-address-code" % "3.0.0-SNAPSHOT",
+    libraryDependencies += "de.opal-project" %% "three-address-code" % "4.0.1-SNAPSHOT",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
     aggregate in assembly := false,
     publishArtifact := false
