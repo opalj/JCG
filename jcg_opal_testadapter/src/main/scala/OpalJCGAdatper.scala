@@ -18,14 +18,20 @@ import org.opalj.br.analyses.DeclaredMethodsKey
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.Project.JavaClassFileReader
 import org.opalj.br.fpcf.PropertyStoreKey
-import org.opalj.br.fpcf.properties.cg.Callees
-import org.opalj.br.fpcf.properties.cg.NoCallees
-import org.opalj.br.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.br.ObjectType
 import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
 import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
+import org.opalj.tac.cg.AllocationSiteBasedPointsToCallGraphKey
+import org.opalj.tac.cg.CHACallGraphKey
 import org.opalj.tac.cg.RTACallGraphKey
+import org.opalj.tac.cg.TypeBasedPointsToCallGraphKey
+import org.opalj.tac.cg.TypeProviderKey
+import org.opalj.tac.cg.XTACallGraphKey
+import org.opalj.tac.fpcf.analyses.cg.TypeProvider
+import org.opalj.tac.fpcf.properties.cg.Callees
+import org.opalj.tac.fpcf.properties.cg.NoCallees
+import org.opalj.tac.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
 
 /**
  * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
@@ -35,7 +41,7 @@ import org.opalj.tac.cg.RTACallGraphKey
  */
 object OpalJCGAdatper extends JCGTestAdapter {
 
-    def possibleAlgorithms(): Array[String] = Array[String]("RTA")
+    def possibleAlgorithms(): Array[String] = Array[String]("CHA", "RTA", "XTA", "0-CFA", "0-1-CFA")
 
     def frameworkName(): String = "OPAL"
 
@@ -111,8 +117,16 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         implicit val ps: PropertyStore = project.get(PropertyStoreKey)
 
-        // run RTA call graph, along with extra analyses e.g. for reflection
-        project.get(RTACallGraphKey)
+        // run call graph, along with extra analyses e.g. for reflection
+        algorithm match {
+            case "CHA" ⇒ project.get(CHACallGraphKey)
+            case "RTA" ⇒ project.get(RTACallGraphKey)
+            case "XTA" ⇒ project.get(XTACallGraphKey)
+            case "0-CFA" ⇒ project.get(TypeBasedPointsToCallGraphKey)
+            case "0-1-CFA" ⇒ project.get(AllocationSiteBasedPointsToCallGraphKey)
+        }
+
+        implicit val typeProvider: TypeProvider = project.get(TypeProviderKey)
 
         // start the computation of the call graph
         implicit val declaredMethods: DeclaredMethods = project.get(DeclaredMethodsKey)
@@ -162,16 +176,18 @@ object OpalJCGAdatper extends JCGTestAdapter {
         method:  DeclaredMethod,
         callees: Callees,
         out:     Writer
-    )(implicit ps: PropertyStore, declaredMethods: DeclaredMethods): Unit = {
+    )(implicit ps: PropertyStore, declaredMethods: DeclaredMethods, typeProvider: TypeProvider): Unit = {
         val bodyO = if (method.hasSingleDefinedMethod) method.definedMethod.body else None
         var first = true
-        for ((pc, targets) ← callees.callSites()) {
+        for { callerContext ← callees.callerContexts
+            (pc, targets) ← callees.callSites(callerContext)
+        } {
             bodyO match {
                 case None ⇒
                     for (tgt ← targets) {
                         if (first) first = false
                         else out.write(",")
-                        writeCallSite(tgt, -1, pc, Iterator(tgt), out)
+                        writeCallSite(tgt.method, -1, pc, Iterator(tgt.method), out)
                     }
 
                 case Some(body) ⇒
@@ -195,26 +211,26 @@ object OpalJCGAdatper extends JCGTestAdapter {
                         )
 
                         val (directCallees, indirectCallees) = targets.partition { callee ⇒
-                            callee.name == name && // TODO check descriptor correctly for refinement
-                                callee.descriptor.parametersCount == desc.parametersCount
+                            callee.method.name == name && // TODO check descriptor correctly for refinement
+                                callee.method.descriptor.parametersCount == desc.parametersCount
                         }
 
                         for (tgt ← indirectCallees) {
                             if (first) first = false
                             else out.write(",")
-                            writeCallSite(tgt, line, pc, Iterator(tgt), out)
+                            writeCallSite(tgt.method, line, pc, Iterator(tgt.method), out)
                         }
                         if (directCallees.nonEmpty) {
                             if (first) first = false
                             else out.write(",")
-                            writeCallSite(declaredTarget, line, pc, directCallees, out)
+                            writeCallSite(declaredTarget, line, pc, directCallees.map(_.method), out)
                         }
 
                     } else {
                         for (tgt ← targets) {
                             if (first) first = false
                             else out.write(",")
-                            writeCallSite(tgt, line, pc, Iterator(tgt), out)
+                            writeCallSite(tgt.method, line, pc, Iterator(tgt.method), out)
                         }
                     }
             }
