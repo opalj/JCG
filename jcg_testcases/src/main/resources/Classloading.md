@@ -193,7 +193,7 @@ public class Demo {
         ClassLoader cl = new ByteClassLoader(ClassLoader.getSystemClassLoader());
         Class<?> cls = cl.loadClass("lib.IntComparator");
         Comparator<Integer> comparator = (Comparator<Integer>) cls.newInstance();
-        Integer one = 1;
+        Integer one = Integer.valueOf(1);
         comparator.compare(one, one);
     }
 
