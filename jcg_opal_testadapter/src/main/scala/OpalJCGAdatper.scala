@@ -23,7 +23,12 @@ import org.opalj.br.ObjectType
 import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
 import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
 import org.opalj.tac.cg.AllocationSiteBasedPointsToCallGraphKey
+import org.opalj.tac.cg.CFA_1_0_CallGraphKey
+import org.opalj.tac.cg.CFA_1_1_CallGraphKey
 import org.opalj.tac.cg.CHACallGraphKey
+import org.opalj.tac.cg.CTACallGraphKey
+import org.opalj.tac.cg.FTACallGraphKey
+import org.opalj.tac.cg.MTACallGraphKey
 import org.opalj.tac.cg.RTACallGraphKey
 import org.opalj.tac.cg.TypeBasedPointsToCallGraphKey
 import org.opalj.tac.cg.TypeProviderKey
@@ -41,7 +46,7 @@ import org.opalj.tac.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
  */
 object OpalJCGAdatper extends JCGTestAdapter {
 
-    def possibleAlgorithms(): Array[String] = Array[String]("CHA", "RTA", "XTA", "0-CFA", "0-1-CFA")
+    def possibleAlgorithms(): Array[String] = Array[String]("CHA", "RTA", "MTA", "CTA", "FTA", "XTA", "0-CFA", "0-1-CFA", "1-0-CFA", "1-1-CFA")
 
     def frameworkName(): String = "OPAL"
 
@@ -121,9 +126,14 @@ object OpalJCGAdatper extends JCGTestAdapter {
         algorithm match {
             case "CHA" ⇒ project.get(CHACallGraphKey)
             case "RTA" ⇒ project.get(RTACallGraphKey)
+            case "MTA" ⇒ project.get(MTACallGraphKey)
+            case "CTA" ⇒ project.get(CTACallGraphKey)
+            case "FTA" ⇒ project.get(FTACallGraphKey)
             case "XTA" ⇒ project.get(XTACallGraphKey)
             case "0-CFA" ⇒ project.get(TypeBasedPointsToCallGraphKey)
             case "0-1-CFA" ⇒ project.get(AllocationSiteBasedPointsToCallGraphKey)
+            case "1-0-CFA" ⇒ project.get(CFA_1_0_CallGraphKey)
+            case "1-1-CFA" ⇒ project.get(CFA_1_1_CallGraphKey)
         }
 
         implicit val typeProvider: TypeProvider = project.get(TypeProviderKey)
