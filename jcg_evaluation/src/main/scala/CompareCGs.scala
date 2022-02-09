@@ -213,15 +213,17 @@ object CompareCGs {
         while (worklist.nonEmpty) {
             val currentMethod = worklist.head
             worklist = worklist.tail
-            for {
-                cs ← cg(currentMethod)
-                t ← cs.targets
-            } {
-                if (!reachableMethods.contains(t)) {
-                    if (!commonReachableMethods.contains(t))
-                        nonCommon add t
-                    reachableMethods add t
-                    worklist enqueue t
+            if(cg.contains(currentMethod)) {
+                for {
+                    cs ← cg(currentMethod)
+                    t ← cs.targets
+                } {
+                    if (!reachableMethods.contains(t)) {
+                        if (!commonReachableMethods.contains(t))
+                            nonCommon add t
+                        reachableMethods add t
+                        worklist enqueue t
+                    }
                 }
             }
         }

@@ -113,12 +113,12 @@ object OpalJCGAdatper extends JCGTestAdapter {
             Seq.empty
         )
 
-        val performInvocationsDomain = classOf[DefaultPerformInvocationsDomainWithCFGAndDefUse[_]]
+        /*val performInvocationsDomain = classOf[DefaultPerformInvocationsDomainWithCFGAndDefUse[_]]
 
         project.updateProjectInformationKeyInitializationData(AIDomainFactoryKey) {
             case None               ⇒ Set(performInvocationsDomain)
             case Some(requirements) ⇒ requirements + performInvocationsDomain
-        }
+        }*/
 
         implicit val ps: PropertyStore = project.get(PropertyStoreKey)
 
@@ -140,11 +140,6 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         // start the computation of the call graph
         implicit val declaredMethods: DeclaredMethods = project.get(DeclaredMethodsKey)
-        for (dm ← declaredMethods.declaredMethods) {
-            ps.force(dm, Callees.key)
-        }
-
-        ps.waitOnPhaseCompletion()
 
         val after = System.nanoTime()
 
