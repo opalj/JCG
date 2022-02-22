@@ -92,6 +92,11 @@ object WalaJCGAdapter extends JCGTestAdapter {
             } else if (algorithm.contains("RTA")) {
                 val rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope)
                 rtaBuilder.makeCallGraph(options, new NullProgressMonitor)
+            } else if (algorithm.contains("CHA")) {
+                import com.ibm.wala.ipa.callgraph.cha.CHACallGraph
+                val CG = new CHACallGraph(classHierarchy)
+                CG.init(entrypoints)
+                CG
             } else throw new IllegalArgumentException
         val after = System.nanoTime
 
@@ -151,7 +156,7 @@ object WalaJCGAdapter extends JCGTestAdapter {
         after - before
     }
 
-    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
+    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
 
     override def frameworkName(): String = "WALA"
 
