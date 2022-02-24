@@ -66,7 +66,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
         )
 
         // configure the initial entry points
-        implicit val config: Config =
+        implicit var config: Config =
             if (mainClass eq null) {
                 baseConfig.withValue(
                     "org.opalj.br.analyses.cg.InitialEntryPointsKey.analysis",
@@ -91,6 +91,10 @@ object OpalJCGAdatper extends JCGTestAdapter {
                         "org.opalj.br.analyses.cg.InitialInstantiatedTypesKey.analysis",
                         ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.ApplicationInstantiatedTypesFinder")
                     )
+
+        config = config
+            .withValue("org.opalj.fpcf.analyses.AllocationSiteBasedPointsToAnalysis.mergeStringConstants", ConfigValueFactory.fromAnyRef(false))
+            .withValue("org.opalj.fpcf.analyses.AllocationSiteBasedPointsToAnalysis.mergeClassConstants", ConfigValueFactory.fromAnyRef(false))
 
         // gather the class files to be loaded
         val cfReader = JavaClassFileReader(theConfig = config)
