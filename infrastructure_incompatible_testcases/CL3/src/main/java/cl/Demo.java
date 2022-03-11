@@ -33,7 +33,7 @@ public class Demo {
     }
 
     @IndirectCalls({
-        @IndirectCall(name = "compare", line = 60, returnType = int.class, resolvedTargets = "Ljava/lang/Integer;"),
+        @IndirectCall(name = "compareTo", line = 60, parameterTypes = {Integer.class}, resolvedTargets = "Ljava/lang/Integer;"),
         @IndirectCall(name = "gc", line = 61, resolvedTargets = "Ljava/lang/System;")
     })
     public static void main(String[] args)
