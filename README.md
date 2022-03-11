@@ -170,13 +170,13 @@ https://bitbucket.org/yanniss/doop/src/master/
 ### OPAL
 The current OPAL adapter builds on an development build of OPAL, to set it up do the following:
 
-First make sure to fulfill OPALs dependencies: (see [here](https://bitbucket.org/delors/opal/src/master/))
+First make sure to fulfill OPALs dependencies: (see [here](https://github.com/opalj/opal/src/master/))
 
-Afterwards, clone the opal project, checkout the `feature/PointsTo` branch and publish the project to the local
+Afterwards, clone the opal project, checkout the `develop` branch and publish the project to the local
 Ivy repository:
 ```
-$ git clone https://bitbucket.org/delors/opal.git
-$ git checkout feature/PointsTo
+$ git clone https://github.com/opalj/opal.git
+$ git checkout develop
 $ sbt publishLocal
 ```
 
