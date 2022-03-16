@@ -96,6 +96,7 @@ object FingerprintExtractor {
                 val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.debug)
                 ow.write(s"\t${result.shortNotation}")
                 fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
+                fingerprintWriter.flush()
 
             }
             ow.newLine()
