@@ -45,11 +45,11 @@ object WalaJCGAdapter extends JCGTestAdapter {
         pw.println(s"java_runtime_dir = $JDKPath")
         pw.close()
 
-        val sysloader = classOf[WalaProperties].getClassLoader.asInstanceOf[URLClassLoader]
+        /*val sysloader = classOf[WalaProperties].getClassLoader.asInstanceOf[URLClassLoader]
         val sysclass = classOf[URLClassLoader]
         val m = sysclass.getDeclaredMethod("addURL", classOf[URL])
         m.setAccessible(true)
-        m.invoke(sysloader, tmp.toURI.toURL)
+        m.invoke(sysloader, tmp.toURI.toURL)*/
 
         val ex = if (analyzeJDK) {
             new File(cl.getResource("no-exclusions.txt").getFile)
