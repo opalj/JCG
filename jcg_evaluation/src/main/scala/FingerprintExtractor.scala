@@ -9,7 +9,14 @@ import org.opalj.log.GlobalLogContext
 import org.opalj.log.OPALLogger
 import play.api.libs.json.Json
 
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 import scala.io.Source
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.util.Failure
+import scala.util.Success
 
 object FingerprintExtractor {
 
@@ -74,6 +81,8 @@ object FingerprintExtractor {
 
                 println(s"performing test case: ${projectSpec.name}")
 
+                val future = Future {
+
                 try {
                     adapter.serializeCG(
                         cgAlgorithm,
@@ -90,14 +99,42 @@ object FingerprintExtractor {
                             println(e.printStackTrace())
                         }
                 }
+                ow.synchronized{
+                    System.gc()
 
-                System.gc()
+                    val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.debug)
+                    ow.write(s"\t${result.shortNotation}")
+                    fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
+                    fingerprintWriter.flush()
 
-                val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.debug)
-                ow.write(s"\t${result.shortNotation}")
-                fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
-                fingerprintWriter.flush()
-
+                }
+              }
+              if(config.parallel){
+                future.onComplete {
+                  case Success(value) => println(s"Success: $value")
+                  case Failure(e) => e.printStackTrace
+                }
+              }
+              else {
+                try {
+                  val duration =
+                    if(config.timeout>=0)
+                      config.timeout seconds
+                    else Duration.Inf
+                  Await.ready(future, duration)
+                }
+                catch {
+                  case _: concurrent.TimeoutException =>
+                    println(s"Test case was interrupted after ${config.timeout} seconds")
+                  case e: Throwable => println(e.getMessage)
+                } finally {
+                  System.gc()
+                  val result = Timeout
+                  ow.write(s"\t${result.shortNotation}")
+                  fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
+                  fingerprintWriter.flush()
+                }
+              }
             }
             ow.newLine()
             fingerprintWriter.close()
