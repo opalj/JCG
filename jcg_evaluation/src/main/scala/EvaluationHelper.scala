@@ -30,6 +30,7 @@ case class JCGConfig(
                    adapters: List[JCGTestAdapter] = List.empty,
                    projectFilter: String = "",
                    algorithmFilter: String = "",
+                   timeout: Int = -1,
                    runHermes: Boolean = false,
                    pseval: Boolean= false,
                    excludeJDK: Boolean = false,
@@ -37,6 +38,7 @@ case class JCGConfig(
                    allQueries: Boolean = false,
                    fingerprintDir: File = new File(""),
                    debug: Boolean = false,
+                   parallel: Boolean = false
                  ) {
     val JRE_LOCATIONS_FILE = "jre.conf"
     val SERIALIZATION_FILE_NAME = "cg.json"
@@ -96,6 +98,10 @@ object ConfigParser {
                   .text("Defines a prefix-based filter for the adapters call-graph algorithms names. (e.g. filter only for RTAs)")
                   .valueName("prefix")
                   .maxOccurs(1).optional(),
+                opt[String]('t', name="timeout")
+                  .action((t, c) => c.copy(timeout =Integer.valueOf(t)))
+                  .valueName("timeout")
+                  .maxOccurs(1).optional(),
                 opt[String]('a', "adapter")
                   .action{(adapterName, c) =>
                       val adapter = ALL_ADAPTERS.find(_.frameworkName().toLowerCase == adapterName.toLowerCase)
@@ -109,6 +115,10 @@ object ConfigParser {
                   .unbounded(),
                 opt[Unit]('d', "debug")
                   .action((_, c) => c.copy(debug = true))
+                  .hidden()
+                  .optional(),
+                opt[Unit]('p', "parallel")
+                  .action((_, c) => c.copy(parallel = true))
                   .hidden()
                   .optional(),
                 opt[File]('f', "fingerprintDir")
