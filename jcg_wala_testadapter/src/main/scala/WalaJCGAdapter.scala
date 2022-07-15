@@ -103,7 +103,7 @@ object WalaJCGAdapter extends JCGTestAdapter {
         val initialEntryPoints = cg.getFakeRootNode.iterateCallSites().asScala.map(_.getDeclaredTarget)
 
         val worklist = mutable.Queue(initialEntryPoints.toSeq: _*)
-        val processed = mutable.Set(worklist: _*)
+        val processed = mutable.Set(worklist.toSeq: _*)
 
         var reachableMethods = Set.empty[ReachableMethod]
         while (worklist.nonEmpty) {
