@@ -82,59 +82,55 @@ object FingerprintExtractor {
                 println(s"performing test case: ${projectSpec.name}")
 
                 val future = Future {
+                    try {
+                        adapter.serializeCG(
+                            cgAlgorithm,
+                            projectSpec.target(projectsDir).getCanonicalPath,
+                            projectSpec.main.orNull,
+                            projectSpec.allClassPathEntryPaths(projectsDir),
+                            jreLocations(projectSpec.java),
+                            false,
+                            cgFile.getAbsolutePath
+                        )
+                    } catch {
+                        case e: Throwable ⇒
+                            if (config.debug) {
+                                println(e.printStackTrace())
+                            }
+                    }
+                    ow.synchronized{
+                        System.gc()
 
-                try {
-                    adapter.serializeCG(
-                        cgAlgorithm,
-                        projectSpec.target(projectsDir).getCanonicalPath,
-                        projectSpec.main.orNull,
-                        projectSpec.allClassPathEntryPaths(projectsDir),
-                        jreLocations(projectSpec.java),
-                        false,
-                        cgFile.getAbsolutePath
-                    )
-                } catch {
-                    case e: Throwable ⇒
-                        if (config.debug) {
-                            println(e.printStackTrace())
-                        }
-                }
-                ow.synchronized{
-                    System.gc()
+                        val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.debug)
+                        ow.write(s"\t${result.shortNotation}")
+                        fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
+                        fingerprintWriter.flush()
 
-                    val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.debug)
-                    ow.write(s"\t${result.shortNotation}")
-                    fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
-                    fingerprintWriter.flush()
-
+                    }
                 }
-              }
-              if(config.parallel){
-                future.onComplete {
-                  case Success(value) => println(s"Success: $value")
-                  case Failure(e) => e.printStackTrace
+                if(config.parallel){
+                    future.onComplete {
+                        case Success(_) =>
+                        case Failure(e) => e.printStackTrace
+                    }
+                } else {
+                    try {
+                        val duration =
+                        if(config.timeout>=0)
+                            config.timeout.seconds
+                        else Duration.Inf
+                        Await.ready(future, duration)
+                    } catch {
+                        case _: concurrent.TimeoutException =>
+                            println(s"Test case was interrupted after ${config.timeout} seconds")
+                            System.gc()
+                            val result = Timeout
+                            ow.write(s"\t${result.shortNotation}")
+                            fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
+                            fingerprintWriter.flush()
+                        case e: Throwable => println(e.getMessage)
+                    }
                 }
-              }
-              else {
-                try {
-                  val duration =
-                    if(config.timeout>=0)
-                      config.timeout seconds
-                    else Duration.Inf
-                  Await.ready(future, duration)
-                }
-                catch {
-                  case _: concurrent.TimeoutException =>
-                    println(s"Test case was interrupted after ${config.timeout} seconds")
-                  case e: Throwable => println(e.getMessage)
-                } finally {
-                  System.gc()
-                  val result = Timeout
-                  ow.write(s"\t${result.shortNotation}")
-                  fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
-                  fingerprintWriter.flush()
-                }
-              }
             }
             ow.newLine()
             fingerprintWriter.close()

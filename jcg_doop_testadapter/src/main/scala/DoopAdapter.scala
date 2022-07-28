@@ -4,6 +4,7 @@ import java.io.PrintWriter
 import java.net.URL
 import java.nio.file.Files
 
+import scala.collection.compat.immutable
 import scala.collection.mutable
 import scala.io.Source
 import scala.sys.process.Process
@@ -12,7 +13,6 @@ import org.apache.commons.io.FileUtils
 import play.api.libs.json.Json
 import play.api.libs.json.JsValue
 
-import org.opalj.collection.immutable.RefArray
 import org.opalj.br.ClassFile
 import org.opalj.br.FieldType
 import org.opalj.br.FieldTypes
@@ -22,6 +22,7 @@ import org.opalj.br.ReferenceType
 import org.opalj.br.ReturnType
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.SomeProject
+import org.opalj.br.instructions.Instruction
 import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
 
@@ -81,8 +82,7 @@ object DoopAdapter extends JCGTestAdapter {
         assert(tgts.nonEmpty)
         val firstTgt = toMethod(tgts.head)
         val tgtReturnType = ReturnType(firstTgt.returnType)
-        val tgtParamTypes: FieldTypes =
-            RefArray.from(firstTgt.parameterTypes.map(FieldType.apply).toArray)
+        val tgtParamTypes: FieldTypes = immutable.ArraySeq(firstTgt.parameterTypes.map(FieldType.apply): _*)
         val tgtMD = MethodDescriptor(tgtParamTypes, tgtReturnType)
         val split = declaredTgt.split("""\.""")
         val declaredType = s"L${split.slice(0, split.size - 1).mkString("/")};"
@@ -90,16 +90,19 @@ object DoopAdapter extends JCGTestAdapter {
         val tgtMethods = tgts.map(toMethod)
         // todo what abot <clinit> etc where no call is in the bytecode
         val declObjType = FieldType(declaredType)
-        val calls = callerOpal.body.get.collect {
+
+        val getInstr: PartialFunction[Instruction, Instruction] = {
             // todo what about lambdas?
             case instr: MethodInvocationInstruction if (
                 instr.name == name &&
-                (instr.declaringClass == declObjType ||
-                    declObjType == ObjectType.Object && instr.declaringClass.isArrayType)
-            ) ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
+                    (instr.declaringClass == declObjType ||
+                        declObjType == ObjectType.Object && instr.declaringClass.isArrayType)
+                ) ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
             case instr: INVOKEDYNAMIC ⇒ instr
-            //throw new Error()
+                //throw new Error()
         }
+
+        val calls = callerOpal.body.get.collect(getInstr)
 
         if (calls.size <= number && callerOpal.isBridge) {
             computeCallSite(declaredTgt, number, tgts, callerMethod, resolveBridgeMethod(callerOpal))
@@ -133,8 +136,7 @@ object DoopAdapter extends JCGTestAdapter {
                 case Some(cf) ⇒
                     implicit val classFile: ClassFile = cf
                     val returnType = ReturnType(callerMethod.returnType)
-                    val parameterTypes: FieldTypes =
-                        RefArray.from(callerMethod.parameterTypes.map(FieldType.apply).toArray)
+                    val parameterTypes: FieldTypes = scala.collection.compat.immutable.ArraySeq(callerMethod.parameterTypes.map(FieldType.apply): _*)
                     val md = MethodDescriptor(parameterTypes, returnType)
 
                     cf.findMethod(callerMethod.name, md) match {
