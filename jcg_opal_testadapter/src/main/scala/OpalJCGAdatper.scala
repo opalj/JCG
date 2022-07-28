@@ -31,9 +31,9 @@ import org.opalj.tac.cg.FTACallGraphKey
 import org.opalj.tac.cg.MTACallGraphKey
 import org.opalj.tac.cg.RTACallGraphKey
 import org.opalj.tac.cg.TypeBasedPointsToCallGraphKey
-import org.opalj.tac.cg.TypeProviderKey
+import org.opalj.tac.cg.TypeIteratorKey
 import org.opalj.tac.cg.XTACallGraphKey
-import org.opalj.tac.fpcf.analyses.cg.TypeProvider
+import org.opalj.tac.fpcf.analyses.cg.TypeIterator
 import org.opalj.tac.fpcf.properties.cg.Callees
 import org.opalj.tac.fpcf.properties.cg.NoCallees
 import org.opalj.tac.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
@@ -140,7 +140,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
             case "1-1-CFA" ⇒ project.get(CFA_1_1_CallGraphKey)
         }
 
-        implicit val typeProvider: TypeProvider = project.get(TypeProviderKey)
+        implicit val typeIterator: TypeIterator = project.get(TypeIteratorKey)
 
         // start the computation of the call graph
         implicit val declaredMethods: DeclaredMethods = project.get(DeclaredMethodsKey)
@@ -185,7 +185,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
         method:  DeclaredMethod,
         callees: Callees,
         out:     Writer
-    )(implicit ps: PropertyStore, declaredMethods: DeclaredMethods, typeProvider: TypeProvider): Unit = {
+    )(implicit ps: PropertyStore, declaredMethods: DeclaredMethods, typeIterator: TypeIterator): Unit = {
         val bodyO = if (method.hasSingleDefinedMethod) method.definedMethod.body else None
         var first = true
         for { callerContext ← callees.callerContexts
