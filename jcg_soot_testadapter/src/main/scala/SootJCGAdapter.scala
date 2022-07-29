@@ -48,6 +48,7 @@ object SootJCGAdapter extends JCGTestAdapter {
 
         val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
 
+        o.set_prepend_classpath(true)
         o.set_soot_classpath((classPath ++ jreJars).mkString(File.pathSeparator))
 
         o.set_output_format(Options.output_format_none)
