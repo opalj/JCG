@@ -105,6 +105,7 @@ object FingerprintExtractor {
                         ow.write(s"\t${result.shortNotation}")
                         fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
                         fingerprintWriter.flush()
+                        println(s"${projectSpec.name}\t${result.shortNotation}")
 
                     }
                 }
