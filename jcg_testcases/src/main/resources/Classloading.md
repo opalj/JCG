@@ -188,12 +188,13 @@ import java.util.Comparator;
 
 public class Demo {
 
-	@IndirectCall(name = "callback", line = 14, resolvedTargets = "Lcl4/Demo;")
+	@IndirectCall(name = "callback", line = 15, resolvedTargets = "Lcl4/Demo;")
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         ClassLoader cl = new ByteClassLoader(ClassLoader.getSystemClassLoader());
         Class<?> cls = cl.loadClass("lib.IntComparator");
         Comparator<Integer> comparator = (Comparator<Integer>) cls.newInstance();
         Integer one = Integer.valueOf(1);
+        Integer two = Integer.valueOf(2);
         comparator.compare(one, one);
     }
 
