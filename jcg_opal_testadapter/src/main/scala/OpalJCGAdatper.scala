@@ -9,6 +9,8 @@ import scala.collection.JavaConverters._
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
+import net.ceedubs.ficus.Ficus.toFicusConfig
+import net.ceedubs.ficus.readers.ArbitraryTypeReader.arbitraryTypeValueReader
 
 import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
@@ -81,11 +83,10 @@ object OpalJCGAdatper extends JCGTestAdapter {
             ).withValue(
                     "org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints",
                     ConfigValueFactory.fromIterable(
-                        Seq(
-                        ConfigValueFactory.fromMap(Map(
-                            "declaringClass" → mainClass.replace('.', '/'), "name" → "main"
-                        ).asJava)
-                    ).asJava
+                        (
+                            (baseConfig.getObjectList("org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints").asScala :+
+                                ConfigValueFactory.fromMap(Map("declaringClass" → mainClass.replace('.', '/'), "name" → "main").asJava))
+                        ).asJava
                     )
                 ).withValue(
                         "org.opalj.br.analyses.cg.InitialInstantiatedTypesKey.analysis",
@@ -148,7 +149,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
         val after = System.nanoTime()
 
         val out = new BufferedWriter(new FileWriter(outputFile))
-        out.write(s"""{"reachableMethods":[""")
+        out.write(s"""{\n\t"reachableMethods":[""")
         var firstRM = true
         for {
             dm ← declaredMethods.declaredMethods if (!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
@@ -161,18 +162,18 @@ object OpalJCGAdatper extends JCGTestAdapter {
             } else {
                 out.write(",")
             }
-            out.write("{\"method\":")
+            out.write("{\n\t\t\"method\":")
             writeMethodObject(dm, out)
-            out.write(",\"callSites\":[")
+            out.write(",\n\t\t\"callSites\":[")
             calleeEOptP match {
                 case FinalEP(_, NoCallees) ⇒
                 case FinalEP(_, callees: Callees) ⇒
                     writeCallSites(dm, callees, out)
                 case _ ⇒ throw new RuntimeException()
             }
-            out.write("]}")
+            out.write("]\n\t}")
         }
-        out.write("]}")
+        out.write("]\n}")
         out.flush()
         out.close()
 
@@ -253,35 +254,35 @@ object OpalJCGAdatper extends JCGTestAdapter {
         targets:        Iterator[DeclaredMethod],
         out:            Writer
     ): Unit = {
-        out.write("{\"declaredTarget\":")
+        out.write("{\n\t\t\t\"declaredTarget\":")
         writeMethodObject(declaredTarget, out)
-        out.write(",\"line\":")
+        out.write(",\n\t\t\t\"line\":")
         out.write(line.toString)
-        out.write(",\"pc\":")
+        out.write(",\n\t\t\t\"pc\":")
         out.write(pc.toString)
-        out.write(",\"targets\":[")
+        out.write(",\n\t\t\t\"targets\":[")
         var first = true
         for (tgt ← targets) {
             if (first) first = false
             else out.write(",")
             writeMethodObject(tgt, out)
         }
-        out.write("]}")
+        out.write("]\n\t\t}")
     }
 
     private def writeMethodObject(
         method: DeclaredMethod,
         out:    Writer
     ): Unit = {
-        out.write("{\"name\":\"")
+        out.write("{\n\t\t\t\t\"name\":\"")
         out.write(method.name)
-        out.write("\",\"declaringClass\":\"")
+        out.write("\",\n\t\t\t\t\"declaringClass\":\"")
         out.write(method.declaringClassType.toJVMTypeName)
-        out.write("\",\"returnType\":\"")
+        out.write("\",\n\t\t\t\t\"returnType\":\"")
         out.write(method.descriptor.returnType.toJVMTypeName)
-        out.write("\",\"parameterTypes\":[")
+        out.write("\",\n\t\t\t\t\"parameterTypes\":[")
         if (method.descriptor.parametersCount > 0)
             out.write(method.descriptor.parameterTypes.iterator.map[String](_.toJVMTypeName).mkString("\"", "\",\"", "\""))
-        out.write("]}")
+        out.write("]\n\t\t\t}")
     }
 }
