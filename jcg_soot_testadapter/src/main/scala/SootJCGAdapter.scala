@@ -10,10 +10,14 @@ import soot.Scene
 import soot.SootMethod
 import soot.options.Options
 import soot.util.backend.ASMBackendUtils
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+
+import com.google.common.base.Optional
+import soot.ModulePathSourceLocator
+import soot.ModuleScene
+import soot.SootClass
 
 object SootJCGAdapter extends JCGTestAdapter {
 
@@ -44,9 +48,13 @@ object SootJCGAdapter extends JCGTestAdapter {
 
         // todo no-bodies-for-excluded in case of !analyzeJDK
 
-        o.set_process_dir(List(target).asJava)
-
         val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
+
+        if(analyzeJDK){
+            o.set_process_dir((List(target) ++ classPath ++ jreJars).asJava)
+        } else {
+            o.set_process_dir((List(target) ++ classPath).asJava)
+        }
 
         o.set_soot_classpath((classPath ++ jreJars).mkString(File.pathSeparator))
 
