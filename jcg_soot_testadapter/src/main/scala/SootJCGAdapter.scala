@@ -148,12 +148,6 @@ object SootJCGAdapter extends JCGTestAdapter {
         after - before
     }
 
-    private def addPhaseOptions(options: ArrayBuffer[String], phase: String, phaseOptions: Array[String]): Unit = {
-        options += "-p"
-        options += phase
-        options += phaseOptions.mkString(",")
-    }
-
     private def createMethodObject(method: SootMethod): Method = {
         val name = method.getName
         val declaringClass = ASMBackendUtils.toTypeDesc(method.getDeclaringClass.getType)
