@@ -79,6 +79,13 @@ lazy val jcg_opal_testadapter = project.settings(
     jcg_testadapter_commons
 )
 
+lazy val jcg_dynamic_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Dynamic Test Adapter",
+    aggregate in assembly := false,
+    publishArtifact := false
+).dependsOn(jcg_testadapter_commons)
+
 
 //lazy val jcg_opal_testadapter = project.settings(
 //    commonSettings,
