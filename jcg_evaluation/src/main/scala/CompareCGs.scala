@@ -4,10 +4,8 @@ import java.util
 import play.api.libs.json.Json
 
 import scala.collection.mutable
-import scala.collection.JavaConverters._
-import java.util.{HashSet => JHashSet}
-
-
+import scala.jdk.CollectionConverters._
+import java.util.{HashSet ⇒ JHashSet}
 
 /**
  * @author Dominik Helm
@@ -21,6 +19,8 @@ object CompareCGs {
         var cg2Path = ""
         var appPackages = List.empty[String]
 
+        var showMethodPrecisionRecall = false
+        var showEdgePrecisionRecall = false
         var showBoundaries = false
         var showCommon = false
         var showReachable = false
@@ -29,8 +29,7 @@ object CompareCGs {
         var maxFindings = Int.MaxValue
 
         var inPackage = ""
-
-
+        var strict = true
 
         args.sliding(2, 2).toList.collect {
             case Array("--input1", cg) ⇒
@@ -41,6 +40,16 @@ object CompareCGs {
                 cg2Path = cg
             case Array("--package", pkg) ⇒
                 appPackages ::= pkg
+            case Array("--showPrecisionRecall", preRec) ⇒
+                preRec match {
+                    case "methods" ⇒
+                        showMethodPrecisionRecall = true
+                    case "edges" ⇒
+                        showEdgePrecisionRecall = true
+                    case "all" ⇒
+                        showMethodPrecisionRecall = true
+                        showEdgePrecisionRecall = true
+                }
             case Array("--showBoundaries", boundaries) ⇒
                 showBoundaries = boundaries == "t"
             case Array("--showCommon", common) ⇒
@@ -55,6 +64,8 @@ object CompareCGs {
                 maxFindings = max.toInt
             case Array("--inPackage", pkg) ⇒
                 inPackage = pkg
+            case Array("--strict", s) ⇒
+                strict = s == "t"
         }
 
         val cg1 = Json.parse(new FileInputStream(cg1Path)).validate[ReachableMethods].get.toMap
@@ -73,21 +84,40 @@ object CompareCGs {
         }
          */
 
+        if (showMethodPrecisionRecall) {
+            val falsePositive = extractAdditionalMethods(cg2, cg1).size
+            val positive = cg2.size
+            val truth = cg1.size
+            val truePositive = positive - falsePositive
+            println(f"Method precision: $truePositive/$positive = ${truePositive.toDouble / positive * 100}%.2f%%")
+            println(f"Method recall: $truePositive/$truth = ${truePositive.toDouble / truth * 100}%.2f%%")
+            println(f"Method F1-score: ${2 * truePositive.toDouble / (truePositive + falsePositive + truth) * 100}%.2f")
+        }
+
+        if (showEdgePrecisionRecall) {
+            val falsePositive = countAdditionalEdges(cg2, cg1, strict)
+            val positive = edgeCount(cg2)
+            val truth = edgeCount(cg1)
+            val truePositive = positive - falsePositive
+            println(f"Edge precision: $truePositive/$positive = ${truePositive.toDouble / positive * 100}%.2f%%")
+            println(f"Edge recall: $truePositive/$truth = ${truePositive.toDouble / truth * 100}%.2f%%")
+            println(f"Edge F1-score: ${2 * truePositive.toDouble / (truePositive + falsePositive + truth) * 100}%.2f")
+        }
+
         if (showAdditional) {
             val additionalReachableMethods1 = extractAdditionalMethods(cg1, cg2).toSeq.sortBy(_.declaringClass).take(maxFindings)
-            val additionalReachableMethods2 = extractAdditionalMethods(cg2, cg1).toSeq.sortBy(_.declaringClass).take(maxFindings)
-
             println(additionalReachableMethods1.mkString(" ##### Additional Methods - Input 1 #####\n\n\t", "\n\t", "\n\n"))
+
+            val additionalReachableMethods2 = extractAdditionalMethods(cg2, cg1).toSeq.sortBy(_.declaringClass).take(maxFindings)
             println(additionalReachableMethods2.mkString(" ##### Additional Methods - Input 2 #####\n\n\t", "\n\t", "\n\n"))
         }
 
-        val commonReachableMethods : java.util.HashSet[Method] = if (showCommon || showBoundaries) {
+        val commonReachableMethods: java.util.HashSet[Method] = if (showCommon || showBoundaries) {
             val cg1Keys = cg1.keySet.iterator
-            val cg2Keys = cg2.keySet
             val common = new java.util.HashSet[Method]()
-            while(cg1Keys.hasNext) {
+            while (cg1Keys.hasNext) {
                 val m1 = cg1Keys.next()
-                if(cg2.contains(m1))
+                if (cg2.contains(m1))
                     common add m1
             }
             common
@@ -109,18 +139,38 @@ object CompareCGs {
 
         if (showBoundaries) {
             val boundaries1 = extractBoundaries(cg1, commonReachableMethods, inPackage).asScala.toSeq.sortBy(_.m.declaringClass).take(maxFindings)
-            val boundaries2 = extractBoundaries(cg2, commonReachableMethods, inPackage).asScala.toSeq.sortBy(_.m.declaringClass).take(maxFindings)
-
             println(boundaries1.mkString(" ##### Boundary Methods - Input 1 #####\n\n\t", "\n\t", "\n\n"))
+
+            val boundaries2 = extractBoundaries(cg2, commonReachableMethods, inPackage).asScala.toSeq.sortBy(_.m.declaringClass).take(maxFindings)
             println(boundaries2.mkString(" ##### Boundary Methods - Input 2 #####\n\n\t", "\n\t", "\n\n"))
         }
 
         if (showAdditionalCalls) {
-            val additional1 = extractAdditionalCalls(cg1, cg2, inPackage).toSeq.sortBy(_._1.declaringClass).take(maxFindings)
-            val additional2 = extractAdditionalCalls(cg2, cg1, inPackage).toSeq.sortBy(_._1.declaringClass).take(maxFindings)
+            val additional1 = extractAdditionalCalls(cg1, cg2, inPackage, strict).toSeq.sortBy(_._1.declaringClass).take(maxFindings)
+            val additional2 = extractAdditionalCalls(cg2, cg1, inPackage, strict).toSeq.sortBy(_._1.declaringClass).take(maxFindings)
 
             println(additional1.mkString(" ##### Additional Calls - Input 1 #####\n\n\t", "\n\t", "\n\n"))
             println(additional2.mkString(" ##### Additional Calls - Input 2 #####\n\n\t", "\n\t", "\n\n"))
+        }
+
+        val sites = cg1.keySet.filter(!cg2.contains(_)).map { m ⇒
+            val css = cg1(m)
+            if(css.nonEmpty) {
+                val additional = cg1(m).maxBy { cs ⇒
+                    cs.targets.size
+                }
+                (m, additional.pc, additional.targets.size)
+            } else {
+                (m, None, 0)
+            }
+        }
+
+        //println(sites.toSeq.sortBy(_._3).takeRight(100).mkString(" #### Impactful Call Sites ####\n\n\t", "\n\t", "\n\n"))
+    }
+
+    private def edgeCount(cg: Map[Method, Set[CallSite]]): Int = {
+        cg.foldLeft(0) { (acc, rm) ⇒
+            acc + rm._2.foldLeft(0)((acc, cs) ⇒ acc + cs.targets.size)
         }
     }
 
@@ -128,7 +178,7 @@ object CompareCGs {
         baseCG: Map[Method, Set[CallSite]], comparedTo: Map[Method, Set[CallSite]]
     ): Set[Method] = {
         baseCG.keySet.filter(!comparedTo.contains(_))
-//        baseCG.filter(m ⇒ !comparedTo.contains(m.._1)).keySet
+        //        baseCG.filter(m ⇒ !comparedTo.contains(m.._1)).keySet
     }
 
     private def extractReachableApplicationMethods(
@@ -145,14 +195,14 @@ object CompareCGs {
         val boundaries = new JHashSet[MethodBoundary]()
 
         val itr = commonReachableMethods.iterator()
-        while(itr.hasNext) {
+        while (itr.hasNext) {
             val caller = itr.next()
-            if(caller.declaringClass.startsWith(inPackage)) {
+            if (caller.declaringClass.startsWith(inPackage)) {
                 val callees = cg(caller).flatMap(_.targets)
-                if(callees.iterator.exists(!commonReachableMethods.contains(_))){
+                if (callees.iterator.exists(!commonReachableMethods.contains(_))) {
                     val differences = new StringBuilder("\n\t\t")
-                    callees.iterator.foreach { callee =>
-                        if(!commonReachableMethods.contains(callee)) {
+                    callees.iterator.foreach { callee ⇒
+                        if (!commonReachableMethods.contains(callee)) {
                             differences.append(s"${transitiveHull(callee, cg, commonReachableMethods)}: $callee\n\t\t")
                         }
                     }
@@ -162,21 +212,48 @@ object CompareCGs {
         }
 
         boundaries
-//        commonReachableMethods.filter { caller ⇒
-//            if (caller.declaringClass.startsWith(inPackage)) {
-//                val callees = cg(caller).flatMap(_.targets)
-//                callees.iterator.exists(target ⇒ !commonReachableMethods.contains(target))
-//            } else {
-//                false
-//            }
-//        }.map { caller ⇒
-//            val callees = cg(caller).flatMap(_.targets)
-//            (caller, callees.diff(commonReachableMethods).map(m ⇒ s"${transitiveHull(m, cg, commonReachableMethods)}: $m").mkString("\n\t\t", "\n\t\t", ""))
-//        }
+    }
+
+    private def countAdditionalEdges(
+        cg: Map[Method, Set[CallSite]], otherCG: Map[Method, Set[CallSite]], strict: Boolean
+    ): Int = {
+        var result = 0
+        cg.foreach {
+            case (method, callSites) ⇒
+                val otherCallSites = otherCG.get(method)
+                callSites.foreach {
+                    case CallSite(declared, line, pc, targets) ⇒
+                        if (otherCallSites.isDefined) {
+                            if(pc.isEmpty){
+                                val possibleCSs = otherCallSites.get.filter{cs ⇒
+                                    (!strict || cs.declaredTarget == declared) && cs.line == line && cs.targets.exists{target ⇒
+                                        target.name == declared.name && target.returnType == declared.returnType && target.parameterTypes == declared.parameterTypes
+                                    }}
+                                val diffs = possibleCSs.foldLeft(targets)((acc, cs) ⇒ acc -- cs.targets)
+                                result += diffs.size
+                            } else {
+                                val differingCSOpt = otherCallSites.get.find(cs ⇒ (!strict || cs.declaredTarget == declared && cs.line == line) && cs.pc == pc && cs.targets.exists { target ⇒
+                                    target.name == declared.name && target.returnType == declared.returnType && target.parameterTypes == declared.parameterTypes
+                                })
+                                if (differingCSOpt.isDefined) {
+                                    val differingCS = differingCSOpt.get
+                                    val diffs = targets -- differingCS.targets
+                                    result += diffs.size
+                                } else {
+                                    result += targets.size
+                                }
+                            }
+                        } else {
+                            result += targets.size
+                        }
+                }
+        }
+
+        result
     }
 
     private def extractAdditionalCalls(
-        cg: Map[Method, Set[CallSite]], otherCG: Map[Method, Set[CallSite]], inPackage: String
+        cg: Map[Method, Set[CallSite]], otherCG: Map[Method, Set[CallSite]], inPackage: String, strict: Boolean
     ): Set[(Method, String)] = {
         var result = Set.empty[(Method, String)]
         cg.foreach {
@@ -185,7 +262,7 @@ object CompareCGs {
                 if (otherCallSites.isDefined) {
                     callSites.foreach {
                         case CallSite(declared, line, pc, targets) ⇒
-                            val differingCSOpt = otherCallSites.get.find(cs ⇒ cs.declaredTarget == declared && cs.line == line && cs.pc == pc)
+                            val differingCSOpt = otherCallSites.get.find(cs ⇒ (!strict || cs.declaredTarget == declared && cs.line == line) && cs.pc == pc)
                             if (differingCSOpt.isDefined) {
                                 val differingCS = differingCSOpt.get
                                 if (differingCS.targets.size < targets.size) {
@@ -213,7 +290,7 @@ object CompareCGs {
         while (worklist.nonEmpty) {
             val currentMethod = worklist.head
             worklist = worklist.tail
-            if(cg.contains(currentMethod)) {
+            if (cg.contains(currentMethod)) {
                 for {
                     cs ← cg(currentMethod)
                     t ← cs.targets
