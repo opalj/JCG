@@ -10,14 +10,10 @@ import soot.Scene
 import soot.SootMethod
 import soot.options.Options
 import soot.util.backend.ASMBackendUtils
+
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-
-import com.google.common.base.Optional
-import soot.ModulePathSourceLocator
-import soot.ModuleScene
-import soot.SootClass
 
 object SootJCGAdapter extends JCGTestAdapter {
 
@@ -75,17 +71,22 @@ object SootJCGAdapter extends JCGTestAdapter {
 
         if (algorithm.contains(CHA)) {
             o.setPhaseOption("cg.cha", "enabled:true")
+            o.setPhaseOption("cg.spark", "enabled:false")
         } else if (algorithm.contains(RTA)) {
             o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "vta:false")
             o.setPhaseOption("cg.spark", "rta:true")
-            o.setPhaseOption("cg.spark", "on-fly-cg:false")
+            o.setPhaseOption("cg.spark", "on-fly-cg:true")
             o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else if (algorithm.contains(VTA)) {
             o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "rta:false")
             o.setPhaseOption("cg.spark", "vta:true")
             o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else if (algorithm.contains(Spark)) {
             o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "rta:false")
+            o.setPhaseOption("cg.spark", "vta:false")
             o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else {
             throw new IllegalArgumentException(s"unknown algorithm $algorithm")
@@ -95,6 +96,12 @@ object SootJCGAdapter extends JCGTestAdapter {
         G.v.out = new PrintStream(out)
 
         val scene = Scene.v()
+        scene.releaseCallGraph()
+        scene.releaseReachableMethods()
+        scene.releasePointsToAnalysis()
+        scene.releaseActiveHierarchy()
+        scene.releaseFastHierarchy()
+
         val before = System.nanoTime
         scene.loadNecessaryClasses()
         // TODO SET ENTRYPOINTS?
