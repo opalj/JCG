@@ -96,8 +96,15 @@ lazy val jcg_dynamic_testadapter = project.settings(
     commonSettings,
     name := "JCG Dynamic Test Adapter",
     assembly / aggregate := false,
-    publishArtifact := false
+    publishArtifact := false,
+    Compile / compile := (Compile / compile).dependsOn(buildJVMTIAgent).value
 ).dependsOn(jcg_testadapter_commons)
+
+lazy val buildJVMTIAgent = taskKey[Unit]("Build the JVMTI Agent")
+jcg_dynamic_testadapter / buildJVMTIAgent := {
+    import sys.process._
+    s"g++ -fPIC -shared -o jcg_dynamic_testadapter/src/main/resources/DynamicCG.so -I ${System.getProperty("java.home")}/../include -I ${System.getProperty("java.home")}/../include/linux jcg_dynamic_testadapter/src/main/resources/DynamicCG.cpp" !
+}
 
 lazy val jcg_testadapter_commons = project.settings(
     commonSettings,
