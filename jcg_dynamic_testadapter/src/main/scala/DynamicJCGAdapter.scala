@@ -1,14 +1,14 @@
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.io.PrintWriter
-import java.net.Socket
+import java.net.ServerSocket
 import java.nio.file.Paths
 import java.util
 import java.util.stream.Collectors
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
+import scala.util.Using
 
 object DynamicJCGAdapter extends JCGTestAdapter {
 
@@ -43,18 +43,20 @@ object DynamicJCGAdapter extends JCGTestAdapter {
 
         val before = System.nanoTime
 
-        new ProcessBuilder(args.asJava).inheritIO().start()
+        val after = Using.Manager { use =>
+            val serverSocket = use(new ServerSocket(port))
 
-        val socket = new Socket("localhost", port)
+            new ProcessBuilder(args.asJava).inheritIO().start()
 
-        val after = System.nanoTime
+            val clientSocket = use(serverSocket.accept)
+            serverSocket.close()
 
-        val reader = new BufferedReader(new InputStreamReader(socket.getInputStream))
+            val in = use(new BufferedReader(new InputStreamReader(clientSocket.getInputStream)))
 
-        System.out.println(reader.readLine())
+            System.out.println(in.readLine())
 
-        socket.close
-        reader.close()
+            System.nanoTime()
+        }.getOrElse(before)
 
         after - before
     }

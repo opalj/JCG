@@ -6,14 +6,15 @@
 #include <stdlib.h>
 #include <map>
 #include <unordered_set>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <netinet/in.h>
 #include <cstring>
 
 using namespace std;
 
 static jvmtiEnv *jvmti = NULL;
+static int port = 0;
 
 struct Callsite {
     int topLevel;
@@ -77,9 +78,21 @@ void JNICALL MethodEntry(jvmtiEnv *jvmti, JNIEnv* jni, jthread thread, jmethodID
     callees.insert(callee);
 }
 
-void print_cg() {
-    printf("CG Size: %d\n", cg.size());
-    fflush(stdout);
+void return_cg() {
+    int channel;
+    struct sockaddr_in serv_addr;
+    char* msg = "Test";
+    
+    channel = socket(AF_INET, SOCK_STREAM, 0);
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+
+    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);
+    connect(channel, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+
+    send(channel, msg, strlen(msg), 0);
+
     for (const auto& calls : cg){
         const Callsite callsite = calls.first;
 
@@ -109,8 +122,7 @@ void print_cg() {
         for (const jmethodID mid : callees){
             char* callee;
             getMethodNameSig(mid, &callee);
-            printf("Call: %s:%d:%d⇒%s\n", caller, callsite.loc, lineNumber, callee);
-            fflush(stdout);
+            //TODO Send caller, callsite.loc, lineNumber, callee
             free(callee);
         }
 
@@ -119,35 +131,18 @@ void print_cg() {
             jvmti->Deallocate((unsigned char*) lineNumbers);
         }
     }
+
+    close(channel);
 }
 
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmti_env, JNIEnv* jni_env) {
-    print_cg();
+    return_cg();
 }
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
+    port = atoi(options);
+
     vm->GetEnv((void**)&jvmti, JVMTI_VERSION_1_0);
-
-    int server_socket, channel;
-    struct sockaddr_in address;
-    int opt = 1;
-    int addrlen = sizeof(address);
-    char* msg = "Test";
-
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
-
-    setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(atoi(options));
-
-    bind(server_socket, (struct sockaddr*)&address, sizeof(address));
-    listen(server_socket, 3);
-    channel = accept(server_socket, (struct sockaddr*)&address, (socklen_t*)&addrlen);
-    send(channel, msg, strlen(msg), 0);
-
-    close(channel);
-    shutdown(server_socket, SHUT_RDWR);
 
     jvmtiCapabilities capabilities = {0};
     capabilities.can_generate_method_entry_events = 1;
