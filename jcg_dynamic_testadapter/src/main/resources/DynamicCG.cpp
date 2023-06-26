@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cstring>
+#include <sstream>
 
 using namespace std;
 
@@ -82,6 +83,7 @@ void return_cg() {
     int channel;
     struct sockaddr_in serv_addr;
     char* msg = "Test";
+    char* final_msg = "End of Callgraph";
     
     channel = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -122,7 +124,23 @@ void return_cg() {
         for (const jmethodID mid : callees){
             char* callee;
             getMethodNameSig(mid, &callee);
-            //TODO Send caller, callsite.loc, lineNumber, callee
+            
+            // Send caller, callsite.loc, lineNumber, callee
+            stringstream ss_caller;
+            stringstream ss_callsite;
+            stringstream ss_lineNumber;
+            stringstream ss_callee;
+  	    
+  	    ss_caller << caller << "\n";
+  	    ss_callsite << callsite.loc<< "\n";
+  	    ss_lineNumber << lineNumber<< "\n";
+  	    ss_callee << callee<< "\n";
+	  	
+            send(channel, ss_caller.str().c_str(), ss_caller.str().length(), 0);
+            send(channel, ss_callsite.str().c_str(), ss_callsite.str().length(), 0);
+            send(channel, ss_lineNumber.str().c_str(), ss_lineNumber.str().length(), 0);
+            send(channel, ss_callee.str().c_str(), ss_callee.str().length(), 0);
+            
             free(callee);
         }
 
@@ -132,6 +150,7 @@ void return_cg() {
         }
     }
 
+    send(channel, final_msg, strlen(final_msg), 0);
     close(channel);
 }
 

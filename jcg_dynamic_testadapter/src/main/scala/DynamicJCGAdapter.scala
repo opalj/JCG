@@ -1,5 +1,8 @@
 import java.io.BufferedReader
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileWriter
+import java.io.Writer
 import java.io.InputStreamReader
 import java.net.ServerSocket
 import java.nio.file.Paths
@@ -10,13 +13,21 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.util.Using
 
-object DynamicJCGAdapter extends JCGTestAdapter {
+import org.opalj.br.MethodDescriptor
 
+object DynamicJCGAdapter extends JCGTestAdapter {
+    
     override def possibleAlgorithms(): Array[String] = Array("Dynamic")
 
     override def frameworkName(): String = "Dynamic"
-
+    
+    //TODO
     val port = 1337
+    
+    def main(args: Array[String]): Unit = {
+    	// for docker
+    	 serializeCG("", "/JCG/jcg_dynamic_testadapter/src/main/resources", /*"SimpleJava"*/ "", Array.empty[String], "/opt/jdk8u342-b07/jre/lib", true, "/home/JCG/jcg_dynamic_testadapter/src/main/scala/output/callgraph.json")
+    }
 
     override def serializeCG(
                        algorithm: String,
@@ -29,7 +40,9 @@ object DynamicJCGAdapter extends JCGTestAdapter {
                    ): Long = {
 
         val javaPath = Paths.get(JDKPath).getParent.toAbsolutePath + "/bin/java"
-        val agentPath = getClass.getClassLoader.getResource("DynamicCG.so").getPath
+        //TODO
+        //val agentPath = getClass.getClassLoader.getResource("DynamicCG.so").getPath
+        val agentPath = "/home/JCG/jcg_dynamic_testadapter/src/main/resources/DynamicCG.so"
         val agentArgs = Array(port.toString).mkString(",")
         val cp = target + File.pathSeparator +
             util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
@@ -43,7 +56,7 @@ object DynamicJCGAdapter extends JCGTestAdapter {
 
         val before = System.nanoTime
 
-        val after = Using.Manager { use =>
+        /*val after = Using.Manager { use =>
             val serverSocket = use(new ServerSocket(port))
 
             new ProcessBuilder(args.asJava).inheritIO().start()
@@ -56,8 +69,156 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             System.out.println(in.readLine())
 
             System.nanoTime()
-        }.getOrElse(before)
+        }.getOrElse(before)*/
+        
+        val tmp = Using.Manager { use =>
+            val serverSocket = use(new ServerSocket(port))
+
+            new ProcessBuilder(args.asJava).inheritIO().start()
+
+            val clientSocket = use(serverSocket.accept)
+            serverSocket.close()
+
+            val in = use(new BufferedReader(new InputStreamReader(clientSocket.getInputStream)))
+
+            val endMessage = "End of Callgraph"
+            var caller = in.readLine()
+
+            while(caller != endMessage){
+            	
+            	val parsedCaller = if(caller == "TopLevel"){
+			        None     	
+            	}
+            	
+            	else{
+            		Some(parseMethod(caller))
+            	}
+            	
+                println("caller: " + caller)
+
+            	val pc = in.readLine().toInt
+            	val lineNumber = in.readLine().toInt
+            	val callee = in.readLine()
+            	val pcLn = (pc, lineNumber)
+            	val parsedCallee = parseMethod(callee)
+            	
+           	    reachableMethods += parsedCallee
+
+                if (parsedCaller.isDefined) {
+                    if (!edges.contains(parsedCaller.get)) {
+                        edges += ((parsedCaller.get, mutable.Map[(Int, Int), mutable.Set[Method]]()))
+                    }
+
+                    val targets = edges(parsedCaller.get)
+
+                    if (!targets.contains(pcLn)) {
+                        targets += ((pcLn, mutable.Set[Method]()))
+                    }
+
+                    targets(pcLn) += parsedCallee
+                }
+
+                caller = in.readLine()	
+            }
+
+            System.nanoTime()
+        }
+        
+        if(tmp.isFailure){
+        	throw tmp.failed.get
+        }
+        
+        val out = new BufferedWriter(new FileWriter(outputFile))
+        var edgeCount = 0
+        println(reachableMethods.size)
+        out.write(s"""{"reachableMethods":[""")
+        var firstRM = true
+        for {
+            rm ← reachableMethods
+        } {
+            if (firstRM) {
+                firstRM = false
+            } else {
+                out.write(",")
+            }
+            out.write("{\"method\":")
+            writeMethodObject(rm, out)
+            out.write(",\"callSites\":[")
+            if (edges.contains(rm)) {
+                val callSites = edges(rm)
+                edgeCount += callSites.values.foldLeft(0)((v, s) ⇒ v + s.size)
+                writeCallSites(callSites, out)
+            }
+            out.write("]}")
+        }
+        println(edgeCount)
+        out.write("]}")
+        out.flush()
+        out.close()
+        
+        val after = tmp.getOrElse(before)
 
         after - before
     }
+    
+    def parseMethod(param: String): Method = {
+    	val calleeData = param.split(':')
+           val calleeNameDesc = calleeData(1).split("\\(")
+          val calleeDesc = MethodDescriptor("("+calleeNameDesc(1))
+          Method(calleeNameDesc(0), calleeData(0), calleeDesc.returnType.toJVMTypeName, calleeDesc.parameterTypes.map(_.toJVMTypeName).toList)
+    }
+    
+   
+    private def writeCallSites(
+        callSites: mutable.Map[(Int, Int), mutable.Set[Method]],
+        out:       Writer
+    ): Unit = {
+        var firstCS = true
+        for (callSite ← callSites) {
+            if (firstCS) {
+                firstCS = false
+            } else {
+                out.write(",")
+            }
+            writeCallSite(callSite._1, callSite._2, out)
+        }
+    }
+
+    private def writeCallSite(
+        pcLn:      (Int, Int),
+        targets: mutable.Set[Method],
+        out:     Writer
+    ): Unit = {
+        out.write("{\"declaredTarget\":")
+        writeMethodObject(Method("", "", "", List.empty), out)
+        out.write(",\"line\":")
+        out.write(pcLn._2.toString)
+        out.write(",\"pc\":")
+        out.write(pcLn._1.toString)
+        out.write(",\"targets\":[")
+        var first = true
+        for (tgt ← targets) {
+            if (first) first = false
+            else out.write(",")
+            writeMethodObject(tgt, out)
+        }
+        out.write("]}")
+    }
+
+    private def writeMethodObject(
+        method: Method,
+        out:    Writer
+    ): Unit = {
+        out.write("{\"name\":\"")
+        out.write(method.name)
+        out.write("\",\"declaringClass\":\"")
+        out.write(method.declaringClass)
+        out.write("\",\"returnType\":\"")
+        out.write(method.returnType)
+        out.write("\",\"parameterTypes\":[")
+        if (method.parameterTypes.length > 0)
+            out.write(method.parameterTypes.mkString("\"", "\",\"", "\""))
+        out.write("]}")
+    }
 }
+
