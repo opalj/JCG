@@ -26,7 +26,7 @@ object DynamicJCGAdapter extends JCGTestAdapter {
     
     def main(args: Array[String]): Unit = {
     	// for docker
-    	 serializeCG("", "/JCG/jcg_dynamic_testadapter/src/main/resources", /*"SimpleJava"*/ "", Array.empty[String], "/opt/jdk8u342-b07/jre/lib", true, "/home/JCG/jcg_dynamic_testadapter/src/main/scala/output/callgraph.json")
+    	 serializeCG("", "/JCG/jcg_dynamic_testadapter/src/main/resources", "SimpleJava", Array.empty[String], "/opt/jdk8u342-b07/jre/lib", true, "/home/JCG/jcg_dynamic_testadapter/src/main/scala/output/callgraph.json")
     }
 
     override def serializeCG(
@@ -44,8 +44,10 @@ object DynamicJCGAdapter extends JCGTestAdapter {
         //val agentPath = getClass.getClassLoader.getResource("DynamicCG.so").getPath
         val agentPath = "/home/JCG/jcg_dynamic_testadapter/src/main/resources/DynamicCG.so"
         val agentArgs = Array(port.toString).mkString(",")
-        val cp = target + File.pathSeparator +
-            util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
+        //val cp = target + File.pathSeparator +
+          //  util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
+        val cp = "/home/JCG/jcg_dynamic_testadapter/src/main/resources/"
+        
         val programArgs = Array.empty[String]
 
         val reachableMethods = mutable.Set[Method]()
@@ -94,7 +96,7 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             		Some(parseMethod(caller))
             	}
             	
-                println("caller: " + caller)
+                //println("caller: " + caller)
 
             	val pc = in.readLine().toInt
             	val lineNumber = in.readLine().toInt
