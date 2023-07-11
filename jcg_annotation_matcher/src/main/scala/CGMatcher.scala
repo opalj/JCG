@@ -3,85 +3,69 @@ import java.io.FileInputStream
 
 import org.opalj.br
 import org.opalj.br.Annotation
-import org.opalj.br.AnnotationValue
-import org.opalj.br.ArrayValue
-import org.opalj.br.ClassValue
-import org.opalj.br.ElementValuePair
-import org.opalj.br.IntValue
-import org.opalj.br.ObjectType
-import org.opalj.br.StringValue
-import org.opalj.br.Type
-import org.opalj.br.VoidType
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.SomeProject
 import org.opalj.log.GlobalLogContext
 import org.opalj.log.OPALLogger
 import play.api.libs.json.Json
 
+/**
+ * For a given project and a computed (serialized as json representation of [[ReachableMethods]])
+ * it computes an [[Assessment]] whether the computed call graph is Sound/Unsound or Imprecise.
+ *
+ * @author Florian Kuebler
+ */
 object CGMatcher {
 
-    val callSiteAnnotationType = ObjectType("lib/annotations/callgraph/DirectCall")
-    val callSitesAnnotationType = ObjectType("lib/annotations/callgraph/DirectCalls")
-    val indirectCallAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCall")
-    val indirectCallsAnnotationType = ObjectType("lib/annotations/callgraph/IndirectCalls")
-
+    /**
+     * Computes whether computed call graph (represented as a json file of [[ReachableMethods]])
+     * is sound/unsound/imprecise with regards to the annotations in the specified target project.
+     *
+     * @param parent in case any specified location is a relative path, the `parent` will be used
+     *               as root.
+     */
     def matchCallSites(
-        projectSpec:  ProjectSpecification,
-        jRELocations: Map[Int, Array[File]],
-        parent:       File,
-        jsonPath:     String,
-        verbose:      Boolean               = false
+        projectSpec:         ProjectSpecification,
+        JREPath:             String,
+        parent:              File,
+        serializedCallGraph: File,
+        verbose:             Boolean              = false
     ): Assessment = {
         if (!verbose)
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
+        val jreFiles = JRELocation.getAllJREJars(JREPath)
         implicit val p: SomeProject = Project(
-            Array(projectSpec.target(parent)) ++ projectSpec.allClassPathEntryFiles(parent) ++ jRELocations(projectSpec.java),
+            Array(projectSpec.target(parent)) ++ projectSpec.allClassPathEntryFiles(parent) ++ jreFiles,
             Array.empty[File]
         )
 
-        val json = Json.parse(new FileInputStream(new File(jsonPath)))
+        if(!serializedCallGraph.exists()){
+            return Error;
+        }
+
         val computedReachableMethods =
-            json.validate[ReachableMethods].getOrElse(throw new RuntimeException("unable to parse json")).toMap
+            Json.parse(new FileInputStream(serializedCallGraph)).validate[ReachableMethods].get.toMap
+
         for {
             clazz ← p.allProjectClassFiles
             method ← clazz.methodsWithBody
+            if AnnotationHelper.isAnnotatedMethod(method)
         } {
             // check if the call site might not be ambiguous
-            if (method.annotations.exists { a ⇒
-                a.annotationType == callSiteAnnotationType ||
-                    a.annotationType == callSitesAnnotationType ||
-                    a.annotationType == indirectCallAnnotationType ||
-                    a.annotationType == indirectCallsAnnotationType
-            }) {
-                val body = method.body.get
-                val invokations = body.instructions.zipWithIndex.filter { case (instr, pc) ⇒ instr != null && instr.isInvocationInstruction }
-                val lines = invokations.map {
-                    case (instr, pc) ⇒
-                        (body.lineNumber(pc), instr.asInvocationInstruction.name)
-                }.toSet
-                if (lines.size != invokations.length) {
-                    throw new RuntimeException(s"Multiple call sites with same name in the same line ${projectSpec.name}, ${method.name}")
-                }
-            }
+            AnnotationVerifier.verifyNoAmbiguousCalls(method)
 
             val annotatedMethod = convertMethod(method)
 
             for (annotation ← method.annotations) {
 
-                val callSiteAnnotations =
-                    if (annotation.annotationType == callSiteAnnotationType)
-                        Seq(annotation)
-                    else if (annotation.annotationType == callSitesAnnotationType)
-                        getAnnotations(annotation, "value")
-                    else
-                        Seq.empty
+                val directCallAnnotations = AnnotationHelper.directCallAnnotations(annotation)
 
-                val csAssessment = handleCallSiteAnnotations(
-                    computedReachableMethods.getOrElse(annotatedMethod, Set.empty), //todo is this correct for wala
+                val csAssessment = handleDirectCallAnnotations(
+                    computedReachableMethods.getOrElse(annotatedMethod, Set.empty),
                     annotatedMethod,
                     method,
-                    callSiteAnnotations,
+                    directCallAnnotations,
                     verbose
                 )
 
@@ -89,13 +73,7 @@ object CGMatcher {
                     return Unsound;
                 }
 
-                val indirectCallAnnotations =
-                    if (annotation.annotationType == indirectCallAnnotationType)
-                        Seq(annotation)
-                    else if (annotation.annotationType == indirectCallsAnnotationType)
-                        getAnnotations(annotation, "value")
-                    else
-                        Seq.empty
+                val indirectCallAnnotations = AnnotationHelper.indirectCallAnnotations(annotation)
 
                 val icsAssessment = handleIndirectCallAnnotations(
                     computedReachableMethods,
@@ -107,7 +85,7 @@ object CGMatcher {
                 val finalAssessment = csAssessment.combine(icsAssessment)
 
                 if (!finalAssessment.isSound)
-                    return finalAssessment
+                    return finalAssessment;
             }
 
         }
@@ -115,33 +93,24 @@ object CGMatcher {
         Sound
     }
 
-    private def verifyCallSite(annotatedLineNumber: Int, src: br.Method, tgtName: String): Unit = {
-        val body = src.body.get
-        val existsInstruction = body.instructions.zipWithIndex.exists {
-            case (null, _) ⇒ false
-            case (instr, pc) if instr.isInvocationInstruction ⇒
-                val lineNumber = body.lineNumber(pc)
-                // todo parameter types
-                lineNumber.isDefined && annotatedLineNumber == lineNumber.get && tgtName == instr.asInvocationInstruction.name
-            case _ ⇒ false
-        }
-        if (!existsInstruction)
-            throw new RuntimeException(s"There is no call to $tgtName in line $annotatedLineNumber")
-    }
-
-    private def handleCallSiteAnnotations(
-        computedCallSites:   Set[CallSite],
-        annotatedMethod:     Method,
-        method:              br.Method,
-        callSiteAnnotations: Seq[Annotation],
-        verbose:             Boolean
+    /**
+     * Checks whether the annotated direct calls are present in the computed call graph and
+     * whether the prohibit call targets are not present in the computed call graph.
+     */
+    private def handleDirectCallAnnotations(
+        computedCallSites:     Set[CallSite],
+        annotatedMethod:       Method,
+        method:                br.Method,
+        directCallAnnotations: Seq[Annotation],
+        verbose:               Boolean
     )(implicit p: SomeProject): Assessment = {
-        for (callSiteAnnotation ← callSiteAnnotations) {
-            val line = getLineNumber(callSiteAnnotation)
-            val name = getName(callSiteAnnotation)
-            val returnType = getType(callSiteAnnotation, "returnType")
-            val parameterTypes = getParameterList(callSiteAnnotation)
-            verifyCallSite(line, method, name)
+        var finalAssessment: Assessment = Sound
+        for (annotation ← directCallAnnotations) {
+            // here we identify call sites only by name and line number, not regarding types
+            AnnotationVerifier.verifyDirectCallAnnotation(annotation, method)
+
+            val line = AnnotationHelper.getLineNumber(annotation)
+            val name = AnnotationHelper.getName(annotation)
 
             computedCallSites.find { cs ⇒
                 cs.line == line && cs.declaredTarget.name == name
@@ -150,65 +119,80 @@ object CGMatcher {
 
                     val computedTargets = computedCallSite.targets.map(_.declaringClass)
 
-                    for (annotatedTgt ← getResolvedTargets(callSiteAnnotation)) {
+                    val resolvedTargets = AnnotationHelper.getResolvedTargets(annotation)
+                    AnnotationVerifier.verifyJVMTypes(resolvedTargets)
+                    for (annotatedTgt ← resolvedTargets) {
                         if (!computedTargets.contains(annotatedTgt)) {
-                            if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
+                            if (verbose)
+                                println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no call to $annotatedTgt#$name")
                             return Unsound;
                         } else {
                             if (verbose) println("found it")
                         }
                     }
 
-                    for (prohibitedTgt ← getProhibitedTargets(callSiteAnnotation)) {
+                    val prohibitedTargets = AnnotationHelper.getProhibitedTargets(annotation)
+                    AnnotationVerifier.verifyJVMTypes(prohibitedTargets)
+                    for (prohibitedTgt ← prohibitedTargets) {
                         if (computedTargets.contains(prohibitedTgt)) {
-                            if (verbose) println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
-                            return Imprecise;
+                            if (verbose)
+                                println(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is a call to prohibited target $prohibitedTgt#$name")
+                            finalAssessment = finalAssessment.combine(Imprecise)
                         } else {
                             if (verbose) println("no call to prohibited")
                         }
                     }
                 case _ ⇒
-                    //throw new RuntimeException(s"$line:${annotatedMethod.declaringClass}#${annotatedMethod.name}:\t there is no callsite to method $name")
-                    return Unsound
+                    // there is no matching call site in the computed call graph
+                    return Unsound;
             }
         }
 
-        Sound
+        finalAssessment
     }
 
-    private def verifyCallExistance(annotatedLineNumber: Int, method: br.Method): Unit = {
-        val body = method.body.get
-        val existsCall = body.instructions.zipWithIndex.exists {
-            case (instr, pc) ⇒
-                val lineNumber = body.lineNumber(pc)
-                instr != null && instr.isInvocationInstruction && lineNumber.isDefined && lineNumber.get == annotatedLineNumber
-        }
-        //        if (!existsCall)
-        //            System.err.println(s"There is no call in line $annotatedLineNumber")
-    }
-
+    /**
+     * Checks whether the annotated indirect calls are present in the computed call graph and
+     * whether the prohibit call targets are not present in the computed call graph.
+     */
     private def handleIndirectCallAnnotations(
         reachableMethods:        Map[Method, Set[CallSite]],
         source:                  br.Method,
         indirectCallAnnotations: Seq[Annotation],
         verbose:                 Boolean
     )(implicit p: SomeProject): Assessment = {
+        val annotatedSource = convertMethod(source)
+        var finalAssessment: Assessment = Sound
         for (annotation ← indirectCallAnnotations) {
-            val line = getLineNumber(annotation)
-            verifyCallExistance(line, source)
-            val name = getName(annotation)
-            val returnType = getReturnType(annotation).toJVMTypeName
-            val parameterTypes = getParameterList(annotation).map(_.toJVMTypeName)
-            for (declaringClass ← getResolvedTargets(annotation)) {
+            AnnotationVerifier.verifyCallExistence(annotation, source)
+
+            val name = AnnotationHelper.getName(annotation)
+            val returnType = AnnotationHelper.getReturnType(annotation).toJVMTypeName
+            val parameterTypes = AnnotationHelper.getParameterList(annotation).map(_.toJVMTypeName)
+
+            val resolvedTargets = AnnotationHelper.getResolvedTargets(annotation)
+            AnnotationVerifier.verifyJVMTypes(resolvedTargets)
+            for (declaringClass ← resolvedTargets) {
                 val annotatedTarget = Method(name, declaringClass, returnType, parameterTypes)
-                val annotatedSource = convertMethod(source)
                 if (!callsIndirectly(reachableMethods, annotatedSource, annotatedTarget, verbose))
                     return Unsound;
             }
+
+            val prohibitedTargets = AnnotationHelper.getProhibitedTargets(annotation)
+            AnnotationVerifier.verifyJVMTypes(prohibitedTargets)
+            for (prohibitedTgt ← prohibitedTargets) {
+                val annotatedTarget = Method(name, prohibitedTgt, returnType, parameterTypes)
+                if (callsIndirectly(reachableMethods, annotatedSource, annotatedTarget, verbose))
+                    finalAssessment = finalAssessment.combine(Imprecise)
+            }
         }
-        Sound
+
+        finalAssessment
     }
 
+    /**
+     * Is there a path in the call graph from the `source` to the `annotatedTarget`?
+     */
     private def callsIndirectly(
         reachableMethods: Map[Method, Set[CallSite]],
         source:           Method,
@@ -242,88 +226,16 @@ object CGMatcher {
         false
     }
 
-    def convertMethod(method: org.opalj.br.Method): Method = {
-        val name = method.name
-        val declaringClass = method.classFile.thisType.toJVMTypeName
-        val returnType = method.returnType.toJVMTypeName
-        val parameterTypes = method.parameterTypes.map(_.toJVMTypeName).toList
-
-        Method(name, declaringClass, returnType, parameterTypes)
-    }
-
     //
     // UTILITY FUNCTIONS
     //
-    def getAnnotations(callSites: Annotation, label: String): Seq[Annotation] = { //@DirectCalls -> @DirectCall[]
-        val avs = callSites.elementValuePairs collectFirst {
-            case ElementValuePair(`label`, ArrayValue(array)) ⇒ array
-        }
-        avs.getOrElse(IndexedSeq.empty).map { cs ⇒ cs.asInstanceOf[AnnotationValue].annotation }
-    }
 
-    def getName(callSite: Annotation): String = { //@DirectCall -> String
-        val sv = callSite.elementValuePairs collectFirst {
-            case ElementValuePair("name", StringValue(string)) ⇒ string
-        }
-        sv.get
-    }
+    private def convertMethod(method: org.opalj.br.Method): Method = {
+        val name = method.name
+        val declaringClass = method.classFile.thisType.toJVMTypeName
+        val returnType = method.returnType.toJVMTypeName
+        val parameterTypes = method.parameterTypes.toList.map(_.toJVMTypeName)
 
-    def getLineNumber(callSite: Annotation): Int = { //@DirectCall -> int
-        val iv = callSite.elementValuePairs collectFirst {
-            case ElementValuePair("line", IntValue(int)) ⇒ int
-        }
-        iv.getOrElse(-1)
-    }
-
-    def getType(annotation: Annotation, label: String): Type = { //@DirectCall -> Type
-        val cv = annotation.elementValuePairs collectFirst {
-            case ElementValuePair(`label`, ClassValue(declaringType)) ⇒ declaringType
-        }
-        cv.getOrElse(VoidType)
-    }
-
-    def getReturnType(annotation: Annotation): Type = { //@DirectCall -> Type
-        getType(annotation, "returnType")
-    }
-
-    def getParameterList(callSite: Annotation): List[Type] = { //@DirectCall -> Seq[FieldType]
-        val av = callSite.elementValuePairs collectFirst {
-            case ElementValuePair("parameterTypes", ArrayValue(ab)) ⇒
-                ab.toIndexedSeq.map(ev ⇒
-                    ev.asInstanceOf[ClassValue].value)
-        }
-        av.getOrElse(List()).toList
-    }
-
-    def getResolvedTargets(annotation: Annotation)(implicit p: SomeProject): List[String] = {
-        val av = annotation.elementValuePairs collectFirst {
-            case ElementValuePair("resolvedTargets", ArrayValue(ab)) ⇒
-                ab.toIndexedSeq.map(_.asInstanceOf[StringValue].value)
-        }
-        val callTargets = av.getOrElse(List()).toList
-        checkJVMTypeString(callTargets)
-        callTargets
-    }
-
-    def getProhibitedTargets(annotation: Annotation)(implicit p: SomeProject): List[String] = {
-        val av = annotation.elementValuePairs collectFirst {
-            case ElementValuePair("prohibitedTargets", ArrayValue(ab)) ⇒
-                ab.toIndexedSeq.map(_.asInstanceOf[StringValue].value)
-        }
-        val callTargets = av.getOrElse(List()).toList
-        checkJVMTypeString(callTargets)
-        callTargets
-    }
-
-    def checkJVMTypeString(callTargets: List[String])(implicit p: SomeProject): Unit = {
-        if (!callTargets.forall { ct ⇒
-            val re = "L([^;]*);".r
-            re findFirstMatchIn ct match {
-                case Some(m) ⇒ p.classHierarchy.isKnown(ObjectType(m.group(1)))
-                case None    ⇒ false
-            }
-        }) {
-            throw new RuntimeException("Call targets must be given in JVM notation and the type must exist")
-        }
+        Method(name, declaringClass, returnType, parameterTypes)
     }
 }

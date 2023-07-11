@@ -22,29 +22,38 @@ object SootJCGAdapter extends JCGTestAdapter {
     private val VTA = "VTA"
     private val Spark = "SPARK"
 
-    override def possibleAlgorithms(): Array[String] = Array( /*CHA,*/ RTA /*, VTA, Spark */ )
+    override def possibleAlgorithms(): Array[String] = Array(CHA, RTA, VTA, Spark)
 
     override def frameworkName(): String = "Soot"
 
     override def serializeCG(
-        algorithm:    String,
-        target:       String,
-        mainClass:    String,
-        classPath:    Array[String],
-        jreLocations: String,
-        jreVersion:   Int,
-        outputFile:   String
+        algorithm:  String,
+        target:     String,
+        mainClass:  String,
+        classPath:  Array[String],
+        JDKPath:    String,
+        analyzeJDK: Boolean,
+        outputFile: String
     ): Long = {
 
         val o = G.v().soot_options_Options()
         o.set_whole_program(true)
         o.set_keep_line_number(true)
         o.set_allow_phantom_refs(true)
-        o.set_include_all(true)
+        o.set_include_all(analyzeJDK)
 
-        o.set_process_dir(List(target).asJava)
-        val jreJars = JRELocation.mapping(new File(jreLocations))(jreVersion)
+        // todo no-bodies-for-excluded in case of !analyzeJDK
+
+        val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
+
+        if(analyzeJDK){
+            o.set_process_dir((List(target) ++ classPath ++ jreJars).asJava)
+        } else {
+            o.set_process_dir((List(target) ++ classPath).asJava)
+        }
+
         o.set_soot_classpath((classPath ++ jreJars).mkString(File.pathSeparator))
+
         o.set_output_format(Options.output_format_none)
 
         o.setPhaseOption("jb", "use-original-names:true")
@@ -62,17 +71,22 @@ object SootJCGAdapter extends JCGTestAdapter {
 
         if (algorithm.contains(CHA)) {
             o.setPhaseOption("cg.cha", "enabled:true")
+            o.setPhaseOption("cg.spark", "enabled:false")
         } else if (algorithm.contains(RTA)) {
             o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "vta:false")
             o.setPhaseOption("cg.spark", "rta:true")
-            o.setPhaseOption("cg.spark", "on-fly-cg:false")
+            o.setPhaseOption("cg.spark", "on-fly-cg:true")
             o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else if (algorithm.contains(VTA)) {
             o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "rta:false")
             o.setPhaseOption("cg.spark", "vta:true")
             o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else if (algorithm.contains(Spark)) {
             o.setPhaseOption("cg.spark", "enabled:true")
+            o.setPhaseOption("cg.spark", "rta:false")
+            o.setPhaseOption("cg.spark", "vta:false")
             o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else {
             throw new IllegalArgumentException(s"unknown algorithm $algorithm")
@@ -82,6 +96,12 @@ object SootJCGAdapter extends JCGTestAdapter {
         G.v.out = new PrintStream(out)
 
         val scene = Scene.v()
+        scene.releaseCallGraph()
+        scene.releaseReachableMethods()
+        scene.releasePointsToAnalysis()
+        scene.releaseActiveHierarchy()
+        scene.releaseFastHierarchy()
+
         val before = System.nanoTime
         scene.loadNecessaryClasses()
         // TODO SET ENTRYPOINTS?
@@ -90,8 +110,8 @@ object SootJCGAdapter extends JCGTestAdapter {
 
         val cg = scene.getCallGraph
 
-        val worklist = mutable.Queue(scene.getEntryPoints.asScala: _*)
-        val processed = mutable.Set(worklist: _*)
+        val worklist = mutable.Queue(scene.getEntryPoints.asScala.toSeq: _*)
+        val processed = mutable.Set(worklist.toSeq: _*)
 
         var reachableMethods = Set.empty[ReachableMethod]
 
@@ -131,7 +151,8 @@ object SootJCGAdapter extends JCGTestAdapter {
 
             val callSites = callSitesMap.map {
                 case ((declaredTgt, line), tgts) ⇒
-                    CallSite(createMethodObject(declaredTgt), line, tgts.map(createMethodObject))
+                    // todo: would be good to have the PC
+                    CallSite(createMethodObject(declaredTgt), line, None, tgts.map(createMethodObject))
             }.toSet
 
             val method = createMethodObject(currentMethod)

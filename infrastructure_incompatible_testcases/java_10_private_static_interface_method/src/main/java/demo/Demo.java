@@ -1,6 +1,6 @@
 package demo;
 
-import lib.annotations.callgraph.CallSite;
+import lib.annotations.callgraph.DirectCall;
 
 /**
  * This test case tests a new language feature from Java 9, namely private static interface methods.
@@ -9,7 +9,7 @@ import lib.annotations.callgraph.CallSite;
  */
 public class Demo {
 
-    @CallSite(name = "publicTarget", line = 14, resolvedTargets = "Ldemo/Interface;")
+    @DirectCall(name = "publicTarget", line = 14, resolvedTargets = "Ldemo/Interface;")
     public static void main(String[] args) {
         Interface.publicTarget();
     }
@@ -17,7 +17,7 @@ public class Demo {
 
 interface Interface {
 
-    @CallSite(name = "privateTarget", line = 22, resolvedTargets = "Ldemo/Interface;")
+    @DirectCall(name = "privateTarget", line = 22, resolvedTargets = "Ldemo/Interface;")
     static void publicTarget(){
         privateTarget();
     }

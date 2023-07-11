@@ -1,5 +1,8 @@
 import java.io.File
 import java.io.FileWriter
+import java.io.PrintWriter
+import java.net.URL
+import java.net.URLClassLoader
 import java.util
 import java.util.stream.Collectors
 
@@ -20,13 +23,13 @@ import scala.collection.mutable
 
 object WalaJCGAdapter extends JCGTestAdapter {
     override def serializeCG(
-        algorithm:    String,
-        target:       String,
-        mainClass:    String,
-        classPath:    Array[String],
-        jreLocations: String,
-        jreVersion:   Int,
-        outputFile:   String
+        algorithm:  String,
+        target:     String,
+        mainClass:  String,
+        classPath:  Array[String],
+        JDKPath:    String,
+        analyzeJDK: Boolean,
+        outputFile: String
     ): Long = {
         val before = System.nanoTime
         val cl = Thread.currentThread.getContextClassLoader
@@ -34,13 +37,34 @@ object WalaJCGAdapter extends JCGTestAdapter {
         var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
         cp = target + File.pathSeparator + cp
 
-        //TODO here the default JRE is added to the classpath -> somehow modify the wala.properties
+        // write wala.properties with the specified JDK and store it in the classpath
+        val tmp = new File("tmp")
+        tmp.mkdirs()
+        val walaPropertiesFile = new File(tmp, "wala.properties")
+        val pw = new PrintWriter(walaPropertiesFile)
+        pw.println(s"java_runtime_dir = $JDKPath")
+        pw.close()
 
-        val ex = new File(cl.getResource("exclusions.txt").getFile)
+        /*val sysloader = classOf[WalaProperties].getClassLoader.asInstanceOf[URLClassLoader]
+        val sysclass = classOf[URLClassLoader]
+        val m = sysclass.getDeclaredMethod("addURL", classOf[URL])
+        m.setAccessible(true)
+        m.invoke(sysloader, tmp.toURI.toURL)*/
+
+        val ex = if (analyzeJDK) {
+            new File(cl.getResource("no-exclusions.txt").getFile)
+        } else {
+            // TODO exclude more of the jdk
+            new File(cl.getResource("Java60RegressionExclusions.txt").getFile)
+        }
+
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
-        println(scope)
-        val classHierarchy = ClassHierarchyFactory.make(scope)
 
+        // we do not need the wala.properties anymore!
+        walaPropertiesFile.delete()
+        tmp.delete()
+
+        val classHierarchy = ClassHierarchyFactory.make(scope)
 
         val entrypoints =
             if (mainClass == null) {
@@ -68,13 +92,18 @@ object WalaJCGAdapter extends JCGTestAdapter {
             } else if (algorithm.contains("RTA")) {
                 val rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope)
                 rtaBuilder.makeCallGraph(options, new NullProgressMonitor)
+            } else if (algorithm.contains("CHA")) {
+                import com.ibm.wala.ipa.callgraph.cha.CHACallGraph
+                val CG = new CHACallGraph(classHierarchy)
+                CG.init(entrypoints)
+                CG
             } else throw new IllegalArgumentException
         val after = System.nanoTime
 
         val initialEntryPoints = cg.getFakeRootNode.iterateCallSites().asScala.map(_.getDeclaredTarget)
 
         val worklist = mutable.Queue(initialEntryPoints.toSeq: _*)
-        val processed = mutable.Set(worklist: _*)
+        val processed = mutable.Set(worklist.toSeq: _*)
 
         var reachableMethods = Set.empty[ReachableMethod]
         while (worklist.nonEmpty) {
@@ -103,7 +132,12 @@ object WalaJCGAdapter extends JCGTestAdapter {
                         case _: ArrayIndexOutOfBoundsException ⇒ -1
                     }
                     val tgts = tgtsWala.map(createMethodObject).toSet
-                    Some(CallSite(createMethodObject(declaredTarget), line, tgts))
+                    Some(CallSite(
+                        createMethodObject(declaredTarget),
+                        line,
+                        Some(cs.getProgramCounter),
+                        tgts
+                    ))
                 } else {
                     None
                 }
@@ -122,7 +156,7 @@ object WalaJCGAdapter extends JCGTestAdapter {
         after - before
     }
 
-    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
+    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
 
     override def frameworkName(): String = "WALA"
 
@@ -138,10 +172,22 @@ object WalaJCGAdapter extends JCGTestAdapter {
     }
 
     private def toJVMString(typeReference: TypeReference): String =
-        if (typeReference.isClassType ||
-            (typeReference.isArrayType && typeReference.getArrayElementType.isClassType)) {
+        if (typeReference.isClassType || isArrayOfClassType(typeReference)) {
             typeReference.getName.toString+";"
         } else {
             typeReference.getName.toString
         }
+
+    private def isArrayOfClassType(typeReference: TypeReference): Boolean = {
+        if (typeReference.isArrayType) {
+            val elementType = typeReference.getArrayElementType
+            if (elementType.isClassType) {
+                true
+            } else {
+                isArrayOfClassType(elementType)
+            }
+        } else {
+            false
+        }
+    }
 }

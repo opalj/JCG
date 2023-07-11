@@ -1,538 +1,625 @@
-#TrivialReflection
-The strings are directly available. No control- or data-flow analysis is required.
+# TrivialReflection
+This tests pertain to the Java's reflection API and comprise method call to
+```java.lang.Class.getDeclaredMethod```, ```java.lang.Class.getMethod```,
+```java.lang.Class.getField```, ```java.lang.reflect.Method.invoke```, and others. Cases that belong
+to this category are rather trivially resolvable as all API inputs are directly known and neither
+data-flow nor control-flow analyses are required. 
 
-##TR1
-[//]: # (MAIN: tr2.Foo)
-Test reflection with respect to static methods.
-
+## TR1
+[//]: # (MAIN: tr.Demo)
+Tests the reflective call resolution when an object of type ```java.lang.Class``` is used to find a
+declared method (```Class.getDeclaredMethod```) of this class. Afterwards, the found method is invoked.
+Since the target method ```Demo.target``` is static and has no arguments, neither a receiver nor a
+method argument is passed over the ```invoke``` method. 
 ```java
-// tr2/Foo.java
-package tr2;
+// tr/Demo.java
+package tr;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo {
-    static String staticToString() { return "Foo"; }
+
+class Demo {
+    static String target() { return "42"; }
 
     @IndirectCall(
-        name = "staticToString", returnType = String.class, line = 12,
-        resolvedTargets = "Ltr2/Foo;"
+        name = "target", returnType = String.class, line = 13,
+        resolvedTargets = "Ltr/Demo;"
     )
     public static void main(String[] args) throws Exception {
-        Foo.class.getDeclaredMethod("staticToString").invoke(null);
+        Demo.class.getDeclaredMethod("target").invoke(null);
     }
 }
 ```
 [//]: # (END)
 
-##TR2
-[//]: # (MAIN: tr3.Foo)
-Test reflection with respect to instance methods.
-
+## TR2
+[//]: # (MAIN: tr.Demo)
+Tests the reflective call resolution when an object of type ```java.lang.Class``` is used to find a
+declared method (```Class.getDeclaredMethod```) of this class. Afterwards, the found method is invoked.
+Since the target method ```Demo.target``` is an instance method, the receiver (```this```) is passed
+```invoke``` such that the method can be called on the actual receiver.
 ```java
-// tr3/Foo.java
-package tr3;
+// tr/Demo.java
+package tr;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo {
-    public String n() { return "Foo"; }
+
+class Demo {
+    public String target() { return "Demo"; }
 
     @IndirectCall(
-        name = "n", returnType = String.class, line = 12,
-        resolvedTargets = "Ltr3/Foo;"
+        name = "target", returnType = String.class, line = 13,
+        resolvedTargets = "Ltr/Demo;"
     )
-    void m() throws Exception {
-        Foo.class.getDeclaredMethod("n").invoke(this);
+    void caller() throws Exception {
+        Demo.class.getDeclaredMethod("target").invoke(this);
     }
 
-    public static void main(String[] args) throws Exception { new Foo().m(); }
+    public static void main(String[] args) throws Exception {
+        new Demo().caller();
+    }
 }
 ```
 [//]: # (END)
 
-##TR3
-[//]: # (MAIN: tr4.Foo)
-Test reflection with respect to instance methods retrieved via getMethod.
-
+## TR3
+[//]: # (MAIN: tr.Demo)
+Tests the reflective call resolution when an object of type ```java.lang.Class``` is used to find a
+method (```Class.getMethod```) of this class. Afterwards, the found method is invoked.
+Since the target method ```Demo.target``` is an instance method, the receiver (```this```) is passed
+```invoke``` such that the method can be called on the actual receiver.
 ```java
-// tr4/Foo.java
-package tr4;
+// tr/Demo.java
+package tr;
 
 import lib.annotations.callgraph.IndirectCall;
-public class Foo {
-    public String n() { return "Foo"; }
+
+public class Demo {
+    public String target() { return "Demo"; }
 
     @IndirectCall(
-        name = "n", returnType = String.class, line = 12,
-        resolvedTargets = "Ltr4/Foo;"
+        name = "target", returnType = String.class, line = 13,
+        resolvedTargets = "Ltr/Demo;"
     )
-    void m() throws Exception {
-        Foo.class.getMethod("n").invoke(this);
+    void caller() throws Exception {
+        Demo.class.getMethod("target").invoke(this);
     }
 
-    public static void main(String[] args) throws Exception { new Foo().m(); }
+    public static void main(String[] args) throws Exception { new Demo().caller(); }
 }
 ```
 [//]: # (END)
 
-##TR4
-[//]: # (MAIN: tr5.Foo)
-Test reflection with respect to methods having parameters.
-
+## TR4
+[//]: # (MAIN: tr.Demo)
+Tests the reflective call resolution when an object of type ```java.lang.Class``` is used to find a
+declared method (```Class.getDeclaredMethod```) of this class. Afterwards, the found method is invoked.
+Since the target method ```Demo.target``` is static and has one parameter, a ```null``` receiver as
+well as a ```String``` matching the method's parameters are passed over the ```invoke``` method. 
 ```java
-// tr5/Foo.java
-package tr5;
+// tr/Demo.java
+package tr;
 
 import lib.annotations.callgraph.IndirectCall;
-class Foo {
-    public static String m(String parameter) { return "Foo" + parameter; }
+
+class Demo {
+    public static String target(String parameter) { return "Value: " + parameter; }
 
     @IndirectCall(
-        name = "m", returnType = String.class, parameterTypes = String.class, line = 12,
-        resolvedTargets = "Ltr5/Foo;"
+        name = "target", returnType = String.class, parameterTypes = String.class, line = 13,
+        resolvedTargets = "Ltr/Demo;"
     )
     public static void main(String[] args) throws Exception {
-        Foo.class.getDeclaredMethod("m", String.class).invoke(null, "Bar");
+        Demo.class.getDeclaredMethod("target", String.class).invoke(null, "42");
     }
 }
 ```
 [//]: # (END)
 
-##TR5
-[//]: # (MAIN: tr6.Foo)
-Test reflection with respect to constructors.
-
+## TR5
+[//]: # (MAIN: tr.Demo)
+Tests the reflective invocation of a constructor by retrieving ```Demo```'s default constructor via
+calling ```newInstance``` on ```tr.Demo```'s class object. This call must be resolved to Demo's 
+```<init>``` method.
 ```java
-// tr6/Foo.java
-package tr6;
+// tr/Demo.java
+package tr;
 
 import lib.annotations.callgraph.DirectCall;
-class Foo {
+
+class Demo {
     public static void verifyCall(){ /* do something */ }
 
-    @DirectCall(name="verifyCall", line=8, resolvedTargets = "Ltr6/Foo;")
-    public Foo(String s) { Foo.verifyCall(); }
+    @DirectCall(name="verifyCall", line=9, resolvedTargets = "Ltr/Demo;")
+    public Demo() { Demo.verifyCall(); }
 
     public static void main(String[] args) throws Exception {
-        Foo.class.getConstructor(String.class).newInstance("ASD");
+        Demo.class.newInstance();
     }
 }
 ```
 [//]: # (END)
 
-
-##TR6
-[//]: # (MAIN: tr7.Foo)
-Test reflection with respect to the default constructor.
-
+## TR6
+[//]: # (MAIN: tr.Demo)
+Tests the reflective invocation of a constructor by retrieving ```Demo```'s constructor with a 
+String argument via ```java.lang.Class```'s ```getConstructor``` method and then calling ```newInstance```
+of the returned ```java.lang.reflect.Constructor``` object. This call must be resolved to Demo's 
+```<init>(String)``` method.
 ```java
-// tr7/Foo.java
-package tr7;
+// tr/Demo.java
+package tr;
 
 import lib.annotations.callgraph.DirectCall;
-class Foo {
+
+class Demo {
     public static void verifyCall(){ /* do something */ }
 
-    @DirectCall(name="verifyCall", line=8, resolvedTargets = "Ltr7/Foo;")
-    public Foo() { Foo.verifyCall(); }
+    @DirectCall(name="verifyCall", line=9, resolvedTargets = "Ltr/Demo;")
+    public Demo(String s) { Demo.verifyCall(); }
 
     public static void main(String[] args) throws Exception {
-        Foo.class.newInstance();
+        Demo.class.getConstructor(String.class).newInstance("42");
     }
 }
 ```
 [//]: # (END)
 
-##TR7
-[//]: # (MAIN: tr8.Foo)
-Test reflection used to retrieve a field.
-
+## TR7
+[//]: # (MAIN: tr.Demo)
+Tests a reflective method invocation that is performed on a class' private field that is retrieved via the
+reflection API. In ```tr.Demo```'s main method a new ```tr.Demo``` object is created and an object
+of type ```tr.CallTarget``` is assigned to its field. This field is then retrieved via the reflection
+using ```java.lang.Class.getDeclaredField(<fieldName>)``` and the field's name, namely ```"field"```.
+```java.lang.reflect.Field.get``` is then used to get the object stored within the field of the Demo
+instance that has been created previously. Afterwards, the returned instance is used to call
+the ```target``` method.
 ```java
-// tr8/Foo.java
-package tr8;
+// tr/Demo.java
+package tr;
 
 import java.lang.reflect.Field;
 import lib.annotations.callgraph.IndirectCall;
-public class Foo {
-    private Object field;
+
+public class Demo {
+    private Target field;
 
     @IndirectCall(
-        name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Ltr8/Foo;"
+        name = "target", line = 18, resolvedTargets = "Ltr/CallTarget;"
     )
     public static void main(String[] args) throws Exception {
-        Foo foo = new Foo();
-        foo.field = new Foo();
+        Demo demo = new Demo();
+        demo.field = new CallTarget();
 
-        Field field = Foo.class.getDeclaredField("field");
-        Object o = field.get(foo);
-        o.toString();
+        Field field = Demo.class.getDeclaredField("field");
+        Target target = (Target) field.get(demo);
+        target.target();
     }
+}
 
-    public String toString() {
-        return "Foo";
-    }
+interface Target {
+    void target();
+}
+
+class CallTarget implements Target {
+    public void target(){ /* do something */ }
+}
+
+class NeverInstantiated implements Target {
+    public void target(){ /* do something */ }
 }
 ```
 [//]: # (END)
 
-##TR8
-[//]: # (MAIN: tr9.Foo)
-Test reflection used to retrieve a field via getField.
+## TR8
+[//]: # (MAIN: tr.Demo)
+Tests a reflective method invocation that is performed on a class' public field that is retrieved via the
+reflection API. In ```tr.Demo```'s main method a new ```tr.Demo``` object is created and an object
+of type ```tr.CallTarget``` is assigned to its field. This field is then retrieved via the reflection
+using ```java.lang.Class.getField(<fieldName>)``` and the field's name, namely ```"field"```.
+```java.lang.reflect.Field.get``` is then used to get the object stored within the field of the Demo
+instance that has been created previously. Afterwards, the returned instance is used to call
+the ```target``` method.
 
 ```java
-// tr9/Foo.java
-package tr9;
+// tr/Demo.java
+package tr;
 
 import java.lang.reflect.Field;
 import lib.annotations.callgraph.IndirectCall;
-public class Foo {
-    public Object field;
+
+public class Demo {
+    public Target field;
 
     @IndirectCall(
-        name = "toString", returnType = String.class, line = 18,
-        resolvedTargets = "Ltr9/Foo;"
+        name = "target", line = 18, resolvedTargets = "Ltr/CallTarget;"
     )
     public static void main(String[] args) throws Exception {
-        Foo foo = new Foo();
-        foo.field = new Foo();
+        Demo demo = new Demo();
+        demo.field = new CallTarget();
 
-        Field field = Foo.class.getField("field");
-        Object o = field.get(foo);
-        o.toString();
+        Field field = Demo.class.getField("field");
+        Target t = (Target) field.get(demo);
+        t.target();
     }
+}
 
-    public String toString() {
-        return "Foo";
-    }
+interface Target {
+    void target();
+}
+
+class CallTarget implements Target {
+    public void target(){ /* do something */ }
+}
+
+class NeverInstantiated implements Target {
+    public void target(){ /* do something */ }
 }
 ```
 [//]: # (END)
 
-##TR9
-[//]: # (MAIN: tr10.Foo)
-Test reflection with respect to forName.
-
+## TR9
+[//]: # (MAIN: tr.Demo)
+This test cases concerns the reflection API as well as a class' static initializer. Within the main
+method of ```tr.Demo``` ```Class.forName``` is called trying to retrieve an object of
+```java.lang.Class``` which is parameterized over ```tr.InitializedClass```. This lookup can trigger
+the static initializer of ```tr.InitializedClass``` which must thus be contained in program's call graph.
 ```java
-// tr10/Foo.java
-package tr10;
+// tr/Demo.java
+package tr;
 
 import lib.annotations.callgraph.DirectCall;
-class Foo {
+
+class Demo {
     public static void verifyCall(){ /* do something */ }
 
     public static void main(String[] args) throws Exception {
-        Class.forName("tr10.Bar");
+        Class.forName("tr.InitializedClass");
     }
 }
 
-class Bar {
+class InitializedClass {
+    
     static {
         staticInitializerCalled();
     }
 
-    @DirectCall(name="verifyCall", line=19, resolvedTargets = "Ltr10/Foo;")
+    @DirectCall(name="verifyCall", line=21, resolvedTargets = "Ltr/Demo;")
     static private void staticInitializerCalled(){
-        Foo.verifyCall();
+        Demo.verifyCall();
     }
 }
 ```
 [//]: # (END)
 
-
-#LocallyResolvableReflection
+# LocallyResolvableReflection
 The complete information is locally (intra-procedurally) available.
-##LRR1
-[//]: # (MAIN: lrr1.Foo)
-Test reflection where the target class is dynamically decided.
-
+## LRR1
+[//]: # (MAIN: lrr.Demo)
+This test cases concerns the reflection API as well as a class' static initializer. Within the main
+method of ```lrr.Demo``` ```Class.forName``` is called trying to retrieve an object of
+```java.lang.Class``` which is either parameterized over ```lrr.Left``` or ```lrr.Right```. This
+lookup can trigger the static initializer of ```lrr.Left``` or ```lrr.Right``` which must thus be
+contained in program's call graph.
 ```java
-// lrr1/Foo.java
-package lrr1;
+// lrr/Demo.java
+package lrr;
 
 import lib.annotations.callgraph.DirectCall;
-class Foo {
+
+class Demo {
     public static void verifyCall(){ /* do something */ }
 
     public static void main(String[] args) throws Exception {
-        m(args.length % 2 == 0);
-    }
-
-    static void m(boolean b) throws Exception {
-        Class.forName(b ? "lrr1.Bar" : "lrr1.Baz");
+        String className = (args.length % 2 == 0) ? "lrr.Left" : "lrr.Right"; 
+        Class.forName(className);
     }
 }
 
-class Bar {
+class Left {
+    
     static {
         staticInitializerCalled();
     }
 
-    @DirectCall(name="verifyCall", line=23, resolvedTargets = "Llrr1/Foo;")
+    @DirectCall(name="verifyCall", line=22, resolvedTargets = "Llrr/Demo;")
     static private void staticInitializerCalled(){
-        Foo.verifyCall();
+        Demo.verifyCall();
     }
 }
 
 
-class Baz {
+class Right {
+    
     static {
         staticInitializerCalled();
     }
 
-    @DirectCall(name="verifyCall", line=35, resolvedTargets = "Llrr1/Foo;")
+    @DirectCall(name="verifyCall", line=35, resolvedTargets = "Llrr/Demo;")
     static private void staticInitializerCalled(){
-        Foo.verifyCall();
+        Demo.verifyCall();
     }
 }
 ```
 [//]: # (END)
 
-##LRR2
-[//]: # (MAIN: lrr2.Foo)
-Tests reflection where the target class is dynamically decided and the result of a StringBuilder.
-
+## LRR2
+[//]: # (MAIN: lrr.Demo)
+This test cases concerns the reflection API as well as a class' static initializer. Within the main
+method of ```lrr.Demo``` ```Class.forName``` is called trying to retrieve an object of
+```java.lang.Class``` which is either parameterized over ```lrr.IsEven``` or ```lrr.IsOdd``` where 
+both strings are constructed over a StringBuilder. This lookup can then trigger the static initializers
+of ```lrr.IsEven``` or ```lrr.IsOdd``` which must thus be contained in program's call graph.
 ```java
-// lrr2/Foo.java
-package lrr2;
+// lrr/Demo.java
+package lrr;
 
 import lib.annotations.callgraph.DirectCall;
-class Foo {
+
+class Demo {
     public static void verifyCall(){ /* do something */ }
 
-    static void m(boolean b) throws Exception {
-        StringBuilder className = new StringBuilder("lrr2.Ba");
-        if (b)
-            className.append("r");
+    public static void main(String[] args) throws Exception {
+        StringBuilder builder = new StringBuilder("lrr.Is");
+        if (args.length % 2 == 0)
+            builder.append("Even"); 
         else
-            className.append("z");
-        Class.forName(className.toString());
-    }
-
-    public static void main(String[] args) throws Exception {
-        m(args.length % 2 == 0);
+            builder.append("Odd");
+        String className = builder.toString();
+        Class.forName(className);
     }
 }
 
-class Bar {
+class IsEven {
+    
      static {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=28, resolvedTargets = "Llrr2/Foo;")
+     @DirectCall(name="verifyCall", line=27, resolvedTargets = "Llrr/Demo;")
      static private void staticInitializerCalled(){
-         Foo.verifyCall();
+         Demo.verifyCall();
      }
  }
 
 
- class Baz {
+ class IsOdd {
+
      static {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=40, resolvedTargets = "Llrr2/Foo;")
+     @DirectCall(name="verifyCall", line=40, resolvedTargets = "Llrr/Demo;")
      static private void staticInitializerCalled(){
-         Foo.verifyCall();
+         Demo.verifyCall();
      }
  }
 ```
 [//]: # (END)
 
-##LRR3
-[//]: # (MAIN: lrr3.Foo)
-Test reflection where the target class is dynamically decided from a locally set instance field.
-
+## LRR3
+[//]: # (MAIN: lrr.Demo)
+This test cases concerns the reflection API as well as a class' static initializer. Within the main
+method of ```lrr.Demo``` ```Class.forName``` is called trying to retrieve an object of
+```java.lang.Class``` which is parameterized over ```lrr.TargetClass```. The target String which is
+passed to the respective ```Class.forName``` call is first assigned to Demo's field and then the
+field's value is read and finally passed as parameter.
+This lookup can then trigger the static initializer of ```lrr.TargetClass``` which must thus be
+contained in program's call graph.
 ```java
-// lrr3/Foo.java
-package lrr3;
+// lrr/Demo.java
+package lrr;
 
 import lib.annotations.callgraph.DirectCall;
-class Foo {
+
+class Demo {
     private String className;
 
     public static void verifyCall(){ /* do something */ }
 
     public static void main(String[] args) throws Exception {
-        Foo foo = new Foo();
-        foo.className = "lrr3.Bar";
-        Class.forName(foo.className);
+        Demo demo = new Demo();
+        demo.className = "lrr.TargetClass";
+        Class.forName(demo.className);
     }
 }
 
-class Bar {
+class TargetClass {
+    
      static {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=23, resolvedTargets = "Llrr3/Foo;")
+     @DirectCall(name="verifyCall", line=25, resolvedTargets = "Llrr/Demo;")
      static private void staticInitializerCalled(){
-         Foo.verifyCall();
+         Demo.verifyCall();
      }
  }
 ```
 [//]: # (END)
 
-#ContextSensitiveReflection
+# ContextSensitiveReflection
 The concrete strings require information about the context.
 
-##CSR1
-[//]: # (MAIN: csr1.Foo)
-The class name is passed as an argument.
-
+## CSR1
+[//]: # (MAIN: csr.Demo)
+This test cases concerns the reflection API as well as a class' static initializer. Within the main
+method of ```csr.Demo``` a static method is called that receives the string constant
+which is transitively passed to ```Class.forName``` and then tries to retrieve an object of
+```java.lang.Class``` which is parameterized over ```csr.TargetClass```. To infer the parameter that
+flows into ```Class.forName``` inter-procedural string tracking is required. This lookup can trigger
+the static initializer of ```csr.TargetClass```.
 ```java
-// csr1/Foo.java
-package csr1;
+// csr/Demo.java
+package csr;
 
 import lib.annotations.callgraph.DirectCall;
-class Foo {
+class Demo {
     public static void verifyCall(){ /* do something */ }
 
-    static void m(String className) throws Exception {
+    static void callForName(String className) throws Exception {
         Class.forName(className);
     }
 
     public static void main(String[] args) throws Exception {
-        Foo.m("csr1.Bar");
+        Demo.callForName("csr.TargetClass");
     }
 }
 
-class Bar {
+class TargetClass {
+    
      static {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=23, resolvedTargets = "Lcsr1/Foo;")
+     @DirectCall(name="verifyCall", line=24, resolvedTargets = "Lcsr/Demo;")
      static private void staticInitializerCalled(){
-         Foo.verifyCall();
+         Demo.verifyCall();
      }
  }
 ```
 [//]: # (END)
 
-##CSR2
-[//]: # (MAIN: csr2.Foo)
-The class name is unknown.
-
+## CSR2
+[//]: # (MAIN: csr.Demo)
+This test cases concerns the reflection API as well as a class' static initializer. Within the main
+method of ```csr.Demo``` a static method is called that receives the string constant
+which is transitively passed to ```Class.forName``` and then tries to retrieve an object of
+```java.lang.Class``` which is parameterized over an __unknown__ type. In this test it is impossible
+to get any information about the retrieved typed and, therefore, all possible types must be considered
+for a sound method resolution.
 ```java
-// csr2/Foo.java
-package csr2;
+// csr/Demo.java
+package csr;
 
 import lib.annotations.callgraph.DirectCall;
-public class Foo {
+public class Demo {
     public static void verifyCall(){ /* do something */ }
 
-    static void m(String className) throws Exception {
+    static void callForName(String className) throws Exception {
         Class.forName(className);
     }
 
     public static void main(String[] args) throws Exception {
-        Foo.m(args[0]);
+        Demo.callForName(args[0]);
     }
 }
 
-class Bar {
+class TargetClass {
+    
      static {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=23, resolvedTargets = "Lcsr2/Foo;")
+     @DirectCall(name="verifyCall", line=24, resolvedTargets = "Lcsr/Demo;")
      static private void staticInitializerCalled(){
-         Foo.verifyCall();
+         Demo.verifyCall();
      }
  }
 ```
 [//]: # (END)
 
-##CSR3
-[//]: # (MAIN: csr3.Foo)
-Test reflection with respect to a public static field.
-
+## CSR3
+[//]: # (MAIN: csr.Demo)
+This test cases concerns the reflection API as well as a class' static initializer. Within the main
+method of ```csr.Demo``` a static method is called reads the value from a static field which is
+first written write before the method call to ```Demo.callForName``` and then passed to ```Class.forName```.
+```Class.forName``` then tries to retrieve an object of ```java.lang.Class``` which is parameterized
+over ```csr.CallTarget```. In this test it is impossible to get any information about the retrieved
+typed and, therefore, all possible types must be considered for a sound method resolution.
 ```java
-// csr3/Foo.java
-package csr3;
+// csr/Demo.java
+package csr;
 
 import lib.annotations.callgraph.DirectCall;
-class Foo {
+class Demo {
     public static String className;
 
     public static void verifyCall(){ /* do something */ }
 
-    static void m() throws Exception {
-        Class.forName(Foo.className);
+    static void callForName() throws Exception {
+        Class.forName(Demo.className);
     }
 
     public static void main(String[] args) throws Exception {
-        Foo.className = "csr3.Bar";
-        Foo.m();
+        Demo.className = "csr.CallTarget";
+        Demo.callForName();
     }
 }
 
-class Bar {
+class CallTarget {
+    
      static {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=22, resolvedTargets = "Lcsr3/Foo;")
+     @DirectCall(name="verifyCall", line=27, resolvedTargets = "Lcsr/Demo;")
      static private void staticInitializerCalled(){
-         Foo.verifyCall();
+         Demo.verifyCall();
      }
  }
 ```
 [//]: # (END)
 
-
-##CSR4
-[//]: # (MAIN: csr4.Foo)
-Test reflection with respect to System properties.
-
+## CSR4
+[//]: # (MAIN: csr.Demo)
+This test cases concerns the reflection API as well as a class' static initializer. Within the main
+method the methods ```java.lang.System.getProperties``` and ```java.lang.System.setProperties``` are
+used to add a ```className``` property with the value ```csr.TargetClass``` to the global system
+properties and thus make it globally available throughout the program. Afterwards,
+```csr.Demo.callForName``` is called that then uses ```java.lang.System.getProperty("className")```
+to access the stored string which is passed to the ```Class.forName``` call. Modelling system
+properties would help to resolve this case soundly and better precision.
 ```java
-// csr4/Foo.java
-package csr4;
+// csr/Demo.java
+package csr;
 
+import java.util.Properties;
 import lib.annotations.callgraph.DirectCall;
-class Foo {
-    public static String className;
+
+class Demo {
 
     public static void verifyCall(){ /* do something */ }
 
-    static void m() throws Exception {
+    static void callForName() throws Exception {
     	String className = System.getProperty("className");
         Class.forName(className);
     }
 
     public static void main(String[] args) throws Exception {
 		Properties props = System.getProperties();
-		props.put("className", "csr4.Bar");
+		props.put("className", "csr.TargetClass");
 		System.setProperties(props);
-        Foo.m();
+        Demo.callForName();
     }
 }
 
-class Bar {
+class TargetClass {
+    
      static {
          staticInitializerCalled();
      }
 
-     @DirectCall(name="verifyCall", line=22, resolvedTargets = "Lcsr4/Foo;")
+     @DirectCall(name="verifyCall", line=31, resolvedTargets = "Lcsr/Demo;")
      static private void staticInitializerCalled(){
-         Foo.verifyCall();
+         Demo.verifyCall();
      }
  }
 ```
 [//]: # (END)
 
-The following test cases
-Test cases w.r.t. to classloading using ```Class.forName(className:String)```.
+# ClassForNameExceptions
+Test cases w.r.t. to classloading using ```Class.forName(className:String)``` and its respective
+exceptions to test whether valid path might be ignored which leads to unsoundness.
 
-##CL1
-[//]: # (MAIN: cl.Demo)
+## CFNE1
+[//]: # (MAIN: cfne.Demo)
 This test case targets a common try catch pattern when classes are loaded. An existing class is loaded
 over ```Class.forName(...)```, instantiated and then casted to another class. Unfortunately, the class
 that is instantiated is __incompatible__ with the cast such that the operation results in a
 ```ClassCastException```.
 ```java
-// cl/Demo.java
-package cl;
+// cfne/Demo.java
+package cfne;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -540,10 +627,10 @@ public class Demo {
 
     public static void verifyCall(){ /* do something */ }
 
-    @DirectCall(name="verifyCall", line = 15, resolvedTargets = "Lcl/Demo;")
+    @DirectCall(name="verifyCall", line = 15, resolvedTargets = "Lcfne/Demo;")
 	public static void main(String[] args){
 	    try {
-	        Class cls = Class.forName("cl.DeceptiveClass");
+	        Class cls = Class.forName("cfne.DeceptiveClass");
 	        LoadedClass lCls = (LoadedClass) cls.newInstance();
 	    } catch(ClassCastException cce){
 	        verifyCall();
@@ -565,14 +652,14 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CL2
-[//]: # (MAIN: cl.Demo)
+## CFNE2
+[//]: # (MAIN: cfne.Demo)
 This test case targets a common try catch pattern when classes are loaded. An absent class is loaded
 over ```Class.forName(...)```. Since the class __can't be found__ the operation results in a ```ClassNotFoundException```
 which is handled in one of the catch blocks.
 ```java
-// cl/Demo.java
-package cl;
+// cfne/Demo.java
+package cfne;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -580,10 +667,10 @@ public class Demo {
 
     public static void verifyCall(){ /* do something */ }
 
-    @DirectCall(name="verifyCall", line = 18, resolvedTargets = "Lcl/Demo;")
+    @DirectCall(name="verifyCall", line = 18, resolvedTargets = "Lcfne/Demo;")
 	public static void main(String[] args){
 	    try {
-	        Class cls = Class.forName("cl.CatchMeIfYouCan");
+	        Class cls = Class.forName("cfne.CatchMeIfYouCan");
 	        // DEAD CODE
 	        LoadedClass lCls = (LoadedClass) cls.newInstance();
 	    } catch(ClassCastException cce){
@@ -602,13 +689,13 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CL3
-[//]: # (MAIN: cl.Demo)
+## CFNE3
+[//]: # (MAIN: cfne.Demo)
 This case targets a concerns not only loading of classes but also the execution of their
 static initializer. When a class is loaded, its static initializer must be called.
 ```java
-// cl/Demo.java
-package cl;
+// cfne/Demo.java
+package cfne;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -618,7 +705,7 @@ public class Demo {
 
 	public static void main(String[] args){
 	    try {
-	        Class cls = Class.forName("cl.LoadedClass");
+	        Class cls = Class.forName("cfne.LoadedClass");
 	        Object lCls = cls.newInstance();
 	    } catch(ClassCastException cce){
 	        // DEAD CODE
@@ -636,7 +723,7 @@ class LoadedClass {
         staticInitializerCalled();
     }
 
-    @DirectCall(name="verifyCall", line=31, resolvedTargets = "Lcl/Demo;")
+    @DirectCall(name="verifyCall", line=31, resolvedTargets = "Lcfne/Demo;")
     static private void staticInitializerCalled(){
         Demo.verifyCall();
     }
@@ -644,14 +731,14 @@ class LoadedClass {
 ```
 [//]: # (END)
 
-##CL4
-[//]: # (MAIN: cl.Demo)
+## CFNE4
+[//]: # (MAIN: cfne.Demo)
 This case targets a concerns not only loading of classes but also the execution of their
 static initializer. When a class is loaded, its static initializer must be called. Also the static
 initializers of potential super classes.
 ```java
-// cl/Demo.java
-package cl;
+// cfne/Demo.java
+package cfne;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -661,7 +748,7 @@ public class Demo {
 
 	public static void main(String[] args){
 	    try {
-	        Class cls = Class.forName("cl.LoadedClass");
+	        Class cls = Class.forName("cfne.LoadedClass");
 	        Object lCls = cls.newInstance();
 	    } catch(ClassCastException cce){
 	        // DEAD CODE
@@ -683,7 +770,7 @@ class RootClass {
         staticInitializerCalled();
     }
 
-    @DirectCall(name="verifyCall", line=35, resolvedTargets = "Lcl/Demo;")
+    @DirectCall(name="verifyCall", line=35, resolvedTargets = "Lcfne/Demo;")
     static private void staticInitializerCalled(){
         Demo.verifyCall();
     }

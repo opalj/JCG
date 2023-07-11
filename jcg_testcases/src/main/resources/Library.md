@@ -15,7 +15,7 @@ According to [1], all test cases in that category assume that all packages are c
  
 [1] Reif et al., Call Graph Construction for Java Libraries, FSE 2016.
 
-##LIB1
+## LIB1
 [//]: # (LIBRARY)
 Tests virtual call resolution in the context of libraries where the calling context is unknown. 
 The circumstances of the virtual call are as follows:
@@ -76,7 +76,7 @@ public class SomeType {
 ```
 [//]: # (END)
 
-##LIB2
+## LIB2
 [//]: # (LIBRARY)
 Tests virtual call resolution in the context of libraries where the calling context is unknown. 
 The circumstances of the virtual call are as follows:
@@ -140,7 +140,7 @@ public class SomeType {
 ```
 [//]: # (END)
 
-##LIB3
+## LIB3
 [//]: # (LIBRARY)
 Tests library interface invocation for CBS edges under the following circumstances:
 1) a ```public class PotentialSuperclass``` that can be inherited,
@@ -195,7 +195,7 @@ public interface Interface {
 ```
 [//]: # (END)
 
-##LIB4
+## LIB4
 [//]: # (LIBRARY)
 Tests library interface invocation for CBS edges under the following circumstances:
 1) a ```package visible class PotentialSuperclass``` in package ```lib4.collude``` that can be
@@ -252,7 +252,7 @@ class InternalClass {
 ```
 [//]: # (END)
 
-##LIB5
+## LIB5
 [//]: # (LIBRARY)
 Tests library interface invocation for CBS edges under the following circumstances:
 1) a ```public class PotentialSuperclass``` in package ```lib5.internal``` that can be

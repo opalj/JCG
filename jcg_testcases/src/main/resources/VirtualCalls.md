@@ -1,36 +1,33 @@
-#VirtualCalls
+# VirtualCalls
 Tests related to the resolution of standard virtual methods. 
-
-##BPC1
-[//]: # (MAIN: bpc1.Class)
+## VC1
+[//]: # (MAIN: vc.Class)
 Tests a virtually dispatched method call which is in fact monomorphic.
-
 ```java
-// bpc1/Class.java
-package bpc1;
+// vc/Class.java
+package vc;
 
 import lib.annotations.callgraph.DirectCall;
 
 class Class {
 
-    public void method(){ }
+    public void target(){ }
 
-    @DirectCall(name = "method", line = 12, resolvedTargets = "Lbpc1/Class;")
+    @DirectCall(name = "target", line = 12, resolvedTargets = "Lvc/Class;")
     public static void main(String[] args){
         Class cls = new Class();
-        cls.method();
+        cls.target();
     }
 }
 ```
 [//]: # (END)
 
-##BPC2
-[//]: # (MAIN: bpc.Class)
+## VC2
+[//]: # (MAIN: vc.Class)
 Tests a virtually dispatched method call when a simple type hierarchy is present.
-
 ```java
-// bpc/Class.java
-package bpc;
+// vc/Class.java
+package vc;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -38,7 +35,7 @@ class Class {
 
     public void method(){ }
 
-    @DirectCall(name = "method", line = 11, resolvedTargets = "Lbpc/SubClass;")
+    @DirectCall(name = "method", line = 11, resolvedTargets = "Lvc/SubClass;")
     public static void callMethod(Class cls) {
         cls.method();
     }
@@ -55,13 +52,12 @@ class SubClass extends Class {
 ```
 [//]: # (END)
 
-##BPC3
-[//]: # (MAIN: bpc3.Class)
+## VC3
+[//]: # (MAIN: vc.Class)
 Tests a virtually dispatched method call when the receiver is an interface type.
-
 ```java
-// bpc3/Class.java
-package bpc3;
+// vc/Class.java
+package vc;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -73,7 +69,7 @@ class Class {
 
     public void method(){ }
 
-    @DirectCall(name = "method", line = 15, resolvedTargets = {"Lbpc3/ClassImpl;"}, prohibitedTargets ={"Lbpc3/Class;"})
+    @DirectCall(name = "method", line = 15, resolvedTargets = {"Lvc/ClassImpl;"}, prohibitedTargets ={"Lvc/Class;"})
     public static void callOnInterface(Interface i){
         i.method();
     }
@@ -89,13 +85,12 @@ class ClassImpl implements Interface {
 ```
 [//]: # (END)
 
-##BPC4
-[//]: # (MAIN: bpc4.Class)
+## VC4
+[//]: # (MAIN: vc.Class)
 Tests a virtually dispatched method call when the receiver is loaded from an array.
-
 ```java
-// bpc4/Class.java
-package bpc4;
+// vc/Class.java
+package vc;
 
 import lib.annotations.callgraph.DirectCall;
 
@@ -109,7 +104,7 @@ class Class implements Interface {
 
     public void method(){ }
 
-    @DirectCall(name = "method", line = 18, resolvedTargets = "Lbpc4/Class;")
+    @DirectCall(name = "method", line = 18, resolvedTargets = "Lvc/Class;")
     public static void main(String[] args){
         Interface i = types[0];
         i.method();

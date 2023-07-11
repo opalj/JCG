@@ -19,7 +19,7 @@ public class Demo {
 
     static {
         try {
-            CLv1 = new URL("file://" + DIR + "classloading_v1.jar");
+            CLv1 = new URL("file://" + DIR + "classloading-version-1.jar");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -27,11 +27,12 @@ public class Demo {
 
     private static final String CLS_NAME = "lib.IntComparator";
 
-
-    @IndirectCall(name = "compare", line = 38, resolvedTargets = "Llib/IntComparator;")
+    @IndirectCall(name = "compareTo", returnType = int.class, line = 39, resolvedTargets = "Ljava/lang/Integer;")
     public static void main(String[] args)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        URLClassLoader cl = URLClassLoader.newInstance(new URL[]{CLv1}, ClassLoader.getSystemClassLoader());
+        ClassLoader parent = ClassLoader.getSystemClassLoader();
+        URL[] urls = new URL[] { CLv1 };
+        URLClassLoader cl = URLClassLoader.newInstance(urls, parent);
         Class<?> cls = cl.loadClass(CLS_NAME);
         Comparator<Integer> comparator = (Comparator<Integer>) cls.newInstance();
         Integer one = Integer.valueOf(1);

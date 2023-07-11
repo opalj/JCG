@@ -1,13 +1,17 @@
-#Java8Invokedynamics
-Tests related to the invokedynamic instructions created by Java8 method references and lambda expressions. Please note, that the Scala compiler hijacks Java's infrastructure and analyses which support Java8's invokedynamics (i.e., those using `(Alt)LambdaMetaFactory`) will also support Scala to a reasonable amount.
+# Java8Invokedynamics
+Tests related to the invokedynamic instructions created by Java 8 method references and lambda expressions.
+Please note, that the Scala compiler hijacks Java's infrastructure and analyses which support 
+Java8's invokedynamics, i.e., those using `(Alt)LambdaMetaFactory`) will also support Scala to a
+reasonable amount.
 
-##MR1
-[//]: # (MAIN: mr1.Class)
-Tests method reference that deals with interface default methods (Java 8 or higher).
+## MR1
+[//]: # (MAIN: id.Class)
+Tests method reference that deals with interface default methods (Java 8 or higher) which leads to
+invokedynamics that use *INVOKEINTERFACE* methods handles.
 
 ```java
-// mr1/Class.java
-package mr1;
+// id/Class.java
+package id;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -19,7 +23,7 @@ class Class implements Interface {
 
     @IndirectCall(
            name = "method", returnType = boolean.class, line = 18,
-           resolvedTargets = "Lmr1/Interface;"
+           resolvedTargets = "Lid/Interface;"
     )
     public static void main(String[] args){
         Class cls = new Class();
@@ -36,23 +40,24 @@ interface Interface {
 ```
 [//]: # (END)
 
-##MR2
-[//]: # (MAIN: mr2.Class)
-Tests method reference that result in an *INVOKESPECIAL* call issued by calling a private method.
+## MR2
+[//]: # (MAIN: id.Class)
+Tests a method reference that results in an invokedynamic that uses an *INVOKESPECIAL* method handle which
+is issued by calling a private method.
 
 ```java
-// mr2/Class.java
-package mr2;
+// id/Class.java
+package id;
 
 import lib.annotations.callgraph.IndirectCall;
 
 class Class {
 
-    private String getTypeName() { return "Lmr2/Class;";}
+    private String getTypeName() { return "Lid/Class;";}
 
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 14,
-       resolvedTargets = "Lmr2/Class;")
+       resolvedTargets = "Lid/Class;")
     public void callViaMethodReference(){
         java.util.function.Supplier<String> stringSupplier = this::getTypeName;
         stringSupplier.get();
@@ -66,14 +71,15 @@ class Class {
 ```
 [//]: # (END)
 
-##MR3
-[//]: # (MAIN: mr3.Class)
-Tests method reference that result in an *INVOKESPECIAL* call issued by calling a protected method
-from a super class.
+## MR3
+[//]: # (MAIN: id.Class)
+Tests a method reference that results in an invokedynamic that uses an *INVOKESPECIAL* method handle which
+is issued by calling a protected method from a super class that is resolved to a syntatic bridge
+method compiled in ```id.Class```.
 
 ```java
-// mr3/Class.java
-package mr3;
+// id/Class.java
+package id;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -81,7 +87,7 @@ class Class extends SuperClass {
 
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 12,
-       resolvedTargets = "Lmr3/SuperClass;")
+       resolvedTargets = "Lid/SuperClass;")
     public void callViaMethodReference(){
         java.util.function.Supplier<String> stringSupplier = super::getTypeName;
         stringSupplier.get();
@@ -94,19 +100,19 @@ class Class extends SuperClass {
 }
 
 class SuperClass{
-    protected String getTypeName() { return "Lmr3/SuperClass;";}
+    protected String getTypeName() { return "Lid/SuperClass;";}
 }
 ```
 [//]: # (END)
 
-##MR4
-[//]: # (MAIN: mr.Class)
-Tests method reference that result in an *INVOKESPECIAL* call issued by calling a static method
-from a super class.
+## MR4
+[//]: # (MAIN: id.Class)
+Tests a method reference that results in an *INOVKESTATIC* method handle where the target method doesn't
+have any formal arguments. The call is issued by calling a static method from a super class.
 
 ```java
-// mr/Class.java
-package mr;
+// id/Class.java
+package id;
 
 import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
@@ -115,25 +121,25 @@ class Class {
 
     @IndirectCall(
        name = "getTypeName", returnType = String.class, line = 13,
-       resolvedTargets = "Lmr/Class;")
+       resolvedTargets = "Lid/Class;")
     public static void main(String[] args){
         Supplier<String> stringSupplier = Class::getTypeName;
         stringSupplier.get();
     }
 
-    static String getTypeName() { return "Lmr/Class"; }
+    static String getTypeName() { return "Lid/Class"; }
 }
 ```
 [//]: # (END)
 
-##MR5
-[//]: # (MAIN: mr.Class)
-Tests method reference dealing with primitive type parameters.
-from a super class.
+## MR5
+[//]: # (MAIN: id.Class)
+Tests a method reference that results in an *INOVKESTATIC* method handle where the target method has
+primitive formal arguments. The call is issued by a call on a functional interface.
 
 ```java
-// mr/Class.java
-package mr;
+// id/Class.java
+package id;
 
 import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
@@ -148,7 +154,7 @@ class Class {
 
     @IndirectCall(
        name = "sum", returnType = double.class, parameterTypes = {double.class, double.class}, line = 19,
-       resolvedTargets = "Lmr/Class;")
+       resolvedTargets = "Lid/Class;")
     public static void main(String[] args){
         FIDoubleDouble fidd = Class::sum;
         fidd.apply(1d,2d);
@@ -157,13 +163,15 @@ class Class {
 ```
 [//]: # (END)
 
-##MR6
-[//]: # (MAIN: mr.Class)
-Tests method reference that result in a constructor call.
+## MR6
+[//]: # (MAIN: id.Class)
+Tests a method reference that results in an invokedynamic that uses an *NEWINVOKESPECIAL* method handle
+which is given by the method reference of ```id.Class::new```. Calling this method references
+results in a constructor call to ```id.Class```.
 
 ```java
-// mr/Class.java
-package mr;
+// id/Class.java
+package id;
 
 import java.util.function.Supplier;
 import lib.annotations.callgraph.IndirectCall;
@@ -173,7 +181,7 @@ class Class {
     public Class(){}
 
     @IndirectCall(
-       name = "<init>", line = 14, resolvedTargets = "Lmr/Class;")
+       name = "<init>", line = 14, resolvedTargets = "Lid/Class;")
     public static void main(String[] args){
         Supplier<Class> classSupplier = Class::new;
         classSupplier.get();
@@ -182,13 +190,15 @@ class Class {
 ```
 [//]: # (END)
 
-##MR7
-[//]: # (MAIN: mr.Class)
-Tests method reference that result in a method invocation where the method is defined in a super class.
+## MR7
+[//]: # (MAIN: id.Class)
+Tests a method reference that results in an invokedynamic that uses an *INVOKEVIRTUAL* method handle
+which is given by the method reference of ```cls::version``` where the actually called method is
+implentend with ```id.Class```'s superclass ```id.SuperClass```.
 
 ```java
-// mr/Class.java
-package mr;
+// id/Class.java
+package id;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -196,7 +206,7 @@ class Class extends SuperClass{
 
     @IndirectCall(
        name = "version", returnType = String.class, line = 13,
-       resolvedTargets = "Lmr/SuperClass;")
+       resolvedTargets = "Lid/SuperClass;")
     public static void main(String[] args){
         Class cls = new Class();
         java.util.function.Supplier<String> classSupplier = cls::version;
@@ -210,23 +220,23 @@ class SuperClass {
 ```
 [//]: # (END)
 
-#Lambdas
+# Lambdas
 Test cases in the presence of lambdas.
 
-##Lambda1
-[//]: # (MAIN: lambda.Class)
-Tests the invocation of a lambda with a integer boxing.
-
+## Lambda1
+[//]: # (MAIN: id.Class)
+Tests the invocation of a lamdba that results in an invokedynamic with an *INVOKESTATIC* method handle
+which points to an synthetic method. Please not that all primitive integers are autoboxed to
+```java.lang.Integer``` which then fits the lambdas (cf. ```isEven```) type.
 ```java
-// lambda/Class.java
-package lambda;
+// id/Class.java
+package id;
 
 import lib.annotations.callgraph.IndirectCall;
 import java.util.function.Function;
 
 class Class {
-    @IndirectCall(
-       name = "doSomething", line = 11, resolvedTargets = "Llambda/Class;")
+    @IndirectCall(name = "doSomething", line = 13, resolvedTargets = "Lid/Class;")
     public static void main(String[] args){
         Function<Integer, Boolean> isEven = (Integer a) -> {
             doSomething();
@@ -242,13 +252,16 @@ class Class {
 ```
 [//]: # (END)
 
-##Lambda2
-[//]: # (MAIN: lambda.Class)
-Tests the invocation on an object receiver captured in a lambda.
+## Lambda2
+[//]: # (MAIN: id.Class)
+Tests an invokedynamic invocation where the object receiver is captured in a lambda function.
+Declaring a lambda function in another class (cf. ```id.LambdaProvider```) as it is invoked
+(cf. ```id.Class```) leads to an *INVOKESTATIC* method handle where the receiver is not declared
+within the same class.
 
 ```java
-// lambda/Class.java
-package lambda;
+// id/Class.java
+package id;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -256,10 +269,9 @@ class Class {
 
     public static void doSomething(){ }
 
-    @IndirectCall(name = "doSomething", line = 17, resolvedTargets = "Llambda/LambdaProvider;")
+    @IndirectCall(name = "doSomething", line = 12, resolvedTargets = "Lid/LambdaProvider;")
     public static void main(String[] args) {
         Runnable lambda = LambdaProvider.getRunnable();
-
         lambda.run();
     }
 }
@@ -270,14 +282,14 @@ class LambdaProvider {
         /* do something */
     }
 
-    public static lambda.Runnable getRunnable(){
+    public static id.Runnable getRunnable(){
         return () -> LambdaProvider.doSomething();
     }
 }
 ```
 ```java
-// lambda/Runnable.java
-package lambda;
+// id/Runnable.java
+package id;
 
 @FunctionalInterface interface Runnable {
     void run();
@@ -285,13 +297,15 @@ package lambda;
 ```
 [//]: # (END)
 
-##Lambda3
-[//]: # (MAIN: lambda.Class)
-Tests the invocation of a lambda when it was written to an array and later retrieved and applied.
+## Lambda3
+[//]: # (MAIN: id.Class)
+Tests the invocation of a lambda that was first written to and then retrieved from an array. This 
+case results in an invokedynamic with an *INVOKESTATIC* method handle where the receiver argument
+is read by *AASTORE* instruction form an array before the method invocation takes place.
 
 ```java
-// lambda/Class.java
-package lambda;
+// id/Class.java
+package id;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -307,12 +321,11 @@ class Class {
 
     public static Runnable[] lambdaArray = new Runnable[10];
 
-    @IndirectCall(name = "doSomething", line = 25, resolvedTargets = "Llambda/Class;")
+    @IndirectCall(name = "doSomething", line = 22, resolvedTargets = "Lid/Class;")
     public static void main(String[] args) {
         Runnable r1 = () -> doSomething();
         lambdaArray[0] = r1;
         Runnable same = lambdaArray[0];
-
         same.run();
     }
 }
@@ -325,13 +338,15 @@ final class Math {
 ```
 [//]: # (END)
 
-##Lambda4
-[//]: # (MAIN: lambda.Class)
-Tests the invocation of an intersection type lambda.
+## Lambda4
+[//]: # (MAIN: id.Class)
+Tests the invocation of an intersection type lambda. This is special because the JVM does then use
+the ```AltLambdaMetaFactory``` instead of the ```LambdaMetaFactory``` which is used for all the
+previously defined cases. 
 
 ```java
-// lambda/Class.java
-package lambda;
+// id/Class.java
+package id;
 
 import lib.annotations.callgraph.IndirectCall;
 
@@ -348,7 +363,7 @@ class Class {
         /* do something */
     }
 
-    @IndirectCall(name = "doSomething", line = 21, resolvedTargets = "Llambda/Class;")
+    @IndirectCall(name = "doSomething", line = 21, resolvedTargets = "Lid/Class;")
     public static void main(String[] args) {
         Runnable run = (Runnable & MyMarkerInterface1 & MyMarkerInterface2) () -> doSomething();
         run.run();

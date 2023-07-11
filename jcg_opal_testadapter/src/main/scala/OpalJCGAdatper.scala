@@ -1,50 +1,65 @@
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.io.Writer
 import java.net.URL
+
+import scala.collection.JavaConverters._
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import org.opalj.br.DeclaredMethod
-import org.opalj.br.Code
-import org.opalj.br.analyses.Project
-import org.opalj.br.analyses.DeclaredMethodsKey
-import org.opalj.br.analyses.Project.JavaClassFileReader
-import org.opalj.br.instructions.MethodInvocationInstruction
-import org.opalj.fpcf.PropertyStoreKey
-import org.opalj.fpcf.FPCFAnalysesManagerKey
-import org.opalj.fpcf.FinalEP
-import org.opalj.fpcf.analyses.cg.EagerRTACallGraphAnalysisScheduler
-import org.opalj.fpcf.analyses.cg.EagerSerializationRelatedCallsAnalysis
-import org.opalj.fpcf.analyses.cg.EagerThreadRelatedCallsAnalysis
-import org.opalj.fpcf.analyses.cg.EagerLoadedClassesAnalysis
-import org.opalj.fpcf.analyses.cg.EagerFinalizerAnalysisScheduler
-import org.opalj.fpcf.analyses.cg.LazyCalleesAnalysis
-import org.opalj.fpcf.analyses.cg.EagerReflectionRelatedCallsAnalysis
-import org.opalj.fpcf.properties.ThreadRelatedCallees
-import org.opalj.fpcf.properties.StandardInvokeCallees
-import org.opalj.fpcf.properties.Callees
-import org.opalj.fpcf.properties.SerializationRelatedCallees
-import org.opalj.fpcf.properties.NoCallees
-import org.opalj.fpcf.properties.NoCalleesDueToNotReachableMethod
-import org.opalj.fpcf.properties.ReflectionRelatedCallees
-import play.api.libs.json.Json
-import scala.collection.JavaConverters._
+import net.ceedubs.ficus.Ficus.toFicusConfig
+import net.ceedubs.ficus.readers.ArbitraryTypeReader.arbitraryTypeValueReader
 
+import org.opalj.fpcf.FinalEP
+import org.opalj.fpcf.PropertyStore
+import org.opalj.br.DeclaredMethod
+import org.opalj.br.analyses.DeclaredMethods
+import org.opalj.br.analyses.DeclaredMethodsKey
+import org.opalj.br.analyses.Project
+import org.opalj.br.analyses.Project.JavaClassFileReader
+import org.opalj.br.fpcf.PropertyStoreKey
+import org.opalj.br.instructions.MethodInvocationInstruction
+import org.opalj.br.ObjectType
+import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
+import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
+import org.opalj.tac.cg.AllocationSiteBasedPointsToCallGraphKey
+import org.opalj.tac.cg.CFA_1_0_CallGraphKey
+import org.opalj.tac.cg.CFA_1_1_CallGraphKey
+import org.opalj.tac.cg.CHACallGraphKey
+import org.opalj.tac.cg.CTACallGraphKey
+import org.opalj.tac.cg.FTACallGraphKey
+import org.opalj.tac.cg.MTACallGraphKey
+import org.opalj.tac.cg.RTACallGraphKey
+import org.opalj.tac.cg.TypeBasedPointsToCallGraphKey
+import org.opalj.tac.cg.TypeIteratorKey
+import org.opalj.tac.cg.XTACallGraphKey
+import org.opalj.tac.fpcf.analyses.cg.TypeIterator
+import org.opalj.tac.fpcf.properties.cg.Callees
+import org.opalj.tac.fpcf.properties.cg.NoCallees
+import org.opalj.tac.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
+
+/**
+ * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
+ *
+ * @author Dominik Helm
+ * @author Florian Kuebler
+ */
 object OpalJCGAdatper extends JCGTestAdapter {
 
-    def possibleAlgorithms(): Array[String] = Array[String]("RTA")
+    def possibleAlgorithms(): Array[String] = Array[String]("CHA", "RTA", "MTA", "CTA", "FTA", "XTA", "0-CFA", "0-1-CFA", "1-0-CFA", "1-1-CFA")
 
     def frameworkName(): String = "OPAL"
 
     def serializeCG(
-        algorithm:    String,
-        target:       String,
-        mainClass:    String,
-        classPath:    Array[String],
-        jreLocations: String,
-        jreVersion:   Int,
-        outputFile:   String
+        algorithm:  String,
+        target:     String,
+        mainClass:  String,
+        classPath:  Array[String],
+        JDKPath:    String,
+        analyzeJDK: Boolean,
+        outputFile: String
     ): Long = {
         val before = System.nanoTime()
         val baseConfig: Config = ConfigFactory.load().withValue(
@@ -52,151 +67,222 @@ object OpalJCGAdatper extends JCGTestAdapter {
             ConfigValueFactory.fromAnyRef(true)
         )
 
-        implicit val config: Config =
+        // configure the initial entry points
+        implicit var config: Config =
             if (mainClass eq null) {
                 baseConfig.withValue(
                     "org.opalj.br.analyses.cg.InitialEntryPointsKey.analysis",
                     ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.LibraryEntryPointsFinder")
-                )
-            } else {
-                baseConfig.withValue(
-                    "org.opalj.br.analyses.cg.InitialEntryPointsKey.analysis",
-                    ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.ConfigurationEntryPointsFinder")
                 ).withValue(
-                        "org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints",
-                        ConfigValueFactory.fromIterable(Seq(ConfigValueFactory.fromMap(Map(
-                            "declaringClass" → mainClass.replace('.', '/'), "name" → "main"
-                        ).asJava)).asJava)
+                        "org.opalj.br.analyses.cg.InitialInstantiatedTypesKey.analysis",
+                        ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.LibraryInstantiatedTypesFinder")
                     )
-            }
+            } else baseConfig.withValue(
+                "org.opalj.br.analyses.cg.InitialEntryPointsKey.analysis",
+                ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.ConfigurationEntryPointsFinder")
+            ).withValue(
+                    "org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints",
+                    ConfigValueFactory.fromIterable(
+                        (
+                            (baseConfig.getObjectList("org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints").asScala :+
+                                ConfigValueFactory.fromMap(Map("declaringClass" → mainClass.replace('.', '/'), "name" → "main").asJava))
+                        ).asJava
+                    )
+                ).withValue(
+                        "org.opalj.br.analyses.cg.InitialInstantiatedTypesKey.analysis",
+                        ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.ApplicationInstantiatedTypesFinder")
+                    )
 
+        config = config
+            .withValue("org.opalj.fpcf.analyses.AllocationSiteBasedPointsToAnalysis.mergeStringConstants", ConfigValueFactory.fromAnyRef(false))
+            .withValue("org.opalj.fpcf.analyses.AllocationSiteBasedPointsToAnalysis.mergeClassConstants", ConfigValueFactory.fromAnyRef(false))
+
+        // gather the class files to be loaded
         val cfReader = JavaClassFileReader(theConfig = config)
-        val targetClassFiles = cfReader.ClassFiles(new File(target)).toIterator
-        val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_))).toIterator
-        val jreJars = JRELocation.mapping(new File(jreLocations)).getOrElse(jreVersion, throw new IllegalArgumentException("unspecified java version"))
+        val targetClassFiles = cfReader.ClassFiles(new File(target))
+        val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_)))
+        val jreJars = JRELocation.getAllJREJars(JDKPath)
         val jre = cfReader.AllClassFiles(jreJars)
-        val allClassFiles = targetClassFiles ++ cpClassFiles ++ jre
-        val project: Project[URL] = Project(allClassFiles.toTraversable, Seq.empty, true, Seq.empty)
+        val allClassFiles = targetClassFiles ++ cpClassFiles ++ (if (analyzeJDK) jre else Seq.empty)
 
-        val ps = project.get(PropertyStoreKey)
+        val libClassFiles =
+            if (analyzeJDK)
+                Seq.empty
+            else
+                Project.JavaLibraryClassFileReader.AllClassFiles(jreJars)
 
-        val manager = project.get(FPCFAnalysesManagerKey)
-        manager.runAll(
-            EagerRTACallGraphAnalysisScheduler,
-            EagerLoadedClassesAnalysis,
-            EagerFinalizerAnalysisScheduler,
-            EagerThreadRelatedCallsAnalysis,
-            EagerSerializationRelatedCallsAnalysis,
-            EagerReflectionRelatedCallsAnalysis,
-            new LazyCalleesAnalysis(
-                Set(
-                    StandardInvokeCallees,
-                    ThreadRelatedCallees,
-                    SerializationRelatedCallees,
-                    ReflectionRelatedCallees
-                )
-            )
+        val project: Project[URL] = Project(
+            allClassFiles,
+            libClassFiles,
+            libraryClassFilesAreInterfacesOnly = true,
+            Seq.empty
         )
 
-        implicit val declaredMethods = project.get(DeclaredMethodsKey)
-        for (dm ← declaredMethods.declaredMethods) {
-            ps.force(dm, Callees.key)
+        /*val performInvocationsDomain = classOf[DefaultPerformInvocationsDomainWithCFGAndDefUse[_]]
+
+        project.updateProjectInformationKeyInitializationData(AIDomainFactoryKey) {
+            case None               ⇒ Set(performInvocationsDomain)
+            case Some(requirements) ⇒ requirements + performInvocationsDomain
+        }*/
+
+        implicit val ps: PropertyStore = project.get(PropertyStoreKey)
+
+        // run call graph, along with extra analyses e.g. for reflection
+        algorithm match {
+            case "CHA" ⇒ project.get(CHACallGraphKey)
+            case "RTA" ⇒ project.get(RTACallGraphKey)
+            case "MTA" ⇒ project.get(MTACallGraphKey)
+            case "CTA" ⇒ project.get(CTACallGraphKey)
+            case "FTA" ⇒ project.get(FTACallGraphKey)
+            case "XTA" ⇒ project.get(XTACallGraphKey)
+            case "0-CFA" ⇒ project.get(TypeBasedPointsToCallGraphKey)
+            case "0-1-CFA" ⇒ project.get(AllocationSiteBasedPointsToCallGraphKey)
+            case "1-0-CFA" ⇒ project.get(CFA_1_0_CallGraphKey)
+            case "1-1-CFA" ⇒ project.get(CFA_1_1_CallGraphKey)
         }
 
-        ps.waitOnPhaseCompletion()
+        implicit val typeIterator: TypeIterator = project.get(TypeIteratorKey)
+
+        // start the computation of the call graph
+        implicit val declaredMethods: DeclaredMethods = project.get(DeclaredMethodsKey)
 
         val after = System.nanoTime()
 
-        var reachableMethods = Set.empty[ReachableMethod]
-
-        for (
-            dm ← declaredMethods.declaredMethods
-            //TODO THIS IS BROKEN FIX IT
-            if((!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
-                (dm.hasSingleDefinedMethod && dm.definedMethod.classFile.thisType == dm.declaringClassType))
-        ) {
-            val m = createMethodObject(dm)
-            ps(dm, Callees.key) match {
-                case FinalEP(_, NoCalleesDueToNotReachableMethod) ⇒
-                case FinalEP(_, NoCallees) ⇒
-                    reachableMethods += ReachableMethod(m, Set.empty)
-                case FinalEP(_, cs: Callees) ⇒
-                    val body = dm.definedMethod.body.get
-                    val callSites = cs.callees.flatMap {
-                        case (pc, callees) ⇒
-                            createCallSites(body, pc, callees)
-                    }.toSet
-                    reachableMethods += ReachableMethod(m, callSites)
+        val out = new BufferedWriter(new FileWriter(outputFile))
+        out.write(s"""{\n\t"reachableMethods":[""")
+        var firstRM = true
+        for {
+            dm ← declaredMethods.declaredMethods if (!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
+                (dm.hasSingleDefinedMethod && dm.definedMethod.classFile.thisType == dm.declaringClassType)
+            calleeEOptP = ps(dm, Callees.key)
+            if calleeEOptP.ub ne NoCalleesDueToNotReachableMethod
+        } {
+            if (firstRM) {
+                firstRM = false
+            } else {
+                out.write(",")
             }
+            out.write("{\n\t\t\"method\":")
+            writeMethodObject(dm, out)
+            out.write(",\n\t\t\"callSites\":[")
+            calleeEOptP match {
+                case FinalEP(_, NoCallees) ⇒
+                case FinalEP(_, callees: Callees) ⇒
+                    writeCallSites(dm, callees, out)
+                case _ ⇒ throw new RuntimeException()
+            }
+            out.write("]\n\t}")
         }
-
-        println(reachableMethods.size)
+        out.write("]\n}")
+        out.flush()
+        out.close()
 
         ps.shutdown()
-
-        val file: FileWriter = new FileWriter(outputFile)
-        file.write(Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods))))
-        file.flush()
-        file.close()
 
         after - before
     }
 
-    private def createCallSites(
-        body:    Code,
-        pc:      Int,
-        callees: Set[DeclaredMethod]
-    ): Seq[CallSite] = {
-        val declaredO = body.instructions(pc) match {
-            case MethodInvocationInstruction(dc, _, name, desc) ⇒ Some(dc, name, desc)
-            case _                                              ⇒ None
-        }
+    private def writeCallSites(
+        method:  DeclaredMethod,
+        callees: Callees,
+        out:     Writer
+    )(implicit ps: PropertyStore, declaredMethods: DeclaredMethods, typeIterator: TypeIterator): Unit = {
+        val bodyO = if (method.hasSingleDefinedMethod) method.definedMethod.body else None
+        var first = true
+        for { callerContext ← callees.callerContexts
+            (pc, targets) ← callees.callSites(callerContext)
+        } {
+            bodyO match {
+                case None ⇒
+                    for (tgt ← targets) {
+                        if (first) first = false
+                        else out.write(",")
+                        writeCallSite(tgt.method, -1, pc, Iterator(tgt.method), out)
+                    }
 
-        val line = body.lineNumber(pc).getOrElse(-1)
+                case Some(body) ⇒
+                    val declaredTgtO = body.instructions(pc) match {
+                        case MethodInvocationInstruction(dc, _, name, desc) ⇒ Some(dc, name, desc)
+                        case _                                              ⇒ None
+                    }
 
-        if (declaredO.isDefined) {
-            val (dc, name, desc) = declaredO.get
-            val declaredTarget =
-                Method(
-                    name,
-                    dc.toJVMTypeName,
-                    desc.returnType.toJVMTypeName,
-                    desc.parameterTypes.iterator.map(_.toJVMTypeName).toList
-                )
+                    val line = body.lineNumber(pc).getOrElse(-1)
 
-            val (directCallees, indirectCallees) = callees.partition { callee ⇒
-                callee.name == name && // TODO check descriptor correctly for refinement
-                    callee.descriptor.parametersCount == desc.parametersCount
+                    if (declaredTgtO.isDefined) {
+                        val (dc, name, desc) = declaredTgtO.get
+                        val declaredType =
+                            if (dc.isArrayType)
+                                ObjectType.Object
+                            else
+                                dc.asObjectType
+
+                        val declaredTarget = declaredMethods(
+                            declaredType, declaredType.packageName, declaredType, name, desc
+                        )
+
+                        val (directCallees, indirectCallees) = targets.partition { callee ⇒
+                            callee.method.name == name && // TODO check descriptor correctly for refinement
+                                callee.method.descriptor.parametersCount == desc.parametersCount
+                        }
+
+                        for (tgt ← indirectCallees) {
+                            if (first) first = false
+                            else out.write(",")
+                            writeCallSite(tgt.method, line, pc, Iterator(tgt.method), out)
+                        }
+                        if (directCallees.nonEmpty) {
+                            if (first) first = false
+                            else out.write(",")
+                            writeCallSite(declaredTarget, line, pc, directCallees.map(_.method), out)
+                        }
+
+                    } else {
+                        for (tgt ← targets) {
+                            if (first) first = false
+                            else out.write(",")
+                            writeCallSite(tgt.method, line, pc, Iterator(tgt.method), out)
+                        }
+                    }
             }
-
-            indirectCallees.iterator.map(createIndividualCallSite(_, line)).toSeq :+
-                CallSite(
-                    declaredTarget,
-                    line,
-                    directCallees.iterator.map(createMethodObject).toSet
-                )
-        } else {
-            callees.iterator.map(createIndividualCallSite(_, line)).toSeq
         }
     }
 
-    def createIndividualCallSite(
-        method: DeclaredMethod,
-        line:   Int
-    ): CallSite = {
-        CallSite(
-            createMethodObject(method),
-            line,
-            Set(createMethodObject(method))
-        )
+    private def writeCallSite(
+        declaredTarget: DeclaredMethod,
+        line:           Int,
+        pc:             Int,
+        targets:        Iterator[DeclaredMethod],
+        out:            Writer
+    ): Unit = {
+        out.write("{\n\t\t\t\"declaredTarget\":")
+        writeMethodObject(declaredTarget, out)
+        out.write(",\n\t\t\t\"line\":")
+        out.write(line.toString)
+        out.write(",\n\t\t\t\"pc\":")
+        out.write(pc.toString)
+        out.write(",\n\t\t\t\"targets\":[")
+        var first = true
+        for (tgt ← targets) {
+            if (first) first = false
+            else out.write(",")
+            writeMethodObject(tgt, out)
+        }
+        out.write("]\n\t\t}")
     }
 
-    private def createMethodObject(method: DeclaredMethod): Method = {
-        Method(
-            method.name,
-            method.declaringClassType.toJVMTypeName,
-            method.descriptor.returnType.toJVMTypeName,
-            method.descriptor.parameterTypes.iterator.map(_.toJVMTypeName).toList
-        )
+    private def writeMethodObject(
+        method: DeclaredMethod,
+        out:    Writer
+    ): Unit = {
+        out.write("{\n\t\t\t\t\"name\":\"")
+        out.write(method.name)
+        out.write("\",\n\t\t\t\t\"declaringClass\":\"")
+        out.write(method.declaringClassType.toJVMTypeName)
+        out.write("\",\n\t\t\t\t\"returnType\":\"")
+        out.write(method.descriptor.returnType.toJVMTypeName)
+        out.write("\",\n\t\t\t\t\"parameterTypes\":[")
+        if (method.descriptor.parametersCount > 0)
+            out.write(method.descriptor.parameterTypes.iterator.map[String](_.toJVMTypeName).mkString("\"", "\",\"", "\""))
+        out.write("]\n\t\t\t}")
     }
 }

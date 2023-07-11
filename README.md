@@ -6,16 +6,56 @@ runtime (JVM) callbacks. Not supporting those features/APIs will render the call
 
 The project's structure and usage are explained in the following.
 
-## The Testcase Project
-The subproject `jcg_testcases` is test suite's s core project. It holds the test files along with 
-the test cases extractor which is used to parse the test cases and compile them to jars. 
+## The repositories project
 
-The project depends on `jcg_annotation` which contains the annotations that
-are required to express the test case's expectations.
+This repository contains multiple projects which provide different building blocks of the JCG Pipeline:
 
-### Annotating Test Expectations
+- **jcg_testcases** is the test suite's core project. It holds the test files along with 
+the test cases extractor which is used to parse the test cases and to compile them to the test-case jars. 
+> please note that all test cases that do belong to a newer Java version than Java 8 are stored and
+> compiled outside of the pipeline. Those test cases can be found in the `infrastructure_incompatible_testcases`.
 
-Within the core project, in `lib.annotations`, are three different annotation classes that enable to specify expectations
+- **jcg_annotations** is a small project that contains the annotations that are required to express
+a test case's expectations. 
+
+- **jcg_annotation_matcher** provides a matcher that matches a given call graph against the expected
+annotations of a particular test case. 
+
+- **jcg_test_adapter_commons** provides an interface that must be implemented when a custom adapter
+is implemented. Adapters that implement this interface are fully compatible with all JCG features and,
+hence, can be used everywhere.
+
+- **jcg_soot_adapter** accommodates an adapter that allows to test Soot's call-graph algorithms
+against the test suite. Currently, the adapter supports Soot's CHA, RTA, VTA, and SPARK algorithms.
+Besides testing Soot's algorithms, the adapter also allows to generate call graph's for an arbitrary
+project. The adapter can also serialize the generated call graph in a unified format
+(see Section Call-graph Serialization).
+
+- **jcg_wala_adapter** accommodates an adapter that allows to test WALA's call-graph algorithms
+against the test suite. Currently, the adapter supports WALA's RTA, 0-CFA, N-CFA, and 0-1-CFA algorithms.
+Besides testing WALA's algorithms, the adapter also allows to generate call graph's for an arbitrary
+project. The adapter can also serialize the generated call graph in a unified format
+(see Section Call-graph Serialization).
+
+- **jcg_opal_adapter** accommodates an adapter that allows to test OPAL's call-graph algorithm
+against the test suite. Currently, the adapter supports OPAL's RTA.
+Besides testing OPAL's algorithms, the adapter also allows to generate call graph's for an arbitrary
+project. The adapter can also serialize the generated call graph in a unified format
+(see Section Call-graph Serialization).
+
+- **jcg_doop_adapter** accommodates an adapter that allows to test Doop's context-insensitive call graph
+against the test suite. Besides testing DOOP, the adapter also allows to generate call graph's for an arbitrary
+project. The adapter can also serialize the generated call graph in a unified format
+(see Section Call-graph Serialization).
+
+- **jcg_data_format** holds the data structure which are used to represent the call graphs internally.
+And data classes for project specifications.
+
+- **jcg_evaluation** provides a several call-graph evaluation an understanding tools. The usage
+
+## Annotating Test Expectations
+
+Within the core project, in `lib.annotations.callgraph`, are three different annotation classes that enable to specify expectations
 for a call site's method resolution, i.e., they allow to annotate a method's call sites with expected call targets.
 The first annotation, `lib.annotations.CallSite`, enables to annotate a method with expectations for a specific call site,
 specified by line number. Please note that the annotation of two call sites within the same source line which call a
@@ -116,5 +156,32 @@ instead of a `.`).
 The `CGMatcher` in the `jcg_annotation_matcher` project, is given one `.jar` file of a test case together with the
 `.json` file of a serialized call graph and computes whether the call graph matches the expectations.
 Furthermore, it does some verification of the test case in order to avoid wrong annotations.
+
+## Use Static Analysis Framework Adapters
+
+Whereas it is straigth forward to use the WALA and SOOT adapter, we have to do a little bit of work
+to setup DOOP and OPAL.
+
+### DOOP
+To use the DOOP adapter, you need to setup DOOP. To do so, please have a look at DOOP's install instructions:
+
+https://bitbucket.org/yanniss/doop/src/master/
+
+### OPAL
+The current OPAL adapter builds on an development build of OPAL, to set it up do the following:
+
+First make sure to fulfill OPALs dependencies: (see [here](https://github.com/opalj/opal/src/master/))
+
+Afterwards, clone the opal project, checkout the `develop` branch and publish the project to the local
+Ivy repository:
+```
+$ git clone https://github.com/opalj/opal.git
+$ git checkout develop
+$ sbt publishLocal
+```
+
+``````
+
+## Usage-ready Docker Container
 
 

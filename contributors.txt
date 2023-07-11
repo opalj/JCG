@@ -1,5 +1,6 @@
 Michael Eichberg
 Michael Reif
 Florian Kübler
+Dominik Helm
 Roberts Kolosovs
 Marco Jacobasch

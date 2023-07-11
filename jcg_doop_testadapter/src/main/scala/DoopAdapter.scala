@@ -2,75 +2,60 @@
 import java.io.File
 import java.io.PrintWriter
 import java.net.URL
+import java.nio.file.Files
+
+import scala.collection.compat.immutable
+import scala.collection.mutable
+import scala.io.Source
+import scala.sys.process.Process
+
+import org.apache.commons.io.FileUtils
+import play.api.libs.json.Json
+import play.api.libs.json.JsValue
 
 import org.opalj.br.ClassFile
 import org.opalj.br.FieldType
+import org.opalj.br.FieldTypes
 import org.opalj.br.MethodDescriptor
 import org.opalj.br.ObjectType
 import org.opalj.br.ReferenceType
 import org.opalj.br.ReturnType
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.SomeProject
+import org.opalj.br.instructions.Instruction
 import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
-import org.opalj.log.GlobalLogContext
-import org.opalj.log.LogContext
-import org.opalj.log.LogMessage
-import org.opalj.log.OPALLogger
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 
-import scala.collection.mutable
-import scala.io.Source
-
-class DevNullLogger extends OPALLogger {
-    override def log(message: LogMessage)(implicit ctx: LogContext): Unit = {}
-}
-
+/**
+ * This is an experimental stage [[JCGTestAdapter]] as it is not possible to run Doop without
+ * installing it (and a data-log engine).
+ * Therefore, this object has the capability of converting the output of the CallGraphEdge table
+ * into the [[ReachableMethods]] data-format.
+ *
+ * @author Florian Kuebler
+ */
 object DoopAdapter extends JCGTestAdapter {
 
     override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
     override def frameworkName(): String = "Doop"
 
-    def main(args: Array[String]): Unit = {
-
-        /*val doopResults = new File(args(0)).listFiles(f ⇒ f.isFile && f.getName.endsWith(".jar.txt"))
-        val jreDir = new File(args(1))
-
-        if (!jreDir.exists())
-            throw new IllegalArgumentException()
-
-        OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
-
-        for (doopResult ← doopResults.sorted) {
-            val source = Source.fromFile(doopResult)
-            val tgtJar = new File(s"result/${doopResult.getName.replace(".txt", "")}")
-            if (!tgtJar.exists()) {
-                throw new IllegalArgumentException(s"${tgtJar.getAbsolutePath} does not exist")
-            }
-            println(s"${tgtJar.getName}")
-            val outFile = createJsonRepresentation(source, tgtJar, jreDir)
-            println(CGMatcher.matchCallSites(tgtJar.getAbsolutePath, outFile.getAbsolutePath))
-        }*/
-
-    }
-
-    def createJsonRepresentation(doopResult: Source, tgtJar: File, jreDir: File): File = {
+    private def createJsonRepresentation(
+        doopEdges: Source, doopReachable: Source, tgtJar: File, jreDir: File, outFile: File
+    ): Unit = {
         implicit val p: Project[URL] = Project(Array(tgtJar, jreDir), Array.empty[File])
 
-        val callGraph = extractDoopCG(doopResult)
+        val callGraph = extractDoopCG(doopEdges, doopReachable)
 
         val reachableMe: ReachableMethods = convertToReachableMethods(callGraph)
 
         val callSitesJson: JsValue = Json.toJson(reachableMe)
-        val outFile = new File(s"${tgtJar.getName.replace(".jar", ".json")}")
+
         val pw = new PrintWriter(outFile)
         pw.write(Json.prettyPrint(callSitesJson))
         pw.close()
-        outFile
     }
 
-    def resolveBridgeMethod(
+    private def resolveBridgeMethod(
         bridgeMethod: org.opalj.br.Method
     )(implicit classFile: ClassFile, p: SomeProject): org.opalj.br.Method = {
         val methods = classFile.findMethod(bridgeMethod.name).filter { m ⇒
@@ -85,7 +70,7 @@ object DoopAdapter extends JCGTestAdapter {
         methods.head
     }
 
-    def computeCallSite(
+    private def computeCallSite(
         declaredTgt:  String,
         number:       Int,
         tgts:         Set[String],
@@ -97,19 +82,27 @@ object DoopAdapter extends JCGTestAdapter {
         assert(tgts.nonEmpty)
         val firstTgt = toMethod(tgts.head)
         val tgtReturnType = ReturnType(firstTgt.returnType)
-        val tgtParamTypes = firstTgt.parameterTypes.map(FieldType.apply)
-        val tgtMD = MethodDescriptor(tgtParamTypes.toIndexedSeq, tgtReturnType)
+        val tgtParamTypes: FieldTypes = immutable.ArraySeq(firstTgt.parameterTypes.map(FieldType.apply): _*)
+        val tgtMD = MethodDescriptor(tgtParamTypes, tgtReturnType)
         val split = declaredTgt.split("""\.""")
         val declaredType = s"L${split.slice(0, split.size - 1).mkString("/")};"
         val name = split.last.replace("'", "")
         val tgtMethods = tgts.map(toMethod)
         // todo what abot <clinit> etc where no call is in the bytecode
-        val calls = callerOpal.body.get.collect {
+        val declObjType = FieldType(declaredType)
+
+        val getInstr: PartialFunction[Instruction, Instruction] = {
             // todo what about lambdas?
-            case instr: MethodInvocationInstruction if instr.name == name ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
-            case instr: INVOKEDYNAMIC                                     ⇒ instr
-            //throw new Error()
+            case instr: MethodInvocationInstruction if (
+                instr.name == name &&
+                    (instr.declaringClass == declObjType ||
+                        declObjType == ObjectType.Object && instr.declaringClass.isArrayType)
+                ) ⇒ instr //&& instr.declaringClass == FieldType(declaredType) ⇒ instr // && instr.methodDescriptor == tgtMD ⇒ instr
+            case instr: INVOKEDYNAMIC ⇒ instr
+                //throw new Error()
         }
+
+        val calls = callerOpal.body.get.collect(getInstr)
 
         if (calls.size <= number && callerOpal.isBridge) {
             computeCallSite(declaredTgt, number, tgts, callerMethod, resolveBridgeMethod(callerOpal))
@@ -121,12 +114,13 @@ object DoopAdapter extends JCGTestAdapter {
             CallSite(
                 firstTgt.copy(declaringClass = declaredType),
                 lineNumber.getOrElse(-1),
+                Some(pc),
                 tgtMethods
             )
         }
     }
 
-    def convertToReachableMethods(
+    private def convertToReachableMethods(
         callGraph: Map[String, Map[(String, Int), Set[String]]]
     )(implicit project: Project[URL]): ReachableMethods = {
         var reachableMethods = Set.empty[ReachableMethod]
@@ -142,15 +136,20 @@ object DoopAdapter extends JCGTestAdapter {
                 case Some(cf) ⇒
                     implicit val classFile: ClassFile = cf
                     val returnType = ReturnType(callerMethod.returnType)
-                    val parameterTypes = callerMethod.parameterTypes.map(FieldType.apply)
-                    val md = MethodDescriptor(parameterTypes.toIndexedSeq, returnType)
+                    val parameterTypes: FieldTypes = scala.collection.compat.immutable.ArraySeq(callerMethod.parameterTypes.map(FieldType.apply): _*)
+                    val md = MethodDescriptor(parameterTypes, returnType)
 
                     cf.findMethod(callerMethod.name, md) match {
                         case Some(callerOpal) if callerOpal.body.isDefined ⇒
                             for (((declaredTgt, number), tgts) ← callSites) {
-                                resultingCallSites += computeCallSite(
-                                    declaredTgt, number, tgts, callerMethod, callerOpal
-                                )
+                                try {
+                                    resultingCallSites += computeCallSite(
+                                        declaredTgt, number, tgts, callerMethod, callerOpal
+                                    )
+                                } catch {
+                                    case _: AssertionError ⇒
+                                        println(s"Callsite not found: $declaredTgt/$number in $callerMethod")
+                                }
 
                             }
                         case _ ⇒
@@ -176,35 +175,57 @@ object DoopAdapter extends JCGTestAdapter {
         ReachableMethods(reachableMethods)
     }
 
-    def extractDoopCG(doopResult: Source): Map[String, Map[(String, Int), Set[String]]] = {
-        val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(s ⇒ mutable.OpenHashMap.empty.withDefault(s ⇒ mutable.Set.empty))
+    private def extractDoopCG(
+        doopEdges: Source, doopReachable: Source
+    ): Map[String, Map[(String, Int), Set[String]]] = {
+        val callGraph = mutable.Map.empty[String, mutable.Map[(String, Int), mutable.Set[String]]].withDefault(_ ⇒ mutable.OpenHashMap.empty.withDefault(_ ⇒ mutable.Set.empty))
 
-        val re = """\[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>/([^/]+)/(\d+), \[\d+\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r ////([^/]+)/(\d+), \[\d+\\]\*\d+, \[\d+\]<([^><]+(<clinit>|<init>)?[^>]*)>""".r
-        for (line ← doopResult.getLines()) {
-            // there is at most one occurrence per line
+        for (line ← doopEdges.getLines()) {
+            val Array(_, callerDeclaredTgtNumber, _, tgtStr) = line.split("\t")
+            try {
+                val (callerStr, declaredTgt, numberString) =
+                    if (callerDeclaredTgtNumber.contains("native ")) {
+                        val Array(callerStr, declaredTgt) = callerDeclaredTgtNumber.split("/")
+                        (callerStr, declaredTgt, "0")
+                    } else if ("<main-thread-init>/0" == callerDeclaredTgtNumber) {
+                        ("<java.lang.Thread: java.lang.Thread currentThread()>", "java.lang.Thread.<init>", "0")
+                    } else if ("<thread-group-init>/0" == callerDeclaredTgtNumber) {
+                        ("<java.lang.Thread: java.lang.Thread currentThread()>", "java.lang.ThreadGroup.<init>", "0")
+                    } else {
+                        val Array(callerStr, declaredTgt, numberString) = callerDeclaredTgtNumber.split("/")
+                        (callerStr, declaredTgt, numberString)
+                    }
+                val caller = callerStr.slice(1, callerStr.length - 1)
+                val tgt = tgtStr.slice(1, tgtStr.length - 1)
+                val number = numberString.toInt
+                // there is at most one occurrence per line
 
-            re.findFirstMatchIn(line) match {
-                case Some(x) ⇒
-                    val caller = x.group(1)
-                    val declaredTgt = x.group(3)
-                    val number = x.group(4).toInt
-                    val tgt = x.group(5)
+                val currentCallsites = callGraph(caller)
+                val callSite = declaredTgt → number
+                val currentCallees = currentCallsites(callSite)
 
-                    val currentCallsites = callGraph(caller)
-                    val callSite = declaredTgt → number
-                    val currentCallees = currentCallsites(callSite)
-
-                    currentCallees += tgt
-                    currentCallsites += (callSite → currentCallees)
-                    callGraph += (caller → currentCallsites)
-                case _ ⇒ // no match
+                currentCallees += tgt
+                currentCallsites += (callSite → currentCallees)
+                callGraph += (caller → currentCallsites)
+            } catch {
+                case _: Throwable ⇒
+                    println()
             }
+
         }
-        doopResult.close()
+        doopEdges.close()
+
+        for (line ← doopReachable.getLines()) {
+            val tgt = line.slice(1, line.length - 1)
+            if (!callGraph.contains(tgt))
+                callGraph += (tgt → mutable.Map.empty)
+        }
+        doopReachable.close()
+
         callGraph.map { case (k, v) ⇒ k → v.map { case (k, v) ⇒ k → v.toSet }.toMap }.toMap
     }
 
-    def toMethod(methodStr: String): Method = {
+    private def toMethod(methodStr: String): Method = {
         """([^:]+): ([^ ]+) ([^\(]+)\(([^\)]*)\)""".r.findFirstMatchIn(methodStr) match {
             case Some(m) ⇒
                 val declClass = m.group(1)
@@ -218,7 +239,7 @@ object DoopAdapter extends JCGTestAdapter {
         }
     }
 
-    def toJVMType(t: String): String = {
+    private def toJVMType(t: String): String = {
         if (t.endsWith("[]"))
             s"[${toJVMType(t.substring(0, t.length - 2))}"
         else t match {
@@ -236,18 +257,84 @@ object DoopAdapter extends JCGTestAdapter {
         }
     }
 
-    def toObjectType(jvmRefType: String): ObjectType = {
+    private def toObjectType(jvmRefType: String): ObjectType = {
         assert(jvmRefType.length > 2)
         ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
 
+    def main(args: Array[String]): Unit = {
+        for (p ← List("antlr", "bloat", "chart", "eclipse", "fop", "hsqldb", "jython", "luindex", "lusearch", "pmd", "xalan"))
+            serializeCG(
+                "context-insensitive",
+                s"/home/dominik/Desktop/doop-benchmarks/dacapo-2006/$p.jar", //"/home/dominik/Desktop/corps/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
+                s"Harness",
+                Array.empty,
+                "/home/dominik/Desktop/java-se-7u75-ri/lib",
+                true,
+                s"doop-dacapo-$p.json"
+            )
+    }
+
     override def serializeCG(
-        algorithm: String,
-        target:    String,
-        mainClass: String,
-        classPath: Array[String],
-        jreLocations: String,
-        jreVersion:   Int,
-        outputFile:   String
-    ): Long = ???
+        algorithm:  String,
+        target:     String,
+        mainClass:  String,
+        classPath:  Array[String],
+        JDKPath:    String,
+        analyzeJDK: Boolean,
+        outputFile: String
+    ): Long = {
+        val env = System.getenv
+
+        assert(env.containsKey("DOOP_HOME"))
+        val doopHome = new File(env.get("DOOP_HOME"))
+        assert(doopHome.exists())
+        assert(doopHome.isDirectory)
+
+        val doopPlatformDirs = Files.createTempDirectory(null).toFile
+        val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.7/lib/")
+        doopJDKPath.mkdirs()
+        FileUtils.copyDirectory(new File(JDKPath), doopJDKPath)
+
+        val outDir = Files.createTempDirectory(null).toFile
+
+        assert(algorithm == "context-insensitive")
+        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", target) ++ classPath
+
+        //args ++= Array("--reflection-classic")
+
+        if (mainClass != null)
+            args ++= Array("--main", mainClass)
+
+        val status = Process(Array("./gradlew", "tasks"), Some(doopHome)).!
+        if (status != 0)
+            throw new RuntimeException("failed to run doop")
+
+        val before = System.nanoTime()
+
+        Process(
+            args,
+            Some(doopHome),
+            "DOOP_HOME" → doopHome.getAbsolutePath,
+            "DOOP_OUT" → outDir.getAbsolutePath,
+            "DOOP_PLATFORMS_LIB" → doopPlatformDirs.getAbsolutePath
+        ).!
+
+        val after = System.nanoTime()
+
+        val cgCsv = new File(doopHome, "last-analysis/CallGraphEdge.csv")
+        val rmCsv = new File(doopHome, "last-analysis/Reachable.csv")
+        createJsonRepresentation(
+            Source.fromFile(cgCsv),
+            Source.fromFile(rmCsv),
+            new File(target),
+            new File(JDKPath),
+            new File(outputFile)
+        )
+
+        FileUtils.deleteDirectory(doopPlatformDirs)
+        FileUtils.deleteDirectory(outDir)
+
+        after - before
+    }
 }
