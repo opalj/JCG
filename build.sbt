@@ -54,7 +54,7 @@ lazy val jcg_wala_testadapter = project.settings(
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
     assembly / aggregate := false,
     publishArtifact := false
-).dependsOn(jcg_data_format, jcg_testadapter_commons)
+).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_soot_testadapter = project.settings(
     commonSettings,
