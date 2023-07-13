@@ -44,10 +44,9 @@ object DynamicJCGAdapter extends JCGTestAdapter {
         //val agentPath = getClass.getClassLoader.getResource("DynamicCG.so").getPath
         val agentPath = "/home/JCG/jcg_dynamic_testadapter/src/main/resources/DynamicCG.so"
         val agentArgs = Array(port.toString).mkString(",")
-        //val cp = target + File.pathSeparator +
-          //  util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
-        val cp = "/home/JCG/jcg_dynamic_testadapter/src/main/resources/"
-        
+        val cp = target + File.pathSeparator +
+            util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
+
         val programArgs = Array.empty[String]
 
         val reachableMethods = mutable.Set[Method]()
@@ -57,23 +56,8 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             programArgs
 
         val before = System.nanoTime
-
-        /*val after = Using.Manager { use =>
-            val serverSocket = use(new ServerSocket(port))
-
-            new ProcessBuilder(args.asJava).inheritIO().start()
-
-            val clientSocket = use(serverSocket.accept)
-            serverSocket.close()
-
-            val in = use(new BufferedReader(new InputStreamReader(clientSocket.getInputStream)))
-
-            System.out.println(in.readLine())
-
-            System.nanoTime()
-        }.getOrElse(before)*/
         
-        val tmp = Using.Manager { use =>
+        val result = Using.Manager { use =>
             val serverSocket = use(new ServerSocket(port))
 
             new ProcessBuilder(args.asJava).inheritIO().start()
@@ -90,13 +74,9 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             	
             	val parsedCaller = if(caller == "TopLevel"){
 			        None     	
-            	}
-            	
-            	else{
+            	} else{
             		Some(parseMethod(caller))
             	}
-            	
-                //println("caller: " + caller)
 
             	val pc = in.readLine().toInt
             	val lineNumber = in.readLine().toInt
@@ -126,8 +106,8 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             System.nanoTime()
         }
         
-        if(tmp.isFailure){
-        	throw tmp.failed.get
+        if(result.isFailure){
+        	throw result.failed.get
         }
         
         val out = new BufferedWriter(new FileWriter(outputFile))
@@ -158,7 +138,7 @@ object DynamicJCGAdapter extends JCGTestAdapter {
         out.flush()
         out.close()
         
-        val after = tmp.getOrElse(before)
+        val after = result.getOrElse(before)
 
         after - before
     }
