@@ -21,7 +21,6 @@ object Evaluation {
 
         //val c = parseConfig(args)
 
-        CommonEvaluationConfig.processArguments(args)
         val config = CommonEvaluationConfig.processArguments(args)
         parseArguments(args)
 
@@ -114,7 +113,7 @@ object Evaluation {
 
         for {
             adapter ← config.EVALUATION_ADAPTERS
-            cgAlgo ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
+            cgAlgo ← adapter.possibleAlgorithms().filter(_.toLowerCase().startsWith(config.ALGORITHM_PREFIX_FILTER.toLowerCase()))
             psf ← projectSpecFiles
         } {
 
