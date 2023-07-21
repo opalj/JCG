@@ -76,7 +76,7 @@ object SootJCGAdapter extends JCGTestAdapter {
             o.setPhaseOption("cg.spark", "enabled:true")
             o.setPhaseOption("cg.spark", "vta:false")
             o.setPhaseOption("cg.spark", "rta:true")
-            o.setPhaseOption("cg.spark", "on-fly-cg:true")
+            o.setPhaseOption("cg.spark", "on-fly-cg:false")
             o.setPhaseOption("cg.spark", "simulate-natives:true")
         } else if (algorithm.contains(VTA)) {
             o.setPhaseOption("cg.spark", "enabled:true")
