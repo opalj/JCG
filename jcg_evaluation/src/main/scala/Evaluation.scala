@@ -138,7 +138,8 @@ object Evaluation {
                     projectSpec.allClassPathEntryPaths(projectsDir),
                     jreLocations(projectSpec.java),
                     !excludeJDK,
-                    cgFile.getPath
+                    cgFile.getPath,
+                    projectSpec.jvm_args.getOrElse(Array.empty)
                 )
             } catch {
                 case e: Throwable ⇒

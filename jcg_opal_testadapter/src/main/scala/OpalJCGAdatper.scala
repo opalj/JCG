@@ -59,7 +59,8 @@ object OpalJCGAdatper extends JCGTestAdapter {
         classPath:  Array[String],
         JDKPath:    String,
         analyzeJDK: Boolean,
-        outputFile: String
+        outputFile: String,
+        jvmArgs: Array[String]
     ): Long = {
         val before = System.nanoTime()
         val baseConfig: Config = ConfigFactory.load().withValue(

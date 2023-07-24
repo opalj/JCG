@@ -23,21 +23,17 @@ object DynamicJCGAdapter extends JCGTestAdapter {
     
     //TODO
     val port = 1337
-    
-    def main(args: Array[String]): Unit = {
-    	// for docker
-    	 serializeCG("", "/JCG/jcg_dynamic_testadapter/src/main/resources", "SimpleJava", Array.empty[String], "/opt/jdk8u342-b07/jre/lib", true, "/home/JCG/jcg_dynamic_testadapter/src/main/scala/output/callgraph.json")
-    }
 
     override def serializeCG(
-                       algorithm: String,
-                       target: String,
-                       mainClass: String,
-                       classPath: Array[String],
-                       JDKPath: String,
-                       analyzeJDK: Boolean,
-                       outputFile: String
-                   ): Long = {
+        algorithm: String,
+        target: String,
+        mainClass: String,
+        classPath: Array[String],
+        JDKPath: String,
+        analyzeJDK: Boolean,
+        outputFile: String,
+        jvmArgs: Array[String]
+    ): Long = {
 
         val javaPath = Paths.get(JDKPath).getParent.toAbsolutePath + "/bin/java"
         //TODO
@@ -52,8 +48,12 @@ object DynamicJCGAdapter extends JCGTestAdapter {
         val reachableMethods = mutable.Set[Method]()
         val edges = mutable.Map[Method, mutable.Map[(Int, Int), mutable.Set[Method]]]()
 
-        val args = List(javaPath, s"-agentpath:$agentPath=$agentArgs", "-cp", cp, mainClass) ++
-            programArgs
+        var args = List(javaPath)
+        args ++= jvmArgs
+        args += s"-agentpath:$agentPath=$agentArgs"
+        args ++= List("-cp", cp)
+        args += mainClass
+        args ++= programArgs
 
         val before = System.nanoTime
         

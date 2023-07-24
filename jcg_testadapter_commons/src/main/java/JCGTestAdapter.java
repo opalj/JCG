@@ -20,7 +20,8 @@ public interface JCGTestAdapter {
             String[] classPath,
             String JDKPath,
             boolean analyzeJDK,
-            String outputFile) throws Exception;
+            String outputFile,
+            String[] jvm_args) throws Exception;
 
     String[] possibleAlgorithms();
 

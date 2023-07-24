@@ -29,7 +29,8 @@ object WalaJCGAdapter extends JCGTestAdapter {
         classPath:  Array[String],
         JDKPath:    String,
         analyzeJDK: Boolean,
-        outputFile: String
+        outputFile: String,
+        jvmArgs: Array[String]
     ): Long = {
         val before = System.nanoTime
         val cl = Thread.currentThread.getContextClassLoader

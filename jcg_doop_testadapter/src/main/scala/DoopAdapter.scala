@@ -271,7 +271,8 @@ object DoopAdapter extends JCGTestAdapter {
                 Array.empty,
                 "/home/dominik/Desktop/java-se-7u75-ri/lib",
                 true,
-                s"doop-dacapo-$p.json"
+                s"doop-dacapo-$p.json",
+                Array.empty
             )
     }
 
@@ -282,7 +283,8 @@ object DoopAdapter extends JCGTestAdapter {
         classPath:  Array[String],
         JDKPath:    String,
         analyzeJDK: Boolean,
-        outputFile: String
+        outputFile: String,
+        jvmArgs: Array[String]
     ): Long = {
         val env = System.getenv
 
