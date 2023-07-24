@@ -90,7 +90,8 @@ object FingerprintExtractor {
                             projectSpec.allClassPathEntryPaths(projectsDir),
                             jreLocations(projectSpec.java),
                             false,
-                            cgFile.getAbsolutePath
+                            cgFile.getAbsolutePath,
+                            Array.empty
                         )
                     } catch {
                         case e: Throwable ⇒

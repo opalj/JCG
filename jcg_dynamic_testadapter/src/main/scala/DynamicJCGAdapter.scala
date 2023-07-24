@@ -50,9 +50,9 @@ object DynamicJCGAdapter extends JCGTestAdapter {
 
         var args = List(javaPath)
         args ++= jvmArgs
-        args += s"-agentpath:$agentPath=$agentArgs"
+        args :+= s"-agentpath:$agentPath=$agentArgs"
         args ++= List("-cp", cp)
-        args += mainClass
+        args :+= mainClass
         args ++= programArgs
 
         val before = System.nanoTime

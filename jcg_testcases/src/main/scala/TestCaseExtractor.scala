@@ -154,7 +154,8 @@ object TestCaseExtractor {
                     target = new File(outPathCompiler.getAbsolutePath).getCanonicalPath,
                     main = mainOpt,
                     java = 8,
-                    cp = None
+                    cp = None,
+                    jvm_args = None
                 )
 
                 val projectSpecJson: JsValue = Json.toJson(projectSpec)
