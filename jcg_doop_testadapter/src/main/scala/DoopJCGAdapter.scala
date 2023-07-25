@@ -280,14 +280,14 @@ object DoopJCGAdapter extends JCGTestAdapter {
         assert(doopHome.isDirectory)
 
         val doopPlatformDirs = Files.createTempDirectory(null).toFile
-        val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.7/lib/")
+        val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.8/lib/")
         doopJDKPath.mkdirs()
         FileUtils.copyDirectory(new File(JDKPath), doopJDKPath)
 
         val outDir = Files.createTempDirectory(null).toFile
 
         assert(algorithm == "context-insensitive")
-        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", target) ++ classPath
+        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_8", "-i", target) ++ classPath
 
         //args ++= Array("--reflection-classic")
 
