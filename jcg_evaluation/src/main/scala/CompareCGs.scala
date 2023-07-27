@@ -86,8 +86,8 @@ object CompareCGs {
 
         if (showMethodPrecisionRecall) {
             val falsePositive = extractAdditionalMethods(cg2, cg1, inPackage).size
-            val positive = cg2.size
-            val truth = cg1.size
+            val positive = if(inPackage.isEmpty) cg2.size else cg2.keysIterator.count(_.declaringClass.startsWith(inPackage))
+            val truth = if(inPackage.isEmpty) cg1.size else cg1.keysIterator.count(_.declaringClass.startsWith(inPackage))
             val truePositive = positive - falsePositive
             println(f"Method precision: $truePositive/$positive = ${truePositive.toDouble / positive * 100}%.2f%%")
             println(f"Method recall: $truePositive/$truth = ${truePositive.toDouble / truth * 100}%.2f%%")
@@ -96,8 +96,8 @@ object CompareCGs {
 
         if (showEdgePrecisionRecall) {
             val falsePositive = countAdditionalEdges(cg2, cg1, inPackage, strict)
-            val positive = edgeCount(cg2)
-            val truth = edgeCount(cg1)
+            val positive = edgeCount(cg2, inPackage)
+            val truth = edgeCount(cg1, inPackage)
             val truePositive = positive - falsePositive
             println(f"Edge precision: $truePositive/$positive = ${truePositive.toDouble / positive * 100}%.2f%%")
             println(f"Edge recall: $truePositive/$truth = ${truePositive.toDouble / truth * 100}%.2f%%")
@@ -168,9 +168,11 @@ object CompareCGs {
         //println(sites.toSeq.sortBy(_._3).takeRight(100).mkString(" #### Impactful Call Sites ####\n\n\t", "\n\t", "\n\n"))
     }
 
-    private def edgeCount(cg: Map[Method, Set[CallSite]]): Int = {
+    private def edgeCount(cg: Map[Method, Set[CallSite]], inPackage: String): Int = {
         cg.foldLeft(0) { (acc, rm) ⇒
-            acc + rm._2.foldLeft(0)((acc, cs) ⇒ acc + cs.targets.size)
+            if(rm._1.declaringClass.startsWith(inPackage))
+                acc + rm._2.foldLeft(0)((acc, cs) ⇒ acc + cs.targets.size)
+            else acc
         }
     }
 
