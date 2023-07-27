@@ -85,7 +85,7 @@ object CompareCGs {
          */
 
         if (showMethodPrecisionRecall) {
-            val falsePositive = extractAdditionalMethods(cg2, cg1).size
+            val falsePositive = extractAdditionalMethods(cg2, cg1, inPackage).size
             val positive = cg2.size
             val truth = cg1.size
             val truePositive = positive - falsePositive
@@ -95,7 +95,7 @@ object CompareCGs {
         }
 
         if (showEdgePrecisionRecall) {
-            val falsePositive = countAdditionalEdges(cg2, cg1, strict)
+            val falsePositive = countAdditionalEdges(cg2, cg1, inPackage, strict)
             val positive = edgeCount(cg2)
             val truth = edgeCount(cg1)
             val truePositive = positive - falsePositive
@@ -105,10 +105,10 @@ object CompareCGs {
         }
 
         if (showAdditional) {
-            val additionalReachableMethods1 = extractAdditionalMethods(cg1, cg2).toSeq.sortBy(_.declaringClass).take(maxFindings)
+            val additionalReachableMethods1 = extractAdditionalMethods(cg1, cg2, inPackage).toSeq.sortBy(_.declaringClass).take(maxFindings)
             println(additionalReachableMethods1.mkString(" ##### Additional Methods - Input 1 #####\n\n\t", "\n\t", "\n\n"))
 
-            val additionalReachableMethods2 = extractAdditionalMethods(cg2, cg1).toSeq.sortBy(_.declaringClass).take(maxFindings)
+            val additionalReachableMethods2 = extractAdditionalMethods(cg2, cg1, inPackage).toSeq.sortBy(_.declaringClass).take(maxFindings)
             println(additionalReachableMethods2.mkString(" ##### Additional Methods - Input 2 #####\n\n\t", "\n\t", "\n\n"))
         }
 
@@ -175,10 +175,9 @@ object CompareCGs {
     }
 
     private def extractAdditionalMethods(
-        baseCG: Map[Method, Set[CallSite]], comparedTo: Map[Method, Set[CallSite]]
+        baseCG: Map[Method, Set[CallSite]], comparedTo: Map[Method, Set[CallSite]], inPackage: String
     ): Set[Method] = {
-        baseCG.keySet.filter(!comparedTo.contains(_))
-        //        baseCG.filter(m ⇒ !comparedTo.contains(m.._1)).keySet
+        baseCG.keySet.filter(m => !comparedTo.contains(m) && m.declaringClass.startsWith(inPackage))
     }
 
     private def extractReachableApplicationMethods(
@@ -215,11 +214,11 @@ object CompareCGs {
     }
 
     private def countAdditionalEdges(
-        cg: Map[Method, Set[CallSite]], otherCG: Map[Method, Set[CallSite]], strict: Boolean
+        cg: Map[Method, Set[CallSite]], otherCG: Map[Method, Set[CallSite]], inPackage: String, strict: Boolean
     ): Int = {
         var result = 0
         cg.foreach {
-            case (method, callSites) ⇒
+            case (method, callSites) if method.declaringClass.startsWith(inPackage) ⇒
                 val otherCallSites = otherCG.get(method)
                 callSites.foreach {
                     case CallSite(declared, line, pc, targets) ⇒
@@ -247,6 +246,7 @@ object CompareCGs {
                             result += targets.size
                         }
                 }
+            case _ ⇒
         }
 
         result
@@ -257,7 +257,7 @@ object CompareCGs {
     ): Set[(Method, String)] = {
         var result = Set.empty[(Method, String)]
         cg.foreach {
-            case (method, callSites) ⇒
+            case (method, callSites) if method.declaringClass.startsWith(inPackage) ⇒
                 val otherCallSites = otherCG.get(method)
                 if (otherCallSites.isDefined) {
                     callSites.foreach {
@@ -274,6 +274,7 @@ object CompareCGs {
                             }
                     }
                 }
+            case _ ⇒
         }
 
         result
