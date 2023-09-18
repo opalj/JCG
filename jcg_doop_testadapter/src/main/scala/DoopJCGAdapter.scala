@@ -287,9 +287,13 @@ object DoopJCGAdapter extends JCGTestAdapter {
         val outDir = Files.createTempDirectory(null).toFile
 
         assert(algorithm == "context-insensitive")
-        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_8", "-i", target) ++ classPath
 
-        //args ++= Array("--reflection-classic")
+        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_8", "-i", target) ++ classPath
+        if (analyzeJDK) {
+           args ++= JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
+        }
+
+        args ++= Array("--reflection-classic")
 
         if (mainClass != null)
             args ++= Array("--main", mainClass)
