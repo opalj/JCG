@@ -9,8 +9,6 @@ import scala.collection.JavaConverters._
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import net.ceedubs.ficus.Ficus.toFicusConfig
-import net.ceedubs.ficus.readers.ArbitraryTypeReader.arbitraryTypeValueReader
 
 import org.opalj.fpcf.FinalEP
 import org.opalj.fpcf.PropertyStore
@@ -20,10 +18,11 @@ import org.opalj.br.analyses.DeclaredMethodsKey
 import org.opalj.br.analyses.Project
 import org.opalj.br.analyses.Project.JavaClassFileReader
 import org.opalj.br.fpcf.PropertyStoreKey
+import org.opalj.br.fpcf.properties.cg.Callees
+import org.opalj.br.fpcf.properties.cg.NoCallees
+import org.opalj.br.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
 import org.opalj.br.ObjectType
-import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse
-import org.opalj.ai.fpcf.properties.AIDomainFactoryKey
 import org.opalj.tac.cg.AllocationSiteBasedPointsToCallGraphKey
 import org.opalj.tac.cg.CFA_1_0_CallGraphKey
 import org.opalj.tac.cg.CFA_1_1_CallGraphKey
@@ -36,9 +35,6 @@ import org.opalj.tac.cg.TypeBasedPointsToCallGraphKey
 import org.opalj.tac.cg.TypeIteratorKey
 import org.opalj.tac.cg.XTACallGraphKey
 import org.opalj.tac.fpcf.analyses.cg.TypeIterator
-import org.opalj.tac.fpcf.properties.cg.Callees
-import org.opalj.tac.fpcf.properties.cg.NoCallees
-import org.opalj.tac.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
 
 /**
  * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
