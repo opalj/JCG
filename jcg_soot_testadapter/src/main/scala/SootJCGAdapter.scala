@@ -34,7 +34,8 @@ object SootJCGAdapter extends JCGTestAdapter {
         JDKPath:    String,
         analyzeJDK: Boolean,
         outputFile: String,
-        jvmArgs: Array[String]
+        jvmArgs: Array[String],
+        programArgs: Array[String]
     ): Long = {
 
         val o = G.v().soot_options_Options()

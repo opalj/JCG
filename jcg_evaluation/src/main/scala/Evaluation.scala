@@ -14,6 +14,7 @@ object Evaluation {
     private var excludeJDK = false
     private var runAnalyses = true
     private var allQueries = false
+    private var programArgs = Array.empty[String]
 
     private var FINGERPRINT_DIR = ""
 
@@ -43,7 +44,7 @@ object Evaluation {
             val resultsDir = new File(config.OUTPUT_DIR_PATH)
             resultsDir.mkdirs()
             val locations: Map[String, Map[String, Set[Method]]] = createLocationsMapping(resultsDir)
-            runAnalyses(projectsDir, resultsDir, jreLocations, locations, config)
+            runAnalyses(projectsDir, resultsDir, jreLocations, locations, config, programArgs)
         }
     }
 
@@ -59,6 +60,11 @@ object Evaluation {
                 assert(FINGERPRINT_DIR.isEmpty, "multiple fingerprint directories specified")
                 FINGERPRINT_DIR = dir
             case Array("--analyze", value: String) ⇒ runAnalyses = value.toBoolean
+        }
+        val argsIndex = args.indexOf("--program-args") + 1
+        if(argsIndex > 0) {
+            val argsEndIndex = args.indexWhere(_.startsWith("--"), argsIndex)
+            programArgs = args.slice(argsIndex, if(argsEndIndex>=0) argsEndIndex else args.length)
         }
 
         if (projectSpecificEvaluation) {
@@ -105,7 +111,8 @@ object Evaluation {
         resultsDir:   File,
         jreLocations: Map[Int, String],
         locationsMap: Map[String, Map[String, Set[Method]]],
-        config:       CommonEvaluationConfig
+        config:       CommonEvaluationConfig,
+        programArgs:  Array[String]
     ): Unit = {
         val projectSpecFiles = projectsDir.listFiles { (_, name) ⇒
             name.endsWith(".conf") && name.startsWith(config.PROJECT_PREFIX_FILTER)
@@ -139,7 +146,8 @@ object Evaluation {
                     jreLocations(projectSpec.java),
                     !excludeJDK,
                     cgFile.getPath,
-                    projectSpec.jvm_args.getOrElse(Array.empty)
+                    projectSpec.jvm_args.getOrElse(Array.empty),
+                    programArgs
                 )
             } catch {
                 case e: Throwable ⇒

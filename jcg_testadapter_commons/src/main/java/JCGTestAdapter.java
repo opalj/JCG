@@ -21,7 +21,8 @@ public interface JCGTestAdapter {
             String JDKPath,
             boolean analyzeJDK,
             String outputFile,
-            String[] jvm_args) throws Exception;
+            String[] jvm_args,
+            String[] program_args) throws Exception;
 
     String[] possibleAlgorithms();
 

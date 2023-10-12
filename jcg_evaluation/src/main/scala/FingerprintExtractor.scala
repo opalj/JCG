@@ -91,6 +91,7 @@ object FingerprintExtractor {
                             jreLocations(projectSpec.java),
                             false,
                             cgFile.getAbsolutePath,
+                            Array.empty,
                             Array.empty
                         )
                     } catch {

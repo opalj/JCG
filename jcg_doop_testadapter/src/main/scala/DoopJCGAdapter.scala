@@ -270,7 +270,8 @@ object DoopJCGAdapter extends JCGTestAdapter {
         JDKPath:    String,
         analyzeJDK: Boolean,
         outputFile: String,
-        jvmArgs: Array[String]
+        jvmArgs: Array[String],
+        programArgs: Array[String]
     ): Long = {
         val env = System.getenv
 

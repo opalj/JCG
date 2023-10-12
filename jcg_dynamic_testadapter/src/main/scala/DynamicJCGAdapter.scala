@@ -32,7 +32,8 @@ object DynamicJCGAdapter extends JCGTestAdapter {
         JDKPath: String,
         analyzeJDK: Boolean,
         outputFile: String,
-        jvmArgs: Array[String]
+        jvmArgs: Array[String],
+        programArgs: Array[String]
     ): Long = {
 
         val javaPath = Paths.get(JDKPath).getParent.toAbsolutePath + "/bin/java"
@@ -42,8 +43,6 @@ object DynamicJCGAdapter extends JCGTestAdapter {
         val agentArgs = Array(port.toString).mkString(",")
         val cp = target + File.pathSeparator +
             util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
-
-        val programArgs = Array.empty[String]
 
         val reachableMethods = mutable.Set[Method]()
         val edges = mutable.Map[Method, mutable.Map[(Int, Int), mutable.Set[Method]]]()
