@@ -25,8 +25,8 @@ lazy val jcg_data_format = project.settings(
     name := "JCG Data Format",
     aggregate in assembly := false,
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
-    libraryDependencies += "io.get-coursier" %% "coursier" % "2.0.16",
-    libraryDependencies += "io.get-coursier" %% "coursier-cache" % "2.0.16"
+    libraryDependencies += "io.get-coursier" %% "coursier" % "2.1.8",
+    libraryDependencies += "io.get-coursier" %% "coursier-cache" % "2.1.8"
 )
 
 lazy val jcg_testcases = project.settings(
