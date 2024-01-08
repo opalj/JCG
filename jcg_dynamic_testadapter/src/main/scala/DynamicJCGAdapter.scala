@@ -25,14 +25,14 @@ object DynamicJCGAdapter extends JCGTestAdapter {
     val port = 1337
 
     override def serializeCG(
-        algorithm: String,
-        target: String,
-        mainClass: String,
-        classPath: Array[String],
-        JDKPath: String,
-        analyzeJDK: Boolean,
-        outputFile: String,
-        jvmArgs: Array[String],
+        algorithm:   String,
+        target:      String,
+        mainClass:   String,
+        classPath:   Array[String],
+        JDKPath:     String,
+        analyzeJDK:  Boolean,
+        output:      Writer,
+        jvmArgs:     Array[String],
         programArgs: Array[String]
     ): Long = {
 
@@ -109,10 +109,9 @@ object DynamicJCGAdapter extends JCGTestAdapter {
         	throw result.failed.get
         }
         
-        val out = new BufferedWriter(new FileWriter(outputFile))
         var edgeCount = 0
         println(reachableMethods.size)
-        out.write(s"""{"reachableMethods":[""")
+        output.write(s"""{"reachableMethods":[""")
         var firstRM = true
         for {
             rm ← reachableMethods
@@ -120,22 +119,20 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             if (firstRM) {
                 firstRM = false
             } else {
-                out.write(",")
+                output.write(",")
             }
-            out.write("{\"method\":")
-            writeMethodObject(rm, out)
-            out.write(",\"callSites\":[")
+            output.write("{\"method\":")
+            writeMethodObject(rm, output)
+            output.write(",\"callSites\":[")
             if (edges.contains(rm)) {
                 val callSites = edges(rm)
                 edgeCount += callSites.values.foldLeft(0)((v, s) ⇒ v + s.size)
-                writeCallSites(callSites, out)
+                writeCallSites(callSites, output)
             }
-            out.write("]}")
+            output.write("]}")
         }
         println(edgeCount)
-        out.write("]}")
-        out.flush()
-        out.close()
+        output.write("]}")
         
         val after = result.getOrElse(before)
 

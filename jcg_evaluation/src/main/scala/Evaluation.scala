@@ -1,5 +1,7 @@
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileWriter
 import java.io.PrintWriter
 
 import scala.io.Source
@@ -137,6 +139,8 @@ object Evaluation {
             if(cgFile.exists())
                 cgFile.delete()
 
+            val output = new BufferedWriter(new FileWriter(cgFile))
+
             val elapsed = try {
                 adapter.serializeCG(
                     cgAlgo,
@@ -145,7 +149,7 @@ object Evaluation {
                     projectSpec.allClassPathEntryPaths(projectsDir),
                     jreLocations(projectSpec.java),
                     !excludeJDK,
-                    cgFile.getPath,
+                    output,
                     projectSpec.jvm_args.getOrElse(Array.empty),
                     programArgs
                 )
@@ -156,6 +160,8 @@ object Evaluation {
                         e.printStackTrace()
                     }
                     -1
+            } finally {
+                output.close()
             }
 
             System.gc()

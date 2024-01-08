@@ -81,6 +81,8 @@ object FingerprintExtractor {
 
                 println(s"performing test case: ${projectSpec.name}")
 
+                val output = new BufferedWriter(new FileWriter(cgFile))
+
                 val future = Future {
                     try {
                         adapter.serializeCG(
@@ -90,7 +92,7 @@ object FingerprintExtractor {
                             projectSpec.allClassPathEntryPaths(projectsDir),
                             jreLocations(projectSpec.java),
                             false,
-                            cgFile.getAbsolutePath,
+                            output,
                             Array.empty,
                             Array.empty
                         )
@@ -99,6 +101,8 @@ object FingerprintExtractor {
                             if (config.debug) {
                                 println(e.printStackTrace())
                             }
+                    } finally {
+                        output.close()
                     }
                     ow.synchronized{
                         System.gc()

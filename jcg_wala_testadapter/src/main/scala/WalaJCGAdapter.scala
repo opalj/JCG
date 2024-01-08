@@ -1,6 +1,7 @@
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter
+import java.io.Writer
 import java.net.URL
 import java.net.URLClassLoader
 import java.util
@@ -17,20 +18,19 @@ import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
 import play.api.libs.json.Json
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object WalaJCGAdapter extends JCGTestAdapter {
     override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String,
-        jvmArgs: Array[String],
+        algorithm:   String,
+        target:      String,
+        mainClass:   String,
+        classPath:   Array[String],
+        JDKPath:     String,
+        analyzeJDK:  Boolean,
+        output:      Writer,
+        jvmArgs:     Array[String],
         programArgs: Array[String]
     ): Long = {
         val before = System.nanoTime
@@ -149,11 +149,8 @@ object WalaJCGAdapter extends JCGTestAdapter {
                 ReachableMethod(createMethodObject(currentMethod), callSites.toSet.flatten)
         }
 
-        val file: FileWriter = new FileWriter(outputFile)
         val prettyPrint = Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods)))
-        file.write(prettyPrint)
-        file.flush()
-        file.close()
+        output.write(prettyPrint)
 
         after - before
     }

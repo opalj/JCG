@@ -1,6 +1,7 @@
 
 import java.io.File
 import java.io.PrintWriter
+import java.io.Writer
 import java.net.URL
 import java.nio.file.Files
 
@@ -40,7 +41,7 @@ object DoopJCGAdapter extends JCGTestAdapter {
     override def frameworkName(): String = "Doop"
 
     private def createJsonRepresentation(
-        doopEdges: Source, doopReachable: Source, tgtJar: File, jreDir: File, outFile: File
+        doopEdges: Source, doopReachable: Source, tgtJar: File, jreDir: File, output: Writer
     ): Unit = {
         implicit val p: Project[URL] = Project(Array(tgtJar, jreDir), Array.empty[File])
 
@@ -50,9 +51,7 @@ object DoopJCGAdapter extends JCGTestAdapter {
 
         val callSitesJson: JsValue = Json.toJson(reachableMe)
 
-        val pw = new PrintWriter(outFile)
-        pw.write(Json.prettyPrint(callSitesJson))
-        pw.close()
+        output.write(Json.prettyPrint(callSitesJson))
     }
 
     private def resolveBridgeMethod(
@@ -263,14 +262,14 @@ object DoopJCGAdapter extends JCGTestAdapter {
     }
 
     override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String,
-        jvmArgs: Array[String],
+        algorithm:   String,
+        target:      String,
+        mainClass:   String,
+        classPath:   Array[String],
+        JDKPath:     String,
+        analyzeJDK:  Boolean,
+        output:      Writer,
+        jvmArgs:     Array[String],
         programArgs: Array[String]
     ): Long = {
         val env = System.getenv
@@ -322,7 +321,7 @@ object DoopJCGAdapter extends JCGTestAdapter {
             Source.fromFile(rmCsv),
             new File(target),
             new File(JDKPath),
-            new File(outputFile)
+            output
         )
 
         FileUtils.deleteDirectory(doopPlatformDirs)

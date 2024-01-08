@@ -2,6 +2,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintStream
+import java.io.Writer
 
 import play.api.libs.json.Json
 import soot.G
@@ -10,7 +11,6 @@ import soot.Scene
 import soot.SootMethod
 import soot.options.Options
 import soot.util.backend.ASMBackendUtils
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -27,14 +27,14 @@ object SootJCGAdapter extends JCGTestAdapter {
     override def frameworkName(): String = "Soot"
 
     override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String,
-        jvmArgs: Array[String],
+        algorithm:   String,
+        target:      String,
+        mainClass:   String,
+        classPath:   Array[String],
+        JDKPath:     String,
+        analyzeJDK:  Boolean,
+        output:      Writer,
+        jvmArgs:     Array[String],
         programArgs: Array[String]
     ): Long = {
 
@@ -161,10 +161,8 @@ object SootJCGAdapter extends JCGTestAdapter {
             reachableMethods += ReachableMethod(method, callSites)
         }
 
-        val file: FileWriter = new FileWriter(outputFile)
-        file.write(Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods))))
-        file.flush()
-        file.close()
+        output.write(Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods))))
+        output.close()
 
         G.reset()
 

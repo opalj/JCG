@@ -49,14 +49,14 @@ object OpalJCGAdatper extends JCGTestAdapter {
     def frameworkName(): String = "OPAL"
 
     def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String,
-        jvmArgs: Array[String],
+        algorithm:   String,
+        target:      String,
+        mainClass:   String,
+        classPath:   Array[String],
+        JDKPath:     String,
+        analyzeJDK:  Boolean,
+        output:      Writer,
+        jvmArgs:     Array[String],
         programArgs: Array[String]
     ): Long = {
         val before = System.nanoTime()
@@ -146,8 +146,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         val after = System.nanoTime()
 
-        val out = new BufferedWriter(new FileWriter(outputFile))
-        out.write(s"""{\n\t"reachableMethods":[""")
+        output.write(s"""{\n\t"reachableMethods":[""")
         var firstRM = true
         for {
             dm ← declaredMethods.declaredMethods if (!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
@@ -158,22 +157,20 @@ object OpalJCGAdatper extends JCGTestAdapter {
             if (firstRM) {
                 firstRM = false
             } else {
-                out.write(",")
+                output.write(",")
             }
-            out.write("{\n\t\t\"method\":")
-            writeMethodObject(dm, out)
-            out.write(",\n\t\t\"callSites\":[")
+            output.write("{\n\t\t\"method\":")
+            writeMethodObject(dm, output)
+            output.write(",\n\t\t\"callSites\":[")
             calleeEOptP match {
                 case FinalEP(_, NoCallees) ⇒
                 case FinalEP(_, callees: Callees) ⇒
-                    writeCallSites(dm, callees, out)
+                    writeCallSites(dm, callees, output)
                 case _ ⇒ throw new RuntimeException()
             }
-            out.write("]\n\t}")
+            output.write("]\n\t}")
         }
-        out.write("]\n}")
-        out.flush()
-        out.close()
+        output.write("]\n}")
 
         ps.shutdown()
 
