@@ -1,8 +1,11 @@
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.FileWriter
+import java.io.OutputStreamWriter
 import java.io.PrintWriter
+import java.util.zip.GZIPOutputStream
 
 import scala.io.Source
 
@@ -133,13 +136,15 @@ object Evaluation {
             val outDir = config.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
             outDir.mkdirs()
 
-
-
             val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
             if(cgFile.exists())
                 cgFile.delete()
 
-            val output = new BufferedWriter(new FileWriter(cgFile))
+            val output =
+                if (cgFile.getName.endsWith(".zip") || cgFile.getName.endsWith(".gz"))
+                    new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(cgFile)))
+                else
+                    new BufferedWriter(new FileWriter(cgFile))
 
             val elapsed = try {
                 adapter.serializeCG(

@@ -1,3 +1,4 @@
+import java.io.File
 import java.io.FileInputStream
 
 import play.api.libs.json.Json
@@ -74,7 +75,7 @@ object CompareToTamiflex {
     }
 
     private def parseCallGraph(callGraphFile: String) = {
-        Json.parse(new FileInputStream(callGraphFile)).validate[ReachableMethods].get.toMap
+        EvaluationHelper.readCG(new File(callGraphFile)).toMap
     }
 
     def extractMethod(targetInfo: String, reflectionType: String) : Method = {

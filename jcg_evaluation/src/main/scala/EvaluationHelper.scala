@@ -1,4 +1,8 @@
 import java.io.File
+import java.io.FileInputStream
+import java.util.zip.GZIPInputStream
+
+import play.api.libs.json.Json
 
 // todo make a factory
 class CommonEvaluationConfig(
@@ -209,5 +213,15 @@ object EvaluationHelper {
         assert(jreLocationsFile.exists(), "please provide a jre.conf file")
         val jreLocations = JRELocation.mapping(jreLocationsFile)
         jreLocations
+    }
+
+    def readCG(cgFile: File): ReachableMethods = {
+        val input =
+            if (cgFile.getName.endsWith(".zip") || cgFile.getName.endsWith(".gz"))
+                new GZIPInputStream(new FileInputStream(cgFile))
+            else
+                new FileInputStream(cgFile)
+
+        Json.parse(input).validate[ReachableMethods].get
     }
 }

@@ -1,8 +1,8 @@
+import java.io.File
 import java.io.FileInputStream
 import java.util
 
 import play.api.libs.json.Json
-
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import java.util.{HashSet ⇒ JHashSet}
@@ -68,8 +68,8 @@ object CompareCGs {
                 strict = s == "t"
         }
 
-        val cg1 = Json.parse(new FileInputStream(cg1Path)).validate[ReachableMethods].get.toMap
-        val cg2 = Json.parse(new FileInputStream(cg2Path)).validate[ReachableMethods].get.toMap
+        val cg1 = EvaluationHelper.readCG(new File(cg1Path)).toMap
+        val cg2 = EvaluationHelper.readCG(new File(cg2Path)).toMap
 
         /*
         for {

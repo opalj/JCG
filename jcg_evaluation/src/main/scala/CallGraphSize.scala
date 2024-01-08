@@ -1,5 +1,7 @@
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.util.zip.GZIPInputStream
 
 import play.api.libs.json.Json
 
@@ -33,7 +35,7 @@ object CallGraphSize {
                 framework ← target.listFiles(_.isDirectory)
                 algo ← framework.listFiles(_.isDirectory)
                 callgraph = s"${framework.getName} ${algo.getName}"
-                file ← algo.listFiles(_.getName.endsWith(".json"))
+                file ← algo.listFiles{ f ⇒ f.getName.endsWith(".json") || f.getName.endsWith(".zip")  || f.getName.endsWith(".gz") }
             } {
                 printStatistic(file, pgkPrefixes, callgraph)
             }
@@ -49,8 +51,8 @@ object CallGraphSize {
         }
     }
 
-    def printStatistic(jsFile: File, appPackages: List[String], callGraphName : String = ""): Unit = {
-        val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.reachableMethods
+    def printStatistic(cgFile: File, appPackages: List[String], callGraphName : String = ""): Unit = {
+        val reachableMethods = EvaluationHelper.readCG(cgFile).reachableMethods
 
         val appMethods = reachableMethods.count { rm =>
             val declClass = rm.method.declaringClass
@@ -63,7 +65,7 @@ object CallGraphSize {
             acc + rm.callSites.foldLeft(0)((acc,cs) => acc + cs.targets.size)
         }
 
-        val outputName = if(callGraphName.isEmpty) jsFile.getName else callGraphName
+        val outputName = if(callGraphName.isEmpty) cgFile.getName else callGraphName
 
         println(s"$outputName - ${reachableMethods.size} reachable methods - $edgeCount call graph edges [application methods: $appMethods]")
     }

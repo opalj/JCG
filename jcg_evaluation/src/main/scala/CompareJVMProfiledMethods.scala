@@ -1,3 +1,4 @@
+import java.io.File
 import java.io.FileInputStream
 
 import play.api.libs.json.Json
@@ -40,7 +41,7 @@ object CompareJVMProfiledMethods {
     }
 
     private def parseCallGraph(callGraphFile: String) = {
-        Json.parse(new FileInputStream(callGraphFile)).validate[ReachableMethods].get.toMap
+        EvaluationHelper.readCG(new File(callGraphFile)).toMap
     }
 
     private def parseProfileMethods(profile: String): List[Method] = {
