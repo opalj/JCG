@@ -11,11 +11,12 @@ class CommonEvaluationConfig(
         val OUTPUT_DIR_PATH:         String,
         val EVALUATION_ADAPTERS:     List[JCGTestAdapter],
         val PROJECT_PREFIX_FILTER:   String,
-        val ALGORITHM_PREFIX_FILTER: String
+        val ALGORITHM_PREFIX_FILTER: String,
+        val ZIP:                     Boolean
 ) {
 
     val JRE_LOCATIONS_FILE = "jre.conf"
-    val SERIALIZATION_FILE_NAME = "cg.json"
+    val SERIALIZATION_FILE_NAME = if(ZIP) "cg.zip" else "cg.json"
 
     def getOutputDirectory(
         adapter:     JCGTestAdapter,
@@ -148,6 +149,7 @@ object CommonEvaluationConfig {
         var DEBUG = false
         var OUTPUT_DIR_PATH = ""
         var INPUT_DIR_PATH = ""
+        var ZIP = false
 
         var EVALUATION_ADAPTERS = List.empty[JCGTestAdapter]
 
@@ -175,6 +177,7 @@ object CommonEvaluationConfig {
 
         args.sliding(1, 1).toList.collect {
             case Array("--debug") ⇒ DEBUG = true
+            case Array("--zip") ⇒ ZIP = true
         }
 
         assert(INPUT_DIR_PATH.nonEmpty, "no input directory specified")
@@ -190,7 +193,8 @@ object CommonEvaluationConfig {
             OUTPUT_DIR_PATH,
             if(EVALUATION_ADAPTERS.isEmpty) ALL_ADAPTERS else EVALUATION_ADAPTERS,
             PROJECT_PREFIX_FILTER,
-            ALGORITHM_PREFIX_FILTER
+            ALGORITHM_PREFIX_FILTER,
+            ZIP
         )
     }
 }

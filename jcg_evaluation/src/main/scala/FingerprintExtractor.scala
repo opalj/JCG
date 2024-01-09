@@ -29,7 +29,7 @@ object FingerprintExtractor {
 
     def main(args: Array[String]): Unit = {
 
-        var c = ConfigParser.parseConfig(args)
+        val c = ConfigParser.parseConfig(args)
         if(c.isEmpty)
             System.exit(0)
 
