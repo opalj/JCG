@@ -31,7 +31,7 @@ object CompareCGs {
         var inPackage = ""
         var strict = true
 
-        args.sliding(2, 2).toList.collect {
+        args.sliding(2, 1).toList.collect {
             case Array("--input1", cg) ⇒
                 assert(cg1Path.isEmpty, "--input1 is specified multiple times")
                 cg1Path = cg
@@ -50,22 +50,20 @@ object CompareCGs {
                         showMethodPrecisionRecall = true
                         showEdgePrecisionRecall = true
                 }
-            case Array("--showBoundaries", boundaries) ⇒
-                showBoundaries = boundaries == "t"
-            case Array("--showCommon", common) ⇒
-                showCommon = common == "t"
-            case Array("--showReachable", reachable) ⇒
-                showReachable = reachable == "t"
-            case Array("--showAdditional", additional) ⇒
-                showAdditional = additional == "t"
-            case Array("--showAdditionalCalls", additionalCalls) ⇒
-                showAdditionalCalls = additionalCalls == "t"
             case Array("--maxFindings", max) ⇒
                 maxFindings = max.toInt
             case Array("--inPackage", pkg) ⇒
                 inPackage = pkg
-            case Array("--strict", s) ⇒
-                strict = s == "t"
+        }
+
+        args.sliding(1, 1).toList.collect {
+            case Array("--showBoundaries") ⇒ showBoundaries = true
+            case Array("--showCommon") ⇒ showCommon = true
+            case Array("--showReachable") ⇒ showReachable = true
+            case Array("--showAdditional") ⇒ showAdditional = true
+            case Array("--showAdditionalCalls") ⇒ showAdditionalCalls = true
+            case Array("--nonStrict") ⇒ strict = false
+
         }
 
         val cg1 = EvaluationHelper.readCG(new File(cg1Path)).toMap
