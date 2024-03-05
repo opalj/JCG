@@ -2,6 +2,10 @@ import sbt.Keys.libraryDependencies
 
 ThisBuild / javacOptions ++= Seq("-encoding", "utf8", "-parameters")
 
+ThisBuild / libraryDependencySchemes ++= Seq(
+    "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+    )
+
 lazy val commonSettings = Seq(
     scalaVersion := "2.13.8",
     organization := "de.opal-project",
