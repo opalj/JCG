@@ -58,10 +58,6 @@ static void getMethodNameSig(jmethodID mid, char** nameSig) {
 void JNICALL MethodEntry(jvmtiEnv *jvmti, JNIEnv* jni, jthread thread, jmethodID method) {
     jlocation loc;
 
-    // Get the callee method from the current stack frame
-    jmethodID callee;
-    jvmti->GetFrameLocation(NULL, 0, &callee, &loc);
-
     // Get the caller method and call location from the previous stack frame
     jmethodID caller;
     int err = jvmti->GetFrameLocation(NULL, 1, &caller, &loc);
@@ -76,7 +72,7 @@ void JNICALL MethodEntry(jvmtiEnv *jvmti, JNIEnv* jni, jthread thread, jmethodID
     // Add call site to the call graph if not already present, get the set of callees back
     auto& callees = cg.emplace(make_pair(move(callsite), unordered_set<jmethodID>())).first->second;
     // Insert callee into call site
-    callees.insert(callee);
+    callees.insert(method);
 }
 
 void return_cg() {
