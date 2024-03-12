@@ -58,9 +58,6 @@ static void getMethodNameSig(jmethodID mid, char** nameSig) {
 
 void JNICALL MethodEntry(jvmtiEnv *jvmti, JNIEnv* jni, jthread thread, jmethodID method) {
     jlocation loc;
-    jmethodID callee;
-    jvmti->GetFrameLocation(NULL, 0, &callee, &loc);
-    assert(callee==method);
 
     // Get the caller method and call location from the previous stack frame
     jmethodID caller;
