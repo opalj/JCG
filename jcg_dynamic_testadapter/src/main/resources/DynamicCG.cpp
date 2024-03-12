@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include <cstring>
 #include <sstream>
-#include <assert.h>
 
 using namespace std;
 
