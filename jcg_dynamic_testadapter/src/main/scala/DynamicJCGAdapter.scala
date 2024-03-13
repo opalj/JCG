@@ -70,6 +70,8 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             var caller = in.readLine()
 
             while(caller != endMessage){
+
+                println("Got Msg: " + caller)
             	
             	val parsedCaller = if(caller == "TopLevel"){
 			        None     	
