@@ -69,13 +69,7 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             val endMessage = "End of Callgraph"
             var caller = in.readLine()
 
-
-            var cnt = 0L
-            println("Reading messages: " + caller)
-
             while(caller != endMessage){
-                
-                if(cnt % 1000 == 0) println("Number of messages from agent: " + cnt)
 
             	val parsedCaller = if(caller == "TopLevel"){
 			        None     	
@@ -106,7 +100,6 @@ object DynamicJCGAdapter extends JCGTestAdapter {
                 }
 
                 caller = in.readLine()
-                cnt += 1L
             }
 
             System.nanoTime()
