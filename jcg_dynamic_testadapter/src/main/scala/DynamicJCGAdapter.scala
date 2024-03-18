@@ -70,7 +70,7 @@ object DynamicJCGAdapter extends JCGTestAdapter {
             var caller = in.readLine()
 
             while(caller != endMessage){
-            	
+
             	val parsedCaller = if(caller == "TopLevel"){
 			        None     	
             	} else{
@@ -99,7 +99,7 @@ object DynamicJCGAdapter extends JCGTestAdapter {
                     targets(pcLn) += parsedCallee
                 }
 
-                caller = in.readLine()	
+                caller = in.readLine()
             }
 
             System.nanoTime()

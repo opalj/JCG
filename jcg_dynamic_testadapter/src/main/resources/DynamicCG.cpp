@@ -35,24 +35,30 @@ static map<Callsite, unordered_set<jmethodID>> cg;
 
 static void getMethodNameSig(jmethodID mid, char** nameSig) {
     jclass cls;
-    jvmti->GetMethodDeclaringClass(mid, &cls);
+    int err = jvmti->GetMethodDeclaringClass(mid, &cls);
 
-    char* cname;
-    char* generic;
-    jvmti->GetClassSignature(cls, &cname, &generic);
+    if(err == JVMTI_ERROR_NONE){
+        char* cname;
+        char* generic;
+        jvmti->GetClassSignature(cls, &cname, &generic);
 
-    jvmti->Deallocate((unsigned char*) generic);
+        jvmti->Deallocate((unsigned char*) generic);
 
-    char* mname;
-    char* sig;
-    jvmti->GetMethodName(mid, &mname, &sig, &generic);
+        char* mname;
+        char* sig;
+        jvmti->GetMethodName(mid, &mname, &sig, &generic);
 
-    asprintf(nameSig, "%s:%s%s", (cname == NULL ? "" : cname), (mname == NULL ? "" : mname), (sig == NULL ? "" : sig));
+        asprintf(nameSig, "%s:%s%s", (cname == NULL ? "" : cname), (mname == NULL ? "" : mname), (sig == NULL ? "" : sig));
 
-    jvmti->Deallocate((unsigned char*) cname);
-    jvmti->Deallocate((unsigned char*) mname);
-    jvmti->Deallocate((unsigned char*) sig);
-    jvmti->Deallocate((unsigned char*) generic);
+        jvmti->Deallocate((unsigned char*) cname);
+        jvmti->Deallocate((unsigned char*) mname);
+        jvmti->Deallocate((unsigned char*) sig);
+        jvmti->Deallocate((unsigned char*) generic);
+    } else {
+        asprintf(nameSig, "<FAILED>");
+    }
+
+    
 }
 
 void JNICALL MethodEntry(jvmtiEnv *jvmti, JNIEnv* jni, jthread thread, jmethodID method) {
