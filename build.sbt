@@ -1,6 +1,10 @@
 import sbt.Keys.libraryDependencies
 
-javacOptions in ThisBuild ++= Seq("-encoding", "utf8", "-parameters")
+ThisBuild / javacOptions ++= Seq("-encoding", "utf8", "-parameters")
+
+ThisBuild / libraryDependencySchemes ++= Seq(
+    "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+    )
 
 lazy val commonSettings = Seq(
     scalaVersion := "2.13.8",
