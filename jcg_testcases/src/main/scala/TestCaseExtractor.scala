@@ -55,15 +55,100 @@ object TestCaseExtractor {
 
         val resourceDir = new File(fileDir.getOrElse(userDir))
 
-        // get all markdown files
-        val resources = resourceDir.
+        val javaDir = new File(resourceDir, "java")
+        val jsDir = new File(resourceDir, "js")
+
+        // get all JAVA markdown files
+        val javaResources = javaDir.
             listFiles(_.getPath.endsWith(".md")).
             filter(_.getName.startsWith(mdFilter))
 
-        println(resources.mkString(", "))
+        extractJavaTests(debug, result, javaResources)
+        println(javaResources.mkString(", "))
 
+        val jsResources = jsDir.
+            listFiles(_.getPath.endsWith(".md")).
+            filter(_.getName.startsWith(mdFilter))
+
+        println(jsResources.mkString(", "))
+        extractJSTests(debug, jsResources)
+
+
+        FileUtils.deleteDirectory(tmp)
+    }
+
+    private def extractJSTests(debug: Boolean, resources: Array[File]): Unit = {
+        val resultDir = new File("testcaseJS")
+
+        // Clear result directory if it already exists
+        if (resultDir.exists()) {
+            FileUtils.deleteDirectory(resultDir)
+        }
+        resultDir.mkdirs()
+
+        resources.foreach(file => {
+            if(debug) {
+                println(file)
+            }
+
+            // read lines from given testcase file
+            val source = Source.fromFile(file)
+            val lines = try source.mkString finally source.close()
+
+            /*
+             * ##ProjectName
+             * [//]: # (Main: path/to/Main.js)
+             * multiple code snippets
+             * [//]: # (END)
+             */
+            val reHeaders = ("""(?s)""" +
+              """\#\#(?<projectName>[^\n]*)\n""" + // ##ProjectName
+              """\[//\]: \# \((?:MAIN: (?<mainClass>[^\n]*)|LIBRARY)\)\n""" + // [//]: # (Main: path.to.Main.js) or [//]: # (LIBRARY)
+              """(?<body>.*?)""" + // multiple code snippets
+              """\[//\]: \# \(END\)""").r // [//]: # (END)
+
+            /*
+             * ```js
+             * // path/to/File.js
+             * CODE SNIPPET
+             * ```
+             */
+            val re = """(?s)```js(\n// ?([^/]*)([^\n]*)\n([^`]*))```""".r
+
+            reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
+                val projectName = projectMatchResult.group("projectName").trim
+                if(debug) {
+                    println("[DEBUG] project", projectName)
+                }
+
+                // create Folder for project
+                val outputFolder = new File(resultDir, projectName)
+                outputFolder.mkdirs()
+
+                re.findAllIn(projectMatchResult.group("body")).matchData.foreach { matchResult =>
+                    val packageName = matchResult.group(2)
+                    val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
+                    val codeSnippet = matchResult.group(4)
+
+                    val file = new File(resultDir.getAbsolutePath, fileName)
+                    file.getParentFile.mkdirs()
+                    file.createNewFile()
+
+                    val pw = new PrintWriter(file)
+                    pw.write(codeSnippet)
+                    pw.close()
+                    file.getAbsolutePath
+                }
+            })
+        })
+    }
+
+    private def extractJavaTests(debug: Boolean, result: File, resources: Array[File]): Unit = {
+        val tmp = new File("tmp")
         resources.foreach { sourceFile ⇒
-            println(sourceFile)
+            if (debug) {
+              println(sourceFile)
+            }
             val source = Source.fromFile(sourceFile)
             val lines = try source.mkString finally source.close()
 
@@ -73,14 +158,13 @@ object TestCaseExtractor {
              * multiple code snippets
              * [//]: # (END)
              */
-            val reHeaders = ("""(?s)"""+
-                """\#\#([^\n]*)\n"""+ // ##ProjectName
-                """\[//\]: \# \((?:MAIN: ([^\n]*)|LIBRARY)\)\n"""+ // [//]: # (Main: path.to.Main.java) or [//]: # (LIBRARY)
-                """(.*?)"""+ // multiple code snippets
-                """\[//\]: \# \(END\)""").r( // [//]: # (END)
-                    "projectName", "mainClass", "body"
-                )
-
+            val reHeaders = ("""(?s)""" +
+              """\#\#([^\n]*)\n""" + // ##ProjectName
+              """\[//\]: \# \((?:MAIN: ([^\n]*)|LIBRARY)\)\n""" + // [//]: # (Main: path.to.Main.java) or [//]: # (LIBRARY)
+              """(.*?)""" + // multiple code snippets
+              """\[//\]: \# \(END\)""").r( // [//]: # (END)
+                "projectName", "mainClass", "body"
+            )
             /*
              * ```java
              * // path/to/Class.java
@@ -142,7 +226,11 @@ object TestCaseExtractor {
                     println(args.mkString("[DEBUG] Jar args: \n\n", "\n", "\n\n"))
                 }
 
-                sys.process.Process(args, bin).!
+                val exitCode = sys.process.Process(args, bin).!
+
+                if (debug && exitCode != 0) {
+                    println(s"[DEBUG] EXIT CODE $exitCode")
+                }
 
                 if (main != null) {
                     println(s"running $projectName.jar")
@@ -164,9 +252,8 @@ object TestCaseExtractor {
                 pw.close()
             }
         }
-
-        FileUtils.deleteDirectory(tmp)
     }
+
 
     def recursiveListFiles(f: File): Array[File] = {
         val these = f.listFiles((_, fil) ⇒ fil.endsWith(".class"))
