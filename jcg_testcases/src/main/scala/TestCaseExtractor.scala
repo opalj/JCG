@@ -24,10 +24,11 @@ object TestCaseExtractor {
 
     /**
      * Extracts the test cases.
+     *
      * @param args possible arguments are:
-     *      '--rsrcDir dir', where 'dir' is the directory to search in. If this option is not
-     *          specified, the resource root directory will be used.
-     *      '--md filter', where 'filter' is a prefix of the filenames to be included.
+     *             '--rsrcDir dir', where 'dir' is the directory to search in. If this option is not
+     *             specified, the resource root directory will be used.
+     *             '--md filter', where 'filter' is a prefix of the filenames to be included.
      */
     def main(args: Array[String]): Unit = {
         val userDir = System.getProperty("user.dir")
@@ -64,7 +65,7 @@ object TestCaseExtractor {
         cleanUpDirectory(resultDir)
 
         resources.foreach(file => {
-            if(debug) {
+            if (debug) {
                 println(file)
             }
 
@@ -94,7 +95,7 @@ object TestCaseExtractor {
 
             reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
                 val projectName = projectMatchResult.group("projectName").trim
-                if(debug) {
+                if (debug) {
                     println("[DEBUG] project", projectName)
                 }
 
@@ -124,7 +125,7 @@ object TestCaseExtractor {
         val tmp = new File("tmp")
         resources.foreach { sourceFile ⇒
             if (debug) {
-              println(sourceFile)
+                println(sourceFile)
             }
             val source = Source.fromFile(sourceFile)
             val lines = try source.mkString finally source.close()
@@ -179,7 +180,7 @@ object TestCaseExtractor {
 
                 val compilerArgs = Seq("-cp", s"$classPath", "-d", bin.getAbsolutePath, "-encoding", "UTF-8", "-source", "1.8", "-target", "1.8") ++ srcFiles
 
-                if(debug) {
+                if (debug) {
                     println(compilerArgs.mkString("[DEBUG] Compiler args: \n\n", "\n", "\n\n"))
                 }
 
@@ -187,7 +188,7 @@ object TestCaseExtractor {
 
                 val allClassFiles = recursiveListFiles(bin.getAbsoluteFile)
 
-                if(debug) {
+                if (debug) {
                     println(allClassFiles.mkString("[DEBUG] Produced class files: \n\n", "\n", "\n\n"))
                 }
 
@@ -199,7 +200,7 @@ object TestCaseExtractor {
                 val mainOpt = Option(main)
                 val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getAbsolutePath) ++ mainOpt ++ allClassFileNames
 
-                if(debug) {
+                if (debug) {
                     println(args.mkString("[DEBUG] Jar args: \n\n", "\n", "\n\n"))
                 }
 
@@ -233,7 +234,8 @@ object TestCaseExtractor {
 
     /**
      * Returns all markdown files in the given directory.
-     * @param dir the directory to search in
+     *
+     * @param dir    the directory to search in
      * @param filter a filter to apply to the file names
      */
     def listMarkdownFiles(dir: File, filter: String): Array[File] = {
@@ -243,10 +245,11 @@ object TestCaseExtractor {
     /**
      * Cleans up the given directory.
      * If the directory does not exist, it will be created.
+     *
      * @param dir the directory to clean up
      */
     def cleanUpDirectory(dir: File): Unit = {
-        if(dir.exists()){
+        if (dir.exists()) {
             FileUtils.deleteDirectory(dir)
         }
         dir.mkdirs()
@@ -255,6 +258,7 @@ object TestCaseExtractor {
     /**
      * Returns the value of the given CLI argument.
      * If the argument is not found, None is returned.
+     *
      * @param args array holding the arguments to search in.
      */
     def getArgumentValue(args: Array[String], argName: String): Option[String] = {
@@ -268,16 +272,16 @@ object TestCaseExtractor {
         these ++ f.listFiles.filter(_.isDirectory).flatMap(recursiveListFiles)
     }
 
-    def findJCGTargetDirs() : List[File] = {
+    def findJCGTargetDirs(): List[File] = {
 
         val root = new File(System.getProperty("user.dir"))
 
         val worklist = scala.collection.mutable.Queue(root)
         val result = scala.collection.mutable.ArrayBuffer.empty[File]
-        while(worklist.nonEmpty){
+        while (worklist.nonEmpty) {
             val curElement = worklist.dequeue()
-            if(curElement.isDirectory){
-                if(curElement.getName == "classes")
+            if (curElement.isDirectory) {
+                if (curElement.getName == "classes")
                     result += curElement
                 else
                     worklist ++= curElement.listFiles()
@@ -287,5 +291,5 @@ object TestCaseExtractor {
         result.toList
     }
 
-    def targetDirsToCP(dirs: List[File]) : String = dirs.mkString(s"$pathSeparator")
+    def targetDirsToCP(dirs: List[File]): String = dirs.mkString(s"$pathSeparator")
 }
