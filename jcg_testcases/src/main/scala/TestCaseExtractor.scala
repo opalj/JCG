@@ -20,6 +20,7 @@ import play.api.libs.json.Json
 object TestCaseExtractor {
 
     val pathSeparator = File.pathSeparator
+    val debug = false
 
     /**
      * Extracts the test cases.
@@ -29,62 +30,38 @@ object TestCaseExtractor {
      *      '--md filter', where 'filter' is a prefix of the filenames to be included.
      */
     def main(args: Array[String]): Unit = {
-
-        val debug = false
-
         val userDir = System.getProperty("user.dir")
-
         val tmp = new File("tmp")
-        if (tmp.exists())
-            FileUtils.deleteDirectory(tmp)
+        val resultJars = new File("testcaseJars")
 
-        tmp.mkdirs()
+        // clean up existing directories
+        cleanUpDirectory(tmp)
+        cleanUpDirectory(resultJars)
 
-        val result = new File("testcaseJars")
-        if (result.exists())
-            FileUtils.deleteDirectory(result)
-        result.mkdirs()
-
-        var mdFilter = ""
-        var fileDir: Option[String]= None
-
-        args.sliding(2, 2).toList.collect {
-            case Array("--md", f: String)        ⇒ mdFilter = f
-            case Array("--rsrcDir", dir: String) ⇒ fileDir = Some(dir)
-        }
-
-        val resourceDir = new File(fileDir.getOrElse(userDir))
+        // parse arguments
+        val mdFilter = getArgumentValue(args, "--md").getOrElse("")
+        val resourceDir = new File(getArgumentValue(args, "--rsrcDir").getOrElse(userDir))
 
         val javaDir = new File(resourceDir, "java")
         val jsDir = new File(resourceDir, "js")
 
-        // get all JAVA markdown files
-        val javaResources = javaDir.
-            listFiles(_.getPath.endsWith(".md")).
-            filter(_.getName.startsWith(mdFilter))
-
-        extractJavaTests(debug, result, javaResources)
+        // extract test cases
+        val javaResources = listMarkdownFiles(javaDir, mdFilter)
         println(javaResources.mkString(", "))
+        extractJavaTests(resultJars, javaResources)
 
-        val jsResources = jsDir.
-            listFiles(_.getPath.endsWith(".md")).
-            filter(_.getName.startsWith(mdFilter))
-
+        val jsResources = listMarkdownFiles(jsDir, mdFilter)
         println(jsResources.mkString(", "))
-        extractJSTests(debug, jsResources)
-
+        extractJSTests(jsResources)
 
         FileUtils.deleteDirectory(tmp)
     }
 
-    private def extractJSTests(debug: Boolean, resources: Array[File]): Unit = {
+    private def extractJSTests(resources: Array[File]): Unit = {
         val resultDir = new File("testcaseJS")
 
         // Clear result directory if it already exists
-        if (resultDir.exists()) {
-            FileUtils.deleteDirectory(resultDir)
-        }
-        resultDir.mkdirs()
+        cleanUpDirectory(resultDir)
 
         resources.foreach(file => {
             if(debug) {
@@ -143,7 +120,7 @@ object TestCaseExtractor {
         })
     }
 
-    private def extractJavaTests(debug: Boolean, result: File, resources: Array[File]): Unit = {
+    private def extractJavaTests(result: File, resources: Array[File]): Unit = {
         val tmp = new File("tmp")
         resources.foreach { sourceFile ⇒
             if (debug) {
@@ -254,6 +231,37 @@ object TestCaseExtractor {
         }
     }
 
+    /**
+     * Returns all markdown files in the given directory.
+     * @param dir the directory to search in
+     * @param filter a filter to apply to the file names
+     */
+    def listMarkdownFiles(dir: File, filter: String): Array[File] = {
+        dir.listFiles(_.getPath.endsWith(".md")).filter(_.getName.startsWith(filter))
+    }
+
+    /**
+     * Cleans up the given directory.
+     * If the directory does not exist, it will be created.
+     * @param dir the directory to clean up
+     */
+    def cleanUpDirectory(dir: File): Unit = {
+        if(dir.exists()){
+            FileUtils.deleteDirectory(dir)
+        }
+        dir.mkdirs()
+    }
+
+    /**
+     * Returns the value of the given CLI argument.
+     * If the argument is not found, None is returned.
+     * @param args array holding the arguments to search in.
+     */
+    def getArgumentValue(args: Array[String], argName: String): Option[String] = {
+        args.sliding(2, 2).collectFirst({
+            case Array(`argName`, value: String) => value
+        })
+    }
 
     def recursiveListFiles(f: File): Array[File] = {
         val these = f.listFiles((_, fil) ⇒ fil.endsWith(".class"))
