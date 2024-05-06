@@ -86,12 +86,15 @@ object TestCaseExtractor {
               """\[//\]: \# \(END\)""").r // [//]: # (END)
 
             /*
+             * (```json
+             * ...
+             * ```)?
              * ```js
              * // path/to/File.js
              * CODE SNIPPET
              * ```
              */
-            val re = """(?s)```js(\n// ?([^/]*)([^\n]*)\n([^`]*))```""".r
+            val re = """(?s)```(json\n(?<expectedCG>[^`]*)```\n```)?js(\n// ?(?<packageName>[^/]*)(?<fileName>[^\n]*)\n(?<codeSnippet>[^`]*))```""".r
 
             reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
                 val projectName = projectMatchResult.group("projectName").trim
@@ -104,22 +107,29 @@ object TestCaseExtractor {
                 outputFolder.mkdirs()
 
                 re.findAllIn(projectMatchResult.group("body")).matchData.foreach { matchResult =>
-                    val packageName = matchResult.group(2)
-                    val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
-                    val codeSnippet = matchResult.group(4)
+                    val packageName = matchResult.group("packageName")
+                    val filePath = s"$projectName/$packageName${matchResult.group("fileName")}"
+                    val codeSnippet = matchResult.group("codeSnippet")
+                    val expectedCG = matchResult.group("expectedCG")
 
-                    val file = new File(resultDir.getAbsolutePath, fileName)
-                    file.getParentFile.mkdirs()
-                    file.createNewFile()
+                    val codeFile = new File(resultDir.getAbsolutePath, filePath)
+                    val cgFile = new File(resultDir.getAbsolutePath, s"$projectName/$packageName${matchResult.group("fileName")}on")
+                    codeFile.getParentFile.mkdirs()
+                    codeFile.createNewFile()
+                    writeToFile(codeFile, codeSnippet)
 
-                    val pw = new PrintWriter(file)
-                    pw.write(codeSnippet)
-                    pw.close()
-                    file.getAbsolutePath
+                    if (expectedCG != null) {
+                        cgFile.getParentFile.mkdirs()
+                        cgFile.createNewFile()
+                        writeToFile(cgFile, expectedCG)
+                    }
+
+                    codeFile.getAbsolutePath
                 }
             })
         })
     }
+
 
     private def extractJavaTests(result: File, resources: Array[File]): Unit = {
         val tmp = new File("tmp")
@@ -228,6 +238,27 @@ object TestCaseExtractor {
                 val pw = new PrintWriter(projectSpecOut)
                 pw.write(Json.prettyPrint(projectSpecJson))
                 pw.close()
+            }
+        }
+    }
+
+    /**
+     * Writes the given content to the given file and catches any exceptions.
+     *
+     * @param file    the file to write to
+     * @param content the content to write
+     */
+    private def writeToFile(file: File, content: String): Unit = {
+        var printWriter: PrintWriter = null
+
+        try {
+            printWriter = new PrintWriter(file)
+            printWriter.write(content)
+        } catch {
+            case e: Exception => println(s"Error writing to file: ${e.getMessage}")
+        } finally {
+            if (printWriter != null) {
+                printWriter.close()
             }
         }
     }
