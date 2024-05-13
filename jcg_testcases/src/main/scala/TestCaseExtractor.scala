@@ -36,8 +36,8 @@ object TestCaseExtractor {
         val resultJars = new File("testcaseJars")
 
         // clean up existing directories
-        cleanUpDirectory(tmp)
-        cleanUpDirectory(resultJars)
+        FileOperations.cleanUpDirectory(tmp)
+        FileOperations.cleanUpDirectory(resultJars)
 
         // parse arguments
         val mdFilter = getArgumentValue(args, "--md").getOrElse("")
@@ -47,11 +47,11 @@ object TestCaseExtractor {
         val jsDir = new File(resourceDir, "js")
 
         // extract test cases
-        val javaResources = listMarkdownFiles(javaDir, mdFilter)
+        val javaResources = FileOperations.listMarkdownFiles(javaDir, mdFilter)
         println(javaResources.mkString(", "))
         extractJavaTests(resultJars, javaResources)
 
-        val jsResources = listMarkdownFiles(jsDir, mdFilter)
+        val jsResources = FileOperations.listMarkdownFiles(jsDir, mdFilter)
         println(jsResources.mkString(", "))
         extractJSTests(jsResources)
 
@@ -62,7 +62,7 @@ object TestCaseExtractor {
         val resultDir = new File("testcaseJS")
 
         // Clear result directory if it already exists
-        cleanUpDirectory(resultDir)
+        FileOperations.cleanUpDirectory(resultDir)
 
         resources.foreach(file => {
             if (debug) {
@@ -116,12 +116,12 @@ object TestCaseExtractor {
                     val cgFile = new File(resultDir.getAbsolutePath, s"$projectName/$packageName${matchResult.group("fileName")}on")
                     codeFile.getParentFile.mkdirs()
                     codeFile.createNewFile()
-                    writeToFile(codeFile, codeSnippet)
+                    FileOperations.writeToFile(codeFile, codeSnippet)
 
                     if (expectedCG != null) {
                         cgFile.getParentFile.mkdirs()
                         cgFile.createNewFile()
-                        writeToFile(cgFile, expectedCG)
+                        FileOperations.writeToFile(cgFile, expectedCG)
                     }
 
                     codeFile.getAbsolutePath
@@ -185,8 +185,8 @@ object TestCaseExtractor {
                 val bin = new File(tmp.getAbsolutePath, s"$projectName/bin/")
                 bin.mkdirs()
 
-                val targetDirs = findJCGTargetDirs()
-                val classPath = Seq(".", targetDirsToCP(targetDirs), System.getProperty("java.home")).mkString(s"$pathSeparator")
+                val targetDirs = FileOperations.findJCGTargetDirs()
+                val classPath = Seq(".", FileOperations.targetDirsToCP(targetDirs), System.getProperty("java.home")).mkString(s"$pathSeparator")
 
                 val compilerArgs = Seq("-cp", s"$classPath", "-d", bin.getAbsolutePath, "-encoding", "UTF-8", "-source", "1.8", "-target", "1.8") ++ srcFiles
 
@@ -196,7 +196,7 @@ object TestCaseExtractor {
 
                 compiler.run(null, null, null, compilerArgs: _*)
 
-                val allClassFiles = recursiveListFiles(bin.getAbsoluteFile)
+                val allClassFiles = FileOperations.recursiveListFiles(bin.getAbsoluteFile)
 
                 if (debug) {
                     println(allClassFiles.mkString("[DEBUG] Produced class files: \n\n", "\n", "\n\n"))
@@ -242,49 +242,6 @@ object TestCaseExtractor {
         }
     }
 
-    /**
-     * Writes the given content to the given file and catches any exceptions.
-     *
-     * @param file    the file to write to
-     * @param content the content to write
-     */
-    private def writeToFile(file: File, content: String): Unit = {
-        var printWriter: PrintWriter = null
-
-        try {
-            printWriter = new PrintWriter(file)
-            printWriter.write(content)
-        } catch {
-            case e: Exception => println(s"Error writing to file: ${e.getMessage}")
-        } finally {
-            if (printWriter != null) {
-                printWriter.close()
-            }
-        }
-    }
-
-    /**
-     * Returns all markdown files in the given directory.
-     *
-     * @param dir    the directory to search in
-     * @param filter a filter to apply to the file names
-     */
-    def listMarkdownFiles(dir: File, filter: String): Array[File] = {
-        dir.listFiles(_.getPath.endsWith(".md")).filter(_.getName.startsWith(filter))
-    }
-
-    /**
-     * Cleans up the given directory.
-     * If the directory does not exist, it will be created.
-     *
-     * @param dir the directory to clean up
-     */
-    def cleanUpDirectory(dir: File): Unit = {
-        if (dir.exists()) {
-            FileUtils.deleteDirectory(dir)
-        }
-        dir.mkdirs()
-    }
 
     /**
      * Returns the value of the given CLI argument.
@@ -297,30 +254,4 @@ object TestCaseExtractor {
             case Array(`argName`, value: String) => value
         })
     }
-
-    def recursiveListFiles(f: File): Array[File] = {
-        val these = f.listFiles((_, fil) ⇒ fil.endsWith(".class"))
-        these ++ f.listFiles.filter(_.isDirectory).flatMap(recursiveListFiles)
-    }
-
-    def findJCGTargetDirs(): List[File] = {
-
-        val root = new File(System.getProperty("user.dir"))
-
-        val worklist = scala.collection.mutable.Queue(root)
-        val result = scala.collection.mutable.ArrayBuffer.empty[File]
-        while (worklist.nonEmpty) {
-            val curElement = worklist.dequeue()
-            if (curElement.isDirectory) {
-                if (curElement.getName == "classes")
-                    result += curElement
-                else
-                    worklist ++= curElement.listFiles()
-            }
-        }
-
-        result.toList
-    }
-
-    def targetDirsToCP(dirs: List[File]): String = dirs.mkString(s"$pathSeparator")
 }
