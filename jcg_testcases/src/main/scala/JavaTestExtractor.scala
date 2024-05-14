@@ -1,4 +1,5 @@
-import TestCaseExtractor.{debug, pathSeparator}
+import TestCaseExtractorApp.{debug, pathSeparator}
+import org.apache.commons.io.FileUtils
 import play.api.libs.json.{JsValue, Json}
 
 import java.io.{File, PrintWriter}
@@ -6,8 +7,15 @@ import javax.tools.ToolProvider
 import scala.io.Source
 
 object JavaTestExtractor extends TestCaseExtractor {
-    override def extract(outputDir: File, resources: Array[File]): Unit = {
+
+    override def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
+        val resources = getResources(new File(inputDir, "java"), prefixFilter)
+        val resultsDir = new File(outputDir, "java")
         val tmp = new File("tmp")
+
+        FileOperations.cleanUpDirectory(tmp)
+        FileOperations.cleanUpDirectory(resultsDir)
+
         resources.foreach { sourceFile ⇒
             if (debug) {
                 println(sourceFile)
@@ -22,12 +30,10 @@ object JavaTestExtractor extends TestCaseExtractor {
              * [//]: # (END)
              */
             val reHeaders = ("""(?s)""" +
-              """\#\#([^\n]*)\n""" + // ##ProjectName
-              """\[//\]: \# \((?:MAIN: ([^\n]*)|LIBRARY)\)\n""" + // [//]: # (Main: path.to.Main.java) or [//]: # (LIBRARY)
-              """(.*?)""" + // multiple code snippets
-              """\[//\]: \# \(END\)""").r( // [//]: # (END)
-                "projectName", "mainClass", "body"
-            )
+              """\#\#(?<projectName>[^\n]*)\n""" + // ##ProjectName
+              """\[//\]: \# \((?:MAIN: (?<mainClass>[^\n]*)|LIBRARY)\)\n""" + // [//]: # (Main: path.to.Main.java) or [//]: # (LIBRARY)
+              """(?<body>.*?)""" + // multiple code snippets
+              """\[//\]: \# \(END\)""").r // [//]: # (END)
             /*
              * ```java
              * // path/to/Class.java
@@ -81,7 +87,7 @@ object JavaTestExtractor extends TestCaseExtractor {
 
 
                 val jarOpts = Seq(if (main != null) "cfe" else "cf")
-                val outPathCompiler = new File(s"${outputDir.getAbsolutePath}/$projectName.jar")
+                val outPathCompiler = new File(s"${resultsDir.getAbsolutePath}/$projectName.jar")
                 val mainOpt = Option(main)
                 val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getAbsolutePath) ++ mainOpt ++ allClassFileNames
 
@@ -97,7 +103,7 @@ object JavaTestExtractor extends TestCaseExtractor {
 
                 if (main != null) {
                     println(s"running $projectName.jar")
-                    sys.process.Process(Seq("java", "-jar", s"$projectName.jar"), outputDir).!
+                    sys.process.Process(Seq("java", "-jar", s"$projectName.jar"), resultsDir).!
                 }
 
                 val projectSpec = ProjectSpecification(
@@ -109,11 +115,15 @@ object JavaTestExtractor extends TestCaseExtractor {
                 )
 
                 val projectSpecJson: JsValue = Json.toJson(projectSpec)
-                val projectSpecOut = new File(outputDir, s"$projectName.conf")
+                val projectSpecOut = new File(resultsDir, s"$projectName.conf")
                 val pw = new PrintWriter(projectSpecOut)
                 pw.write(Json.prettyPrint(projectSpecJson))
                 pw.close()
             }
+
         }
+
+
+        FileUtils.deleteDirectory(tmp)
     }
 }

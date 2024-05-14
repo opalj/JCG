@@ -1,9 +1,23 @@
 import java.io.File
 
-import org.apache.commons.io.FileUtils
-
 trait TestCaseExtractor {
-    def extract(outputDir: File, resources: Array[File]): Unit
+    /**
+     * Extracts test cases from the given directory and writes them to the output directory.
+     *
+     * @param inputDir     the directory to search in
+     * @param outputDir    the directory to write the test cases to
+     * @param prefixFilter a filter to apply to the file names in the input directory
+     */
+    def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit
+
+    /**
+     * Returns all markdown files in the given directory with the given prefix.
+     *
+     * @param inputDir     the directory to search in
+     * @param filterPrefix a filter to apply to the file names
+     * @return an array of markdown files
+     */
+    protected def getResources(inputDir: File, filterPrefix: String): Array[File] = FileOperations.listMarkdownFiles(inputDir, filterPrefix)
 }
 
 /**
@@ -16,9 +30,9 @@ trait TestCaseExtractor {
  * @author Michael Reif
  * @author Florian Kuebler
  */
-object TestCaseExtractor {
+object TestCaseExtractorApp {
 
-    val pathSeparator = File.pathSeparator
+    val pathSeparator: String = File.pathSeparator
     val debug = false
 
     /**
@@ -31,30 +45,18 @@ object TestCaseExtractor {
      */
     def main(args: Array[String]): Unit = {
         val userDir = System.getProperty("user.dir")
-        val tmp = new File("tmp")
-        val resultJars = new File("testcaseJars")
+        val outputDir = new File("testcasesOutput")
 
-        // clean up existing directories
-        FileOperations.cleanUpDirectory(tmp)
-        FileOperations.cleanUpDirectory(resultJars)
+        val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor)
 
         // parse arguments
         val mdFilter = getArgumentValue(args, "--md").getOrElse("")
         val resourceDir = new File(getArgumentValue(args, "--rsrcDir").getOrElse(userDir))
 
-        val javaDir = new File(resourceDir, "java")
-        val jsDir = new File(resourceDir, "js")
 
-        // extract test cases
-        val javaResources = FileOperations.listMarkdownFiles(javaDir, mdFilter)
-        println(javaResources.mkString(", "))
-        JavaTestExtractor.extract(resultJars, javaResources)
-
-        val jsResources = FileOperations.listMarkdownFiles(jsDir, mdFilter)
-        println(jsResources.mkString(", "))
-        JSTestExtractor.extract(new File("testcaseJS"), jsResources)
-
-        FileUtils.deleteDirectory(tmp)
+        for (extractor <- extractors) {
+            extractor.extract(resourceDir, outputDir, mdFilter)
+        }
     }
 
 
