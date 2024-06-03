@@ -1,15 +1,15 @@
 import java.io.File
 
-object JSCallGraphAdapter {
-    val debug = false
+object JSCallGraphAdapter extends TestAdapter {
+    val debug: Boolean = false
 
-    val possibleAlgorithms = Array("NONE", "ONESHOT", "DEMAND", "FULL")
-    val frameWorkName = "js-callgraph"
+    val possibleAlgorithms: Array[String] = Array("NONE", "ONESHOT", "DEMAND", "FULL")
+    val frameworkName: String = "js-callgraph"
 
     def main(args: Array[String]): Unit = {
         // generate call graphs for all algorithms
         for (algo <- possibleAlgorithms) {
-            generateCallGraphs(s"results/js/$frameWorkName", algo)
+            generateCallGraphs(s"results/js/$frameworkName", algo)
         }
     }
 

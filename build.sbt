@@ -83,6 +83,13 @@ lazy val jcg_opal_testadapter = project.settings(
     jcg_testadapter_commons
 )
 
+lazy val jcg_js_callgraph_testadapter = project.settings(
+    commonSettings,
+    name := "JCG js-callgraph Test Adapter",
+    aggregate in assembly := false,
+    publishArtifact := false
+).dependsOn(jcg_testadapter_commons, jcg_testadapter_commons)
+
 
 //lazy val jcg_opal_testadapter = project.settings(
 //    commonSettings,
@@ -115,13 +122,16 @@ lazy val jcg_evaluation = project.settings(
     resolvers += "soot release" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-release/",
     resolvers += Resolver.mavenLocal,
     libraryDependencies += "de.opal-project" %% "hermes" % "5.0.1-SNAPSHOT",
+    libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0",
     publishArtifact := false
 ).dependsOn(
     jcg_testcases,
     jcg_data_format,
     jcg_annotation_matcher,
+    jcg_testadapter_commons,
     jcg_wala_testadapter,
     jcg_soot_testadapter,
     jcg_opal_testadapter,
     jcg_doop_testadapter
+    jcg_js_callgraph_testadapter,
 )
