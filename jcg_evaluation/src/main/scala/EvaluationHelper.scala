@@ -38,7 +38,8 @@ case class JCGConfig(
                    allQueries: Boolean = false,
                    fingerprintDir: File = new File(""),
                    debug: Boolean = false,
-                   parallel: Boolean = false
+                   parallel: Boolean = false,
+                   language: String = "",
                  ) {
     val JRE_LOCATIONS_FILE = "jre.conf"
     val SERIALIZATION_FILE_NAME = "cg.json"
@@ -78,8 +79,8 @@ object ConfigParser {
                       else failure(s"Value ${dir.getAbsolutePath} must exist and must be a directory.")
                   }
                   .validate{dir =>
-                      if(dir.listFiles(_.getName.endsWith(".conf")).nonEmpty) success
-                      else failure(s"${dir.getAbsolutePath} does not contain *.conf files")
+                      if(FileOperations.listFilesDeep(dir, ".conf").nonEmpty || FileOperations.listFilesDeep(dir, ".js").nonEmpty) success
+                      else failure(s"${dir.getAbsolutePath} does not contain *.conf or *.js files")
                   },
                 opt[File]('o', "outputDir")
                   .action{(dir, c) =>
@@ -125,6 +126,11 @@ object ConfigParser {
                   .action((dir, c) => c.copy(fingerprintDir = dir))
                   .text("provide a fingerprint for a project-specific evaluation")
                   .valueName("<path/to/dir>")
+                  .optional(),
+                opt[String]('l', "language")
+                  .action((lang, c) => c.copy(language = lang))
+                  .text("provide the language of the projects")
+                  .valueName("language")
                   .optional(),
                 checkConfig(_ => success)
             )
