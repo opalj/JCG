@@ -132,6 +132,6 @@ lazy val jcg_evaluation = project.settings(
     jcg_wala_testadapter,
     jcg_soot_testadapter,
     jcg_opal_testadapter,
-    jcg_doop_testadapter
+    jcg_doop_testadapter,
     jcg_js_callgraph_testadapter,
 )
