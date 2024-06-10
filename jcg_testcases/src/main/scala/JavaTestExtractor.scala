@@ -7,6 +7,7 @@ import javax.tools.ToolProvider
 import scala.io.Source
 
 object JavaTestExtractor extends TestCaseExtractor {
+    val language = "java"
 
     override def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
         val resources = getResources(new File(inputDir, "java"), prefixFilter)
@@ -125,5 +126,6 @@ object JavaTestExtractor extends TestCaseExtractor {
 
 
         FileUtils.deleteDirectory(tmp)
+        println(s"Extracted test cases for java from $inputDir to $outputDir")
     }
 }

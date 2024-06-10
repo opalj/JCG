@@ -4,6 +4,7 @@ import java.io.File
 import scala.io.Source
 
 object JSTestExtractor extends TestCaseExtractor {
+    val language = "js"
 
     override def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
         val resources = getResources(new File(inputDir, "js"), prefixFilter)
@@ -76,5 +77,7 @@ object JSTestExtractor extends TestCaseExtractor {
                 }
             })
         })
+
+        println(s"Extracted test cases for js from $inputDir to $outputDir")
     }
 }

@@ -1,6 +1,8 @@
 import java.io.File
 
 trait TestCaseExtractor {
+    val language: String
+
     /**
      * Extracts test cases from the given directory and writes them to the output directory.
      *
@@ -42,17 +44,18 @@ object TestCaseExtractorApp {
      *             '--rsrcDir dir', where 'dir' is the directory to search in. If this option is not
      *             specified, the resource root directory will be used.
      *             '--md filter', where 'filter' is a prefix of the filenames to be included.
+     *             '--lang lang', where 'lang' is the language of the test cases to extract ('js', 'java', 'all'). Default is 'all'.
      */
     def main(args: Array[String]): Unit = {
         val userDir = System.getProperty("user.dir")
         val outputDir = new File("testcasesOutput")
 
-        val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor)
-
         // parse arguments
         val mdFilter = getArgumentValue(args, "--md").getOrElse("")
+        val language = getArgumentValue(args, "--lang").getOrElse("all")
         val resourceDir = new File(getArgumentValue(args, "--rsrcDir").getOrElse(userDir))
 
+        val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor).filter(lang => language == "all" || language.contains(lang.language))
 
         for (extractor <- extractors) {
             extractor.extract(resourceDir, outputDir, mdFilter)
