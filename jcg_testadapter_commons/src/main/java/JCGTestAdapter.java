@@ -25,4 +25,8 @@ public interface JCGTestAdapter {
     String[] possibleAlgorithms();
 
     String frameworkName();
+
+    default Language language() {
+        return Language.JAVA;
+    }
 }
