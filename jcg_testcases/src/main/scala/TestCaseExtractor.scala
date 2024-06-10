@@ -19,7 +19,15 @@ trait TestCaseExtractor {
      * @param filterPrefix a filter to apply to the file names
      * @return an array of markdown files
      */
-    protected def getResources(inputDir: File, filterPrefix: String): Array[File] = FileOperations.listMarkdownFiles(inputDir, filterPrefix)
+    protected def getResources(inputDir: File, filterPrefix: String): Array[File] = {
+        try {
+            FileOperations.listMarkdownFiles(inputDir, filterPrefix)
+        } catch {
+            case e: Exception =>
+                println(s"${Console.RED}Error reading directory: ${inputDir.getAbsolutePath}. Make sure the directory contains a '$language' directory.${Console.RESET}")
+                Array.empty
+        }
+    }
 }
 
 /**
@@ -41,7 +49,7 @@ object TestCaseExtractorApp {
      * Extracts the test cases.
      *
      * @param args possible arguments are:
-     *             '--rsrcDir dir', where 'dir' is the directory to search in. If this option is not
+     *             '--rsrcDir dir', where 'dir' is the directory to search in, this folder should contain a js and/or java folder. If this option is not
      *             specified, the resource root directory will be used.
      *             '--md filter', where 'filter' is a prefix of the filenames to be included.
      *             '--lang lang', where 'lang' is the language of the test cases to extract ('js', 'java', 'all'). Default is 'all'.

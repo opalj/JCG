@@ -10,8 +10,8 @@ object JavaTestExtractor extends TestCaseExtractor {
     val language = "java"
 
     override def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
-        val resources = getResources(new File(inputDir, "java"), prefixFilter)
-        val resultsDir = new File(outputDir, "java")
+        val resources: Array[File] = getResources(new File(inputDir, language), prefixFilter)
+        val resultsDir = new File(outputDir, language)
         val tmp = new File("tmp")
 
         FileOperations.cleanUpDirectory(tmp)
@@ -126,6 +126,6 @@ object JavaTestExtractor extends TestCaseExtractor {
 
 
         FileUtils.deleteDirectory(tmp)
-        println(s"Extracted test cases for java from $inputDir to $outputDir")
+        if (resources.nonEmpty) println(s"Extracted test cases for java from $inputDir to $outputDir")
     }
 }

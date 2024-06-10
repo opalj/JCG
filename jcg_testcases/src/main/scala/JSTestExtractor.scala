@@ -7,8 +7,8 @@ object JSTestExtractor extends TestCaseExtractor {
     val language = "js"
 
     override def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
-        val resources = getResources(new File(inputDir, "js"), prefixFilter)
-        val resultsDir = new File(outputDir, "js")
+        val resources: Array[File] = getResources(new File(inputDir, language), prefixFilter)
+        val resultsDir = new File(outputDir, language)
 
         // Clear result directory if it already exists
         FileOperations.cleanUpDirectory(resultsDir)
@@ -78,6 +78,6 @@ object JSTestExtractor extends TestCaseExtractor {
             })
         })
 
-        println(s"Extracted test cases for js from $inputDir to $outputDir")
+        if (resources.nonEmpty) println(s"Extracted test cases for js from $inputDir to $outputDir")
     }
 }
