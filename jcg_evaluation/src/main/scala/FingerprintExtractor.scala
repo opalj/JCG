@@ -1,36 +1,22 @@
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileWriter
-import java.io.PrintWriter
-import java.io.Writer
-
-import org.opalj.log.GlobalLogContext
-import org.opalj.log.OPALLogger
+import org.opalj.log.{GlobalLogContext, OPALLogger}
+import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.Json
 
-import scala.concurrent.Await
-import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
-import scala.io.Source
+import java.io._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.util.Failure
-import scala.util.Success
+import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.{Await, Future, TimeoutException}
+import scala.io.Source
+import scala.util.{Failure, Success}
 
 object FingerprintExtractor {
 
     val EVALUATION_RESULT_FILE_NAME = "evaluation-result.tsv"
 
-    def getFingerprintFile(adapter: JCGTestAdapter, algorithm: String, resultsDir: File): File = {
-        val fileName = s"${adapter.frameworkName()}-$algorithm.profile"
-        new File(resultsDir, fileName)
-    }
-
     def main(args: Array[String]): Unit = {
 
         var c = ConfigParser.parseConfig(args)
-        if(c.isEmpty)
+        if (c.isEmpty)
             System.exit(0)
 
         val config = c.get
@@ -54,7 +40,7 @@ object FingerprintExtractor {
 
         printHeader(ow, projectSpecFiles)
 
-        val adapters = if(config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_ADAPTERS
+        val adapters = if (config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_ADAPTERS
 
         for {
             adapter ← adapters
@@ -98,7 +84,7 @@ object FingerprintExtractor {
                                 println(e.printStackTrace())
                             }
                     }
-                    ow.synchronized{
+                    ow.synchronized {
                         System.gc()
 
                         val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.debug)
@@ -109,7 +95,7 @@ object FingerprintExtractor {
 
                     }
                 }
-                if(config.parallel){
+                if (config.parallel) {
                     future.onComplete {
                         case Success(_) =>
                         case Failure(e) => e.printStackTrace
@@ -117,12 +103,12 @@ object FingerprintExtractor {
                 } else {
                     try {
                         val duration =
-                        if(config.timeout>=0)
-                            config.timeout.seconds
-                        else Duration.Inf
+                            if (config.timeout >= 0)
+                                config.timeout.seconds
+                            else Duration.Inf
                         Await.ready(future, duration)
                     } catch {
-                        case _: concurrent.TimeoutException =>
+                        case _: TimeoutException =>
                             println(s"Test case was interrupted after ${config.timeout} seconds")
                             System.gc()
                             val result = Timeout
@@ -169,5 +155,23 @@ object FingerprintExtractor {
             outputFile.createNewFile()
         }
         new FileWriter(outputFile, false)
+    }
+
+    def getFingerprintFile(adapter: JCGTestAdapter, algorithm: String, resultsDir: File): File = {
+        val fileName = s"${adapter.frameworkName()}-$algorithm.profile"
+        new File(resultsDir, fileName)
+    }
+
+    def parseFingerprints(
+                           adapter: JCGTestAdapter,
+                           algorithm: String,
+                           fingerprintDir: File
+                         ): Set[String] = {
+        val fingerprintFile = FingerprintExtractor.getFingerprintFile(adapter, algorithm, fingerprintDir)
+        assert(fingerprintFile.exists(), s"${fingerprintFile.getPath} does not exists")
+
+        Source.fromFile(fingerprintFile).getLines().map(_.split("\t")).collect {
+            case Array(featureID, result) if result == Sound.shortNotation ⇒ featureID
+        }.toSet
     }
 }
