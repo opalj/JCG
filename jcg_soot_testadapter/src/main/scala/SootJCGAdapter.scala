@@ -46,7 +46,7 @@ object SootJCGAdapter extends JCGTestAdapter {
 
         val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
 
-        if(analyzeJDK){
+        if(analyzeJDK && algorithm == "CHA"){
             o.set_process_dir((List(target) ++ classPath ++ jreJars).asJava)
         } else {
             o.set_process_dir((List(target) ++ classPath).asJava)
@@ -58,8 +58,8 @@ object SootJCGAdapter extends JCGTestAdapter {
 
         o.setPhaseOption("jb", "use-original-names:true")
 
-        o.setPhaseOption("cg", "safe-forname:true")
-        o.setPhaseOption("cg", "safe-newinstance:true")
+        o.setPhaseOption("cg", "safe-forname:false")
+        o.setPhaseOption("cg", "safe-newinstance:false")
         //o.setPhaseOption("cg", "types-for-invoke:true")
 
         if (mainClass == null) {
