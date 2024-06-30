@@ -197,7 +197,7 @@ object FingerprintExtractor {
                     val isSound = compareCGs(expectedCG, generatedCG).length == 0
                     testCaseMap += (testName.split("\\.").head -> isSound)
 
-                    outputWriter.write("\t\t" + testName + " -> false")
+                    outputWriter.write("\t\t" + testName + " -> " + isSound)
                     outputWriter.flush()
                 }
                 algorithmMap += (algoDir.getName -> testCaseMap)
