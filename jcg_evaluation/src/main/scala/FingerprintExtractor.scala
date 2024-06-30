@@ -141,12 +141,17 @@ object FingerprintExtractor {
         val testCasesPath = "testcasesOutput/js/"
 
         // create output directories and execute adapters
-        val outputDir = config.fingerprintDir
+        val outputDir = config.outputDir
         val adapterOutputDir = config.outputDir
-        executeAdapters(adapters, outputDir)
+        executeAdapters(adapters, adapterOutputDir)
 
         // parse expected call graph for test case
-        val expectedCGs: Array[ExpectedCG] = FileOperations.listJsonFilesDeep(config.inputDir).filter(f => f.getAbsolutePath.contains("js")).map(f => new ExpectedCG(f))
+        val expectedCGs: Array[ExpectedCG] =
+            FileOperations.listJsonFilesDeep(config.inputDir)
+              .filter(f => f.getAbsolutePath.contains("js"))
+              .map(f => new ExpectedCG(f))
+              .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
+
         if (config.debug) println("[DEBUG] expectedCGs:" + expectedCGs.map(_.filePath).mkString(","))
 
         val generatedCGFiles = FileOperations.listJsonFilesDeep(adapterOutputDir).filter(f => f.getAbsolutePath.contains("js"))
@@ -154,28 +159,40 @@ object FingerprintExtractor {
 
         var adapterMap = Map[String, Map[String, Map[String, Boolean]]]()
 
+
+        val outputWriter = new BufferedWriter(getOutputTarget(outputDir))
+
         for (adapter <- adapters) {
             val algoDirs = listDirs(new File(adapterOutputDir, adapter.frameworkName))
+            println("AlgoDirs: " + algoDirs.map(_.getName).mkString(","))
             var algorithmMap = Map[String, Map[String, Boolean]]()
+            outputWriter.write(adapter.frameworkName + "\n")
 
             for (algoDir <- algoDirs) {
                 var testCaseMap = Map[String, Boolean]()
+                outputWriter.write("\t" + algoDir.getName)
+                outputWriter.newLine()
                 for (expectedCG <- expectedCGs) {
                     val testName: String = expectedCG.filePath.split("/").last
                     if (config.debug) println("[DEBUG] Test name: " + testName + " " + algoDir.getName)
                     val generatedCGFile = algoDir.listFiles().find(_.getName == testName).get
-                    val generatedCG = new AdapterCallGraph(generatedCGFile)
+                    val generatedCG = new AdapterCG(generatedCGFile)
 
                     if (compareCGs(expectedCG, generatedCG).length > 0) {
                         testCaseMap += (testName.split("\\.").head -> false)
+                        outputWriter.write("\t\t" + testName + " -> false")
                     } else {
                         testCaseMap += (testName.split("\\.").head -> true)
+                        outputWriter.write("\t\t" + testName + " -> true")
                     }
+                    outputWriter.flush()
                 }
                 algorithmMap += (algoDir.getName -> testCaseMap)
+                outputWriter.newLine()
             }
             adapterMap += (adapter.frameworkName -> algorithmMap)
         }
+        outputWriter.close()
 
 
         println("Results: ")
