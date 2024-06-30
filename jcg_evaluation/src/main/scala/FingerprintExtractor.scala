@@ -49,10 +49,10 @@ object FingerprintExtractor {
         val adapters = if (config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_ADAPTERS
 
         for {
-            adapter ← adapters
-            cgAlgorithm ← adapter.possibleAlgorithms().filter(_.startsWith(config.algorithmFilter))
+            adapter <- adapters
+            cgAlgorithm <- adapter.possibleAlgorithms().filter(_.startsWith(config.algorithmFilter))
         } {
-            ow.write(s"${adapter.frameworkName()}-${cgAlgorithm}")
+            ow.write(s"${adapter.frameworkName()}-$cgAlgorithm")
 
             println(s"creating fingerprint for ${adapter.frameworkName()} $cgAlgorithm")
             val fingerprintFile = getFingerprintFile(adapter, cgAlgorithm, resultsDir)
@@ -60,7 +60,7 @@ object FingerprintExtractor {
                 fingerprintFile.delete()
             }
             val fingerprintWriter = new PrintWriter(fingerprintFile)
-            for (psf ← projectSpecFiles) {
+            for (psf <- projectSpecFiles) {
                 val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
                 val outDir = config.getOutputDirectory(adapter, cgAlgorithm, projectSpec, resultsDir)
@@ -151,35 +151,37 @@ object FingerprintExtractor {
         if (config.debug) println("[DEBUG] " + config.language + " " + config.inputDir + " " + config.outputDir)
         println("Extracting JS fingerprints")
         val adapters = List(JSCallGraphAdapter)
-        val testCasesPath = "testcasesOutput/js/"
 
-        // create output directories and execute adapters
+        // create output directories and execute all adapters
         val outputDir = config.outputDir
         val adapterOutputDir = config.outputDir
         executeAdapters(adapters, adapterOutputDir)
 
-        // parse expected call graph for test case
+        // parse expected call graph for test case from json files
         val expectedCGs: Array[ExpectedCG] =
             FileOperations.listJsonFilesDeep(config.inputDir)
               .filter(f => f.getAbsolutePath.contains("js"))
               .map(f => new ExpectedCG(f))
               .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
 
-        if (config.debug) println("[DEBUG] expectedCGs:" + expectedCGs.map(_.filePath).mkString(","))
-
-        val generatedCGFiles = FileOperations.listJsonFilesDeep(adapterOutputDir).filter(f => f.getAbsolutePath.contains("js"))
-        if (config.debug) println("[DEBUG] generatedCGFiles: " + generatedCGFiles.mkString(","))
+        if (config.debug) {
+            println("[DEBUG] expectedCGs:" + expectedCGs.map(_.filePath).mkString(","))
+            val generatedCGFiles = FileOperations.listJsonFilesDeep(adapterOutputDir).filter(f => f.getAbsolutePath.contains("js"))
+            println("[DEBUG] generatedCGFiles: " + generatedCGFiles.mkString(","))
+        }
 
         var adapterMap = Map[String, Map[String, Map[String, Boolean]]]()
 
-
         val outputWriter = new BufferedWriter(getOutputTarget(outputDir))
 
+
+        // compare expected and generated call graphs and write results to file
         for (adapter <- adapters) {
             val algoDirs = listDirs(new File(adapterOutputDir, adapter.frameworkName))
             println("AlgoDirs: " + algoDirs.map(_.getName).mkString(","))
             var algorithmMap = Map[String, Map[String, Boolean]]()
-            outputWriter.write(adapter.frameworkName + "\n")
+            outputWriter.write(adapter.frameworkName)
+            outputWriter.newLine()
 
             for (algoDir <- algoDirs) {
                 var testCaseMap = Map[String, Boolean]()
@@ -191,13 +193,11 @@ object FingerprintExtractor {
                     val generatedCGFile = algoDir.listFiles().find(_.getName == testName).get
                     val generatedCG = new AdapterCG(generatedCGFile)
 
-                    if (compareCGs(expectedCG, generatedCG).length > 0) {
-                        testCaseMap += (testName.split("\\.").head -> false)
-                        outputWriter.write("\t\t" + testName + " -> false")
-                    } else {
-                        testCaseMap += (testName.split("\\.").head -> true)
-                        outputWriter.write("\t\t" + testName + " -> true")
-                    }
+                    // check if call graph has missing edges
+                    val isSound = compareCGs(expectedCG, generatedCG).length == 0
+                    testCaseMap += (testName.split("\\.").head -> isSound)
+
+                    outputWriter.write("\t\t" + testName + " -> false")
                     outputWriter.flush()
                 }
                 algorithmMap += (algoDir.getName -> testCaseMap)
@@ -207,10 +207,9 @@ object FingerprintExtractor {
         }
         outputWriter.close()
 
-
-        println("Results: ")
-        println(adapterMap.map(x => " --- " + x._1 + "---- \n" + x._2.map(y => y._1 + "\n\t" + y._2.map(z => z._1 + " -> " + z._2).toSeq.sorted.mkString("\n\t")).mkString("\n")).mkString)
+        if (config.debug) println("Results " + adapterMap.map(x => " --- " + x._1 + "---- \n" + x._2.map(y => y._1 + "\n\t" + y._2.map(z => z._1 + " -> " + z._2).toSeq.sorted.mkString("\n\t")).mkString("\n")).mkString)
     }
+
 
     /**
      * Returns a FileWriter for the evaluation result file.
@@ -231,6 +230,11 @@ object FingerprintExtractor {
         dir.listFiles().filter(_.isDirectory)
     }
 
+    /**
+     * Compares the expected call graph with the generated call graph.
+     *
+     * @return Array of edges missing from generated call graph
+     */
     private def compareCGs(expectedCG: ExpectedCG, generatedCG: AdapterCG): Array[Array[String]] = {
         var missingEdges: Array[Array[String]] = Array()
 
@@ -246,7 +250,6 @@ object FingerprintExtractor {
 
     /**
      * Creates output directories for each adapter and executes the adapters on the test cases.
-     * s
      *
      * @param adapters  List of adapters to execute.
      * @param outputDir The output directory to write to.
@@ -259,17 +262,12 @@ object FingerprintExtractor {
             val adapterDir = new File(outputDir, adapter.frameworkName)
             adapterDir.mkdirs()
 
-            // execute adapter (algorithms) on test cases
-            // write results to file
+            // execute adapter
             adapter.main(Array())
         }
     }
 
-    def parseFingerprints(
-                           adapter: JCGTestAdapter,
-                           algorithm: String,
-                           fingerprintDir: File
-                         ): Set[String] = {
+    def parseFingerprints(adapter: JCGTestAdapter, algorithm: String, fingerprintDir: File): Set[String] = {
         val fingerprintFile = FingerprintExtractor.getFingerprintFile(adapter, algorithm, fingerprintDir)
         assert(fingerprintFile.exists(), s"${fingerprintFile.getPath} does not exists")
 
