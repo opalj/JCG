@@ -1,7 +1,6 @@
 import java.io.File
 
-class AdapterCallGraph {
-
+class AdapterCG {
     var filePath: String = ""
     var algorithm: String = ""
     var links: Array[Array[String]] = Array()

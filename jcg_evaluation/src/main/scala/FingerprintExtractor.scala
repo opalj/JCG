@@ -1,5 +1,4 @@
 import org.opalj.log.{GlobalLogContext, OPALLogger}
-import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.Json
 
 import java.io._
@@ -134,7 +133,21 @@ object FingerprintExtractor {
         ow.close()
     }
 
-    def getJSFingerprints(config: JCGConfig): Unit = {
+    /**
+     * Prints the header of the evaluation result file.
+     *
+     * @param ow   The writer to write the header to.
+     * @param jars The list of jars to write to the header.
+     */
+    private def printHeader(ow: BufferedWriter, jars: Array[File]): Unit = {
+        ow.write("algorithm")
+        for (tgt <- jars) {
+            ow.write(s"\t$tgt")
+        }
+        ow.newLine()
+    }
+
+    private def getJSFingerprints(config: JCGConfig): Unit = {
         if (config.debug) println("[DEBUG] " + config.language + " " + config.inputDir + " " + config.outputDir)
         println("Extracting JS fingerprints")
         val adapters = List(JSCallGraphAdapter)
@@ -200,7 +213,40 @@ object FingerprintExtractor {
     }
 
     /**
+     * Returns a FileWriter for the evaluation result file.
+     *
+     * @param resultsDir The directory where the evaluation result file should be created.
+     * @return A FileWriter for the evaluation result file.
+     */
+    private def getOutputTarget(resultsDir: File): Writer = {
+        val outputFile = new File(resultsDir, EVALUATION_RESULT_FILE_NAME)
+        if (outputFile.exists()) {
+            outputFile.delete()
+            outputFile.createNewFile()
+        }
+        new FileWriter(outputFile, false)
+    }
+
+    private def listDirs(dir: File) = {
+        dir.listFiles().filter(_.isDirectory)
+    }
+
+    private def compareCGs(expectedCG: ExpectedCG, generatedCG: AdapterCG): Array[Array[String]] = {
+        var missingEdges: Array[Array[String]] = Array()
+
+        for (edge <- expectedCG.directLinks) {
+            if (!generatedCG.links.map(_.mkString(",")).contains(edge.mkString(","))) {
+                //println("[DEBUG] Edge not found: " + edge.mkString(" ->"))
+                missingEdges :+= edge
+            }
+        }
+
+        missingEdges
+    }
+
+    /**
      * Creates output directories for each adapter and executes the adapters on the test cases.
+     * s
      *
      * @param adapters  List of adapters to execute.
      * @param outputDir The output directory to write to.
@@ -219,45 +265,6 @@ object FingerprintExtractor {
         }
     }
 
-    private def listDirs(dir: File) = {
-        dir.listFiles().filter(_.isDirectory)
-    }
-
-    private def compareCGs(expectedCG: ExpectedCG, generatedCG: AdapterCallGraph): Array[Array[String]] = {
-        var missingEdges: Array[Array[String]] = Array()
-
-        for (edge <- expectedCG.directLinks) {
-            if (!generatedCG.links.map(_.mkString(",")).contains(edge.mkString(","))) {
-                //println("[DEBUG] Edge not found: " + edge.mkString(" ->"))
-                missingEdges :+= edge
-            }
-        }
-
-        return missingEdges
-    }
-
-    private def printHeader(ow: BufferedWriter, jars: Array[File]): Unit = {
-        ow.write("algorithm")
-        for (tgt ← jars) {
-            ow.write(s"\t$tgt")
-        }
-        ow.newLine()
-    }
-
-    private def getOutputTarget(resultsDir: File): Writer = {
-        val outputFile = new File(resultsDir, EVALUATION_RESULT_FILE_NAME)
-        if (outputFile.exists()) {
-            outputFile.delete()
-            outputFile.createNewFile()
-        }
-        new FileWriter(outputFile, false)
-    }
-
-    def getFingerprintFile(adapter: JCGTestAdapter, algorithm: String, resultsDir: File): File = {
-        val fileName = s"${adapter.frameworkName()}-$algorithm.profile"
-        new File(resultsDir, fileName)
-    }
-
     def parseFingerprints(
                            adapter: JCGTestAdapter,
                            algorithm: String,
@@ -269,5 +276,15 @@ object FingerprintExtractor {
         Source.fromFile(fingerprintFile).getLines().map(_.split("\t")).collect {
             case Array(featureID, result) if result == Sound.shortNotation ⇒ featureID
         }.toSet
+    }
+
+    def getFingerprintFile(adapter: JCGTestAdapter, algorithm: String, resultsDir: File): File = {
+        val fileName = s"${adapter.frameworkName()}-$algorithm.profile"
+        new File(resultsDir, fileName)
+    }
+
+    def getFingerprintFile(adapter: TestAdapter, algorithm: String, resultsDir: File): File = {
+        val fileName = s"${adapter.frameworkName}-$algorithm.profile"
+        new File(resultsDir, fileName)
     }
 }
