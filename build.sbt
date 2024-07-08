@@ -90,6 +90,14 @@ lazy val jcg_js_callgraph_testadapter = project.settings(
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
 
+lazy val jcg_code2flow_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Code2Flow Test Adapter",
+    libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0",
+    aggregate in assembly := false,
+    publishArtifact := false,
+).dependsOn(jcg_testadapter_commons, jcg_testadapter_commons)
+
 
 //lazy val jcg_opal_testadapter = project.settings(
 //    commonSettings,
@@ -134,4 +142,5 @@ lazy val jcg_evaluation = project.settings(
     jcg_opal_testadapter,
     jcg_doop_testadapter,
     jcg_js_callgraph_testadapter,
+    jcg_code2flow_testadapter,
 )
