@@ -4,7 +4,7 @@
 object RebuildAndTest {
 
     def main(args: Array[String]): Unit = {
-        TestCaseExtractorApp.main(args)
+        TestCaseExtractor.main(args)
         Evaluation.main(args)
     }
 }

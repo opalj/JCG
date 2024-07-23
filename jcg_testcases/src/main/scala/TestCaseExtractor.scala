@@ -1,6 +1,8 @@
 import java.io.File
 
 trait TestCaseExtractor {
+    val pathSeparator: String = File.pathSeparator
+    val debug = false
     val language: String
 
     /**
@@ -40,10 +42,8 @@ trait TestCaseExtractor {
  * @author Michael Reif
  * @author Florian Kuebler
  */
-object TestCaseExtractorApp {
+object TestCaseExtractor {
 
-    val pathSeparator: String = File.pathSeparator
-    val debug = false
 
     /**
      * Extracts the test cases.
