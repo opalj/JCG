@@ -1,6 +1,7 @@
 import org.apache.commons.io.FileUtils
 
-import java.io.{File, PrintWriter}
+import java.io.File
+import java.io.PrintWriter
 
 object FileOperations {
     private val pathSeparator = File.pathSeparator

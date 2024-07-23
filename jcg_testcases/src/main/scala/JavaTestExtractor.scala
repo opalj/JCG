@@ -1,8 +1,11 @@
-import TestCaseExtractorApp.{debug, pathSeparator}
+import TestCaseExtractorApp.debug
+import TestCaseExtractorApp.pathSeparator
 import org.apache.commons.io.FileUtils
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 
-import java.io.{File, PrintWriter}
+import java.io.File
+import java.io.PrintWriter
 import javax.tools.ToolProvider
 import scala.io.Source
 
