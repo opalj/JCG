@@ -7,9 +7,6 @@ Test the use of an anonymous function as an argument to another function.
 
 ```json
 {
-  "nodes": [
-    "<global>", "AF1.foo", "AF1.<anonymous:7>"
-  ],
   "directLinks": [
     ["AF1.foo", "AF1.<anonymous:7>"]
   ],
@@ -37,9 +34,6 @@ Test the use of multiple anonymous functions as arguments to another function.
 
 ```json
 {
-  "nodes": [
-    "AF2.foo", "AF2.<anonymous:9>", "AF2.<anonymous:12>"
-  ],
   "directLinks": [
     ["AF2.foo", "AF2.<anonymous:9>"],
     ["AF2.foo", "AF2.<anonymous:12>"]
