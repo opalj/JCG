@@ -5,9 +5,6 @@ import scala.io.Source
 import scala.util.matching.Regex
 
 trait TestCaseExtractor {
-    val pathSeparator: String = File.pathSeparator
-    val debug = false
-
     val language: String
     /*
      * ##ProjectName
@@ -38,7 +35,7 @@ trait TestCaseExtractor {
         FileOperations.cleanUpDirectory(temp)
 
         resources.foreach(file => {
-            if (debug) {
+            if (TestCaseExtractor.debug) {
                 println(file)
             }
 
@@ -75,7 +72,7 @@ trait TestCaseExtractor {
  * @author Florian Kuebler
  */
 object TestCaseExtractor {
-
+    var debug: Boolean = false
 
     /**
      * Extracts the test cases.
@@ -94,6 +91,9 @@ object TestCaseExtractor {
         val mdFilter = getArgumentValue(args, "--md").getOrElse("")
         val language = getArgumentValue(args, "--lang").getOrElse("all")
         val resourceDir = new File(getArgumentValue(args, "--rsrcDir").getOrElse(userDir))
+        if (args.contains("--debug")) {
+            debug = true
+        }
 
         val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor).filter(lang => language == "all" || language.contains(lang.language))
 
@@ -101,7 +101,6 @@ object TestCaseExtractor {
             extractor.extract(resourceDir, outputDir, mdFilter)
         }
     }
-
 
     /**
      * Returns the value of the given CLI argument.

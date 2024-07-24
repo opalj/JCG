@@ -42,11 +42,11 @@ object JavaTestExtractor extends TestCaseExtractor {
             bin.mkdirs()
 
             val targetDirs = FileOperations.findJCGTargetDirs()
-            val classPath = Seq(".", FileOperations.targetDirsToCP(targetDirs), System.getProperty("java.home")).mkString(s"$pathSeparator")
+            val classPath = Seq(".", FileOperations.targetDirsToCP(targetDirs), System.getProperty("java.home")).mkString(s"${File.pathSeparator}")
 
             val compilerArgs = Seq("-cp", s"$classPath", "-d", bin.getAbsolutePath, "-encoding", "UTF-8", "-source", "1.8", "-target", "1.8") ++ srcFiles
 
-            if (debug) {
+            if (TestCaseExtractor.debug) {
                 println(compilerArgs.mkString("[DEBUG] Compiler args: \n\n", "\n", "\n\n"))
             }
 
@@ -54,7 +54,7 @@ object JavaTestExtractor extends TestCaseExtractor {
 
             val allClassFiles = FileOperations.listFilesRecursively(bin.getAbsoluteFile)
 
-            if (debug) {
+            if (TestCaseExtractor.debug) {
                 println(allClassFiles.mkString("[DEBUG] Produced class files: \n\n", "\n", "\n\n"))
             }
 
@@ -66,13 +66,13 @@ object JavaTestExtractor extends TestCaseExtractor {
             val mainOpt = Option(main)
             val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getAbsolutePath) ++ mainOpt ++ allClassFileNames
 
-            if (debug) {
+            if (TestCaseExtractor.debug) {
                 println(args.mkString("[DEBUG] Jar args: \n\n", "\n", "\n\n"))
             }
 
             val exitCode = sys.process.Process(args, bin).!
 
-            if (debug && exitCode != 0) {
+            if (TestCaseExtractor.debug && exitCode != 0) {
                 println(s"[DEBUG] EXIT CODE $exitCode")
             }
 

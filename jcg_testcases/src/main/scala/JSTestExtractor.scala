@@ -14,11 +14,10 @@ object JSTestExtractor extends TestCaseExtractor {
      */
     private val re = """(?s)```(json\n(?<expectedCG>[^`]*)```\n```)?js(\n// ?(?<packageName>[^/]*)(?<fileName>[^\n]*)\n(?<codeSnippet>[^`]*))```""".r
 
-
     override def processLines(lines: String, resultsDir: File, temp: File): Unit = {
         reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
             val projectName = projectMatchResult.group("projectName").trim
-            if (debug) {
+            if (TestCaseExtractor.debug) {
                 println("[DEBUG] project", projectName)
             }
 
