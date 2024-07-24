@@ -8,11 +8,10 @@ Test the use of an anonymous function as an argument to another function.
 ```json
 {
   "nodes": [
-    "<global>", "AF1.foo", "AF1.<anonymous:6>"
+    "<global>", "AF1.foo", "AF1.<anonymous:7>"
   ],
   "directLinks": [
-    ["<global>", "AF1.foo"],
-    ["AF1.foo", "AF1.<anonymous:6>"]
+    ["AF1.foo", "AF1.<anonymous:7>"]
   ],
   "indirectLinks": []
 }
@@ -24,9 +23,11 @@ function foo(f) {
     return f(1);
 }
 
-foo(function(x) {
-    return x+1;
-});
+foo(
+    function(x) {
+        return x + 1;
+    }
+);
 ```
 [//]: # (END)
 
@@ -37,12 +38,11 @@ Test the use of multiple anonymous functions as arguments to another function.
 ```json
 {
   "nodes": [
-    "<global>", "AF2.foo", "AF2.<anonymous:8>", "AF2.<anonymous:11>"
+    "AF2.foo", "AF2.<anonymous:9>", "AF2.<anonymous:12>"
   ],
   "directLinks": [
-    ["<global>", "AF2.foo"],
-    ["AF2.foo", "AF2.<anonymous:8>"],
-    ["AF2.foo", "AF2.<anonymous:10>"]
+    ["AF2.foo", "AF2.<anonymous:9>"],
+    ["AF2.foo", "AF2.<anonymous:12>"]
   ],
   "indirectLinks": []
 }
@@ -56,10 +56,13 @@ function foo(f1, f2) {
     return x + y;
 }
 
-foo(function(x) {
-    return x;
-}, function(x) {
-    return x;
-});
+foo(
+    function(x) {
+        return x;
+    }, 
+    function(x) {
+        return x;
+    }
+);
 ```
 [//]: # (END)
