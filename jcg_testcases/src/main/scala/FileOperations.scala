@@ -46,9 +46,9 @@ object FileOperations {
      * @param f the directory to list files from
      * @return an array of files
      */
-    def recursiveListFiles(f: File): Array[File] = {
-        val these = f.listFiles((_, fil) ⇒ fil.endsWith(".class"))
-        these ++ f.listFiles.filter(_.isDirectory).flatMap(recursiveListFiles)
+    def listFilesRecursively(f: File): Array[File] = {
+        val these = f.listFiles((_, fil) => fil.endsWith(".class"))
+        these ++ f.listFiles.filter(_.isDirectory).flatMap(listFilesRecursively)
     }
 
     /**
@@ -92,7 +92,7 @@ object FileOperations {
      */
     def getResources(inputDir: File, filterPrefix: String): Array[File] = {
         try {
-            FileOperations.listMarkdownFiles(inputDir, filterPrefix)
+            listFiles(inputDir, ".md", filterPrefix)
         } catch {
             case e: Exception =>
                 println(s"${Console.RED}Error reading directory: ${inputDir.getAbsolutePath}. Make sure the directory contains a '$language' directory.${Console.RESET}")
@@ -103,10 +103,11 @@ object FileOperations {
     /**
      * Returns all markdown files in the given directory.
      *
-     * @param dir    the directory to search in
-     * @param filter a filter to apply to the file names
+     * @param dir       the directory to search in
+     * @param extension the extension of the files to list e.g '.md'
+     * @param filter    a filter to apply to the file names
      */
-    def listMarkdownFiles(dir: File, filter: String): Array[File] = {
-        dir.listFiles(_.getPath.endsWith(".md")).filter(_.getName.startsWith(filter))
+    def listFiles(dir: File, extension: String, filter: String): Array[File] = {
+        dir.listFiles(_.getPath.endsWith(extension)).filter(_.getName.startsWith(filter))
     }
 }

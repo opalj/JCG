@@ -52,7 +52,7 @@ object JavaTestExtractor extends TestCaseExtractor {
 
             compiler.run(null, null, null, compilerArgs: _*)
 
-            val allClassFiles = FileOperations.recursiveListFiles(bin.getAbsoluteFile)
+            val allClassFiles = FileOperations.listFilesRecursively(bin.getAbsoluteFile)
 
             if (debug) {
                 println(allClassFiles.mkString("[DEBUG] Produced class files: \n\n", "\n", "\n\n"))
