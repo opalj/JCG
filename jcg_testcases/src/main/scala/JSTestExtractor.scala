@@ -1,81 +1,51 @@
 import java.io.File
-import scala.io.Source
 
 object JSTestExtractor extends TestCaseExtractor {
     val language = "js"
 
-    override def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
-        val resources: Array[File] = getResources(new File(inputDir, language), prefixFilter)
-        val resultsDir = new File(outputDir, language)
+    /*
+     * (```json
+     * ...
+     * ```)?
+     * ```js
+     * // path/to/File.js
+     * CODE SNIPPET
+     * ```
+     */
+    private val re = """(?s)```(json\n(?<expectedCG>[^`]*)```\n```)?js(\n// ?(?<packageName>[^/]*)(?<fileName>[^\n]*)\n(?<codeSnippet>[^`]*))```""".r
 
-        // Clear result directory if it already exists
-        FileOperations.cleanUpDirectory(resultsDir)
 
-        resources.foreach(file => {
+    override def processLines(lines: String, resultsDir: File, temp: File): Unit = {
+        reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
+            val projectName = projectMatchResult.group("projectName").trim
             if (debug) {
-                println(file)
+                println("[DEBUG] project", projectName)
             }
 
-            // read lines from given testcase file
-            val source = Source.fromFile(file)
-            val lines = try source.mkString finally source.close()
+            // create Folder for project
+            val outputFolder = new File(resultsDir, projectName)
+            outputFolder.mkdirs()
 
-            /*
-             * ##ProjectName
-             * [//]: # (Main: path/to/Main.js)
-             * multiple code snippets
-             * [//]: # (END)
-             */
-            val reHeaders = ("""(?s)""" +
-              """\#\#(?<projectName>[^\n]*)\n""" + // ##ProjectName
-              """\[//\]: \# \((?:MAIN: (?<mainClass>[^\n]*)|LIBRARY)\)\n""" + // [//]: # (Main: path.to.Main.js) or [//]: # (LIBRARY)
-              """(?<body>.*?)""" + // multiple code snippets
-              """\[//\]: \# \(END\)""").r // [//]: # (END)
+            re.findAllIn(projectMatchResult.group("body")).matchData.foreach { matchResult =>
+                val packageName = matchResult.group("packageName")
+                val filePath = s"$projectName/$packageName${matchResult.group("fileName")}"
+                val codeSnippet = matchResult.group("codeSnippet")
+                val expectedCG = matchResult.group("expectedCG")
 
-            /*
-             * (```json
-             * ...
-             * ```)?
-             * ```js
-             * // path/to/File.js
-             * CODE SNIPPET
-             * ```
-             */
-            val re = """(?s)```(json\n(?<expectedCG>[^`]*)```\n```)?js(\n// ?(?<packageName>[^/]*)(?<fileName>[^\n]*)\n(?<codeSnippet>[^`]*))```""".r
+                val codeFile = new File(resultsDir.getAbsolutePath, filePath)
+                val cgFile = new File(resultsDir.getAbsolutePath, s"$projectName/$packageName${matchResult.group("fileName")}on")
+                codeFile.getParentFile.mkdirs()
+                codeFile.createNewFile()
+                FileOperations.writeToFile(codeFile, codeSnippet)
 
-            reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
-                val projectName = projectMatchResult.group("projectName").trim
-                if (debug) {
-                    println("[DEBUG] project", projectName)
+                if (expectedCG != null) {
+                    cgFile.getParentFile.mkdirs()
+                    cgFile.createNewFile()
+                    FileOperations.writeToFile(cgFile, expectedCG)
                 }
 
-                // create Folder for project
-                val outputFolder = new File(resultsDir, projectName)
-                outputFolder.mkdirs()
-
-                re.findAllIn(projectMatchResult.group("body")).matchData.foreach { matchResult =>
-                    val packageName = matchResult.group("packageName")
-                    val filePath = s"$projectName/$packageName${matchResult.group("fileName")}"
-                    val codeSnippet = matchResult.group("codeSnippet")
-                    val expectedCG = matchResult.group("expectedCG")
-
-                    val codeFile = new File(resultsDir.getAbsolutePath, filePath)
-                    val cgFile = new File(resultsDir.getAbsolutePath, s"$projectName/$packageName${matchResult.group("fileName")}on")
-                    codeFile.getParentFile.mkdirs()
-                    codeFile.createNewFile()
-                    FileOperations.writeToFile(codeFile, codeSnippet)
-
-                    if (expectedCG != null) {
-                        cgFile.getParentFile.mkdirs()
-                        cgFile.createNewFile()
-                        FileOperations.writeToFile(cgFile, expectedCG)
-                    }
-
-                    codeFile.getAbsolutePath
-                }
-            })
+                codeFile.getAbsolutePath
+            }
         })
-
-        if (resources.nonEmpty) println(s"Extracted test cases for js from $inputDir to $outputDir")
     }
 }

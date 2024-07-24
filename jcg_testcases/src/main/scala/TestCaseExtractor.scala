@@ -1,9 +1,26 @@
+import org.apache.commons.io.FileUtils
+
 import java.io.File
+import scala.io.Source
+import scala.util.matching.Regex
 
 trait TestCaseExtractor {
     val pathSeparator: String = File.pathSeparator
     val debug = false
+
     val language: String
+    /*
+     * ##ProjectName
+     * [//]: # (Main: path/to/Main.xyz)
+     * multiple code snippets
+     * [//]: # (END)
+     */
+    protected val reHeaders: Regex = ("""(?s)""" +
+      """\#\#(?<projectName>[^\n]*)\n""" + // ##ProjectName
+      """\[//\]: \# \((?:MAIN: (?<mainClass>[^\n]*)|LIBRARY)\)\n""" + // [//]: # (Main: path.to.Main.xyz) or [//]: # (LIBRARY)
+      """(?<body>.*?)""" + // multiple code snippets
+      """\[//\]: \# \(END\)""").r // [//]: # (END)
+
 
     /**
      * Extracts test cases from the given directory and writes them to the output directory.
@@ -12,7 +29,30 @@ trait TestCaseExtractor {
      * @param outputDir    the directory to write the test cases to
      * @param prefixFilter a filter to apply to the file names in the input directory
      */
-    def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit
+    def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
+        val resources: Array[File] = getResources(new File(inputDir, language), prefixFilter)
+        val resultsDir = new File(outputDir, language)
+        val temp = new File("tmp")
+        // Clear result directory if it already exists
+        FileOperations.cleanUpDirectory(resultsDir)
+        FileOperations.cleanUpDirectory(temp)
+
+        resources.foreach(file => {
+            if (debug) {
+                println(file)
+            }
+
+            val source = Source.fromFile(file)
+            val lines = try source.mkString finally source.close()
+
+            processLines(lines, resultsDir, temp)
+        })
+
+        FileUtils.deleteDirectory(temp)
+        if (resources.nonEmpty) {
+            println(s"${Console.GREEN}Successfully extracted test cases for $language${Console.RESET}")
+        }
+    }
 
     /**
      * Returns all markdown files in the given directory with the given prefix.
@@ -21,7 +61,7 @@ trait TestCaseExtractor {
      * @param filterPrefix a filter to apply to the file names
      * @return an array of markdown files
      */
-    protected def getResources(inputDir: File, filterPrefix: String): Array[File] = {
+    private def getResources(inputDir: File, filterPrefix: String): Array[File] = {
         try {
             FileOperations.listMarkdownFiles(inputDir, filterPrefix)
         } catch {
@@ -30,6 +70,15 @@ trait TestCaseExtractor {
                 Array.empty
         }
     }
+
+    /**
+     * Processes the lines in a testcase markdown file.
+     *
+     * @param lines      the lines to process
+     * @param resultsDir the directory to write the test cases to
+     * @param temp       temporary directory to save intermediate files, will be cleared before and after processing
+     */
+    def processLines(lines: String, resultsDir: File, temp: File): Unit
 }
 
 /**
