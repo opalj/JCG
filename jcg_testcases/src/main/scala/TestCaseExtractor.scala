@@ -30,7 +30,7 @@ trait TestCaseExtractor {
      * @param prefixFilter a filter to apply to the file names in the input directory
      */
     def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
-        val resources: Array[File] = getResources(new File(inputDir, language), prefixFilter)
+        val resources: Array[File] = FileOperations.getResources(new File(inputDir, language), prefixFilter)
         val resultsDir = new File(outputDir, language)
         val temp = new File("tmp")
         // Clear result directory if it already exists
@@ -51,23 +51,6 @@ trait TestCaseExtractor {
         FileUtils.deleteDirectory(temp)
         if (resources.nonEmpty) {
             println(s"${Console.GREEN}Successfully extracted test cases for $language${Console.RESET}")
-        }
-    }
-
-    /**
-     * Returns all markdown files in the given directory with the given prefix.
-     *
-     * @param inputDir     the directory to search in
-     * @param filterPrefix a filter to apply to the file names
-     * @return an array of markdown files
-     */
-    private def getResources(inputDir: File, filterPrefix: String): Array[File] = {
-        try {
-            FileOperations.listMarkdownFiles(inputDir, filterPrefix)
-        } catch {
-            case e: Exception =>
-                println(s"${Console.RED}Error reading directory: ${inputDir.getAbsolutePath}. Make sure the directory contains a '$language' directory.${Console.RESET}")
-                Array.empty
         }
     }
 

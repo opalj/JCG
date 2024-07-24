@@ -28,16 +28,6 @@ object FileOperations {
     }
 
     /**
-     * Returns all markdown files in the given directory.
-     *
-     * @param dir    the directory to search in
-     * @param filter a filter to apply to the file names
-     */
-    def listMarkdownFiles(dir: File, filter: String): Array[File] = {
-        dir.listFiles(_.getPath.endsWith(".md")).filter(_.getName.startsWith(filter))
-    }
-
-    /**
      * Cleans up the given directory.
      * If the directory does not exist, it will be created.
      *
@@ -92,4 +82,31 @@ object FileOperations {
      * @return the classpath string
      */
     def targetDirsToCP(dirs: List[File]): String = dirs.mkString(s"$pathSeparator")
+
+    /**
+     * Returns all markdown files in the given directory with the given prefix.
+     *
+     * @param inputDir     the directory to search in
+     * @param filterPrefix a filter to apply to the file names
+     * @return an array of markdown files
+     */
+    def getResources(inputDir: File, filterPrefix: String): Array[File] = {
+        try {
+            FileOperations.listMarkdownFiles(inputDir, filterPrefix)
+        } catch {
+            case e: Exception =>
+                println(s"${Console.RED}Error reading directory: ${inputDir.getAbsolutePath}. Make sure the directory contains a '$language' directory.${Console.RESET}")
+                Array.empty
+        }
+    }
+
+    /**
+     * Returns all markdown files in the given directory.
+     *
+     * @param dir    the directory to search in
+     * @param filter a filter to apply to the file names
+     */
+    def listMarkdownFiles(dir: File, filter: String): Array[File] = {
+        dir.listFiles(_.getPath.endsWith(".md")).filter(_.getName.startsWith(filter))
+    }
 }
