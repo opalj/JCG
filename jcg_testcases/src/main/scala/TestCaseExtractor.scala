@@ -1,11 +1,65 @@
-import scala.io.Source
-import java.io.PrintWriter
-import java.io.File
-
-import javax.tools.ToolProvider
 import org.apache.commons.io.FileUtils
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
+
+import java.io.File
+import scala.io.Source
+import scala.util.matching.Regex
+
+trait TestCaseExtractor {
+    val language: String
+    /*
+     * ##ProjectName
+     * [//]: # (Main: path/to/Main.xyz)
+     * multiple code snippets
+     * [//]: # (END)
+     */
+    protected val reHeaders: Regex = ("""(?s)""" +
+      """\#\#(?<projectName>[^\n]*)\n""" + // ##ProjectName
+      """\[//\]: \# \((?:MAIN: (?<mainClass>[^\n]*)|LIBRARY)\)\n""" + // [//]: # (Main: path.to.Main.xyz) or [//]: # (LIBRARY)
+      """(?<body>.*?)""" + // multiple code snippets
+      """\[//\]: \# \(END\)""").r // [//]: # (END)
+
+
+    /**
+     * Extracts test cases from the given directory and writes them to the output directory.
+     *
+     * @param inputDir     the directory to search in
+     * @param outputDir    the directory to write the test cases to
+     * @param prefixFilter a filter to apply to the file names in the input directory
+     */
+    def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
+        val resources: Array[File] = FileOperations.getResources(new File(inputDir, language), prefixFilter)
+        val resultsDir = new File(outputDir, language)
+        val temp = new File("tmp")
+        // Clear result directory if it already exists
+        FileOperations.cleanUpDirectory(resultsDir)
+        FileOperations.cleanUpDirectory(temp)
+
+        resources.foreach(file => {
+            if (TestCaseExtractor.debug) {
+                println(file)
+            }
+
+            val source = Source.fromFile(file)
+            val lines = try source.mkString finally source.close()
+
+            processLines(lines, resultsDir, temp)
+        })
+
+        FileUtils.deleteDirectory(temp)
+        if (resources.nonEmpty) {
+            println(s"${Console.GREEN}Successfully extracted test cases for $language${Console.RESET}")
+        }
+    }
+
+    /**
+     * Processes the lines in a testcase markdown file.
+     *
+     * @param lines      the lines to process
+     * @param resultsDir the directory to write the test cases to
+     * @param temp       temporary directory to save intermediate files, will be cleared before and after processing
+     */
+    def processLines(lines: String, resultsDir: File, temp: File): Unit
+}
 
 /**
  * This tool searches for '.md' files in the resources (or in the specified directory) to extracts
@@ -18,179 +72,45 @@ import play.api.libs.json.Json
  * @author Florian Kuebler
  */
 object TestCaseExtractor {
-
-    val pathSeparator = File.pathSeparator
+    var debug: Boolean = false
 
     /**
      * Extracts the test cases.
+     *
      * @param args possible arguments are:
-     *      '--rsrcDir dir', where 'dir' is the directory to search in. If this option is not
-     *          specified, the resource root directory will be used.
-     *      '--md filter', where 'filter' is a prefix of the filenames to be included.
+     *             '--rsrcDir dir', where 'dir' is the directory to search in, this folder should contain a js and/or java folder. If this option is not
+     *             specified, the resource root directory will be used.
+     *             '--md filter', where 'filter' is a prefix of the filenames to be included.
+     *             '--lang lang', where 'lang' is the language of the test cases to extract ('js', 'java', 'all'). Default is 'all'.
      */
     def main(args: Array[String]): Unit = {
-
-        val debug = false
-
         val userDir = System.getProperty("user.dir")
+        val outputDir = new File("testcasesOutput")
 
-        val tmp = new File("tmp")
-        if (tmp.exists())
-            FileUtils.deleteDirectory(tmp)
-
-        tmp.mkdirs()
-
-        val result = new File("testcaseJars")
-        if (result.exists())
-            FileUtils.deleteDirectory(result)
-        result.mkdirs()
-
-        var mdFilter = ""
-        var fileDir: Option[String]= None
-
-        args.sliding(2, 2).toList.collect {
-            case Array("--md", f: String)        ⇒ mdFilter = f
-            case Array("--rsrcDir", dir: String) ⇒ fileDir = Some(dir)
+        // parse arguments
+        val mdFilter = getArgumentValue(args, "--md").getOrElse("")
+        val language = getArgumentValue(args, "--lang").getOrElse("all")
+        val resourceDir = new File(getArgumentValue(args, "--rsrcDir").getOrElse(userDir))
+        if (args.contains("--debug")) {
+            debug = true
         }
 
-        val resourceDir = new File(fileDir.getOrElse(userDir))
+        val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor).filter(lang => language == "all" || language.contains(lang.language))
 
-        // get all markdown files
-        val resources = resourceDir.
-            listFiles(_.getPath.endsWith(".md")).
-            filter(_.getName.startsWith(mdFilter))
-
-        println(resources.mkString(", "))
-
-        resources.foreach { sourceFile ⇒
-            println(sourceFile)
-            val source = Source.fromFile(sourceFile)
-            val lines = try source.mkString finally source.close()
-
-            /*
-             * ##ProjectName
-             * [//]: # (Main: path/to/Main.java)
-             * multiple code snippets
-             * [//]: # (END)
-             */
-            val reHeaders = ("""(?s)"""+
-                """\#\#([^\n]*)\n"""+ // ##ProjectName
-                """\[//\]: \# \((?:MAIN: ([^\n]*)|LIBRARY)\)\n"""+ // [//]: # (Main: path.to.Main.java) or [//]: # (LIBRARY)
-                """(.*?)"""+ // multiple code snippets
-                """\[//\]: \# \(END\)""").r( // [//]: # (END)
-                    "projectName", "mainClass", "body"
-                )
-
-            /*
-             * ```java
-             * // path/to/Class.java
-             * CODE SNIPPET
-             * ```
-             */
-            val re = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
-
-            reHeaders.findAllIn(lines).matchData.foreach { projectMatchResult ⇒
-                val projectName = projectMatchResult.group("projectName").trim
-                val main = projectMatchResult.group("mainClass")
-                assert(main == null || !main.contains("/"), "invalid main class, use '.' instead of '/'")
-                val srcFiles = re.findAllIn(projectMatchResult.group("body")).matchData.map { matchResult ⇒
-                    val packageName = matchResult.group(2)
-                    val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
-                    val codeSnippet = matchResult.group(4)
-
-                    val file = new File(tmp.getAbsolutePath, fileName)
-                    file.getParentFile.mkdirs()
-                    file.createNewFile()
-
-                    val pw = new PrintWriter(file)
-                    pw.write(codeSnippet)
-                    pw.close()
-                    file.getAbsolutePath
-                }
-
-                val compiler = ToolProvider.getSystemJavaCompiler
-
-                val bin = new File(tmp.getAbsolutePath, s"$projectName/bin/")
-                bin.mkdirs()
-
-                val targetDirs = findJCGTargetDirs()
-                val classPath = Seq(".", targetDirsToCP(targetDirs), System.getProperty("java.home")).mkString(s"$pathSeparator")
-
-                val compilerArgs = Seq("-cp", s"$classPath", "-d", bin.getAbsolutePath, "-encoding", "UTF-8", "-source", "1.8", "-target", "1.8") ++ srcFiles
-
-                if(debug) {
-                    println(compilerArgs.mkString("[DEBUG] Compiler args: \n\n", "\n", "\n\n"))
-                }
-
-                compiler.run(null, null, null, compilerArgs: _*)
-
-                val allClassFiles = recursiveListFiles(bin.getAbsoluteFile)
-
-                if(debug) {
-                    println(allClassFiles.mkString("[DEBUG] Produced class files: \n\n", "\n", "\n\n"))
-                }
-
-                val allClassFileNames = allClassFiles.map(_.getAbsolutePath.replace(s"${tmp.getAbsolutePath}/$projectName/bin/", ""))
-
-
-                val jarOpts = Seq(if (main != null) "cfe" else "cf")
-                val outPathCompiler = new File(s"${result.getAbsolutePath}/$projectName.jar")
-                val mainOpt = Option(main)
-                val args = Seq("jar") ++ jarOpts ++ Seq(outPathCompiler.getAbsolutePath) ++ mainOpt ++ allClassFileNames
-
-                if(debug) {
-                    println(args.mkString("[DEBUG] Jar args: \n\n", "\n", "\n\n"))
-                }
-
-                sys.process.Process(args, bin).!
-
-                if (main != null) {
-                    println(s"running $projectName.jar")
-                    sys.process.Process(Seq("java", "-jar", s"$projectName.jar"), result).!
-                }
-
-                val projectSpec = ProjectSpecification(
-                    name = projectName,
-                    target = new File(outPathCompiler.getAbsolutePath).getCanonicalPath,
-                    main = mainOpt,
-                    java = 8,
-                    cp = None
-                )
-
-                val projectSpecJson: JsValue = Json.toJson(projectSpec)
-                val projectSpecOut = new File(result, s"$projectName.conf")
-                val pw = new PrintWriter(projectSpecOut)
-                pw.write(Json.prettyPrint(projectSpecJson))
-                pw.close()
-            }
+        for (extractor <- extractors) {
+            extractor.extract(resourceDir, outputDir, mdFilter)
         }
-
-        FileUtils.deleteDirectory(tmp)
     }
 
-    def recursiveListFiles(f: File): Array[File] = {
-        val these = f.listFiles((_, fil) ⇒ fil.endsWith(".class"))
-        these ++ f.listFiles.filter(_.isDirectory).flatMap(recursiveListFiles)
+    /**
+     * Returns the value of the given CLI argument.
+     * If the argument is not found, None is returned.
+     *
+     * @param args array holding the arguments to search in.
+     */
+    def getArgumentValue(args: Array[String], argName: String): Option[String] = {
+        args.sliding(2, 2).collectFirst({
+            case Array(`argName`, value: String) => value
+        })
     }
-
-    def findJCGTargetDirs() : List[File] = {
-
-        val root = new File(System.getProperty("user.dir"))
-
-        val worklist = scala.collection.mutable.Queue(root)
-        val result = scala.collection.mutable.ArrayBuffer.empty[File]
-        while(worklist.nonEmpty){
-            val curElement = worklist.dequeue()
-            if(curElement.isDirectory){
-                if(curElement.getName == "classes")
-                    result += curElement
-                else
-                    worklist ++= curElement.listFiles()
-            }
-        }
-
-        result.toList
-    }
-
-    def targetDirsToCP(dirs: List[File]) : String = dirs.mkString(s"$pathSeparator")
 }
