@@ -129,7 +129,15 @@ object FileOperations {
      * @param extension the extension of the files to list e.g '.md'
      * @param filter    a filter to apply to the file names
      */
-    def listFiles(dir: File, extension: String, filter: String): Array[File] = {
+    def listFiles(dir: File, extension: String, filter: String): Array[File] =
         dir.listFiles(_.getPath.endsWith(extension)).filter(_.getName.startsWith(filter))
-    }
+
+
+    /**
+     * Returns all directories in the given directory.
+     *
+     * @param dir the directory to search in
+     * @return an array of directories in the given directory
+     */
+    def listDirs(dir: File): Array[File] = dir.listFiles().filter(_.isDirectory)
 }

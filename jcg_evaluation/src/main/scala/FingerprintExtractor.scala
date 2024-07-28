@@ -3,12 +3,12 @@ import org.opalj.log.OPALLogger
 import play.api.libs.json.Json
 
 import java.io._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration.DurationInt
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.TimeoutException
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
 import scala.io.Source
 import scala.util.Failure
 import scala.util.Success
@@ -152,6 +152,21 @@ object FingerprintExtractor {
         ow.newLine()
     }
 
+    /**
+     * Returns a FileWriter for the evaluation result file.
+     *
+     * @param resultsDir The directory where the evaluation result file should be created.
+     * @return A FileWriter for the evaluation result file.
+     */
+    private def getOutputTarget(resultsDir: File): Writer = {
+        val outputFile = new File(resultsDir, EVALUATION_RESULT_FILE_NAME)
+        if (outputFile.exists()) {
+            outputFile.delete()
+            outputFile.createNewFile()
+        }
+        new FileWriter(outputFile, false)
+    }
+
     private def getJSFingerprints(config: JCGConfig): Unit = {
         if (config.debug) println("[DEBUG] " + config.language + " " + config.inputDir + " " + config.outputDir)
         println("Extracting JS fingerprints")
@@ -182,7 +197,7 @@ object FingerprintExtractor {
 
         // compare expected and generated call graphs and write results to file
         for (adapter <- adapters) {
-            val algoDirs = listDirs(new File(adapterOutputDir, adapter.frameworkName))
+            val algoDirs = FileOperations.listDirs(new File(adapterOutputDir, adapter.frameworkName))
             println("AlgoDirs: " + algoDirs.map(_.getName).mkString(","))
             var algorithmMap = Map[String, Map[String, Boolean]]()
             outputWriter.write(adapter.frameworkName)
@@ -215,26 +230,6 @@ object FingerprintExtractor {
         if (config.debug) println("Results " + adapterMap.map(x => " --- " + x._1 + "---- \n" + x._2.map(y => y._1 + "\n\t" + y._2.map(z => z._1 + " -> " + z._2).toSeq.sorted.mkString("\n\t")).mkString("\n")).mkString)
     }
 
-
-    /**
-     * Returns a FileWriter for the evaluation result file.
-     *
-     * @param resultsDir The directory where the evaluation result file should be created.
-     * @return A FileWriter for the evaluation result file.
-     */
-    private def getOutputTarget(resultsDir: File): Writer = {
-        val outputFile = new File(resultsDir, EVALUATION_RESULT_FILE_NAME)
-        if (outputFile.exists()) {
-            outputFile.delete()
-            outputFile.createNewFile()
-        }
-        new FileWriter(outputFile, false)
-    }
-
-    private def listDirs(dir: File) = {
-        dir.listFiles().filter(_.isDirectory)
-    }
-
     /**
      * Compares the expected call graph with the generated call graph.
      *
@@ -245,7 +240,6 @@ object FingerprintExtractor {
 
         for (edge <- expectedCG.directLinks) {
             if (!generatedCG.links.map(_.mkString(",")).contains(edge.mkString(","))) {
-                //println("[DEBUG] Edge not found: " + edge.mkString(" ->"))
                 missingEdges :+= edge
             }
         }
@@ -267,7 +261,6 @@ object FingerprintExtractor {
             val adapterDir = new File(outputDir, adapter.frameworkName)
             adapterDir.mkdirs()
 
-            // execute adapter
             adapter.main(Array())
         }
     }
@@ -281,13 +274,8 @@ object FingerprintExtractor {
         }.toSet
     }
 
-    def getFingerprintFile(adapter: JCGTestAdapter, algorithm: String, resultsDir: File): File = {
+    private def getFingerprintFile(adapter: JCGTestAdapter, algorithm: String, resultsDir: File): File = {
         val fileName = s"${adapter.frameworkName()}-$algorithm.profile"
-        new File(resultsDir, fileName)
-    }
-
-    def getFingerprintFile(adapter: TestAdapter, algorithm: String, resultsDir: File): File = {
-        val fileName = s"${adapter.frameworkName}-$algorithm.profile"
         new File(resultsDir, fileName)
     }
 }
