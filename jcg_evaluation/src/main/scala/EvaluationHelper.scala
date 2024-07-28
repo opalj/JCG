@@ -69,7 +69,7 @@ object ConfigParser {
                 opt[Unit]('h', "runHermes")
                   .action((x, c) => c.copy(runHermes = true))
                   .text("Hermes will be run on the target project")
-                .optional(),
+                  .optional(),
                 opt[File]('i', "inputDir")
                   .action((dir, c) => c.copy(inputDir = dir))
                   .text("Defines the directory with the configuration files for the input projects.")
@@ -79,7 +79,7 @@ object ConfigParser {
                       else failure(s"Value ${dir.getAbsolutePath} must exist and must be a directory.")
                   }
                   .validate{dir =>
-                      if(FileOperations.listFilesDeep(dir, ".conf").nonEmpty || FileOperations.listFilesDeep(dir, ".js").nonEmpty) success
+                      if(FileOperations.hasFilesDeep(dir, ".conf", ".js")) success
                       else failure(s"${dir.getAbsolutePath} does not contain *.conf or *.js files")
                   },
                 opt[File]('o', "outputDir")

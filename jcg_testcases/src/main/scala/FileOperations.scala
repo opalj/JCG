@@ -33,7 +33,7 @@ object FileOperations {
      * @param dir      the directory to search in
      * @param endsWith the string the files should end with
      */
-    def listFilesDeep(dir: File, endsWith: String): Array[File] = {
+    def listFilesDeep(dir: File, endsWith: String = ""): Array[File] = {
         val currentFiles = dir.listFiles((_, file) => file.endsWith(endsWith))
         currentFiles ++ dir.listFiles.filter(_.isDirectory).flatMap(listFilesDeep(_, endsWith))
     }
@@ -60,6 +60,17 @@ object FileOperations {
     def listFilesRecursively(f: File): Array[File] = {
         val these = f.listFiles((_, fil) => fil.endsWith(".class"))
         these ++ f.listFiles.filter(_.isDirectory).flatMap(listFilesRecursively)
+    }
+
+    /**
+     * Checks if the given directory contains files with any of the given extensions.
+     *
+     * @param dir        the directory to check
+     * @param extensions the extensions to check for
+     * @return true if the directory contains files with any of the given extensions, false otherwise
+     */
+    def hasFilesDeep(dir: File, extensions: String*): Boolean = {
+        listFilesDeep(dir).exists(f => extensions.exists(f.getName.endsWith))
     }
 
     /**
