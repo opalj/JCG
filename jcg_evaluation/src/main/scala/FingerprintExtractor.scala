@@ -1,12 +1,17 @@
-import org.opalj.log.{GlobalLogContext, OPALLogger}
+import org.opalj.log.GlobalLogContext
+import org.opalj.log.OPALLogger
 import play.api.libs.json.Json
 
 import java.io._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration, DurationInt}
-import scala.concurrent.{Await, Future, TimeoutException}
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.TimeoutException
 import scala.io.Source
-import scala.util.{Failure, Success}
+import scala.util.Failure
+import scala.util.Success
 
 object FingerprintExtractor {
 
@@ -159,14 +164,14 @@ object FingerprintExtractor {
 
         // parse expected call graph for test case from json files
         val expectedCGs: Array[ExpectedCG] =
-            FileOperations.listJsonFilesDeep(config.inputDir)
+            FileOperations.listFilesDeep(config.inputDir, ".json")
               .filter(f => f.getAbsolutePath.contains("js"))
               .map(f => new ExpectedCG(f))
               .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
 
         if (config.debug) {
             println("[DEBUG] expectedCGs:" + expectedCGs.map(_.filePath).mkString(","))
-            val generatedCGFiles = FileOperations.listJsonFilesDeep(adapterOutputDir).filter(f => f.getAbsolutePath.contains("js"))
+            val generatedCGFiles = FileOperations.listFilesDeep(adapterOutputDir, ".json").filter(f => f.getAbsolutePath.contains("js"))
             println("[DEBUG] generatedCGFiles: " + generatedCGFiles.mkString(","))
         }
 
