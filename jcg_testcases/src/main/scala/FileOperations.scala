@@ -28,26 +28,6 @@ object FileOperations {
     }
 
     /**
-     * Returns all markdown files in the given directory.
-     *
-     * @param dir    the directory to search in
-     * @param filter a filter to apply to the file names
-     */
-    def listMarkdownFiles(dir: File, filter: String): Array[File] = {
-        dir.listFiles(_.getPath.endsWith(".md")).filter(_.getName.startsWith(filter))
-    }
-
-    /**
-     * Returns all JSON files in the given directory.
-     *
-     * @param dir the directory to search in
-     */
-    def listJsonFilesDeep(dir: File): Array[File] = {
-        val these = dir.listFiles((_, fil) => fil.endsWith(".json"))
-        these ++ dir.listFiles.filter(_.isDirectory).flatMap(listJsonFilesDeep)
-    }
-
-    /**
      * Returns all files in the given directory that end with the given string.
      *
      * @param dir      the directory to search in
