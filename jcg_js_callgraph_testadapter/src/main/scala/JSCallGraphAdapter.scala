@@ -33,8 +33,12 @@ object JSCallGraphAdapter extends TestAdapter {
             val inputDirPath = s"testcasesOutput/js/$inputDir"
             val outputPath = s"${outputDir.getAbsolutePath}/$inputDir.json"
             val args = Seq("--cg", inputDirPath, "--output", outputPath, "--strategy", algorithm)
-            println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
-            sys.process.Process(Seq(command) ++ args).!!
+            if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
+            try {
+                sys.process.Process(Seq(command) ++ args).!!
+            } catch {
+                case e: Exception => println(s"[Error]: $command failed for $inputDir")
+            }
         })
 
         println("Call graphs generated!")

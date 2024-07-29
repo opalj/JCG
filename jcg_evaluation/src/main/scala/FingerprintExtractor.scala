@@ -190,8 +190,6 @@ object FingerprintExtractor {
             println("[DEBUG] generatedCGFiles: " + generatedCGFiles.mkString(","))
         }
 
-        var adapterMap = Map[String, Map[String, Map[String, Boolean]]]()
-
         val outputWriter = new BufferedWriter(getOutputTarget(outputDir))
 
 
@@ -204,7 +202,6 @@ object FingerprintExtractor {
             outputWriter.newLine()
 
             for (algoDir <- algoDirs) {
-                var testCaseMap = Map[String, Boolean]()
                 outputWriter.write("\t" + algoDir.getName)
                 outputWriter.newLine()
                 for (expectedCG <- expectedCGs) {
@@ -215,19 +212,14 @@ object FingerprintExtractor {
 
                     // check if call graph has missing edges
                     val isSound = compareCGs(expectedCG, generatedCG).length == 0
-                    testCaseMap += (testName.split("\\.").head -> isSound)
 
                     outputWriter.write("\t\t" + testName + " -> " + isSound)
                     outputWriter.flush()
                 }
-                algorithmMap += (algoDir.getName -> testCaseMap)
                 outputWriter.newLine()
             }
-            adapterMap += (adapter.frameworkName -> algorithmMap)
         }
         outputWriter.close()
-
-        if (config.debug) println("Results " + adapterMap.map(x => " --- " + x._1 + "---- \n" + x._2.map(y => y._1 + "\n\t" + y._2.map(z => z._1 + " -> " + z._2).toSeq.sorted.mkString("\n\t")).mkString("\n")).mkString)
     }
 
     /**
@@ -270,7 +262,7 @@ object FingerprintExtractor {
         assert(fingerprintFile.exists(), s"${fingerprintFile.getPath} does not exists")
 
         Source.fromFile(fingerprintFile).getLines().map(_.split("\t")).collect {
-            case Array(featureID, result) if result == Sound.shortNotation ⇒ featureID
+            case Array(featureID, result) if result == Sound.shortNotation => featureID
         }.toSet
     }
 
