@@ -26,13 +26,13 @@ object FingerprintExtractor {
         val config = c.get
 
         config.language match {
-            case "java" => getJavaFingerprints(config)
-            case "js" => getJSFingerprints(config)
+            case "java" => generateJavaFingerprints(config)
+            case "js" => generateJSFingerprints(config)
             case _ => println("Language not supported")
         }
     }
 
-    private def getJavaFingerprints(config: JCGConfig): Unit = {
+    private def generateJavaFingerprints(config: JCGConfig): Unit = {
         if (!config.debug)
             OPALLogger.updateLogger(GlobalLogContext, new DevNullLogger())
 
@@ -167,7 +167,7 @@ object FingerprintExtractor {
         new FileWriter(outputFile, false)
     }
 
-    private def getJSFingerprints(config: JCGConfig): Unit = {
+    private def generateJSFingerprints(config: JCGConfig): Unit = {
         if (config.debug) println("[DEBUG] " + config.language + " " + config.inputDir + " " + config.outputDir)
         println("Extracting JS fingerprints")
         val adapters = List(JSCallGraphAdapter)
@@ -197,7 +197,6 @@ object FingerprintExtractor {
         for (adapter <- adapters) {
             val algoDirs = FileOperations.listDirs(new File(adapterOutputDir, adapter.frameworkName))
             println("AlgoDirs: " + algoDirs.map(_.getName).mkString(","))
-            var algorithmMap = Map[String, Map[String, Boolean]]()
             outputWriter.write(adapter.frameworkName)
             outputWriter.newLine()
 
