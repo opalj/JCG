@@ -210,7 +210,7 @@ object FingerprintExtractor {
                     val generatedCG = new AdapterCG(generatedCGFile)
 
                     // check if call graph has missing edges
-                    val isSound = compareCGs(expectedCG, generatedCG).length == 0
+                    val isSound = generatedCG.compareLinks(expectedCG).length == 0
 
                     outputWriter.write("\t\t" + testName + " -> " + isSound)
                     outputWriter.flush()
@@ -221,22 +221,6 @@ object FingerprintExtractor {
         outputWriter.close()
     }
 
-    /**
-     * Compares the expected call graph with the generated call graph.
-     *
-     * @return Array of edges missing from generated call graph
-     */
-    private def compareCGs(expectedCG: ExpectedCG, generatedCG: AdapterCG): Array[Array[String]] = {
-        var missingEdges: Array[Array[String]] = Array()
-
-        for (edge <- expectedCG.directLinks) {
-            if (!generatedCG.links.map(_.mkString(",")).contains(edge.mkString(","))) {
-                missingEdges :+= edge
-            }
-        }
-
-        missingEdges
-    }
 
     /**
      * Creates output directories for each adapter and executes the adapters on the test cases.

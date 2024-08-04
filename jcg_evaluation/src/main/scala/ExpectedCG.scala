@@ -1,22 +1,24 @@
 import java.io.File
 
-class ExpectedCG {
-    var filePath: String = ""
-    var directLinks: Array[Array[String]] = Array[Array[String]]()
-    var indirectLinks: Array[Array[String]] = Array[Array[String]]()
+class ExpectedCG(val jsonFile: File) extends CallGraph {
+    private val json = parseFileToJson(jsonFile).getOrElse(ujson.Null)
+    val filePath: String = jsonFile.getAbsolutePath
+    val links: Seq[Seq[String]] = parseLinks("directLinks")
+    val indirectLinks: Seq[Seq[String]] = parseLinks("indirectLinks")
 
-    def this(jsonFile: File) = {
-        this()
-        filePath = jsonFile.getAbsolutePath
-        val source = scala.io.Source.fromFile(jsonFile)
-        val json = try source.mkString finally source.close()
-
-        ujson.read(json)("directLinks").arr.foreach { directLink =>
-            directLinks = directLinks :+ directLink.arr.map(_.str.trim).toArray
-        }
-
-        ujson.read(json)("indirectLinks").arr.foreach { indirectLink =>
-            indirectLinks = indirectLinks :+ indirectLink.arr.map(_.str.trim).toArray
+    /**
+     * Parses the links from the given JSON file.
+     *
+     * @param linkType the type of links to parse
+     * @return the parsed links
+     */
+    private def parseLinks(linkType: String): Seq[Seq[String]] = {
+        if (json.isNull) Seq.empty
+        else {
+            json(linkType).arrOpt match {
+                case Some(links) => links.map(_.arr.map(_.str.trim).toSeq).toSeq
+                case None => Seq.empty
+            }
         }
     }
 }

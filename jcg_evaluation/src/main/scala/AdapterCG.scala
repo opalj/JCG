@@ -1,32 +1,26 @@
 import java.io.File
 
-class AdapterCG {
-    var filePath: String = ""
-    var algorithm: String = ""
-    var links: Array[Array[String]] = Array()
+class AdapterCG(val jsonFile: File) extends CallGraph {
+    val filePath: String = jsonFile.getAbsolutePath
+    var links: Seq[Seq[String]] = {
+        val json = parseFileToJson(jsonFile).getOrElse(ujson.Null)
+        if (json.isNull) Seq.empty
+        else {
+            json.arr.map(f => {
+                val sourceLabel = f("source")("label").strOpt.getOrElse("")
+                val sourceFileName = f("source")("file").strOpt.getOrElse("").split("/").last.split("\\.").head
+                val targetLabel = f("target")("label").strOpt.getOrElse("")
+                val targetFileName = f("target")("file").strOpt.getOrElse("").split("/").last.split("\\.").head
 
-    def this(jsonFile: File) = {
-        this()
-        val source = scala.io.Source.fromFile(jsonFile)
-        val json = try source.mkString finally source.close()
-        filePath = jsonFile.getAbsolutePath
+                val source = if (sourceLabel == "anon") s"$sourceFileName.<anonymous:${f("source")("start")("row").numOpt.getOrElse(0.0).toInt}>"
+                else if (sourceLabel == "global") s"<$sourceLabel>"
+                else s"$sourceFileName.$sourceLabel".trim
 
-        ujson.read(json).arr.foreach(f => {
-            var sourceLabel = f("source")("label").str
-            val sourceFileName = f("source")("file").str.split("/").last.split("\\.").head
-            var targetLabel = f("target")("label").str
-            val targetFileName = f("target")("file").str.split("/").last.split("\\.").head
+                val target = if (targetLabel == "anon") s"$sourceFileName.<anonymous:${f("target")("start")("row").numOpt.getOrElse(0.0).toInt}>"
+                else s"$targetFileName.$targetLabel".trim
 
-            if (sourceLabel == "anon") {
-                sourceLabel = "<anonymous" + ":" + f("source")("start")("row").num.toInt.toString + ">"
-            }
-
-            if (targetLabel == "anon") {
-                targetLabel = "<anonymous" + ":" + f("target")("start")("row").num.toInt.toString + ">"
-            }
-
-            links :+= Array(if (sourceLabel == "global") s"<$sourceLabel>" else (sourceFileName + "." + sourceLabel).trim, (targetFileName + "." + targetLabel).trim)
-
-        })
+                Seq(source, target)
+            }).toSeq
+        }
     }
 }
