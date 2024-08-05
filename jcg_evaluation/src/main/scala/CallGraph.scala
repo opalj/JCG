@@ -8,6 +8,12 @@ trait CallGraph {
 
     def links: Seq[Seq[String]]
 
+    /**
+     * Parses a given file to a JSON object.
+     *
+     * @param file The file to parse.
+     * @return The JSON object parsed from the file.
+     */
     def parseFileToJson(file: File): Option[Value] = {
         Using(scala.io.Source.fromFile(file)) { source =>
             ujson.read(source.mkString)
@@ -29,9 +35,6 @@ trait CallGraph {
             }
         }
 
-        if (missingEdges.length > 0) println(s"Missing edges in $filePath: ${missingEdges.mkString(", ")}\n${links.mkString(", ")}}")
-
         missingEdges
     }
-
 }
