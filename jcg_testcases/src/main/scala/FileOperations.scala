@@ -52,17 +52,6 @@ object FileOperations {
     }
 
     /**
-     * Recursively lists all files in the given directory.
-     *
-     * @param f the directory to list files from
-     * @return an array of files
-     */
-    def listFilesRecursively(f: File): Array[File] = {
-        val these = f.listFiles((_, fil) => fil.endsWith(".class"))
-        these ++ f.listFiles.filter(_.isDirectory).flatMap(listFilesRecursively)
-    }
-
-    /**
      * Checks if the given directory contains files with any of the given extensions.
      *
      * @param dir        the directory to check
