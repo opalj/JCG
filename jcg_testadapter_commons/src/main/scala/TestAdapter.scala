@@ -1,6 +1,5 @@
-
 trait TestAdapter {
     val frameworkName: String
 
-    def main(args: Array[String]): Unit
+    def possibleAlgorithms: Array[String]
 }

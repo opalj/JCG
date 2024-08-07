@@ -175,11 +175,12 @@ object FingerprintExtractor {
         // create output directories and execute all adapters
         val outputDir = config.outputDir
         val adapterOutputDir = config.outputDir
-        executeAdapters(adapters, adapterOutputDir)
+        val inputDir = config.inputDir
+        executeAdapters(adapters, inputDir, adapterOutputDir)
 
         // parse expected call graph for test case from json files
         val expectedCGs: Array[ExpectedCG] =
-            FileOperations.listFilesDeep(config.inputDir, ".json")
+            FileOperations.listFilesDeep(inputDir, ".json")
               .filter(f => f.getAbsolutePath.contains("js"))
               .map(f => new ExpectedCG(f))
               .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
@@ -228,7 +229,7 @@ object FingerprintExtractor {
      * @param adapters  List of adapters to execute.
      * @param outputDir The output directory to write to.
      */
-    private def executeAdapters(adapters: List[TestAdapter], outputDir: File): Unit = {
+    private def executeAdapters(adapters: List[JSTestAdapter], inputDir: File, outputDir: File): Unit = {
         outputDir.mkdirs()
 
         for (adapter <- adapters) {
@@ -236,7 +237,7 @@ object FingerprintExtractor {
             val adapterDir = new File(outputDir, adapter.frameworkName)
             adapterDir.mkdirs()
 
-            adapter.main(Array())
+            adapter.serializeAllCGs("testcasesOutput/js", adapterDir.getAbsolutePath)
         }
     }
 

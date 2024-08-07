@@ -1,6 +1,6 @@
 import java.io.File
 
-object JSCallGraphAdapter extends TestAdapter {
+object JSCallGraphAdapter extends JSTestAdapter {
     val debug: Boolean = false
 
     val possibleAlgorithms: Array[String] = Array("NONE", "ONESHOT", "DEMAND", "FULL")
