@@ -88,7 +88,7 @@ lazy val jcg_js_callgraph_testadapter = project.settings(
     name := "JCG js-callgraph Test Adapter",
     aggregate in assembly := false,
     publishArtifact := false
-).dependsOn(jcg_testadapter_commons, jcg_testadapter_commons)
+).dependsOn(jcg_testadapter_commons)
 
 
 //lazy val jcg_opal_testadapter = project.settings(
