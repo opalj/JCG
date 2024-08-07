@@ -180,14 +180,14 @@ object FingerprintExtractor {
 
         // parse expected call graph for test case from json files
         val expectedCGs: Array[ExpectedCG] =
-            FileOperations.listFilesDeep(inputDir, ".json")
+            FileOperations.listFilesRecursively(inputDir, ".json")
               .filter(f => f.getAbsolutePath.contains("js"))
               .map(f => new ExpectedCG(f))
               .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
 
         if (config.debug) {
             println("[DEBUG] expectedCGs:" + expectedCGs.map(_.filePath).mkString(","))
-            val generatedCGFiles = FileOperations.listFilesDeep(adapterOutputDir, ".json").filter(f => f.getAbsolutePath.contains("js"))
+            val generatedCGFiles = FileOperations.listFilesRecursively(adapterOutputDir, ".json").filter(f => f.getAbsolutePath.contains("js"))
             println("[DEBUG] generatedCGFiles: " + generatedCGFiles.mkString(","))
         }
 
