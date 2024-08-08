@@ -34,7 +34,7 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
 
         printHeader(ow, projectSpecFiles)
 
-        val adapters = if (config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_ADAPTERS
+        val adapters = if (config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_JAVA_ADAPTERS
 
         for {
             adapter <- adapters

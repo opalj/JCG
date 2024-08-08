@@ -8,7 +8,7 @@ object JSFingerprintExtractor extends FingerprintExtractor {
     override def generateFingerprints(config: JCGConfig): Unit = {
         if (config.debug) println("[DEBUG] " + config.language + " " + config.inputDir + " " + config.outputDir)
         println("Extracting JS fingerprints")
-        val adapters = List(JSCallGraphAdapter)
+        val adapters = CommonEvaluationConfig.ALL_JS_ADAPTERS
 
         // create output directories and execute all adapters
         val outputDir = config.outputDir
