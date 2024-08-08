@@ -39,27 +39,6 @@ object FileOperations {
     }
 
     /**
-     * Returns all JSON files in the given directory.
-     *
-     * @param dir the directory to search in
-     */
-    def listJsonFilesDeep(dir: File): Array[File] = {
-        val these = dir.listFiles((_, fil) => fil.endsWith(".json"))
-        these ++ dir.listFiles.filter(_.isDirectory).flatMap(listJsonFilesDeep)
-    }
-
-    /**
-     * Returns all files in the given directory that end with the given string.
-     *
-     * @param dir      the directory to search in
-     * @param endsWith the string the files should end with
-     */
-    def listFilesDeep(dir: File, endsWith: String): Array[File] = {
-        val currentFiles = dir.listFiles((_, file) => file.endsWith(endsWith))
-        currentFiles ++ dir.listFiles.filter(_.isDirectory).flatMap(listFilesDeep(_, endsWith))
-    }
-
-    /**
      * Cleans up the given directory.
      * If the directory does not exist, it will be created.
      *
