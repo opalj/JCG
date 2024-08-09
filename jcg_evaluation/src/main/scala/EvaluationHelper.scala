@@ -38,7 +38,8 @@ case class JCGConfig(
                    allQueries: Boolean = false,
                    fingerprintDir: File = new File(""),
                    debug: Boolean = false,
-                   parallel: Boolean = false
+                   parallel: Boolean = false,
+                   language: String = "",
                  ) {
     val JRE_LOCATIONS_FILE = "jre.conf"
     val SERIALIZATION_FILE_NAME = "cg.json"
@@ -68,7 +69,7 @@ object ConfigParser {
                 opt[Unit]('h', "runHermes")
                   .action((x, c) => c.copy(runHermes = true))
                   .text("Hermes will be run on the target project")
-                .optional(),
+                  .optional(),
                 opt[File]('i', "inputDir")
                   .action((dir, c) => c.copy(inputDir = dir))
                   .text("Defines the directory with the configuration files for the input projects.")
@@ -78,8 +79,8 @@ object ConfigParser {
                       else failure(s"Value ${dir.getAbsolutePath} must exist and must be a directory.")
                   }
                   .validate{dir =>
-                      if(dir.listFiles(_.getName.endsWith(".conf")).nonEmpty) success
-                      else failure(s"${dir.getAbsolutePath} does not contain *.conf files")
+                      if(FileOperations.hasFilesDeep(dir, ".conf", ".js")) success
+                      else failure(s"${dir.getAbsolutePath} does not contain *.conf or *.js files")
                   },
                 opt[File]('o', "outputDir")
                   .action{(dir, c) =>
@@ -126,6 +127,11 @@ object ConfigParser {
                   .text("provide a fingerprint for a project-specific evaluation")
                   .valueName("<path/to/dir>")
                   .optional(),
+                opt[String]('l', "language")
+                  .action((lang, c) => c.copy(language = lang))
+                  .text("provide the language of the projects")
+                  .valueName("language")
+                  .optional(),
                 checkConfig(_ => success)
             )
         }
@@ -137,7 +143,8 @@ object ConfigParser {
 
 object CommonEvaluationConfig {
 
-    val ALL_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
+    val ALL_JAVA_ADAPTERS: List[JCGTestAdapter] = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
+    val ALL_JS_ADAPTERS: List[JSTestAdapter] = List(JSCallGraphAdapter)
 
 
 
@@ -165,7 +172,7 @@ object CommonEvaluationConfig {
                 assert(ALGORITHM_PREFIX_FILTER.isEmpty, "multiple algorithm filters specified")
                 ALGORITHM_PREFIX_FILTER = prefix
             case Array("--adapter", name) ⇒ // you can use this option multiple times
-                val adapter = ALL_ADAPTERS.find(_.frameworkName().toLowerCase == name.toLowerCase)
+                val adapter = ALL_JAVA_ADAPTERS.find(_.frameworkName().toLowerCase == name.toLowerCase)
                 assert(adapter.nonEmpty, s"'$name' is not a valid framework adapter")
                 EVALUATION_ADAPTERS ++= adapter
         }
@@ -185,7 +192,7 @@ object CommonEvaluationConfig {
             DEBUG,
             INPUT_DIR_PATH,
             OUTPUT_DIR_PATH,
-            if(EVALUATION_ADAPTERS.isEmpty) ALL_ADAPTERS else EVALUATION_ADAPTERS,
+            if(EVALUATION_ADAPTERS.isEmpty) ALL_JAVA_ADAPTERS else EVALUATION_ADAPTERS,
             PROJECT_PREFIX_FILTER,
             ALGORITHM_PREFIX_FILTER
         )

@@ -28,6 +28,17 @@ object FileOperations {
     }
 
     /**
+     * Returns all files in the given directory that end with the given string.
+     *
+     * @param dir      the directory to search in
+     * @param endsWith the string the files should end with
+     */
+    def listFilesRecursively(dir: File, endsWith: String = ""): Array[File] = {
+        val currentFiles = dir.listFiles((_, file) => file.endsWith(endsWith))
+        currentFiles ++ dir.listFiles.filter(_.isDirectory).flatMap(listFilesRecursively(_, endsWith))
+    }
+
+    /**
      * Cleans up the given directory.
      * If the directory does not exist, it will be created.
      *
@@ -41,14 +52,14 @@ object FileOperations {
     }
 
     /**
-     * Recursively lists all files in the given directory.
+     * Checks if the given directory contains files with any of the given extensions.
      *
-     * @param f the directory to list files from
-     * @return an array of files
+     * @param dir        the directory to check
+     * @param extensions the extensions to check for
+     * @return true if the directory contains files with any of the given extensions, false otherwise
      */
-    def listFilesRecursively(f: File): Array[File] = {
-        val these = f.listFiles((_, fil) => fil.endsWith(".class"))
-        these ++ f.listFiles.filter(_.isDirectory).flatMap(listFilesRecursively)
+    def hasFilesDeep(dir: File, extensions: String*): Boolean = {
+        listFilesRecursively(dir).exists(f => extensions.exists(f.getName.endsWith))
     }
 
     /**
@@ -107,7 +118,15 @@ object FileOperations {
      * @param extension the extension of the files to list e.g '.md'
      * @param filter    a filter to apply to the file names
      */
-    def listFiles(dir: File, extension: String, filter: String): Array[File] = {
+    def listFiles(dir: File, extension: String, filter: String): Array[File] =
         dir.listFiles(_.getPath.endsWith(extension)).filter(_.getName.startsWith(filter))
-    }
+
+
+    /**
+     * Returns all directories in the given directory.
+     *
+     * @param dir the directory to search in
+     * @return an array of directories in the given directory
+     */
+    def listDirs(dir: File): Array[File] = dir.listFiles().filter(_.isDirectory)
 }
