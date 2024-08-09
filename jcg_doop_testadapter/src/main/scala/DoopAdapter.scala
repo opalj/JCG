@@ -27,17 +27,17 @@ import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
 
 /**
- * This is an experimental stage [[JCGTestAdapter]] as it is not possible to run Doop without
+ * This is an experimental stage [[JavaTestAdapter]] as it is not possible to run Doop without
  * installing it (and a data-log engine).
  * Therefore, this object has the capability of converting the output of the CallGraphEdge table
  * into the [[ReachableMethods]] data-format.
  *
  * @author Florian Kuebler
  */
-object DoopAdapter extends JCGTestAdapter {
+object DoopAdapter extends JavaTestAdapter {
 
-    override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
-    override def frameworkName(): String = "Doop"
+    val possibleAlgorithms: Array[String] = Array("context-insensitive")
+    val frameworkName: String = "Doop"
 
     private def createJsonRepresentation(
         doopEdges: Source, doopReachable: Source, tgtJar: File, jreDir: File, outFile: File

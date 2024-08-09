@@ -1,27 +1,23 @@
-import java.io.File
-import java.io.FileWriter
-import java.io.PrintWriter
-import java.net.URL
-import java.net.URLClassLoader
-import java.util
-import java.util.stream.Collectors
-
 import com.ibm.wala.classLoader.Language.JAVA
 import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
 import com.ibm.wala.ipa.callgraph.impl.Util
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory
-import com.ibm.wala.properties.WalaProperties
 import com.ibm.wala.types.MethodReference
 import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
 import play.api.libs.json.Json
 
+import java.io.File
+import java.io.FileWriter
+import java.io.PrintWriter
+import java.util
+import java.util.stream.Collectors
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-object WalaJCGAdapter extends JCGTestAdapter {
+object WalaJCGAdapter extends JavaTestAdapter {
     override def serializeCG(
         algorithm:  String,
         target:     String,
@@ -156,9 +152,9 @@ object WalaJCGAdapter extends JCGTestAdapter {
         after - before
     }
 
-    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
+    val possibleAlgorithms: Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
 
-    override def frameworkName(): String = "WALA"
+    val frameworkName: String = "WALA"
 
     private def createMethodObject(method: MethodReference): Method = {
         val name = method.getName.toString

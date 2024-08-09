@@ -60,7 +60,7 @@ object FingerprintExtractor {
         }
     }
 
-    def parseFingerprints(adapter: JCGTestAdapter, algorithm: String, fingerprintDir: File): Set[String] = {
+    def parseFingerprints(adapter: JavaTestAdapter, algorithm: String, fingerprintDir: File): Set[String] = {
         val fingerprintFile = FingerprintExtractor.getFingerprintFile(adapter, algorithm, fingerprintDir)
         assert(fingerprintFile.exists(), s"${fingerprintFile.getPath} does not exists")
 
@@ -69,8 +69,8 @@ object FingerprintExtractor {
         }.toSet
     }
 
-    private def getFingerprintFile(adapter: JCGTestAdapter, algorithm: String, resultsDir: File): File = {
-        val fileName = s"${adapter.frameworkName()}-$algorithm.profile"
+    private def getFingerprintFile(adapter: JavaTestAdapter, algorithm: String, resultsDir: File): File = {
+        val fileName = s"${adapter.frameworkName}-$algorithm.profile"
         new File(resultsDir, fileName)
     }
 }

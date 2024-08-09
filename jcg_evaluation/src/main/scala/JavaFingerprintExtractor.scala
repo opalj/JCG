@@ -38,12 +38,12 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
 
         for {
             adapter <- adapters
-            cgAlgorithm <- adapter.possibleAlgorithms().filter(_.startsWith(config.algorithmFilter))
+            cgAlgorithm <- adapter.possibleAlgorithms.filter(_.startsWith(config.algorithmFilter))
         } {
-            ow.write(s"${adapter.frameworkName()}-$cgAlgorithm")
+            ow.write(s"${adapter.frameworkName}-$cgAlgorithm")
 
-            println(s"creating fingerprint for ${adapter.frameworkName()} $cgAlgorithm")
-            val fingerprintFile = getFingerprintFile(adapter.frameworkName(), cgAlgorithm, resultsDir)
+            println(s"creating fingerprint for ${adapter.frameworkName} $cgAlgorithm")
+            val fingerprintFile = getFingerprintFile(adapter.frameworkName, cgAlgorithm, resultsDir)
             if (fingerprintFile.exists()) {
                 fingerprintFile.delete()
             }

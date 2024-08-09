@@ -114,13 +114,13 @@ object Evaluation {
 
         for {
             adapter ← config.EVALUATION_ADAPTERS
-            cgAlgo ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
+            cgAlgo ← adapter.possibleAlgorithms.filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
             psf ← projectSpecFiles
         } {
 
             val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
-            println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
+            println(s"running ${adapter.frameworkName} $cgAlgo against ${projectSpec.name}")
 
             val outDir = config.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
             outDir.mkdirs()
@@ -173,7 +173,7 @@ object Evaluation {
 
     private def performProjectSpecificEvaluation(
         projectSpec:  ProjectSpecification,
-        adapter:      JCGTestAdapter,
+        adapter:      JavaTestAdapter,
         algorithm:    String,
         locationsMap: Map[String, Map[String, Set[Method]]],
         outDir:       File,

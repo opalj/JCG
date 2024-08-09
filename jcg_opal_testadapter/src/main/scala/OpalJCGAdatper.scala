@@ -37,16 +37,16 @@ import org.opalj.tac.cg.XTACallGraphKey
 import org.opalj.tac.fpcf.analyses.cg.TypeIterator
 
 /**
- * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
+ * A [[JavaTestAdapter]] for the FPCF-based call graph analyses of OPAL.
  *
  * @author Dominik Helm
  * @author Florian Kuebler
  */
-object OpalJCGAdatper extends JCGTestAdapter {
+object OpalJCGAdatper extends JavaTestAdapter {
 
-    def possibleAlgorithms(): Array[String] = Array[String]("CHA", "RTA", "MTA", "CTA", "FTA", "XTA", "0-CFA", "0-1-CFA", "1-0-CFA", "1-1-CFA")
+    val possibleAlgorithms: Array[String] = Array[String]("CHA", "RTA", "MTA", "CTA", "FTA", "XTA", "0-CFA", "0-1-CFA", "1-0-CFA", "1-1-CFA")
 
-    def frameworkName(): String = "OPAL"
+    val frameworkName: String = "OPAL"
 
     def serializeCG(
         algorithm:  String,

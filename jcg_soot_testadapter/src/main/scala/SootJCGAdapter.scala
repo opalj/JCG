@@ -1,8 +1,3 @@
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileWriter
-import java.io.PrintStream
-
 import play.api.libs.json.Json
 import soot.G
 import soot.PackManager
@@ -11,20 +6,23 @@ import soot.SootMethod
 import soot.options.Options
 import soot.util.backend.ASMBackendUtils
 
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileWriter
+import java.io.PrintStream
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
-object SootJCGAdapter extends JCGTestAdapter {
+object SootJCGAdapter extends JavaTestAdapter {
 
     private val CHA = "CHA"
     private val RTA = "RTA"
     private val VTA = "VTA"
     private val Spark = "SPARK"
 
-    override def possibleAlgorithms(): Array[String] = Array(CHA, RTA, VTA, Spark)
+    val possibleAlgorithms: Array[String] = Array(CHA, RTA, VTA, Spark)
 
-    override def frameworkName(): String = "Soot"
+    val frameworkName: String = "Soot"
 
     override def serializeCG(
         algorithm:  String,
