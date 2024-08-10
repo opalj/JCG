@@ -7,11 +7,7 @@ Test the use of a function as an argument to another function.
 
 ```json
 {
-  "nodes": [
-    "<global>", "HOF1.foo", "HOF1.bar"
-  ],
   "directLinks": [
-    ["<global>", "HOF1.foo"],
     ["HOF1.foo", "HOF1.bar"]
   ],
   "indirectLinks": []
@@ -38,13 +34,9 @@ Test the use of a function as a return value of another function.
 
 ```json
 {
-  "nodes": [
-    "<global>", "HOF2.foo", "HOF2.bar", "HOF2.main"
-  ],
   "directLinks": [
-    ["<global>", "HOF2.main"],
-    ["HOF2.main", "HOF2.foo"],
-    ["HOF2.main", "HOF2.bar"]
+    ["<global>", "HOF2.foo"],
+    ["<global>", "HOF2.bar"]
   ],
   "indirectLinks": []
 }
@@ -60,27 +52,19 @@ function bar(x) {
     return x;
 }
 
-function main() {
-    foo()(1);
-}
-
-main();
+foo()(1);
 ```
 [//]: # (END)
 
 ## HOF3
 [//]: # (MAIN: global)
-Test the use of multiple functions as arguments to another function.
+Test the use of a function as return value but stored in variable
 
 ```json
 {
-  "nodes": [
-    "<global>", "HOF3.foo", "HOF3.bar", "HOF3.main"
-  ],
   "directLinks": [
-    ["<global>", "HOF3.foo"],
-    ["HOF3.foo", "HOF3.bar"],
-    ["HOF3.foo", "HOF3.baz"]
+    ["<global>", "HOF2.foo"],
+    ["<global>", "HOF2.bar"]
   ],
   "indirectLinks": []
 }
@@ -88,19 +72,15 @@ Test the use of multiple functions as arguments to another function.
 ```js
 // af/HOF3.js
 
-function foo(f1, f2) {
-    f1(1);
-    f2(1);
+function foo() {
+    return bar;
 }
 
 function bar(x) {
     return x;
 }
 
-function baz(x) {
-    return x;
-}
-
-foo(bar, baz);
+var x = foo()
+x(1);
 ```
 [//]: # (END)
