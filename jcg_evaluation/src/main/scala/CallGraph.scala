@@ -29,12 +29,29 @@ trait CallGraph {
     def compareLinks(expectedCG: CallGraph): Array[Seq[String]] = {
         var missingEdges: Array[Seq[String]] = Array()
 
-        for (edge <- expectedCG.links) {
-            if (!links.map(_.mkString(",")).contains(edge.mkString(","))) {
-                missingEdges :+= edge
+        for (expectedEdge <- expectedCG.links) {
+            if (links.isEmpty || !links.exists(edge => edgesMatch(edge, expectedEdge))) {
+                missingEdges :+= expectedEdge
             }
         }
 
         missingEdges
+    }
+
+    /**
+     * Compares two edges and returns true if they match, false otherwise. Ignores line numbers, if expected edge does not contain them.
+     * @param edge The edge to compare.
+     * @param expectedEdge The expected edge to compare.
+     * @return True if the edges match, false otherwise.
+     */
+    private def edgesMatch(edge: Seq[String], expectedEdge: Seq[String]): Boolean = {
+        edge.zip(expectedEdge).forall { case (e, ee) =>
+            // if expected edge does not contain line numbers, remove them
+            if(!ee.contains(":")) {
+                e.split(":").head == ee
+            } else {
+                e == ee
+            }
+        }
     }
 }
