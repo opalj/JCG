@@ -60,3 +60,61 @@ foo(
 );
 ```
 [//]: # (END)
+
+## AF3
+[//]: # (MAIN: global)
+Test the use of anonymous function as argument using arrow function syntax.
+
+```json
+{
+  "directLinks": [
+    ["AF3.foo", "AF3.<anonymous:7>"]
+  ],
+  "indirectLinks": []
+}
+```
+```js
+// af/AF3.js
+
+function foo(f) {
+    return f(1);
+}
+
+foo(
+    x => x + 1
+);
+```
+[//]: # (END)
+
+## AF4
+[//]: # (MAIN: global)
+Test an anonymous function calling another anonymous function.
+
+```json
+{
+  "directLinks": [
+    ["<global>", "AF4.foo"],
+    ["AF4.foo", "AF4.<anonymous:11>"],
+    ["AF4.<anonymous:12>", "AF4.<anonymous:4>"]
+  ],
+  "indirectLinks": []
+}
+```
+```js
+// af/AF4.js
+
+function foo(f) {
+    f(
+        function(x) {
+            return x + 1;
+        }
+    );
+}
+
+foo(
+    function(f) {
+        return f(1);
+    }
+);
+```
+[//]: # (END)
