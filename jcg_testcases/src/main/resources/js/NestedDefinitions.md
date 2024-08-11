@@ -6,11 +6,7 @@ Test the use of a function definition inside another function definition.
 
 ```json
 {
-  "nodes": [
-    "<global>", "ND1.foo", "ND1.bar"
-  ],
   "directLinks": [
-    ["<global>", "ND1.foo"],
     ["ND1.foo", "ND1.bar"]
   ],
   "indirectLinks": []
@@ -33,13 +29,10 @@ foo();
 
 ## ND2
 [//]: # (MAIN: global)
-Test the use of a function definition inside another function definition.
+Test a nested function calling an outside function.
 
 ```json
 {
-  "nodes": [
-    "<global>", "ND2.foo", "ND2.bar", "ND2.baz"
-  ],
   "directLinks": [
     ["<global>", "ND2.foo"],
     ["ND2.foo", "ND2.bar"],
@@ -72,14 +65,9 @@ Test the use of nested function definitions with overlapping names.
 
 ```json
 {
-  "nodes": [
-    "<global>", "ND3.foo", "ND3.bar", "ND3.baz"
-  ],
   "directLinks": [
-    ["<global>", "ND3.foo"],
-    ["<global>", "ND3.baz"],
-    ["ND3.foo", "ND3.bar"],
-    ["ND3.baz", "ND3.bar"]
+    ["ND3.foo", "ND3.bar:11"],
+    ["ND3.baz", "ND3.bar:3"]
   ],
   "indirectLinks": []
 }
