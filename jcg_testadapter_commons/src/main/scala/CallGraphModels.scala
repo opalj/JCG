@@ -1,12 +1,10 @@
-import upickle.default.{ReadWriter, macroRW}
+import upickle.default.ReadWriter
+import upickle.default.macroRW
 
-// Define the Position class
 case class Position(row: Int)
 
-// Define the Node class
 case class Node(id: String, label: String, file: String, start: Position)
 
-// Define the Edge class
 case class Edge(source: Node, target: Node)
 
 // Companion objects for serialization
