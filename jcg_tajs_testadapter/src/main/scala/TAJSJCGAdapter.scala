@@ -1,23 +1,36 @@
 import upickle.default._
 
-import java.io.{BufferedWriter, File, FileWriter}
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
 import scala.collection.mutable
 
-object TAJSJCGAdapter extends TestAdapter {
+object TAJSJCGAdapter extends JSTestAdapter {
     val debug: Boolean = false
 
     val possibleAlgorithms: Array[String] = Array("NONE")
     val frameworkName: String = "TAJS"
+    private var command = Seq.empty[String]
 
     def main(args: Array[String]): Unit = {
         // generate call graphs for all algorithms
+        serializeAllCGs("testcasesOutput/js", s"results/js/$frameworkName")
+    }
+
+    /**
+     * Generates all call graphs with the given algorithm.
+     *
+     * @param inputDirPath  The directory containing the input files to generate call graphs for.
+     * @param outputDirPath The directory to write the call graphs to.
+     */
+    override def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
         for (algo <- possibleAlgorithms) {
-            generateCallGraphs(s"results/js/$frameworkName", algo)
+            generateCallGraphs(inputDirPath, outputDirPath, algo)
         }
     }
 
-    private def generateCallGraphs(outputDirPath: String, algorithm: String): Unit = {
-        val inputDirs = new File("testcasesOutput/js").list()
+    private def generateCallGraphs(inputDirPath: String, outputDirPath: String, algorithm: String): Unit = {
+        val testDirs = new File(inputDirPath).list()
         val outputDir = new File(s"$outputDirPath/$algorithm")
         outputDir.mkdirs()
 
@@ -36,7 +49,7 @@ object TAJSJCGAdapter extends TestAdapter {
         }
 
         // build tajs command to execute from cli
-        val command = Seq("java", "-jar", tajsJar.getAbsolutePath)
+        command = Seq("java", "-jar", tajsJar.getAbsolutePath)
 
         // check if tajs command is available
         try {
@@ -50,32 +63,49 @@ object TAJSJCGAdapter extends TestAdapter {
         }
 
         // generate callgraph for every testcase
-        inputDirs.foreach(inputDir => {
-            val inputDirPath = new File(s"testcasesOutput/js/$inputDir").listFiles()(0).listFiles().map(_.getAbsolutePath).filter(_.endsWith(".js"))
-            val outputPath = s"${outputDir.getAbsolutePath}/$inputDir.json"
-            val args = Seq("-callgraph", inputDirPath(0))
-            println(s"[DEBUG] executing ${args.mkString(" ")}")
-            val processSucceeded = try {
-                sys.process.Process(command ++ args).!!
-                true
+        testDirs.foreach(testDir => {
+            // Extract input files, TAJS only supports single file projects
+            val inputFilePaths = new File(s"$inputDirPath/$testDir").listFiles()(0).listFiles().map(_.getAbsolutePath).filter(_.endsWith(".js"))
+            serializeCG(algorithm, outputDir.getAbsolutePath, inputFilePaths(0))
+        })
+    }
+
+    /**
+     * Generates a single call graph.
+     *
+     * @param algorithm     The algorithm to use for generating the call graph.
+     * @param outputDirPath The directory to write the call graph to.
+     * @param inputDirPath  The directory containing the input files to generate a call graph for.
+     * @return The time taken to generate the call graph in nanoseconds.
+     */
+    override def serializeCG(algorithm: String, outputDirPath: String, inputDirPath: String): Long = {
+        // TAJS does not support multi-file projects
+        val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last.split("\\.").head}.json"
+        val args = Seq("-callgraph", inputDirPath)
+        if (debug) println(s"[DEBUG] executing ${args.mkString(" ")}")
+        val start = System.nanoTime()
+        val processSucceeded = try {
+            sys.process.Process(command ++ args).!!
+            true
+        } catch {
+            case e: Exception =>
+                println(s"${Console.RED}[Error]: $inputDirPath failed to generate${Console.RESET}")
+                false
+        }
+        val end = System.nanoTime()
+
+        if (processSucceeded) {
+            try {
+                val json = toCommonFormat(new File("out/callgraph.dot"))
+                val bw = new BufferedWriter(new FileWriter(outputPath))
+                bw.write(json)
+                bw.close()
             } catch {
                 case e: Exception =>
-                    println(s"${Console.RED}[Error]: $inputDir failed to generate${Console.RESET}")
-                    false
+                    println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
             }
-
-            if (processSucceeded) {
-                try {
-                    val json = toCommonFormat(new File("out/callgraph.dot"))
-                    val bw = new BufferedWriter(new FileWriter(outputPath))
-                    bw.write(json)
-                    bw.close()
-                } catch {
-                    case e: Exception =>
-                        println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputDir${Console.RESET}")
-                }
-            }
-        })
+        }
+        end - start
     }
 
     private def toCommonFormat(cgFile: File): String = {
@@ -99,7 +129,7 @@ object TAJSJCGAdapter extends TestAdapter {
                 case _ => label.split("\\(")(0)
             }
 
-            nodeMap += (id -> Node(id, label, filePath, start))
+            nodeMap += (id -> Node(id, label, filePath, Position(start)))
         })
 
         val edgeArray = edges.map(edge => Edge(nodeMap(edge.split("->").head.trim), nodeMap(edge.split("->").last.trim)))
@@ -113,9 +143,15 @@ object TAJSJCGAdapter extends TestAdapter {
         jsonCG
     }
 
-    case class Node(id: String, label: String, file: String, start: Int)
+    case class Position(row: Int)
+
+    case class Node(id: String, label: String, file: String, start: Position)
 
     case class Edge(source: Node, target: Node)
+
+    private object Position {
+        implicit val rw: ReadWriter[Position] = macroRW
+    }
 
     private object Node {
         implicit val rw: ReadWriter[Node] = macroRW
