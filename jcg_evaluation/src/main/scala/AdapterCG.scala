@@ -9,15 +9,17 @@ class AdapterCG(val jsonFile: File) extends CallGraph {
             json.arr.map(f => {
                 val sourceLabel = f("source")("label").strOpt.getOrElse("")
                 val sourceFileName = f("source")("file").strOpt.getOrElse("").split("/").last.split("\\.").head
+                val sourceLineNum = f("source")("start")("row").numOpt.getOrElse(0.0).toInt
                 val targetLabel = f("target")("label").strOpt.getOrElse("")
                 val targetFileName = f("target")("file").strOpt.getOrElse("").split("/").last.split("\\.").head
+                val targetLineNum = f("target")("start")("row").numOpt.getOrElse(0.0).toInt
 
-                val source = if (sourceLabel == "anon") s"$sourceFileName.<anonymous:${f("source")("start")("row").numOpt.getOrElse(0.0).toInt}>"
+                val source = if (sourceLabel == "anon") s"$sourceFileName.<anonymous:$sourceLineNum>"
                 else if (sourceLabel == "global") s"<$sourceLabel>"
-                else s"$sourceFileName.$sourceLabel".trim
+                else s"$sourceFileName.$sourceLabel:$sourceLineNum".trim
 
-                val target = if (targetLabel == "anon") s"$sourceFileName.<anonymous:${f("target")("start")("row").numOpt.getOrElse(0.0).toInt}>"
-                else s"$targetFileName.$targetLabel".trim
+                val target = if (targetLabel == "anon") s"$sourceFileName.<anonymous:$targetLineNum>"
+                else s"$targetFileName.$targetLabel:$targetLineNum".trim
 
                 Seq(source, target)
             }).toSeq
