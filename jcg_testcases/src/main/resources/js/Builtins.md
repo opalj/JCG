@@ -6,9 +6,6 @@ Test the use of console.log.
 
 ```json
 {
-  "nodes": [
-    "<global>", "Native.console_log"
-  ],
   "directLinks": [
     ["<global>", "Native.console_log"]
   ],
@@ -28,9 +25,6 @@ Test the use of map.
 
 ```json
 {
-  "nodes": [
-    "<global>", "Native.Array_prototype_map", "B2.foo"
-  ],
   "directLinks": [
     ["<global>", "Native.Array_prototype_map"],
     ["Native.Array_prototype_map", "B2.foo"]
@@ -56,9 +50,6 @@ Test the use of forEach.
 
 ```json
 {
-  "nodes": [
-    "<global>", "Native.Array_prototype_foreach", "B3.foo"
-  ],
   "directLinks": [
     ["<global>", "Native.Array_prototype_foreach"],
     ["Native.Array_prototype_foreach", "B3.foo"]
@@ -84,9 +75,6 @@ Test the use of reduce.
 
 ```json
 {
-  "nodes": [
-    "<global>", "Native.Array_prototype_reduce", "B4.foo"
-  ],
   "directLinks": [
     ["<global>", "Native.Array_prototype_reduce"],
     ["Native.Array_prototype_reduce", "B4.foo"]
@@ -112,9 +100,6 @@ Test the use of filter.
 
 ```json
 {
-  "nodes": [
-    "<global>", "Native.Array_prototype_filter", "B5.foo"
-  ],
   "directLinks": [
     ["<global>", "Native.Array_prototype_filter"],
     ["Native.Array_prototype_filter", "B5.foo"]
@@ -140,9 +125,6 @@ Test the use of every.
 
 ```json
 {
-  "nodes": [
-    "<global>", "Native.Array_prototype_every", "B6.foo"
-  ],
   "directLinks": [
     ["<global>", "Native.Array_prototype_every"],
     ["Native.Array_prototype_every", "B6.foo"]
@@ -168,9 +150,6 @@ Test the use of some.
 
 ```json
 {
-  "nodes": [
-    "<global>", "Native.Array_prototype_some", "B7.foo"
-  ],
   "directLinks": [
     ["<global>", "Native.Array_prototype_some"],
     ["Native.Array_prototype_some", "B7.foo"]
