@@ -116,12 +116,19 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
         val path = folder.split("/").last.split("\\.").head + "/" + splitName.head + ".js"
         val start = kv._2("label").str.split(":").head.toInt
 
-        kv._1 -> Node(kv._1, label, path, start)
+        kv._1 -> Node(kv._1, label, path, Position(start))
     }
 
-    case class Node(id: String, label: String, file: String, start: Int)
+
+    case class Position(row: Int)
+
+    case class Node(id: String, label: String, file: String, start: Position)
 
     case class Edge(source: Node, target: Node)
+
+    private object Position {
+        implicit val rw: ReadWriter[Position] = macroRW
+    }
 
     private object Node {
         implicit val rw: ReadWriter[Node] = macroRW
