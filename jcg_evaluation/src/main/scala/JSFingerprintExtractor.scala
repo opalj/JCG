@@ -20,6 +20,7 @@ object JSFingerprintExtractor extends FingerprintExtractor {
         val expectedCGs: Array[ExpectedCG] =
             FileOperations.listFilesRecursively(inputDir, ".json")
               .filter(f => f.getAbsolutePath.contains("js"))
+              .filter(f => f.getName.startsWith(config.projectFilter))
               .map(f => new ExpectedCG(f))
               .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
 
