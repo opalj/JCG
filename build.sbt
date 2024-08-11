@@ -92,12 +92,12 @@ lazy val jcg_js_callgraph_testadapter = project.settings(
 
 lazy val jcg_tajs_testadapter = project.settings(
     commonSettings,
-    name := "JCG js-callgraph Test Adapter",
+    name := "JCG TAJS Test Adapter",
     libraryDependencies += "dk.brics.tajs." %% "dk.brics.tajs" % "1.0.0" from "https://www.brics.dk/TAJS/dist/tajs-all.jar",
     libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0",
     aggregate in assembly := false,
     publishArtifact := false
-).dependsOn(jcg_testadapter_commons, jcg_testadapter_commons)
+).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_code2flow_testadapter = project.settings(
     commonSettings,
@@ -105,7 +105,7 @@ lazy val jcg_code2flow_testadapter = project.settings(
     libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0",
     aggregate in assembly := false,
     publishArtifact := false,
-).dependsOn(jcg_testadapter_commons, jcg_testadapter_commons)
+).dependsOn(jcg_testadapter_commons)
 
 
 //lazy val jcg_opal_testadapter = project.settings(
