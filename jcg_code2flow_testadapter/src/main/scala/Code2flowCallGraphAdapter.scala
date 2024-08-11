@@ -118,23 +118,4 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
 
         kv._1 -> Node(kv._1, label, path, Position(start))
     }
-
-
-    case class Position(row: Int)
-
-    case class Node(id: String, label: String, file: String, start: Position)
-
-    case class Edge(source: Node, target: Node)
-
-    private object Position {
-        implicit val rw: ReadWriter[Position] = macroRW
-    }
-
-    private object Node {
-        implicit val rw: ReadWriter[Node] = macroRW
-    }
-
-    private object Edge {
-        implicit val rw: ReadWriter[Edge] = macroRW
-    }
 }
