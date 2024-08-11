@@ -93,7 +93,6 @@ lazy val jcg_js_callgraph_testadapter = project.settings(
 lazy val jcg_tajs_testadapter = project.settings(
     commonSettings,
     name := "JCG TAJS Test Adapter",
-    libraryDependencies += "dk.brics.tajs." %% "dk.brics.tajs" % "1.0.0" from "https://www.brics.dk/TAJS/dist/tajs-all.jar",
     libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0",
     aggregate in assembly := false,
     publishArtifact := false
