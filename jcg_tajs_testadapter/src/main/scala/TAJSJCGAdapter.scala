@@ -109,9 +109,9 @@ object TAJSJCGAdapter extends JSTestAdapter {
     }
 
     private def toCommonFormat(cgFile: File): String = {
-        val (nodes, edges) = DOTGraphParser.parseFile(cgFile)
+        val dotGraph = DOTGraphParser.parseFile(cgFile)
         val nodeMap: mutable.Map[String, Node] = mutable.Map()
-        nodes.foreach(node => {
+        dotGraph.nodes.foreach(node => {
             // extract label field from node
             var label = node.split("label=\"")(1).split("\"").head
             val id = node.split("\\[").head.trim
@@ -132,7 +132,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
             nodeMap += (id -> Node(id, label, filePath, Position(start)))
         })
 
-        val edgeArray = edges.map(edge => Edge(nodeMap(edge.split("->").head.trim), nodeMap(edge.split("->").last.trim)))
+        val edgeArray = dotGraph.edges.map(edge => Edge(nodeMap(edge.split("->").head.trim), nodeMap(edge.split("->").last.trim)))
 
         if (debug) {
             println("[DEBUG] nodes: " + nodeMap.mkString("\n"))

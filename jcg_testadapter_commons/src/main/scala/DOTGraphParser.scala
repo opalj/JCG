@@ -2,15 +2,16 @@ import java.io.File
 import scala.io.Source
 import scala.util.Using
 
+case class DOTGraph(nodes: List[String], edges: List[String])
+
 object DOTGraphParser {
     /**
-     * Parses a DOT file and returns the nodes and edges
+     * Parses a DOT file containing a graph and returns the nodes and edges of the graph.
      *
-     * @param file       the file to parse
-     * @param outputFile the file to write the output to
-     * @return a tuple containing the nodes and edges
+     * @param file the file to parse
+     * @return a [[DOTGraph]] containing the nodes and edges of the graph
      */
-    def parseFile(file: File): (List[String], List[String]) = {
+    def parseFile(file: File): DOTGraph = {
         if (!file.exists()) {
             throw new IllegalArgumentException(s"[ERROR] File ${file.getAbsolutePath} does not exist")
         }
@@ -34,7 +35,7 @@ object DOTGraphParser {
                 }
             }
 
-            (nodes, edges)
+            DOTGraph(nodes, edges)
         }.getOrElse {
             throw new IllegalArgumentException(s"[ERROR] Could not read file ${file.getAbsolutePath}")
         }
