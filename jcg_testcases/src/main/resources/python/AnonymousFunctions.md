@@ -52,3 +52,30 @@ foo(
 )
 ```
 [//]: # (END)
+
+## AF3
+[//]: # (MAIN: global)
+Test the use of an anonymous function calling another anonymous function.
+
+```json
+{
+  "directLinks": [
+    ["AF4.foo", "AF4.<anonymous:8>"],
+    ["AF4.<anonymous:8>", "AF4.<anonymous:4>"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# af/AF3.py
+
+def foo(f):
+    f(
+        lambda x: x + 1
+    )
+
+foo(
+    lambda x: x(1)
+)
+```
+[//]: # (END)
