@@ -103,8 +103,8 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
         val edges: Array[Edge] = cg("edges").arr.map(edge => Edge(nodes(edge("source").str), nodes(edge("target").str))).toArray
 
         if (debug) {
-            println("[DEBUG] nodes: " + nodes.mkString("\n"))
-            println("[DEBUG] edges: " + edges.mkString("\n"))
+            println("[DEBUG] nodes:\n" + nodes.mkString("\n"))
+            println("[DEBUG] edges:\n" + edges.mkString("\n"))
         }
         val jsonCG = write(edges)
         jsonCG
