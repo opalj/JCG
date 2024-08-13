@@ -20,6 +20,7 @@ object JSFingerprintExtractor extends FingerprintExtractor {
         val expectedCGs: Array[ExpectedCG] =
             FileOperations.listFilesRecursively(inputDir, ".json")
               .filter(f => f.getAbsolutePath.contains("js"))
+              .filter(f => f.getName.startsWith(config.projectFilter))
               .map(f => new ExpectedCG(f))
               .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
 
@@ -49,16 +50,21 @@ object JSFingerprintExtractor extends FingerprintExtractor {
             for (expectedCG <- expectedCGs) {
                 val testName: String = expectedCG.filePath.split("/").last
                 if (config.debug) println("[DEBUG] Test name: " + testName + " " + algo)
-                val generatedCGFile = new File(adapterOutputDir, s"${adapter.frameworkName}/$algo/$testName")
-                val generatedCG = new AdapterCG(generatedCGFile)
+                val generatedCGFile = new File(adapterOutputDir, s"${adapter.frameworkName}/$algo/").listFiles().find(_.getName == testName).orNull
 
-                // check if call graph has missing edges
-                val isSound = generatedCG.compareLinks(expectedCG).length == 0
+                // if callgraph file does not exist write Error to result
+                var assessment: Assessment = Error
+                if (generatedCGFile != null) {
+                    val generatedCG = new AdapterCG(generatedCGFile)
+                    // check if call graph has missing edges
+                    val isSound = generatedCG.compareLinks(expectedCG).length == 0
+                    assessment = if (isSound) Sound else Unsound
+                }
 
-                fingerprintWriter.write(s"$testName -> $isSound\n")
+                fingerprintWriter.write(s"$testName -> $assessment\n")
                 fingerprintWriter.flush()
 
-                outputWriter.write(s"\t$isSound")
+                outputWriter.write(s"\t$assessment")
                 outputWriter.flush()
             }
             outputWriter.newLine()

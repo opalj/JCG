@@ -4,7 +4,7 @@ ThisBuild / javacOptions ++= Seq("-encoding", "utf8", "-parameters")
 
 ThisBuild / libraryDependencySchemes ++= Seq(
     "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
-    )
+)
 
 lazy val commonSettings = Seq(
     scalaVersion := "2.13.8",
@@ -90,6 +90,20 @@ lazy val jcg_js_callgraph_testadapter = project.settings(
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
 
+lazy val jcg_tajs_testadapter = project.settings(
+    commonSettings,
+    name := "JCG TAJS Test Adapter",
+    aggregate in assembly := false,
+    publishArtifact := false
+).dependsOn(jcg_testadapter_commons)
+
+lazy val jcg_code2flow_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Code2Flow Test Adapter",
+    aggregate in assembly := false,
+    publishArtifact := false,
+).dependsOn(jcg_testadapter_commons)
+
 
 //lazy val jcg_opal_testadapter = project.settings(
 //    commonSettings,
@@ -112,7 +126,8 @@ lazy val jcg_doop_testadapter = project.settings(
 lazy val jcg_testadapter_commons = project.settings(
     commonSettings,
     name := "JCG Test Adapter Commons",
-    aggregate in assembly := false
+    aggregate in assembly := false,
+    libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0",
 ).dependsOn(jcg_data_format)
 
 lazy val jcg_evaluation = project.settings(
@@ -122,7 +137,6 @@ lazy val jcg_evaluation = project.settings(
     resolvers += "soot release" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-release/",
     resolvers += Resolver.mavenLocal,
     libraryDependencies += "de.opal-project" %% "hermes" % "5.0.1-SNAPSHOT",
-    libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0",
     publishArtifact := false
 ).dependsOn(
     jcg_testcases,
@@ -134,4 +148,6 @@ lazy val jcg_evaluation = project.settings(
     jcg_opal_testadapter,
     jcg_doop_testadapter,
     jcg_js_callgraph_testadapter,
+    jcg_code2flow_testadapter,
+    jcg_tajs_testadapter,
 )

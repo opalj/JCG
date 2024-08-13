@@ -144,9 +144,7 @@ object ConfigParser {
 object CommonEvaluationConfig {
 
     val ALL_JAVA_ADAPTERS: List[JCGTestAdapter] = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
-    val ALL_JS_ADAPTERS: List[JSTestAdapter] = List(JSCallGraphAdapter)
-
-
+    val ALL_JS_ADAPTERS: List[JSTestAdapter] = List(JSCallGraphAdapter, Code2flowCallGraphAdapter, TAJSJCGAdapter)
 
     def processArguments(args: Array[String]): CommonEvaluationConfig = {
         var DEBUG = false
