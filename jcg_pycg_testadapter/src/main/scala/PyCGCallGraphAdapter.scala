@@ -1,9 +1,9 @@
-import java.io.File
-import scala.collection.mutable.ArrayBuffer
 import upickle.default._
 
 import java.io.BufferedWriter
+import java.io.File
 import java.io.FileWriter
+import scala.collection.mutable.ArrayBuffer
 
 object PyCGCallGraphAdapter extends JSTestAdapter {
     val debug: Boolean = true
@@ -58,7 +58,7 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
         val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
         val files = new File(inputDirPath).listFiles()(0).listFiles().filter(_.getName.endsWith(".py")).map(_.getAbsolutePath)
         val mainFilePath = if (files.length == 1) files(0) else files.find(_.contains("main")).getOrElse(files(0))
-        println(mainFilePath)
+        if (debug) println(mainFilePath)
         val args = Seq(mainFilePath, "-o", outputPath, "--fasten")
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 
@@ -83,12 +83,14 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
         // process output and convert to common call graph format
         if (processSucceeded) {
             val outputFile = new File(outputPath)
-            //try {
+            try {
                 val json = toCommonFormat(outputFile)
                 val bw = new BufferedWriter(new FileWriter(outputFile))
                 bw.write(json)
                 bw.close()
-
+            } catch {
+                case e: Exception => println(s"${Console.RED}[ERROR]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
+            }
         }
 
         end - start
@@ -100,59 +102,73 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
 
         // merge "internalCalls", "resolvedCalls" and externalCalls array
         val edges = cg("internalCalls").arr ++ cg("resolvedCalls").arr ++ cg("externalCalls").arr
-        println(edges)
         val nodes = parseNodes(file)
-        /*val resultEdges: Array[Edge] = edges.map(edgeArr => {
+        if (debug) {
+            println("[DEBUG] nodes:\n" + nodes.mkString("\n"))
+            println("[DEBUG] edges:\n" + edges.mkString("\n"))
+        }
+
+        val resultEdges: Array[Edge] = edges.map(edgeArr => {
             // array contains three elements, last one is always empty object
             val source = edgeArr(0).str
             val target = edgeArr(1).str
             Edge(nodes.find(_.id == source).get, nodes.find(_.id == target).get)
-        }).toArray*/
-        val jsonCG = write(edges)
+        }).toArray
+        val jsonCG = write(resultEdges)
         jsonCG
     }
 
     /**
      * Parses the nodes from the given JSON object.
+     *
      * @param cg The JSON object to parse the nodes from.
      * @return An array of nodes.
      */
     private def parseNodes(cg: ujson.Obj): Array[Node] = {
-        val internalModules = cg("modules").obj("internal").obj.values
         val nodes: ArrayBuffer[Node] = ArrayBuffer()
 
+        val internalModules = cg("modules").obj("internal").obj.values
         internalModules.foreach(module => {
             val filePath = module("sourceFile").str
-
             val namespaces = module("namespaces").obj
-            namespaces.foreach(jsonNode => {
-                val node = getNodeFromKV(jsonNode, filePath)
 
-                println(s"ID: ${node.id}, Label: ${node.label}, File: ${node.file}, Row: ${node.start}")
-                nodes += node
-            })
+            nodes ++= getNodesFromNamespace(namespaces, filePath)
         })
-
 
         val externalModules = cg("modules").obj("external").obj
         externalModules.foreach(module => {
             val filePath = if (module._1 == ".builtin") "Native" else module._2("sourceFile").str
             val namespaces = module._2("namespaces").obj
 
-            println(namespaces)
-            namespaces.foreach(jsonNode => {
-                val node = getNodeFromKV(jsonNode, filePath)
-
-                //println(s"ID: ${node.id}, Label: ${node.label}, File: ${node.file}, Row: ${node.start}")
-                nodes += node
-            })
+            nodes ++= getNodesFromNamespace(namespaces, filePath)
         })
-        //println(internalModules)
-        println("Nodes:", nodes)
+
         nodes.toArray
     }
 
+    /**
+     * Extract nodes from a namespace object.
+     *
+     * @param namespace The namespace object to extract nodes from.
+     * @param filePath  The file path of the namespace.
+     * @return An array of nodes extracted from the namespace.
+     */
+    private def getNodesFromNamespace(namespace: ujson.Obj, filePath: String): Array[Node] = {
+        val nodes: ArrayBuffer[Node] = ArrayBuffer()
+        namespace.obj.foreach(jsonNode => {
+            val node = getNodeFromKV(jsonNode, filePath)
+            nodes += node
+        })
+        nodes.toArray
+    }
 
+    /**
+     * Extract call graph node from json key-value pair.
+     *
+     * @param kv       key-value pair.
+     * @param filePath The file path of the nodes.
+     * @return The node extracted from the key-value pair.
+     */
     private def getNodeFromKV(kv: (String, ujson.Value), filePath: String): Node = {
         val label = kv._2("namespace").strOpt.getOrElse("").split("/").last
         val row = kv._2("metadata").objOpt match {
