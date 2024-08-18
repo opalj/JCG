@@ -37,7 +37,7 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
         val adapters = if (config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_JAVA_ADAPTERS
 
         for {
-            adapter <- adapters
+            adapter <- adapters.map(_.asInstanceOf[JavaTestAdapter])
             cgAlgorithm <- adapter.possibleAlgorithms.filter(_.startsWith(config.algorithmFilter))
         } {
             ow.write(s"${adapter.frameworkName}-$cgAlgorithm")

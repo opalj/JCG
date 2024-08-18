@@ -27,7 +27,7 @@ class CommonEvaluationConfig(
 case class JCGConfig(
                    inputDir: File = new File("."),
                    outputDir: File = new File("."),
-                   adapters: List[JavaTestAdapter] = List.empty,
+                   adapters: List[TestAdapter] = List.empty,
                    projectFilter: String = "",
                    algorithmFilter: String = "",
                    timeout: Int = -1,
@@ -56,7 +56,7 @@ case class JCGConfig(
 }
 
 object ConfigParser {
-    val ALL_ADAPTERS = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
+    private val ALL_ADAPTERS: List[TestAdapter] = CommonEvaluationConfig.ALL_JS_ADAPTERS ++ CommonEvaluationConfig.ALL_JAVA_ADAPTERS
 
     def parseConfig(args: Array[String]): Option[JCGConfig] = {
         import scopt.OParser
@@ -131,8 +131,11 @@ object ConfigParser {
                   .action((lang, c) => c.copy(language = lang))
                   .text("provide the language of the projects")
                   .valueName("language")
-                  .optional(),
-                checkConfig(_ => success)
+                  .required(),
+                checkConfig(c =>
+                    // check if adapters match language
+                    if (c.adapters.map(_.language).forall(_ == c.language)) success
+                    else failure("The given adapters do not match the language of the projects."))
             )
         }
 

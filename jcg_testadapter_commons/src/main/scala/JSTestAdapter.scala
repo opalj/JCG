@@ -1,5 +1,6 @@
 
 trait JSTestAdapter extends TestAdapter {
+    val language = "js"
 
     /**
      * Generates a single call graph.
