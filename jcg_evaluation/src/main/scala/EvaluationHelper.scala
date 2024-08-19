@@ -14,11 +14,11 @@ class CommonEvaluationConfig(
     val SERIALIZATION_FILE_NAME = "cg.json"
 
     def getOutputDirectory(
-        adapter:     JavaTestAdapter,
-        algorithm:   String,
-        projectSpec: ProjectSpecification,
-        resultsDir:  File
-    ): File = {
+                            adapter:     JavaTestAdapter,
+                            algorithm:   String,
+                            projectSpec: ProjectSpecification,
+                            resultsDir:  File
+                        ): File = {
         val dirName = s"${projectSpec.name}${File.separator}${adapter.frameworkName}${File.separator}$algorithm"
         new File(resultsDir, dirName)
     }
@@ -56,7 +56,7 @@ case class JCGConfig(
 }
 
 object ConfigParser {
-    private val ALL_ADAPTERS: List[TestAdapter] = CommonEvaluationConfig.ALL_JS_ADAPTERS ++ CommonEvaluationConfig.ALL_JAVA_ADAPTERS
+    private val ALL_ADAPTERS: List[TestAdapter] = EvaluationHelper.ALL_JS_ADAPTERS ++ EvaluationHelper.ALL_JAVA_ADAPTERS
 
     def parseConfig(args: Array[String]): Option[JCGConfig] = {
         import scopt.OParser
@@ -146,9 +146,6 @@ object ConfigParser {
 
 object CommonEvaluationConfig {
 
-    val ALL_JAVA_ADAPTERS: List[JavaTestAdapter] = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
-    val ALL_JS_ADAPTERS: List[JSTestAdapter] = List(JSCallGraphAdapter, Code2flowCallGraphAdapter, TAJSJCGAdapter)
-
     def processArguments(args: Array[String]): CommonEvaluationConfig = {
         var DEBUG = false
         var OUTPUT_DIR_PATH = ""
@@ -173,7 +170,7 @@ object CommonEvaluationConfig {
                 assert(ALGORITHM_PREFIX_FILTER.isEmpty, "multiple algorithm filters specified")
                 ALGORITHM_PREFIX_FILTER = prefix
             case Array("--adapter", name) ⇒ // you can use this option multiple times
-                val adapter = ALL_JAVA_ADAPTERS.find(_.frameworkName.toLowerCase == name.toLowerCase)
+                val adapter = EvaluationHelper.ALL_JAVA_ADAPTERS.find(_.frameworkName.toLowerCase == name.toLowerCase)
                 assert(adapter.nonEmpty, s"'$name' is not a valid framework adapter")
                 EVALUATION_ADAPTERS ++= adapter
         }
@@ -193,7 +190,7 @@ object CommonEvaluationConfig {
             DEBUG,
             INPUT_DIR_PATH,
             OUTPUT_DIR_PATH,
-            if(EVALUATION_ADAPTERS.isEmpty) ALL_JAVA_ADAPTERS else EVALUATION_ADAPTERS,
+            if(EVALUATION_ADAPTERS.isEmpty) EvaluationHelper.ALL_JAVA_ADAPTERS else EVALUATION_ADAPTERS,
             PROJECT_PREFIX_FILTER,
             ALGORITHM_PREFIX_FILTER
         )
@@ -201,6 +198,9 @@ object CommonEvaluationConfig {
 }
 
 object EvaluationHelper {
+    val ALL_JAVA_ADAPTERS: List[JavaTestAdapter] = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
+    val ALL_JS_ADAPTERS: List[JSTestAdapter] = List(JSCallGraphAdapter, Code2flowCallGraphAdapter, TAJSJCGAdapter)
+
     def getProjectsDir(inputPath: String): File = {
         val projectsDir = new File(inputPath)
 

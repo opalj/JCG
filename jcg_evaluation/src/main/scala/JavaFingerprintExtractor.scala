@@ -34,7 +34,7 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
 
         printHeader(ow, projectSpecFiles)
 
-        val adapters = if (config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_JAVA_ADAPTERS
+        val adapters = if (config.adapters.nonEmpty) config.adapters else EvaluationHelper.ALL_JAVA_ADAPTERS
 
         for {
             adapter <- adapters.map(_.asInstanceOf[JavaTestAdapter])
