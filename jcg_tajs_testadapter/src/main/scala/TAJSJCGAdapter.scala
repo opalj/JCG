@@ -66,7 +66,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
         testDirs.foreach(testDir => {
             // Extract input files, TAJS only supports single file projects
             val inputFilePaths = new File(s"$inputDirPath/$testDir").listFiles()(0).listFiles().map(_.getAbsolutePath).filter(_.endsWith(".js"))
-            serializeCG(algorithm, outputDir.getAbsolutePath, inputFilePaths(0))
+            serializeCG(algorithm, inputFilePaths(0), outputDir.getAbsolutePath)
         })
     }
 
@@ -78,7 +78,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
      * @param inputDirPath  The directory containing the input files to generate a call graph for.
      * @return The time taken to generate the call graph in nanoseconds.
      */
-    override def serializeCG(algorithm: String, outputDirPath: String, inputDirPath: String): Long = {
+    def serializeCG(algorithm: String, inputDirPath: String, outputDirPath: String, adapterOptions: AdapterOptions): Long =  {
         // TAJS does not support multi-file projects
         val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last.split("\\.").head}.json"
         val args = Seq("-callgraph", inputDirPath)

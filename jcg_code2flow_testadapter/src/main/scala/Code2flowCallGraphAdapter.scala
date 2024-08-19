@@ -44,7 +44,7 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
 
         // generate callgraph for every testcase
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, outputDir.getAbsolutePath, s"$inputDirPath/$testDir")
+            serializeCG(algorithm, s"$inputDirPath/$testDir", outputDir.getAbsolutePath)
         })
 
         println("Call graphs generated!")
@@ -58,7 +58,7 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
      * @param inputDirPath  The directory containing the input files to generate a call graph for.
      * @return The time taken to generate the call graph in nanoseconds.
      */
-    override def serializeCG(algorithm: String, outputDirPath: String, inputDirPath: String): Long = {
+    def serializeCG(algorithm: String, inputDirPath: String, outputDirPath: String, adapterOptions: AdapterOptions): Long = {
         val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
         val args = Seq(inputDirPath, "--output", outputPath, "-q", "--source-type=module", "--no-trimming")
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
@@ -118,4 +118,6 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
 
         kv._1 -> Node(kv._1, label, path, Position(start))
     }
+
+
 }
