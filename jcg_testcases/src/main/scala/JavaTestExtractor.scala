@@ -4,6 +4,7 @@ import play.api.libs.json.Json
 import java.io.File
 import java.io.PrintWriter
 import javax.tools.ToolProvider
+import scala.util.matching.Regex
 
 object JavaTestExtractor extends TestCaseExtractor {
     val language = "java"
@@ -14,9 +15,9 @@ object JavaTestExtractor extends TestCaseExtractor {
      * CODE SNIPPET
      * ```
      */
-    private val re = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
+    protected val re: Regex = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
 
-    override def processLines(lines: String, resultsDir: File, temp: File): Unit = {
+    override protected def processLines(lines: String, resultsDir: File, temp: File): Unit = {
         reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
             val projectName = projectMatchResult.group("projectName").trim
             val main = projectMatchResult.group("mainClass")

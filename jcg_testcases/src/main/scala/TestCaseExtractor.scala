@@ -18,6 +18,8 @@ trait TestCaseExtractor {
       """(?<body>.*?)""" + // multiple code snippets
       """\[//\]: \# \(END\)""").r // [//]: # (END)
 
+    protected val re: Regex
+
 
     /**
      * Extracts test cases from the given directory and writes them to the output directory.
@@ -58,7 +60,39 @@ trait TestCaseExtractor {
      * @param resultsDir the directory to write the test cases to
      * @param temp       temporary directory to save intermediate files, will be cleared before and after processing
      */
-    def processLines(lines: String, resultsDir: File, temp: File): Unit
+    protected def processLines(lines: String, resultsDir: File, temp: File): Unit = {
+        reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
+            val projectName = projectMatchResult.group("projectName").trim
+            if (TestCaseExtractor.debug) {
+                println("[DEBUG] project", projectName)
+            }
+
+            // create Folder for project
+            val outputFolder = new File(resultsDir, projectName)
+            outputFolder.mkdirs()
+
+            re.findAllIn(projectMatchResult.group("body")).matchData.foreach { matchResult =>
+                val packageName = matchResult.group("packageName")
+                val filePath = s"$projectName/$packageName${matchResult.group("fileName")}"
+                val codeSnippet = matchResult.group("codeSnippet")
+                val expectedCG = matchResult.group("expectedCG")
+
+                val codeFile = new File(resultsDir.getAbsolutePath, filePath)
+                val cgFile = new File(resultsDir.getAbsolutePath, s"$projectName/$packageName${matchResult.group("fileName").split('.').head}.json")
+                codeFile.getParentFile.mkdirs()
+                codeFile.createNewFile()
+                FileOperations.writeToFile(codeFile, codeSnippet)
+
+                if (expectedCG != null) {
+                    cgFile.getParentFile.mkdirs()
+                    cgFile.createNewFile()
+                    FileOperations.writeToFile(cgFile, expectedCG)
+                }
+
+                codeFile.getAbsolutePath
+            }
+        })
+    }
 }
 
 /**
@@ -95,7 +129,7 @@ object TestCaseExtractor {
             debug = true
         }
 
-        val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor).filter(lang => language == "all" || language.contains(lang.language))
+        val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor).filter(extractor => language == "all" || language.contains(extractor.language))
 
         for (extractor <- extractors) {
             extractor.extract(resourceDir, outputDir, mdFilter)
