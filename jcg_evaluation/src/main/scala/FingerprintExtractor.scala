@@ -49,7 +49,7 @@ object FingerprintExtractor {
 
         var c = ConfigParser.parseConfig(args)
         if (c.isEmpty)
-            System.exit(0)
+            return
 
         val config = c.get
 

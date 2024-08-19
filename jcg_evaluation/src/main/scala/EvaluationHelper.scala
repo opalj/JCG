@@ -33,7 +33,6 @@ case class JCGConfig(
                     ) {
     val JRE_LOCATIONS_FILE = "jre.conf"
     val SERIALIZATION_FILE_NAME = "cg.json"
-
 }
 
 object ConfigParser {
@@ -120,7 +119,18 @@ object ConfigParser {
             )
         }
 
-        OParser.parse(parser, args, JCGConfig())
+        OParser.parse(parser, args, JCGConfig()) match {
+            case Some(config) =>
+                // If no adapter is specified, all adapters of specified language are used
+                if (config.adapters.isEmpty) {
+                    val adapters = ALL_ADAPTERS.filter(_.language == config.language)
+                    Some(config.copy(adapters = adapters))
+                } else {
+                    Some(config)
+                }
+            case _ => None
+        }
+
     }
 
 }
