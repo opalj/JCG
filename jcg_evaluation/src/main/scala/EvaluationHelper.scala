@@ -2,57 +2,38 @@ import java.io.File
 
 // todo make a factory
 class CommonEvaluationConfig(
-        val DEBUG:                   Boolean,
-        val INPUT_DIR_PATH:          String,
-        val OUTPUT_DIR_PATH:         String,
-        val EVALUATION_ADAPTERS:     List[JavaTestAdapter],
-        val PROJECT_PREFIX_FILTER:   String,
-        val ALGORITHM_PREFIX_FILTER: String
-) {
+                              val DEBUG: Boolean,
+                              val INPUT_DIR_PATH: String,
+                              val OUTPUT_DIR_PATH: String,
+                              val EVALUATION_ADAPTERS: List[JavaTestAdapter],
+                              val PROJECT_PREFIX_FILTER: String,
+                              val ALGORITHM_PREFIX_FILTER: String
+                            ) {
 
     val JRE_LOCATIONS_FILE = "jre.conf"
     val SERIALIZATION_FILE_NAME = "cg.json"
-
-    def getOutputDirectory(
-                            adapter:     JavaTestAdapter,
-                            algorithm:   String,
-                            projectSpec: ProjectSpecification,
-                            resultsDir:  File
-                        ): File = {
-        val dirName = s"${projectSpec.name}${File.separator}${adapter.frameworkName}${File.separator}$algorithm"
-        new File(resultsDir, dirName)
-    }
 }
 
 case class JCGConfig(
-                   inputDir: File = new File("."),
-                   outputDir: File = new File("."),
-                   adapters: List[TestAdapter] = List.empty,
-                   projectFilter: String = "",
-                   algorithmFilter: String = "",
-                   timeout: Int = -1,
-                   runHermes: Boolean = false,
-                   pseval: Boolean= false,
-                   excludeJDK: Boolean = false,
-                   runAnalyses: Boolean = true,
-                   allQueries: Boolean = false,
-                   fingerprintDir: File = new File(""),
-                   debug: Boolean = false,
-                   parallel: Boolean = false,
-                   language: String = "",
-                 ) {
+                      inputDir: File = new File("."),
+                      outputDir: File = new File("."),
+                      adapters: List[TestAdapter] = List.empty,
+                      projectFilter: String = "",
+                      algorithmFilter: String = "",
+                      timeout: Int = -1,
+                      runHermes: Boolean = false,
+                      pseval: Boolean = false,
+                      excludeJDK: Boolean = false,
+                      runAnalyses: Boolean = true,
+                      allQueries: Boolean = false,
+                      fingerprintDir: File = new File(""),
+                      debug: Boolean = false,
+                      parallel: Boolean = false,
+                      language: String = "",
+                    ) {
     val JRE_LOCATIONS_FILE = "jre.conf"
     val SERIALIZATION_FILE_NAME = "cg.json"
 
-    def getOutputDirectory(
-                            adapter:     JavaTestAdapter,
-                            algorithm:   String,
-                            projectSpec: ProjectSpecification,
-                            resultsDir:  File
-                          ): File = {
-        val dirName = s"${projectSpec.name}${File.separator}${adapter.frameworkName}${File.separator}$algorithm"
-        new File(resultsDir, dirName)
-    }
 }
 
 object ConfigParser {
@@ -74,17 +55,17 @@ object ConfigParser {
                   .action((dir, c) => c.copy(inputDir = dir))
                   .text("Defines the directory with the configuration files for the input projects.")
                   .required().maxOccurs(1)
-                  .validate{dir =>
-                      if(dir.exists() && dir.isDirectory) success
+                  .validate { dir =>
+                      if (dir.exists() && dir.isDirectory) success
                       else failure(s"Value ${dir.getAbsolutePath} must exist and must be a directory.")
                   }
-                  .validate{dir =>
-                      if(FileOperations.hasFilesDeep(dir, ".conf", ".js")) success
+                  .validate { dir =>
+                      if (FileOperations.hasFilesDeep(dir, ".conf", ".js")) success
                       else failure(s"${dir.getAbsolutePath} does not contain *.conf or *.js files")
                   },
                 opt[File]('o', "outputDir")
-                  .action{(dir, c) =>
-                      if(!dir.exists()) dir.mkdirs()
+                  .action { (dir, c) =>
+                      if (!dir.exists()) dir.mkdirs()
                       c.copy(outputDir = dir)
                   }
                   .text("Defines the output directory; all files will be placed here.")
@@ -99,14 +80,14 @@ object ConfigParser {
                   .text("Defines a prefix-based filter for the adapters call-graph algorithms names. (e.g. filter only for RTAs)")
                   .valueName("prefix")
                   .maxOccurs(1).optional(),
-                opt[String]('t', name="timeout")
-                  .action((t, c) => c.copy(timeout =Integer.valueOf(t)))
+                opt[String]('t', name = "timeout")
+                  .action((t, c) => c.copy(timeout = Integer.valueOf(t)))
                   .valueName("timeout")
                   .maxOccurs(1).optional(),
                 opt[String]('a', "adapter")
-                  .action{(adapterName, c) =>
+                  .action { (adapterName, c) =>
                       val adapter = ALL_ADAPTERS.find(_.frameworkName.toLowerCase == adapterName.toLowerCase)
-                      if(adapter.isEmpty) failure("The given <adapter> is not yet registered as valid adapter.")
+                      if (adapter.isEmpty) failure("The given <adapter> is not yet registered as valid adapter.")
                       val newAdapters = c.adapters.::(adapter.get)
                       c.copy(adapters = newAdapters)
                   }
@@ -190,7 +171,7 @@ object CommonEvaluationConfig {
             DEBUG,
             INPUT_DIR_PATH,
             OUTPUT_DIR_PATH,
-            if(EVALUATION_ADAPTERS.isEmpty) EvaluationHelper.ALL_JAVA_ADAPTERS else EVALUATION_ADAPTERS,
+            if (EVALUATION_ADAPTERS.isEmpty) EvaluationHelper.ALL_JAVA_ADAPTERS else EVALUATION_ADAPTERS,
             PROJECT_PREFIX_FILTER,
             ALGORITHM_PREFIX_FILTER
         )
@@ -218,5 +199,15 @@ object EvaluationHelper {
         assert(jreLocationsFile.exists(), "please provide a jre.conf file")
         val jreLocations = JRELocation.mapping(jreLocationsFile)
         jreLocations
+    }
+
+    def getOutputDirectory(
+                            adapter: JavaTestAdapter,
+                            algorithm: String,
+                            projectSpec: ProjectSpecification,
+                            resultsDir: File
+                          ): File = {
+        val dirName = s"${projectSpec.name}${File.separator}${adapter.frameworkName}${File.separator}$algorithm"
+        new File(resultsDir, dirName)
     }
 }

@@ -122,7 +122,7 @@ object Evaluation {
 
             println(s"running ${adapter.frameworkName} $cgAlgo against ${projectSpec.name}")
 
-            val outDir = config.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
+            val outDir = EvaluationHelper.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
             outDir.mkdirs()
 
 

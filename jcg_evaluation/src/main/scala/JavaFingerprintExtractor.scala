@@ -51,7 +51,7 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
             for (psf <- projectSpecFiles) {
                 val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
-                val outDir = config.getOutputDirectory(adapter, cgAlgorithm, projectSpec, resultsDir)
+                val outDir = EvaluationHelper.getOutputDirectory(adapter, cgAlgorithm, projectSpec, resultsDir)
                 outDir.mkdirs()
 
                 val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
