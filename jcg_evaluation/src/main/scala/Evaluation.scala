@@ -135,12 +135,10 @@ object Evaluation {
                 adapter.serializeCG(
                     cgAlgo,
                     projectSpec.target(projectsDir).getCanonicalPath,
-                    projectSpec.main.orNull,
-                    projectSpec.allClassPathEntryPaths(projectsDir),
-                    jreLocations(projectSpec.java),
-                    !excludeJDK,
-                    cgFile.getPath
+                    cgFile.getPath,
+                    AdapterOptions(projectSpec.main.orNull, projectSpec.allClassPathEntryPaths(projectsDir), jreLocations(projectSpec.java), !excludeJDK)
                 )
+
             } catch {
                 case e: Throwable ⇒
                     println(s"exception in project ${projectSpec.name}")
