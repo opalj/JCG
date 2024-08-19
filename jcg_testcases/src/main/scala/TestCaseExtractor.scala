@@ -18,8 +18,8 @@ trait TestCaseExtractor {
       """(?<body>.*?)""" + // multiple code snippets
       """\[//\]: \# \(END\)""").r // [//]: # (END)
 
-    protected val re: Regex
-
+    /** Used to parse the body of the test file, i.e. the content between [//]: # (MAIN: global) and [//]: # (END) */
+    protected val reBody: Regex
 
     /**
      * Extracts test cases from the given directory and writes them to the output directory.
@@ -71,7 +71,7 @@ trait TestCaseExtractor {
             val outputFolder = new File(resultsDir, projectName)
             outputFolder.mkdirs()
 
-            re.findAllIn(projectMatchResult.group("body")).matchData.foreach { matchResult =>
+            reBody.findAllIn(projectMatchResult.group("body")).matchData.foreach { matchResult =>
                 val packageName = matchResult.group("packageName")
                 val filePath = s"$projectName/$packageName${matchResult.group("fileName")}"
                 val codeSnippet = matchResult.group("codeSnippet")

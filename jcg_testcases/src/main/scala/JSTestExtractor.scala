@@ -12,5 +12,5 @@ object JSTestExtractor extends TestCaseExtractor {
      * CODE SNIPPET
      * ```
      */
-    protected val re: Regex = """(?s)```(json\n(?<expectedCG>[^`]*)```\n```)?js(\n// ?(?<packageName>[^/]*)(?<fileName>[^\n]*)\n(?<codeSnippet>[^`]*))```""".r
+    protected val reBody: Regex = """(?s)```(json\n(?<expectedCG>[^`]*)```\n```)?js(\n// ?(?<packageName>[^/]*)(?<fileName>[^\n]*)\n(?<codeSnippet>[^`]*))```""".r
 }

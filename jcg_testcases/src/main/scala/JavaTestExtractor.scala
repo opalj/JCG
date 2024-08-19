@@ -15,14 +15,14 @@ object JavaTestExtractor extends TestCaseExtractor {
      * CODE SNIPPET
      * ```
      */
-    protected val re: Regex = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
+    protected val reBody: Regex = """(?s)```java(\n// ([^/]*)([^\n]*)\n([^`]*))```""".r
 
     override protected def processLines(lines: String, resultsDir: File, temp: File): Unit = {
         reHeaders.findAllIn(lines).matchData.foreach(projectMatchResult => {
             val projectName = projectMatchResult.group("projectName").trim
             val main = projectMatchResult.group("mainClass")
             assert(main == null || !main.contains("/"), "invalid main class, use '.' instead of '/'")
-            val srcFiles = re.findAllIn(projectMatchResult.group("body")).matchData.map { matchResult ⇒
+            val srcFiles = reBody.findAllIn(projectMatchResult.group("body")).matchData.map { matchResult ⇒
                 val packageName = matchResult.group(2)
                 val fileName = s"$projectName/src/$packageName${matchResult.group(3)}"
                 val codeSnippet = matchResult.group(4)
