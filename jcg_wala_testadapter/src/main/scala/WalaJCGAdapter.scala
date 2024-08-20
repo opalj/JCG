@@ -18,27 +18,24 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object WalaJCGAdapter extends JavaTestAdapter {
-    override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String
+    def serializeCG(
+                     algorithm: String,
+                     inputDirPath: String,
+                     outputDirPath: String,
+                     adapterOptions: AdapterOptions
     ): Long = {
         val before = System.nanoTime
         val cl = Thread.currentThread.getContextClassLoader
 
-        var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
-        cp = target + File.pathSeparator + cp
+        var cp = util.Arrays.stream(adapterOptions.classPath).collect(Collectors.joining(File.pathSeparator))
+        cp = inputDirPath + File.pathSeparator + cp
 
         // write wala.properties with the specified JDK and store it in the classpath
         val tmp = new File("tmp")
         tmp.mkdirs()
         val walaPropertiesFile = new File(tmp, "wala.properties")
         val pw = new PrintWriter(walaPropertiesFile)
-        pw.println(s"java_runtime_dir = $JDKPath")
+        pw.println(s"java_runtime_dir = ${adapterOptions.JDKPath}")
         pw.close()
 
         /*val sysloader = classOf[WalaProperties].getClassLoader.asInstanceOf[URLClassLoader]
@@ -47,7 +44,7 @@ object WalaJCGAdapter extends JavaTestAdapter {
         m.setAccessible(true)
         m.invoke(sysloader, tmp.toURI.toURL)*/
 
-        val ex = if (analyzeJDK) {
+        val ex = if (adapterOptions.analyzeJDK) {
             new File(cl.getResource("no-exclusions.txt").getFile)
         } else {
             // TODO exclude more of the jdk
@@ -63,10 +60,10 @@ object WalaJCGAdapter extends JavaTestAdapter {
         val classHierarchy = ClassHierarchyFactory.make(scope)
 
         val entrypoints =
-            if (mainClass == null) {
+            if (adapterOptions.mainClass == null) {
                 new AllSubtypesOfApplicationEntrypoints(scope, classHierarchy)
             } else {
-                val mainClassWala = "L"+mainClass.replace(".", "/")
+                val mainClassWala = "L"+adapterOptions.mainClass.replace(".", "/")
                 Util.makeMainEntrypoints(scope, classHierarchy, mainClassWala)
             }
 
@@ -143,7 +140,7 @@ object WalaJCGAdapter extends JavaTestAdapter {
                 ReachableMethod(createMethodObject(currentMethod), callSites.toSet.flatten)
         }
 
-        val file: FileWriter = new FileWriter(outputFile)
+        val file: FileWriter = new FileWriter(outputDirPath)
         val prettyPrint = Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods)))
         file.write(prettyPrint)
         file.flush()

@@ -263,28 +263,24 @@ object DoopAdapter extends JavaTestAdapter {
     }
 
     def main(args: Array[String]): Unit = {
-        for (p ← List("antlr", "bloat", "chart", "eclipse", "fop", "hsqldb", "jython", "luindex", "lusearch", "pmd", "xalan"))
+        for (p ← List("antlr", "bloat", "chart", "eclipse", "fop", "hsqldb", "jython", "luindex", "lusearch", "pmd", "xalan")) {
             serializeCG(
                 "context-insensitive",
                 s"/home/dominik/Desktop/doop-benchmarks/dacapo-2006/$p.jar", //"/home/dominik/Desktop/corps/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
-                s"Harness",
-                Array.empty,
-                "/home/dominik/Desktop/java-se-7u75-ri/lib",
-                true,
-                s"doop-dacapo-$p.json"
+                s"doop-dacapo-$p.json",
+                AdapterOptions("Harness", Array.empty, "/home/dominik/Desktop/java-se-7u75-ri/lib", analyzeJDK = true)
             )
+        }
     }
 
     override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String
+                              algorithm: String,
+                              inputDirPath: String,
+                              outputDirPath: String,
+                              adapterOptions: AdapterOptions
     ): Long = {
         val env = System.getenv
+
 
         assert(env.containsKey("DOOP_HOME"))
         val doopHome = new File(env.get("DOOP_HOME"))
@@ -294,17 +290,17 @@ object DoopAdapter extends JavaTestAdapter {
         val doopPlatformDirs = Files.createTempDirectory(null).toFile
         val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.7/lib/")
         doopJDKPath.mkdirs()
-        FileUtils.copyDirectory(new File(JDKPath), doopJDKPath)
+        FileUtils.copyDirectory(new File(adapterOptions.JDKPath), doopJDKPath)
 
         val outDir = Files.createTempDirectory(null).toFile
 
         assert(algorithm == "context-insensitive")
-        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", target) ++ classPath
+        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", inputDirPath) ++ adapterOptions.classPath
 
         //args ++= Array("--reflection-classic")
 
-        if (mainClass != null)
-            args ++= Array("--main", mainClass)
+        if (adapterOptions.mainClass != null)
+            args ++= Array("--main", adapterOptions.mainClass)
 
         val status = Process(Array("./gradlew", "tasks"), Some(doopHome)).!
         if (status != 0)
@@ -327,9 +323,9 @@ object DoopAdapter extends JavaTestAdapter {
         createJsonRepresentation(
             Source.fromFile(cgCsv),
             Source.fromFile(rmCsv),
-            new File(target),
-            new File(JDKPath),
-            new File(outputFile)
+            new File(inputDirPath),
+            new File(adapterOptions.JDKPath),
+            new File(outputDirPath)
         )
 
         FileUtils.deleteDirectory(doopPlatformDirs)

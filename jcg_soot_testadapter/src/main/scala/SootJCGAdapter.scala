@@ -23,34 +23,30 @@ object SootJCGAdapter extends JavaTestAdapter {
     val possibleAlgorithms: Array[String] = Array(CHA, RTA, VTA, Spark)
 
     val frameworkName: String = "Soot"
-
-    override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String
+    def serializeCG(
+                     algorithm: String,
+                     inputDirPath: String,
+                     outputDirPath: String,
+                     adapterOptions: AdapterOptions
     ): Long = {
 
         val o = G.v().soot_options_Options()
         o.set_whole_program(true)
         o.set_keep_line_number(true)
         o.set_allow_phantom_refs(true)
-        o.set_include_all(analyzeJDK)
+        o.set_include_all(adapterOptions.analyzeJDK)
 
         // todo no-bodies-for-excluded in case of !analyzeJDK
 
-        val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
+        val jreJars = JRELocation.getAllJREJars(adapterOptions.JDKPath).map(_.getCanonicalPath)
 
-        if(analyzeJDK && algorithm == "CHA"){
-            o.set_process_dir((List(target) ++ classPath ++ jreJars).asJava)
+        if(adapterOptions.analyzeJDK && algorithm == "CHA"){
+            o.set_process_dir((List(inputDirPath) ++ adapterOptions.classPath ++ jreJars).asJava)
         } else {
-            o.set_process_dir((List(target) ++ classPath).asJava)
+            o.set_process_dir((List(inputDirPath) ++ adapterOptions.classPath).asJava)
         }
 
-        o.set_soot_classpath((classPath ++ jreJars).mkString(File.pathSeparator))
+        o.set_soot_classpath((adapterOptions.classPath ++ jreJars).mkString(File.pathSeparator))
 
         o.set_output_format(Options.output_format_none)
 
@@ -60,11 +56,11 @@ object SootJCGAdapter extends JavaTestAdapter {
         o.setPhaseOption("cg", "safe-newinstance:false")
         //o.setPhaseOption("cg", "types-for-invoke:true")
 
-        if (mainClass == null) {
+        if (adapterOptions.mainClass == null) {
             o.setPhaseOption("cg", "library:signature-resolution")
             o.setPhaseOption("cg", "all-reachable:true")
         } else {
-            o.set_main_class(mainClass)
+            o.set_main_class(adapterOptions.mainClass)
         }
 
         if (algorithm.contains(CHA)) {
@@ -157,7 +153,7 @@ object SootJCGAdapter extends JavaTestAdapter {
             reachableMethods += ReachableMethod(method, callSites)
         }
 
-        val file: FileWriter = new FileWriter(outputFile)
+        val file: FileWriter = new FileWriter(outputDirPath)
         file.write(Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods))))
         file.flush()
         file.close()
@@ -175,4 +171,6 @@ object SootJCGAdapter extends JavaTestAdapter {
 
         Method(name, declaringClass, returnType, paramTypes)
     }
+
+
 }
