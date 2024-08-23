@@ -262,17 +262,6 @@ object DoopAdapter extends JavaTestAdapter {
         ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
 
-    def main(args: Array[String]): Unit = {
-        for (p ← List("antlr", "bloat", "chart", "eclipse", "fop", "hsqldb", "jython", "luindex", "lusearch", "pmd", "xalan")) {
-            serializeCG(
-                "context-insensitive",
-                s"/home/dominik/Desktop/doop-benchmarks/dacapo-2006/$p.jar", //"/home/dominik/Desktop/corps/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
-                s"doop-dacapo-$p.json",
-                AdapterOptions("Harness", Array.empty, "/home/dominik/Desktop/java-se-7u75-ri/lib", analyzeJDK = true)
-            )
-        }
-    }
-
     override def serializeCG(
                               algorithm: String,
                               inputDirPath: String,
