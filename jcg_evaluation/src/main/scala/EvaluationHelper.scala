@@ -5,11 +5,10 @@ class CommonEvaluationConfig(
                               val DEBUG: Boolean,
                               val INPUT_DIR_PATH: String,
                               val OUTPUT_DIR_PATH: String,
-                              val EVALUATION_ADAPTERS: List[JavaTestAdapter],
+                              val EVALUATION_ADAPTERS: List[TestAdapter],
                               val PROJECT_PREFIX_FILTER: String,
                               val ALGORITHM_PREFIX_FILTER: String
                             ) {
-
     val JRE_LOCATIONS_FILE = "jre.conf"
     val SERIALIZATION_FILE_NAME = "cg.json"
 }
@@ -212,7 +211,7 @@ object EvaluationHelper {
     }
 
     def getOutputDirectory(
-                            adapter: JavaTestAdapter,
+                            adapter: TestAdapter,
                             algorithm: String,
                             projectSpec: ProjectSpecification,
                             resultsDir: File

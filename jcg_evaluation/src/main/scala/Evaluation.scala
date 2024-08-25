@@ -1,11 +1,10 @@
 import java.io.File
 import java.io.FileInputStream
 import java.io.PrintWriter
-
 import scala.io.Source
+import play.api.libs.json.Json
 
 import org.opalj.br.MethodDescriptor
-import play.api.libs.json.Json
 
 object Evaluation {
 
@@ -50,10 +49,10 @@ object Evaluation {
 
     private def parseArguments(args: Array[String]): Unit = {
         args.sliding(1, 1).toList.collect {
-            case Array("--hermes")           ⇒ runHermes = true
+            case Array("--hermes") ⇒ runHermes = true
             case Array("--project-specific") ⇒ projectSpecificEvaluation = true
-            case Array("--exclude-jdk")      ⇒ excludeJDK = true
-            case Array("--all-queries")      ⇒ allQueries = true
+            case Array("--exclude-jdk") ⇒ excludeJDK = true
+            case Array("--all-queries") ⇒ allQueries = true
         }
         args.sliding(2, 1).toList.collect {
             case Array("--fingerprint-dir", dir) ⇒
@@ -102,12 +101,12 @@ object Evaluation {
     }
 
     private def runAnalyses(
-        projectsDir:  File,
-        resultsDir:   File,
-        jreLocations: Map[Int, String],
-        locationsMap: Map[String, Map[String, Set[Method]]],
-        config:       CommonEvaluationConfig
-    ): Unit = {
+                             projectsDir: File,
+                             resultsDir: File,
+                             jreLocations: Map[Int, String],
+                             locationsMap: Map[String, Map[String, Set[Method]]],
+                             config: CommonEvaluationConfig
+                           ): Unit = {
         val projectSpecFiles = projectsDir.listFiles { (_, name) ⇒
             name.endsWith(".conf") && name.startsWith(config.PROJECT_PREFIX_FILTER)
         }.sorted
@@ -168,13 +167,13 @@ object Evaluation {
     }
 
     private def performProjectSpecificEvaluation(
-        projectSpec:  ProjectSpecification,
-        adapter:      JavaTestAdapter,
-        algorithm:    String,
-        locationsMap: Map[String, Map[String, Set[Method]]],
-        outDir:       File,
-        jsFile:       File
-    ): Unit = {
+                                                  projectSpec: ProjectSpecification,
+                                                  adapter: TestAdapter,
+                                                  algorithm: String,
+                                                  locationsMap: Map[String, Map[String, Set[Method]]],
+                                                  outDir: File,
+                                                  jsFile: File
+                                                ): Unit = {
         val fingerprint = FingerprintExtractor.parseFingerprints(adapter, algorithm, new File(FINGERPRINT_DIR))
         val locations = locationsMap(projectSpec.name)
         val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.toMap
