@@ -54,6 +54,11 @@ object OpalJCGAdatper extends JavaTestAdapter {
                      outputDirPath: String,
                      adapterOptions: AdapterOptions
     ): Long = {
+        val mainClass = adapterOptions.getString("mainClass")
+        val classPath = adapterOptions.getStringArray("classPath")
+        val JDKPath = adapterOptions.getString("JDKPath")
+        val analyzeJDK = adapterOptions.getBoolean("analyzeJDK")
+
         val before = System.nanoTime()
         val baseConfig: Config = ConfigFactory.load().withValue(
             "org.opalj.br.reader.ClassFileReader.Invokedynamic.rewrite",
@@ -62,7 +67,7 @@ object OpalJCGAdatper extends JavaTestAdapter {
 
         // configure the initial entry points
         implicit var config: Config =
-            if (adapterOptions.mainClass eq null) {
+            if (mainClass eq null) {
                 baseConfig.withValue(
                     "org.opalj.br.analyses.cg.InitialEntryPointsKey.analysis",
                     ConfigValueFactory.fromAnyRef("org.opalj.br.analyses.cg.LibraryEntryPointsFinder")
@@ -78,7 +83,7 @@ object OpalJCGAdatper extends JavaTestAdapter {
                     ConfigValueFactory.fromIterable(
                         (
                             (baseConfig.getObjectList("org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints").asScala :+
-                                ConfigValueFactory.fromMap(Map("declaringClass" → adapterOptions.mainClass.replace('.', '/'), "name" → "main").asJava))
+                                ConfigValueFactory.fromMap(Map("declaringClass" -> mainClass.replace('.', '/'), "name" -> "main").asJava))
                         ).asJava
                     )
                 ).withValue(
@@ -93,13 +98,13 @@ object OpalJCGAdatper extends JavaTestAdapter {
         // gather the class files to be loaded
         val cfReader = JavaClassFileReader(theConfig = config)
         val targetClassFiles = cfReader.ClassFiles(new File(inputDirPath))
-        val cpClassFiles = cfReader.AllClassFiles(adapterOptions.classPath.map(new File(_)))
-        val jreJars = JRELocation.getAllJREJars(adapterOptions.JDKPath)
+        val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_)))
+        val jreJars = JRELocation.getAllJREJars(JDKPath)
         val jre = cfReader.AllClassFiles(jreJars)
-        val allClassFiles = targetClassFiles ++ cpClassFiles ++ (if (adapterOptions.analyzeJDK) jre else Seq.empty)
+        val allClassFiles = targetClassFiles ++ cpClassFiles ++ (if (analyzeJDK) jre else Seq.empty)
 
         val libClassFiles =
-            if (adapterOptions.analyzeJDK)
+            if (analyzeJDK)
                 Seq.empty
             else
                 Project.JavaLibraryClassFileReader.AllClassFiles(jreJars)

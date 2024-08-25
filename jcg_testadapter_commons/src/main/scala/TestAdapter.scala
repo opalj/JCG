@@ -3,5 +3,10 @@ trait TestAdapter {
     val language: String
     val possibleAlgorithms: Array[String]
 
-    def serializeCG(algorithm: String, inputDirPath: String, outputDirPath: String, adapterOptions: AdapterOptions = AdapterOptions.default): Long
+    def serializeCG(
+        algorithm:      String,
+        inputDirPath:   String,
+        outputDirPath:  String,
+        adapterOptions: AdapterOptions = new AdapterOptions(Map())
+    ): Long
 }

@@ -126,9 +126,8 @@ object Evaluation {
             outDir.mkdirs()
 
 
-
             val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
-            if(cgFile.exists())
+            if (cgFile.exists())
                 cgFile.delete()
 
             val elapsed = try {
@@ -136,8 +135,7 @@ object Evaluation {
                     cgAlgo,
                     projectSpec.target(projectsDir).getCanonicalPath,
                     cgFile.getPath,
-                    AdapterOptions(projectSpec.main.orNull, projectSpec.allClassPathEntryPaths(projectsDir), jreLocations(projectSpec.java), !excludeJDK)
-                )
+                    AdapterOptions.makeJavaOptions(projectSpec.main.orNull, projectSpec.allClassPathEntryPaths(projectsDir), jreLocations(projectSpec.java), !excludeJDK))
 
             } catch {
                 case e: Throwable ⇒

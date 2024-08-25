@@ -270,6 +270,9 @@ object DoopAdapter extends JavaTestAdapter {
     ): Long = {
         val env = System.getenv
 
+        val mainClass = adapterOptions.getString("mainClass")
+        val classPath = adapterOptions.getStringArray("classPath")
+        val JDKPath = adapterOptions.getString("JDKPath")
 
         assert(env.containsKey("DOOP_HOME"))
         val doopHome = new File(env.get("DOOP_HOME"))
@@ -279,17 +282,17 @@ object DoopAdapter extends JavaTestAdapter {
         val doopPlatformDirs = Files.createTempDirectory(null).toFile
         val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.7/lib/")
         doopJDKPath.mkdirs()
-        FileUtils.copyDirectory(new File(adapterOptions.JDKPath), doopJDKPath)
+        FileUtils.copyDirectory(new File(JDKPath), doopJDKPath)
 
         val outDir = Files.createTempDirectory(null).toFile
 
         assert(algorithm == "context-insensitive")
-        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", inputDirPath) ++ adapterOptions.classPath
+        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", inputDirPath) ++ classPath
 
         //args ++= Array("--reflection-classic")
 
-        if (adapterOptions.mainClass != null)
-            args ++= Array("--main", adapterOptions.mainClass)
+        if (mainClass != null)
+            args ++= Array("--main", mainClass)
 
         val status = Process(Array("./gradlew", "tasks"), Some(doopHome)).!
         if (status != 0)
@@ -313,7 +316,7 @@ object DoopAdapter extends JavaTestAdapter {
             Source.fromFile(cgCsv),
             Source.fromFile(rmCsv),
             new File(inputDirPath),
-            new File(adapterOptions.JDKPath),
+            new File(JDKPath),
             new File(outputDirPath)
         )
 

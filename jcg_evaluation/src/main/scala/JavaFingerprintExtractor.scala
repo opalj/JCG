@@ -67,7 +67,7 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                             cgAlgorithm,
                             projectSpec.target(projectsDir).getCanonicalPath,
                             cgFile.getAbsolutePath,
-                            AdapterOptions(projectSpec.main.orNull, projectSpec.allClassPathEntryPaths(projectsDir), jreLocations(projectSpec.java), analyzeJDK = false)
+                            AdapterOptions.makeJavaOptions(projectSpec.main.orNull, projectSpec.allClassPathEntryPaths(projectsDir), jreLocations(projectSpec.java), analyzeJDK = false)
                         )
                     } catch {
                         case e: Throwable =>
