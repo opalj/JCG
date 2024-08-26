@@ -1,6 +1,12 @@
 import java.io.BufferedWriter
 import java.io.File
 import java.io.PrintWriter
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.TimeoutException
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
 
 object JSFingerprintExtractor extends FingerprintExtractor {
     val language = "js"
@@ -15,19 +21,23 @@ object JSFingerprintExtractor extends FingerprintExtractor {
         val outputDir = config.outputDir
         val adapterOutputDir = config.outputDir
         val inputDir = config.inputDir
-        executeAdapters(adapters, inputDir, adapterOutputDir)
+        executeAdaptersWithTimeout(adapters, inputDir, adapterOutputDir, config.timeout)
+        return
+        // executeAdaptersWithTimeout2(adapters, inputDir, adapterOutputDir, config.timeout)
 
         // parse expected call graph for test case from json files
         val expectedCGs: Array[ExpectedCG] =
             FileOperations.listFilesRecursively(inputDir, ".json")
-              .filter(f => f.getAbsolutePath.contains("js"))
-              .filter(f => f.getName.startsWith(config.projectFilter))
-              .map(f => new ExpectedCG(f))
-              .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
+                .filter(f => f.getAbsolutePath.contains("js"))
+                .filter(f => f.getName.startsWith(config.projectFilter))
+                .map(f => new ExpectedCG(f))
+                .sorted(Ordering.by((f: ExpectedCG) => f.filePath))
 
         if (config.debug) {
             println("[DEBUG] expectedCGs:" + expectedCGs.map(_.filePath).mkString(","))
-            val generatedCGFiles = FileOperations.listFilesRecursively(adapterOutputDir, ".json").filter(f => f.getAbsolutePath.contains("js"))
+            val generatedCGFiles = FileOperations.listFilesRecursively(adapterOutputDir, ".json").filter(f =>
+                f.getAbsolutePath.contains("js")
+            )
             println("[DEBUG] generatedCGFiles: " + generatedCGFiles.mkString(","))
         }
 
@@ -51,7 +61,9 @@ object JSFingerprintExtractor extends FingerprintExtractor {
             for (expectedCG <- expectedCGs) {
                 val testName: String = expectedCG.filePath.split("/").last
                 if (config.debug) println("[DEBUG] Test name: " + testName + " " + algo)
-                val generatedCGFile = new File(adapterOutputDir, s"${adapter.frameworkName}/$algo/").listFiles().find(_.getName == testName).orNull
+                val generatedCGFile = new File(adapterOutputDir, s"${adapter.frameworkName}/$algo/").listFiles().find(
+                    _.getName == testName
+                ).orNull
 
                 // if callgraph file does not exist write Error to result
                 var assessment: Assessment = Error
@@ -92,6 +104,96 @@ object JSFingerprintExtractor extends FingerprintExtractor {
             adapter.serializeAllCGs("testcasesOutput/js", adapterDir.getAbsolutePath)
         }
     }
+
+    private def executeAdaptersWithTimeout(
+        adapters:  List[TestAdapter],
+        inputDir:  File,
+        outputDir: File,
+        timeout:   Int
+    ): Unit = {
+        outputDir.mkdirs()
+        val testDirs = new File(inputDir.getAbsolutePath).list().sorted
+
+        val timeoutWriter = new PrintWriter(new File("timeout.txt"))
+
+        val ow = new BufferedWriter(getOutputTarget(outputDir))
+
+        printHeader(ow, testDirs.map(new File(_)))
+        for {
+            adapter <- adapters
+            cgAlgorithm <- adapter.possibleAlgorithms
+        } {
+            val fingerprintFile = getFingerprintFile(adapter.frameworkName, cgAlgorithm, outputDir)
+            if (fingerprintFile.exists()) {
+                fingerprintFile.delete()
+            }
+            val fingerprintWriter = new PrintWriter(fingerprintFile)
+
+            val adapterDir = new File(s"$outputDir/${adapter.frameworkName}/$cgAlgorithm")
+            adapterDir.mkdirs()
+            ow.write(s"${adapter.frameworkName}-$cgAlgorithm")
+            for (testDir <- testDirs) {
+                val future = Future {
+                    // execute adapter
+                    try {
+                        adapter.serializeCG(
+                            cgAlgorithm,
+                            s"${inputDir.getAbsolutePath}/$testDir",
+                            adapterDir.getAbsolutePath
+                        )
+                    } catch {
+                        case e: Throwable =>
+                            println(e.getMessage)
+                    }
+
+                    // try reading and matching it
+                    ow.synchronized {
+                        // compare to expected call graph
+                        val cgFile = new File(s"${adapterDir.getAbsolutePath}/$testDir.json")
+                        println(cgFile)
+                        val callGraph: Option[AdapterCG] = if (cgFile.exists()) Some(new AdapterCG(cgFile)) else None
+                        val expectedCGFile =
+                            FileOperations.listFilesRecursively(
+                                new File(s"${inputDir.getAbsolutePath}/$testDir"),
+                                ".json"
+                            ).head
+
+                        val expectedCG = new ExpectedCG(expectedCGFile)
+                        val assessment: Assessment = callGraph match {
+                            case Some(cg) =>
+                                val isSound = cg.compareLinks(expectedCG).length == 0
+                                if (isSound) Sound else Unsound
+                            case None => Error
+                        }
+
+                        fingerprintWriter.write(s"$testDir -> $assessment\n")
+                        fingerprintWriter.flush()
+                        ow.write(s"\t$assessment")
+                    }
+                }
+                try {
+                    val duration =
+                        if (timeout >= 0)
+                            timeout.seconds
+                        else Duration.Inf
+                    Await.ready(future, duration)
+                } catch {
+                    case _: TimeoutException =>
+                        println(s"Test case was interrupted after $timeout seconds")
+                        System.gc()
+                        val result = Timeout
+                        ow.write(s"\t${result.shortNotation}")
+                        fingerprintWriter.println(s"$testDir -> ${result.shortNotation}")
+                        fingerprintWriter.flush()
+
+                    case e: Throwable => println(e.getMessage)
+                }
+
+            }
+            ow.newLine()
+            fingerprintWriter.close()
+        }
+        timeoutWriter.close()
+        ow.close()
+    }
 }
-
-
