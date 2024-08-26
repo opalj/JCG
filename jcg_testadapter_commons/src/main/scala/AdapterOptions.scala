@@ -1,4 +1,4 @@
-class AdapterOptions(val options: Map[String, Any]) {
+class AdapterOptions private (val options: Map[String, Any]) {
 
     def getOptionAs[T](key: String): Option[T] = options.get(key).flatMap {
         case value: T => Some(value)
@@ -29,5 +29,12 @@ object AdapterOptions {
             "JDKPath" -> JDKPath,
             "analyzeJDK" -> analyzeJDK
         ))
+    }
+
+    /**
+     * Creates an empty AdapterOptions object.
+     */
+    def makeEmptyOptions(): AdapterOptions = {
+        new AdapterOptions(Map.empty)
     }
 }

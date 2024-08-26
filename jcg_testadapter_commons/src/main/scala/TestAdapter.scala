@@ -7,6 +7,6 @@ trait TestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         outputDirPath:  String,
-        adapterOptions: AdapterOptions = new AdapterOptions(Map())
+        adapterOptions: AdapterOptions = AdapterOptions.makeEmptyOptions()
     ): Long
 }
