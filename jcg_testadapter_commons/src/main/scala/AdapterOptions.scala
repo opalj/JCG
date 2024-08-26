@@ -1,15 +1,15 @@
 class AdapterOptions(val options: Map[String, Any]) {
 
-    def getString(key: String): String = getOptionAs(key).orNull
-
     def getOptionAs[T](key: String): Option[T] = options.get(key).flatMap {
         case value: T => Some(value)
         case _        => None
     }
 
-    def getBoolean(key: String): Boolean = getOptionAs(key).getOrElse(false)
+    def getString(key: String): String = getOptionAs[String](key).orNull
 
-    def getStringArray(key: String): Array[String] = getOptionAs(key).getOrElse(Array.empty)
+    def getBoolean(key: String): Boolean = getOptionAs[Boolean](key).getOrElse(false)
+
+    def getStringArray(key: String): Array[String] = getOptionAs[Array[String]](key).getOrElse(Array.empty)
 }
 
 object AdapterOptions {
