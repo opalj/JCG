@@ -21,7 +21,7 @@ object JSFingerprintExtractor extends FingerprintExtractor {
         val outputDir = config.outputDir
         val adapterOutputDir = config.outputDir
         val inputDir = config.inputDir
-        executeAdaptersWithTimeout(adapters, inputDir, adapterOutputDir, config.timeout)
+        executeAdaptersWithTimeout(config, adapters, inputDir, adapterOutputDir, config.timeout)
         return
         // executeAdaptersWithTimeout2(adapters, inputDir, adapterOutputDir, config.timeout)
 
@@ -106,6 +106,7 @@ object JSFingerprintExtractor extends FingerprintExtractor {
     }
 
     private def executeAdaptersWithTimeout(
+        config:    JCGConfig,
         adapters:  List[TestAdapter],
         inputDir:  File,
         outputDir: File,
@@ -132,7 +133,7 @@ object JSFingerprintExtractor extends FingerprintExtractor {
             val adapterDir = new File(s"$outputDir/${adapter.frameworkName}/$cgAlgorithm")
             adapterDir.mkdirs()
             ow.write(s"${adapter.frameworkName}-$cgAlgorithm")
-            for (testDir <- testDirs) {
+            for (testDir <- testDirs.filter(_.startsWith(config.projectFilter))) {
                 val future = Future {
                     // execute adapter
                     try {
