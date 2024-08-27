@@ -1,16 +1,33 @@
-import upickle.default._
-
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import scala.collection.mutable
+
+import upickle.default._
 
 object TAJSJCGAdapter extends JSTestAdapter {
     val debug: Boolean = false
 
     val possibleAlgorithms: Array[String] = Array("NONE")
     val frameworkName: String = "TAJS"
-    private var command = Seq.empty[String]
+    private val command: Option[Seq[String]] = {
+        // read tajs location from tajs variable in tajs.properties
+        val tajsProperties = new File("tajs.properties")
+        if (!tajsProperties.exists()) {
+            println("[ERROR] tajs.properties not found")
+            None
+        } else {
+            val tajsLocation = scala.io.Source.fromFile(tajsProperties).getLines.find(
+                _.replaceAll(" ", "").startsWith("tajs=")
+            ).getOrElse("")
+            val tajsJar = new File(s"${tajsLocation.split("=")(1)}dist/tajs-all.jar".trim())
+            if (!tajsJar.exists()) {
+                println("[ERROR] tajs location not found in tajs.properties")
+                None
+            }
+            Some(Seq("java", "-jar", tajsJar.getAbsolutePath))
+        }
+    }
 
     def main(args: Array[String]): Unit = {
         // generate call graphs for all algorithms
@@ -34,26 +51,9 @@ object TAJSJCGAdapter extends JSTestAdapter {
         val outputDir = new File(s"$outputDirPath/$algorithm")
         outputDir.mkdirs()
 
-        // read tajs location from tajs variable in tajs.properties
-        val tajsProperties = new File("tajs.properties")
-        if (!tajsProperties.exists()) {
-            println("[ERROR] tajs.properties not found")
-            return
-        }
-        val tajsLocation = scala.io.Source.fromFile(tajsProperties).getLines.find(_.replaceAll(" ", "").startsWith("tajs=")).getOrElse("")
-
-        val tajsJar = new File(s"${tajsLocation.split("=")(1)}dist/tajs-all.jar".trim())
-        if (!tajsJar.exists()) {
-            println("[ERROR] tajs location not found in tajs.properties")
-            return
-        }
-
-        // build tajs command to execute from cli
-        command = Seq("java", "-jar", tajsJar.getAbsolutePath)
-
         // check if tajs command is available
         try {
-            val out = sys.process.Process(command)
+            val out = sys.process.Process(command.get)
             println(out)
         } catch {
             case e: Exception => {
@@ -65,8 +65,8 @@ object TAJSJCGAdapter extends JSTestAdapter {
         // generate callgraph for every testcase
         testDirs.foreach(testDir => {
             // Extract input files, TAJS only supports single file projects
-            val inputFilePaths = new File(s"$inputDirPath/$testDir").listFiles()(0).listFiles().map(_.getAbsolutePath).filter(_.endsWith(".js"))
-            serializeCG(algorithm, inputFilePaths(0), outputDir.getAbsolutePath)
+
+            serializeCG(algorithm, s"$inputDirPath/$testDir", outputDir.getAbsolutePath)
         })
     }
 
@@ -78,20 +78,33 @@ object TAJSJCGAdapter extends JSTestAdapter {
      * @param inputDirPath  The directory containing the input files to generate a call graph for.
      * @return The time taken to generate the call graph in nanoseconds.
      */
-    def serializeCG(algorithm: String, inputDirPath: String, outputDirPath: String, adapterOptions: AdapterOptions): Long =  {
+    def serializeCG(
+        algorithm:      String,
+        inputDirPath:   String,
+        outputDirPath:  String,
+        adapterOptions: AdapterOptions
+    ): Long = {
+        if (command.isEmpty) throw new Exception(
+            "TAJS command not available. Make sure you set the tajs variable in tajs.properties correctly."
+        )
         // TAJS does not support multi-file projects
-        val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last.split("\\.").head}.json"
-        val args = Seq("-callgraph", inputDirPath)
+        val inputFilePath =
+            new File(inputDirPath).listFiles()(0).listFiles().map(_.getAbsolutePath).filter(_.endsWith(
+                ".js"
+            )).head
+        val outputPath = s"$outputDirPath/${inputFilePath.split(File.separator).last.split("\\.").head}.json"
+        val args = Seq("-callgraph", inputFilePath)
         if (debug) println(s"[DEBUG] executing ${args.mkString(" ")}")
         val start = System.nanoTime()
-        val processSucceeded = try {
-            sys.process.Process(command ++ args).!!
-            true
-        } catch {
-            case e: Exception =>
-                println(s"${Console.RED}[Error]: $inputDirPath failed to generate${Console.RESET}")
-                false
-        }
+        val processSucceeded =
+            try {
+                sys.process.Process(command.get ++ args).!!
+                true
+            } catch {
+                case e: Exception =>
+                    println(s"${Console.RED}[Error]: $inputFilePath failed to generate${Console.RESET}")
+                    false
+            }
         val end = System.nanoTime()
 
         if (processSucceeded) {
@@ -102,7 +115,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
                 bw.close()
             } catch {
                 case e: Exception =>
-                    println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
+                    println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputFilePath${Console.RESET}")
             }
         }
         end - start
@@ -125,14 +138,15 @@ object TAJSJCGAdapter extends JSTestAdapter {
 
             label = label match {
                 case s"function($rest" => if (filePath != "Native") s"<anonymous:$start>" else label
-                case "<main>" => "global"
-                case _ => label.split("\\(")(0)
+                case "<main>"          => "global"
+                case _                 => label.split("\\(")(0)
             }
 
             nodeMap += (id -> Node(id, label, filePath, Position(start)))
         })
 
-        val edgeArray = dotGraph.edges.map(edge => Edge(nodeMap(edge.split("->").head.trim), nodeMap(edge.split("->").last.trim)))
+        val edgeArray =
+            dotGraph.edges.map(edge => Edge(nodeMap(edge.split("->").head.trim), nodeMap(edge.split("->").last.trim)))
 
         if (debug) {
             println("[DEBUG] nodes: " + nodeMap.mkString("\n"))
