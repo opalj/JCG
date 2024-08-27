@@ -37,26 +37,28 @@ import org.opalj.tac.cg.XTACallGraphKey
 import org.opalj.tac.fpcf.analyses.cg.TypeIterator
 
 /**
- * A [[JCGTestAdapter]] for the FPCF-based call graph analyses of OPAL.
+ * A [[JavaTestAdapter]] for the FPCF-based call graph analyses of OPAL.
  *
  * @author Dominik Helm
  * @author Florian Kuebler
  */
-object OpalJCGAdatper extends JCGTestAdapter {
+object OpalJCGAdatper extends JavaTestAdapter {
 
-    def possibleAlgorithms(): Array[String] = Array[String]("CHA", "RTA", "MTA", "CTA", "FTA", "XTA", "0-CFA", "0-1-CFA", "1-0-CFA", "1-1-CFA")
+    val possibleAlgorithms: Array[String] = Array[String]("CHA", "RTA", "MTA", "CTA", "FTA", "XTA", "0-CFA", "0-1-CFA", "1-0-CFA", "1-1-CFA")
 
-    def frameworkName(): String = "OPAL"
+    val frameworkName: String = "OPAL"
 
     def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String
+                     algorithm: String,
+                     inputDirPath: String,
+                     outputDirPath: String,
+                     adapterOptions: AdapterOptions
     ): Long = {
+        val mainClass = adapterOptions.getString("mainClass")
+        val classPath = adapterOptions.getStringArray("classPath")
+        val JDKPath = adapterOptions.getString("JDKPath")
+        val analyzeJDK = adapterOptions.getBoolean("analyzeJDK")
+
         val before = System.nanoTime()
         val baseConfig: Config = ConfigFactory.load().withValue(
             "org.opalj.br.reader.ClassFileReader.Invokedynamic.rewrite",
@@ -81,7 +83,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
                     ConfigValueFactory.fromIterable(
                         (
                             (baseConfig.getObjectList("org.opalj.br.analyses.cg.InitialEntryPointsKey.entryPoints").asScala :+
-                                ConfigValueFactory.fromMap(Map("declaringClass" → mainClass.replace('.', '/'), "name" → "main").asJava))
+                                ConfigValueFactory.fromMap(Map("declaringClass" -> mainClass.replace('.', '/'), "name" -> "main").asJava))
                         ).asJava
                     )
                 ).withValue(
@@ -95,7 +97,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         // gather the class files to be loaded
         val cfReader = JavaClassFileReader(theConfig = config)
-        val targetClassFiles = cfReader.ClassFiles(new File(target))
+        val targetClassFiles = cfReader.ClassFiles(new File(inputDirPath))
         val cpClassFiles = cfReader.AllClassFiles(classPath.map(new File(_)))
         val jreJars = JRELocation.getAllJREJars(JDKPath)
         val jre = cfReader.AllClassFiles(jreJars)
@@ -144,7 +146,7 @@ object OpalJCGAdatper extends JCGTestAdapter {
 
         val after = System.nanoTime()
 
-        val out = new BufferedWriter(new FileWriter(outputFile))
+        val out = new BufferedWriter(new FileWriter(outputDirPath))
         out.write(s"""{\n\t"reachableMethods":[""")
         var firstRM = true
         for {
@@ -281,4 +283,6 @@ object OpalJCGAdatper extends JCGTestAdapter {
             out.write(method.descriptor.parameterTypes.iterator.map[String](_.toJVMTypeName).mkString("\"", "\",\"", "\""))
         out.write("]\n\t\t\t}")
     }
+
+
 }

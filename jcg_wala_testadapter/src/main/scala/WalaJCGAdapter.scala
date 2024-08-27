@@ -1,41 +1,39 @@
-import java.io.File
-import java.io.FileWriter
-import java.io.PrintWriter
-import java.net.URL
-import java.net.URLClassLoader
-import java.util
-import java.util.stream.Collectors
-
 import com.ibm.wala.classLoader.Language.JAVA
 import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
 import com.ibm.wala.ipa.callgraph.impl.Util
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory
-import com.ibm.wala.properties.WalaProperties
 import com.ibm.wala.types.MethodReference
 import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
 import play.api.libs.json.Json
 
+import java.io.File
+import java.io.FileWriter
+import java.io.PrintWriter
+import java.util
+import java.util.stream.Collectors
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-object WalaJCGAdapter extends JCGTestAdapter {
-    override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String
+object WalaJCGAdapter extends JavaTestAdapter {
+    def serializeCG(
+                     algorithm: String,
+                     inputDirPath: String,
+                     outputDirPath: String,
+                     adapterOptions: AdapterOptions
     ): Long = {
+        val mainClass = adapterOptions.getString("mainClass")
+        val classPath = adapterOptions.getStringArray("classPath")
+        val JDKPath = adapterOptions.getString("JDKPath")
+        val analyzeJDK = adapterOptions.getBoolean("analyzeJDK")
+
         val before = System.nanoTime
         val cl = Thread.currentThread.getContextClassLoader
 
         var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
-        cp = target + File.pathSeparator + cp
+        cp = inputDirPath + File.pathSeparator + cp
 
         // write wala.properties with the specified JDK and store it in the classpath
         val tmp = new File("tmp")
@@ -70,7 +68,7 @@ object WalaJCGAdapter extends JCGTestAdapter {
             if (mainClass == null) {
                 new AllSubtypesOfApplicationEntrypoints(scope, classHierarchy)
             } else {
-                val mainClassWala = "L"+mainClass.replace(".", "/")
+                val mainClassWala = "L" + mainClass.replace(".", "/")
                 Util.makeMainEntrypoints(scope, classHierarchy, mainClassWala)
             }
 
@@ -147,7 +145,7 @@ object WalaJCGAdapter extends JCGTestAdapter {
                 ReachableMethod(createMethodObject(currentMethod), callSites.toSet.flatten)
         }
 
-        val file: FileWriter = new FileWriter(outputFile)
+        val file: FileWriter = new FileWriter(outputDirPath)
         val prettyPrint = Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods)))
         file.write(prettyPrint)
         file.flush()
@@ -156,9 +154,9 @@ object WalaJCGAdapter extends JCGTestAdapter {
         after - before
     }
 
-    override def possibleAlgorithms(): Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
+    val possibleAlgorithms: Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
 
-    override def frameworkName(): String = "WALA"
+    val frameworkName: String = "WALA"
 
     private def createMethodObject(method: MethodReference): Method = {
         val name = method.getName.toString

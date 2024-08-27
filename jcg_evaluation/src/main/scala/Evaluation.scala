@@ -1,11 +1,10 @@
 import java.io.File
 import java.io.FileInputStream
 import java.io.PrintWriter
-
+import play.api.libs.json.Json
 import scala.io.Source
 
 import org.opalj.br.MethodDescriptor
-import play.api.libs.json.Json
 
 object Evaluation {
 
@@ -19,7 +18,7 @@ object Evaluation {
 
     def main(args: Array[String]): Unit = {
 
-        //val c = parseConfig(args)
+        // val c = parseConfig(args)
 
         CommonEvaluationConfig.processArguments(args)
         val config = CommonEvaluationConfig.processArguments(args)
@@ -50,16 +49,16 @@ object Evaluation {
 
     private def parseArguments(args: Array[String]): Unit = {
         args.sliding(1, 1).toList.collect {
-            case Array("--hermes")           ⇒ runHermes = true
-            case Array("--project-specific") ⇒ projectSpecificEvaluation = true
-            case Array("--exclude-jdk")      ⇒ excludeJDK = true
-            case Array("--all-queries")      ⇒ allQueries = true
+            case Array("--hermes")           => runHermes = true
+            case Array("--project-specific") => projectSpecificEvaluation = true
+            case Array("--exclude-jdk")      => excludeJDK = true
+            case Array("--all-queries")      => allQueries = true
         }
         args.sliding(2, 1).toList.collect {
-            case Array("--fingerprint-dir", dir) ⇒
+            case Array("--fingerprint-dir", dir) =>
                 assert(FINGERPRINT_DIR.isEmpty, "multiple fingerprint directories specified")
                 FINGERPRINT_DIR = dir
-            case Array("--analyze", value: String) ⇒ runAnalyses = value.toBoolean
+            case Array("--analyze", value: String) => runAnalyses = value.toBoolean
         }
 
         if (projectSpecificEvaluation) {
@@ -68,7 +67,10 @@ object Evaluation {
         }
 
         if (runHermes) {
-            assert(FINGERPRINT_DIR.nonEmpty || allQueries, "hermes requires the fingerprints or `--all-queries` must be set")
+            assert(
+                FINGERPRINT_DIR.nonEmpty || allQueries,
+                "hermes requires the fingerprints or `--all-queries` must be set"
+            )
         }
     }
 
@@ -77,8 +79,8 @@ object Evaluation {
             if (projectSpecificEvaluation) {
                 println("create locations mapping")
                 (for {
-                    projectLocation ← resultsDir.listFiles(_.getName.endsWith(".tsv"))
-                    line ← Source.fromFile(projectLocation).getLines().drop(1)
+                    projectLocation <- resultsDir.listFiles(_.getName.endsWith(".tsv"))
+                    line <- Source.fromFile(projectLocation).getLines().drop(1)
                     lineSplit = line.split("\t", -1)
                     if lineSplit.size == 9
                     Array(projectId, featureId, _, _, classString, methodName, mdString, _, _) = lineSplit
@@ -92,9 +94,9 @@ object Evaluation {
                     val returnType = md.returnType.toJVMTypeName
                     (projectName, featureName, Method(methodName, className, returnType, params))
                 }).groupBy(_._1).map {
-                    case (pId, group1) ⇒ pId → group1.map { case (_, f, m) ⇒ f → m }.groupBy(_._1).map {
-                        case (fId, group2) ⇒ fId → group2.map(_._2).toSet
-                    }
+                    case (pId, group1) => pId -> group1.map { case (_, f, m) => f -> m }.groupBy(_._1).map {
+                            case (fId, group2) => fId -> group2.map(_._2).toSet
+                        }
                 }
             } else
                 Map.empty
@@ -108,47 +110,49 @@ object Evaluation {
         locationsMap: Map[String, Map[String, Set[Method]]],
         config:       CommonEvaluationConfig
     ): Unit = {
-        val projectSpecFiles = projectsDir.listFiles { (_, name) ⇒
+        val projectSpecFiles = projectsDir.listFiles { (_, name) =>
             name.endsWith(".conf") && name.startsWith(config.PROJECT_PREFIX_FILTER)
         }.sorted
 
         for {
-            adapter ← config.EVALUATION_ADAPTERS
-            cgAlgo ← adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
-            psf ← projectSpecFiles
+            adapter <- config.EVALUATION_ADAPTERS
+            cgAlgo <- adapter.possibleAlgorithms.filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
+            psf <- projectSpecFiles
         } {
 
             val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
-            println(s"running ${adapter.frameworkName()} $cgAlgo against ${projectSpec.name}")
+            println(s"running ${adapter.frameworkName} $cgAlgo against ${projectSpec.name}")
 
-            val outDir = config.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
+            val outDir = EvaluationHelper.getOutputDirectory(adapter, cgAlgo, projectSpec, resultsDir)
             outDir.mkdirs()
 
-
-
             val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
-            if(cgFile.exists())
+            if (cgFile.exists())
                 cgFile.delete()
 
-            val elapsed = try {
-                adapter.serializeCG(
-                    cgAlgo,
-                    projectSpec.target(projectsDir).getCanonicalPath,
-                    projectSpec.main.orNull,
-                    projectSpec.allClassPathEntryPaths(projectsDir),
-                    jreLocations(projectSpec.java),
-                    !excludeJDK,
-                    cgFile.getPath
-                )
-            } catch {
-                case e: Throwable ⇒
-                    println(s"exception in project ${projectSpec.name}")
-                    if (config.DEBUG) {
-                        e.printStackTrace()
-                    }
-                    -1
-            }
+            val elapsed =
+                try {
+                    adapter.serializeCG(
+                        cgAlgo,
+                        projectSpec.target(projectsDir).getCanonicalPath,
+                        cgFile.getPath,
+                        AdapterOptions.makeJavaOptions(
+                            projectSpec.main.orNull,
+                            projectSpec.allClassPathEntryPaths(projectsDir),
+                            jreLocations(projectSpec.java),
+                            !excludeJDK
+                        )
+                    )
+
+                } catch {
+                    case e: Throwable =>
+                        println(s"exception in project ${projectSpec.name}")
+                        if (config.DEBUG) {
+                            e.printStackTrace()
+                        }
+                        -1
+                }
 
             System.gc()
 
@@ -157,7 +161,12 @@ object Evaluation {
             if (projectSpecificEvaluation) {
                 assert(cgFile.exists(), "the adapter failed to write the call graph")
                 performProjectSpecificEvaluation(
-                    projectSpec, adapter, cgAlgo, locationsMap, outDir, cgFile
+                    projectSpec,
+                    adapter,
+                    cgAlgo,
+                    locationsMap,
+                    outDir,
+                    cgFile
                 )
             }
         }
@@ -173,7 +182,7 @@ object Evaluation {
 
     private def performProjectSpecificEvaluation(
         projectSpec:  ProjectSpecification,
-        adapter:      JCGTestAdapter,
+        adapter:      TestAdapter,
         algorithm:    String,
         locationsMap: Map[String, Map[String, Set[Method]]],
         outDir:       File,
@@ -184,11 +193,13 @@ object Evaluation {
         val reachableMethods = Json.parse(new FileInputStream(jsFile)).validate[ReachableMethods].get.toMap
 
         val projectSpecificLocations = ProjectSpecificEvaluator.projectSpecificEvaluation(
-            reachableMethods.keySet, locations, fingerprint
+            reachableMethods.keySet,
+            locations,
+            fingerprint
         )
 
         val pw = new PrintWriter(new File(outDir, "pse.tsv"))
-        for ((location, fID) ← projectSpecificLocations) {
+        for ((location, fID) <- projectSpecificLocations) {
             pw.println(s"${projectSpec.name}\t$fID\t$location")
         }
         pw.close()

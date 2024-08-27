@@ -1,8 +1,3 @@
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileWriter
-import java.io.PrintStream
-
 import play.api.libs.json.Json
 import soot.G
 import soot.PackManager
@@ -11,30 +6,33 @@ import soot.SootMethod
 import soot.options.Options
 import soot.util.backend.ASMBackendUtils
 
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileWriter
+import java.io.PrintStream
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
-object SootJCGAdapter extends JCGTestAdapter {
+object SootJCGAdapter extends JavaTestAdapter {
 
     private val CHA = "CHA"
     private val RTA = "RTA"
     private val VTA = "VTA"
     private val Spark = "SPARK"
 
-    override def possibleAlgorithms(): Array[String] = Array(CHA, RTA, VTA, Spark)
+    val possibleAlgorithms: Array[String] = Array(CHA, RTA, VTA, Spark)
 
-    override def frameworkName(): String = "Soot"
-
-    override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String
+    val frameworkName: String = "Soot"
+    def serializeCG(
+                     algorithm: String,
+                     inputDirPath: String,
+                     outputDirPath: String,
+                     adapterOptions: AdapterOptions
     ): Long = {
+        val mainClass = adapterOptions.getString("mainClass")
+        val classPath = adapterOptions.getStringArray("classPath")
+        val JDKPath = adapterOptions.getString("JDKPath")
+        val analyzeJDK = adapterOptions.getBoolean("analyzeJDK")
 
         val o = G.v().soot_options_Options()
         o.set_whole_program(true)
@@ -47,9 +45,9 @@ object SootJCGAdapter extends JCGTestAdapter {
         val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
 
         if(analyzeJDK && algorithm == "CHA"){
-            o.set_process_dir((List(target) ++ classPath ++ jreJars).asJava)
+            o.set_process_dir((List(inputDirPath) ++ classPath ++ jreJars).asJava)
         } else {
-            o.set_process_dir((List(target) ++ classPath).asJava)
+            o.set_process_dir((List(inputDirPath) ++ classPath).asJava)
         }
 
         o.set_soot_classpath((classPath ++ jreJars).mkString(File.pathSeparator))
@@ -159,7 +157,7 @@ object SootJCGAdapter extends JCGTestAdapter {
             reachableMethods += ReachableMethod(method, callSites)
         }
 
-        val file: FileWriter = new FileWriter(outputFile)
+        val file: FileWriter = new FileWriter(outputDirPath)
         file.write(Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods))))
         file.flush()
         file.close()

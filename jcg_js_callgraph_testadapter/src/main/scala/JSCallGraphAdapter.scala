@@ -38,14 +38,13 @@ object JSCallGraphAdapter extends JSTestAdapter {
 
         // generate callgraph for every testcase
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, outputDir.getAbsolutePath, s"$inputDirPath/$testDir")
+            serializeCG(algorithm, s"$inputDirPath/$testDir", outputDir.getAbsolutePath)
         })
 
         println("Call graphs generated!")
     }
 
-
-    def serializeCG(algorithm: String, outputDirPath: String, inputDirPath: String): Long = {
+    def serializeCG(algorithm: String, inputDirPath: String, outputDirPath: String, adapterOptions: AdapterOptions): Long ={
         val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
         val args = Seq("--cg", inputDirPath, "--output", outputPath, "--strategy", algorithm)
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")

@@ -114,7 +114,7 @@ object TestCaseHermesJsonExtractor {
             Set.empty[String]
         } else {
             config.EVALUATION_ADAPTERS.flatMap { adapter ⇒
-                adapter.possibleAlgorithms().filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER)).flatMap { algorithm ⇒
+                adapter.possibleAlgorithms.filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER)).flatMap { algorithm ⇒
                     FingerprintExtractor.parseFingerprints(adapter, algorithm, fingerprintDir)
                 }
             }.toSet

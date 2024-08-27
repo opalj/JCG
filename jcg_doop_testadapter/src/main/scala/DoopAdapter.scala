@@ -27,17 +27,17 @@ import org.opalj.br.instructions.INVOKEDYNAMIC
 import org.opalj.br.instructions.MethodInvocationInstruction
 
 /**
- * This is an experimental stage [[JCGTestAdapter]] as it is not possible to run Doop without
+ * This is an experimental stage [[JavaTestAdapter]] as it is not possible to run Doop without
  * installing it (and a data-log engine).
  * Therefore, this object has the capability of converting the output of the CallGraphEdge table
  * into the [[ReachableMethods]] data-format.
  *
  * @author Florian Kuebler
  */
-object DoopAdapter extends JCGTestAdapter {
+object DoopAdapter extends JavaTestAdapter {
 
-    override def possibleAlgorithms(): Array[String] = Array("context-insensitive")
-    override def frameworkName(): String = "Doop"
+    val possibleAlgorithms: Array[String] = Array("context-insensitive")
+    val frameworkName: String = "Doop"
 
     private def createJsonRepresentation(
         doopEdges: Source, doopReachable: Source, tgtJar: File, jreDir: File, outFile: File
@@ -262,29 +262,17 @@ object DoopAdapter extends JCGTestAdapter {
         ObjectType(jvmRefType.substring(1, jvmRefType.length - 1))
     }
 
-    def main(args: Array[String]): Unit = {
-        for (p ← List("antlr", "bloat", "chart", "eclipse", "fop", "hsqldb", "jython", "luindex", "lusearch", "pmd", "xalan"))
-            serializeCG(
-                "context-insensitive",
-                s"/home/dominik/Desktop/doop-benchmarks/dacapo-2006/$p.jar", //"/home/dominik/Desktop/corps/xcorpus/data/qualitas_corpus_20130901/sablecc-3.2/project/bin.zip",
-                s"Harness",
-                Array.empty,
-                "/home/dominik/Desktop/java-se-7u75-ri/lib",
-                true,
-                s"doop-dacapo-$p.json"
-            )
-    }
-
     override def serializeCG(
-        algorithm:  String,
-        target:     String,
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean,
-        outputFile: String
+                              algorithm: String,
+                              inputDirPath: String,
+                              outputDirPath: String,
+                              adapterOptions: AdapterOptions
     ): Long = {
         val env = System.getenv
+
+        val mainClass = adapterOptions.getString("mainClass")
+        val classPath = adapterOptions.getStringArray("classPath")
+        val JDKPath = adapterOptions.getString("JDKPath")
 
         assert(env.containsKey("DOOP_HOME"))
         val doopHome = new File(env.get("DOOP_HOME"))
@@ -299,7 +287,7 @@ object DoopAdapter extends JCGTestAdapter {
         val outDir = Files.createTempDirectory(null).toFile
 
         assert(algorithm == "context-insensitive")
-        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", target) ++ classPath
+        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", inputDirPath) ++ classPath
 
         //args ++= Array("--reflection-classic")
 
@@ -327,9 +315,9 @@ object DoopAdapter extends JCGTestAdapter {
         createJsonRepresentation(
             Source.fromFile(cgCsv),
             Source.fromFile(rmCsv),
-            new File(target),
+            new File(inputDirPath),
             new File(JDKPath),
-            new File(outputFile)
+            new File(outputDirPath)
         )
 
         FileUtils.deleteDirectory(doopPlatformDirs)

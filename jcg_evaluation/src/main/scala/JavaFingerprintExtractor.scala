@@ -34,16 +34,16 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
 
         printHeader(ow, projectSpecFiles)
 
-        val adapters = if (config.adapters.nonEmpty) config.adapters else CommonEvaluationConfig.ALL_JAVA_ADAPTERS
+        val adapters = config.adapters.asInstanceOf[List[JavaTestAdapter]]
 
         for {
-            adapter <- adapters
-            cgAlgorithm <- adapter.possibleAlgorithms().filter(_.startsWith(config.algorithmFilter))
+            adapter <- adapters.map(_.asInstanceOf[JavaTestAdapter])
+            cgAlgorithm <- adapter.possibleAlgorithms.filter(_.startsWith(config.algorithmFilter))
         } {
-            ow.write(s"${adapter.frameworkName()}-$cgAlgorithm")
+            ow.write(s"${adapter.frameworkName}-$cgAlgorithm")
 
-            println(s"creating fingerprint for ${adapter.frameworkName()} $cgAlgorithm")
-            val fingerprintFile = getFingerprintFile(adapter.frameworkName(), cgAlgorithm, resultsDir)
+            println(s"creating fingerprint for ${adapter.frameworkName} $cgAlgorithm")
+            val fingerprintFile = getFingerprintFile(adapter.frameworkName, cgAlgorithm, resultsDir)
             if (fingerprintFile.exists()) {
                 fingerprintFile.delete()
             }
@@ -51,7 +51,7 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
             for (psf <- projectSpecFiles) {
                 val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
-                val outDir = config.getOutputDirectory(adapter, cgAlgorithm, projectSpec, resultsDir)
+                val outDir = EvaluationHelper.getOutputDirectory(adapter, cgAlgorithm, projectSpec, resultsDir)
                 outDir.mkdirs()
 
                 val cgFile = new File(outDir, config.SERIALIZATION_FILE_NAME)
@@ -66,11 +66,8 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                         adapter.serializeCG(
                             cgAlgorithm,
                             projectSpec.target(projectsDir).getCanonicalPath,
-                            projectSpec.main.orNull,
-                            projectSpec.allClassPathEntryPaths(projectsDir),
-                            jreLocations(projectSpec.java),
-                            false,
-                            cgFile.getAbsolutePath
+                            cgFile.getAbsolutePath,
+                            AdapterOptions.makeJavaOptions(projectSpec.main.orNull, projectSpec.allClassPathEntryPaths(projectsDir), jreLocations(projectSpec.java), analyzeJDK = false)
                         )
                     } catch {
                         case e: Throwable =>
