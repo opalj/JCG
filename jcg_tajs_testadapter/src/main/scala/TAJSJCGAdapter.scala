@@ -10,7 +10,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
 
     val possibleAlgorithms: Array[String] = Array("NONE")
     val frameworkName: String = "TAJS"
-    private val command: Option[Seq[String]] = {
+    private lazy val command: Option[Seq[String]] = {
         // read tajs location from tajs variable in tajs.properties
         val tajsProperties = new File("tajs.properties")
         if (!tajsProperties.exists()) {
