@@ -63,7 +63,8 @@ trait FingerprintExtractor {
     }
 
     /**
-     * Expects future that generates call graph, awaits it for a given timeout and then writes the result to the output file.
+     * Expects future that generates call graph, awaits it for a given timeout
+     * and on timeout writes the timeout to the fingerprint and evaluation file.
      * @param timeout The timeout in seconds.
      * @param ow The writer for the evaluation result file.
      * @param fingerprintWriter The writer for the fingerprint file.
