@@ -40,7 +40,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
      * @param inputDirPath  The directory containing the input files to generate call graphs for.
      * @param outputDirPath The directory to write the call graphs to.
      */
-    override def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
+    private def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
         for (algo <- possibleAlgorithms) {
             generateCallGraphs(inputDirPath, outputDirPath, algo)
         }

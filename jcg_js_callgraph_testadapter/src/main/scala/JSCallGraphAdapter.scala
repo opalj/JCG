@@ -12,7 +12,7 @@ object JSCallGraphAdapter extends JSTestAdapter {
         serializeAllCGs("testcasesOutput/js", s"results/js/$frameworkName")
     }
 
-    def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
+    private def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
         for (algo <- possibleAlgorithms) {
             generateCallGraphs(inputDirPath, outputDirPath, algo)
         }
@@ -44,7 +44,12 @@ object JSCallGraphAdapter extends JSTestAdapter {
         println("Call graphs generated!")
     }
 
-    def serializeCG(algorithm: String, inputDirPath: String, outputDirPath: String, adapterOptions: AdapterOptions): Long ={
+    def serializeCG(
+        algorithm:      String,
+        inputDirPath:   String,
+        outputDirPath:  String,
+        adapterOptions: AdapterOptions
+    ): Long = {
         val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
         val args = Seq("--cg", inputDirPath, "--output", outputPath, "--strategy", algorithm)
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
