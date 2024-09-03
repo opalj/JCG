@@ -1,16 +1,12 @@
-import org.opalj.log.GlobalLogContext
-import org.opalj.log.OPALLogger
-import play.api.libs.json.Json
-
 import java.io._
-import scala.concurrent.Await
+import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.TimeoutException
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
+
+import org.opalj.log.GlobalLogContext
+import org.opalj.log.OPALLogger
 
 object JavaFingerprintExtractor extends FingerprintExtractor {
     val language = "java"
@@ -26,28 +22,22 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
         val jreLocations = EvaluationHelper.getJRELocations(config.JRE_LOCATIONS_FILE)
         assert(new File(config.JRE_LOCATIONS_FILE).exists(), "'jre.conf' not specified")
 
-        val ow = new BufferedWriter(getOutputTarget(resultsDir))
-
         val projectSpecFiles = projectsDir.listFiles { (_, name) =>
             name.endsWith(".conf") && name.startsWith(config.projectFilter)
         }.sorted
 
+        val ow = new BufferedWriter(getOutputTarget(resultsDir))
         printHeader(ow, projectSpecFiles)
 
-        val adapters = config.adapters.asInstanceOf[List[JavaTestAdapter]]
-
         for {
-            adapter <- adapters.map(_.asInstanceOf[JavaTestAdapter])
+            adapter <- config.adapters
             cgAlgorithm <- adapter.possibleAlgorithms.filter(_.startsWith(config.algorithmFilter))
         } {
             ow.write(s"${adapter.frameworkName}-$cgAlgorithm")
 
             println(s"creating fingerprint for ${adapter.frameworkName} $cgAlgorithm")
-            val fingerprintFile = getFingerprintFile(adapter.frameworkName, cgAlgorithm, resultsDir)
-            if (fingerprintFile.exists()) {
-                fingerprintFile.delete()
-            }
-            val fingerprintWriter = new PrintWriter(fingerprintFile)
+            val fingerprintWriter: PrintWriter = makeFingerprintWriter(resultsDir, adapter, cgAlgorithm)
+
             for (psf <- projectSpecFiles) {
                 val projectSpec = Json.parse(new FileInputStream(psf)).validate[ProjectSpecification].get
 
@@ -67,7 +57,12 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                             cgAlgorithm,
                             projectSpec.target(projectsDir).getCanonicalPath,
                             cgFile.getAbsolutePath,
-                            AdapterOptions.makeJavaOptions(projectSpec.main.orNull, projectSpec.allClassPathEntryPaths(projectsDir), jreLocations(projectSpec.java), analyzeJDK = false)
+                            AdapterOptions.makeJavaOptions(
+                                projectSpec.main.orNull,
+                                projectSpec.allClassPathEntryPaths(projectsDir),
+                                jreLocations(projectSpec.java),
+                                analyzeJDK = false
+                            )
                         )
                     } catch {
                         case e: Throwable =>
@@ -78,7 +73,13 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                     ow.synchronized {
                         System.gc()
 
-                        val result = CGMatcher.matchCallSites(projectSpec, jreLocations(projectSpec.java), projectsDir, cgFile, config.debug)
+                        val result = CGMatcher.matchCallSites(
+                            projectSpec,
+                            jreLocations(projectSpec.java),
+                            projectsDir,
+                            cgFile,
+                            config.debug
+                        )
                         ow.write(s"\t${result.shortNotation}")
                         fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
                         fingerprintWriter.flush()
@@ -89,32 +90,15 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                 if (config.parallel) {
                     future.onComplete {
                         case Success(_) =>
-                        case Failure(e) => e.printStackTrace
+                        case Failure(e) => e.printStackTrace()
                     }
                 } else {
-                    try {
-                        val duration =
-                            if (config.timeout >= 0)
-                                config.timeout.seconds
-                            else Duration.Inf
-                        Await.ready(future, duration)
-                    } catch {
-                        case _: TimeoutException =>
-                            println(s"Test case was interrupted after ${config.timeout} seconds")
-                            System.gc()
-                            val result = Timeout
-                            ow.write(s"\t${result.shortNotation}")
-                            fingerprintWriter.println(s"${projectSpec.name}\t${result.shortNotation}")
-                            fingerprintWriter.flush()
-                        case e: Throwable => println(e.getMessage)
-                    }
+                    tryAwaitGenerateCG(config.timeout, ow, fingerprintWriter, projectSpec.name, future)
                 }
             }
             ow.newLine()
             fingerprintWriter.close()
         }
-
-        ow.flush()
         ow.close()
     }
 }

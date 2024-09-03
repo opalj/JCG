@@ -1,9 +1,9 @@
-import upickle.default._
-
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import scala.collection.mutable
+
+import upickle.default._
 
 object Code2flowCallGraphAdapter extends JSTestAdapter {
     val debug: Boolean = false
@@ -20,7 +20,7 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
      * @param inputDirPath  The directory containing the input files to generate call graphs for.
      * @param outputDirPath The directory to write the call graphs to.
      */
-    override def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
+    private def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
         for (algo <- possibleAlgorithms) {
             generateCallGraphs(inputDirPath, outputDirPath, algo)
         }
@@ -58,21 +58,27 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
      * @param inputDirPath  The directory containing the input files to generate a call graph for.
      * @return The time taken to generate the call graph in nanoseconds.
      */
-    def serializeCG(algorithm: String, inputDirPath: String, outputDirPath: String, adapterOptions: AdapterOptions): Long = {
+    def serializeCG(
+        algorithm:      String,
+        inputDirPath:   String,
+        outputDirPath:  String,
+        adapterOptions: AdapterOptions
+    ): Long = {
         val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
         val args = Seq(inputDirPath, "--output", outputPath, "-q", "--source-type=module", "--no-trimming")
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 
         // Generate call graph
         val start = System.nanoTime()
-        val processSucceeded = try {
-            sys.process.Process(Seq(command) ++ args).!!
-            true
-        } catch {
-            case e: Exception =>
-                println(s"${Console.RED}[Error]: $inputDirPath failed to generate${Console.RESET}")
-                false
-        }
+        val processSucceeded =
+            try {
+                sys.process.Process(Seq(command) ++ args).!!
+                true
+            } catch {
+                case e: Exception =>
+                    println(s"${Console.RED}[Error]: $inputDirPath failed to generate${Console.RESET}")
+                    false
+            }
         val end = System.nanoTime()
 
         // Process output and convert to common call graph format
@@ -84,7 +90,8 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
                 bw.write(json)
                 bw.close()
             } catch {
-                case e: Exception => println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
+                case e: Exception =>
+                    println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
             }
         }
 
@@ -100,7 +107,8 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
     private def toCommonFormat(cgFile: File): String = {
         val cg = ujson.read(cgFile).obj("graph")
         val nodes: mutable.Map[String, Node] = cg("nodes").obj.map(node => getNodeFromKV(node, cgFile.getAbsolutePath))
-        val edges: Array[Edge] = cg("edges").arr.map(edge => Edge(nodes(edge("source").str), nodes(edge("target").str))).toArray
+        val edges: Array[Edge] =
+            cg("edges").arr.map(edge => Edge(nodes(edge("source").str), nodes(edge("target").str))).toArray
 
         if (debug) {
             println("[DEBUG] nodes:\n" + nodes.mkString("\n"))
@@ -118,6 +126,4 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
 
         kv._1 -> Node(kv._1, label, path, Position(start))
     }
-
-
 }

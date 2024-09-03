@@ -1,6 +1,10 @@
 import java.io._
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.TimeoutException
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
 import scala.io.Source
-
 
 trait FingerprintExtractor {
     val EVALUATION_RESULT_FILE_NAME = "evaluation-result.tsv"
@@ -41,6 +45,56 @@ trait FingerprintExtractor {
         }
         ow.newLine()
     }
+
+    /**
+     * Creates a PrintWriter for the fingerprint file.
+     * @param resultsDir The directory where the fingerprint file should be created.
+     * @param adapter The test adapter used to create fingerprints.
+     * @param cgAlgorithm The call graph algorithm used to create the fingerprints.
+     * @return
+     */
+    protected def makeFingerprintWriter(resultsDir: File, adapter: TestAdapter, cgAlgorithm: String): PrintWriter = {
+        val fingerprintFile = getFingerprintFile(adapter.frameworkName, cgAlgorithm, resultsDir)
+        if (fingerprintFile.exists()) {
+            fingerprintFile.delete()
+        }
+        val fingerprintWriter = new PrintWriter(fingerprintFile)
+        fingerprintWriter
+    }
+
+    /**
+     * Expects future that generates call graph, awaits it for a given timeout
+     * and on timeout writes the timeout to the fingerprint and evaluation file.
+     * @param timeout The timeout in seconds.
+     * @param ow The writer for the evaluation result file.
+     * @param fingerprintWriter The writer for the fingerprint file.
+     * @param testName The name of the current test case.
+     * @param future The future that generates the call graph.
+     */
+    protected def tryAwaitGenerateCG(
+        timeout:           Int,
+        ow:                BufferedWriter,
+        fingerprintWriter: PrintWriter,
+        testName:          String,
+        future:            Future[Unit]
+    ): Unit = {
+        try {
+            val duration =
+                if (timeout >= 0)
+                    timeout.seconds
+                else Duration.Inf
+            Await.ready(future, duration)
+        } catch {
+            case _: TimeoutException =>
+                println(s"Test case was interrupted after $timeout seconds")
+                System.gc()
+                val result = Timeout
+                ow.write(s"\t${result.shortNotation}")
+                fingerprintWriter.println(s"$testName\t${result.shortNotation}")
+                fingerprintWriter.flush()
+            case e: Throwable => println(e.getMessage)
+        }
+    }
 }
 
 object FingerprintExtractor {
@@ -55,8 +109,8 @@ object FingerprintExtractor {
 
         config.language match {
             case "java" => JavaFingerprintExtractor.generateFingerprints(config)
-            case "js" => JSFingerprintExtractor.generateFingerprints(config)
-            case _ => println("Language not supported")
+            case "js"   => JSFingerprintExtractor.generateFingerprints(config)
+            case _      => println("Language not supported")
         }
     }
 
