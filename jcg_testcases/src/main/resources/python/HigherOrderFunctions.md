@@ -59,7 +59,8 @@ Test the use of a function as return value but stored in variable
 ```json
 {
   "directLinks": [
-    ["HOF3.foo", "HOF3.bar"]
+    ["<global>", "HOF3.foo"],
+    ["<global>", "HOF3.bar"]
   ],
   "indirectLinks": []
 }
