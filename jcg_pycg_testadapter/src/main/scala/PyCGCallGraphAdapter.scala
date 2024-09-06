@@ -1,12 +1,12 @@
-import upickle.default._
-
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import scala.collection.mutable.ArrayBuffer
 
-object PyCGCallGraphAdapter extends JSTestAdapter {
-    val debug: Boolean = true
+import upickle.default._
+
+object PyCGCallGraphAdapter extends PyTestAdapter {
+    val debug: Boolean = false
     val frameworkName: String = "PyCG"
     val possibleAlgorithms: Array[String] = Array("NONE")
     private val command = "pycg"
@@ -21,7 +21,7 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
      * @param inputDirPath  The directory containing the input files to generate call graphs for.
      * @param outputDirPath The directory to write the call graphs to.
      */
-    override def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
+    def serializeAllCGs(inputDirPath: String, outputDirPath: String): Unit = {
         for (algo <- possibleAlgorithms) {
             generateCallGraphs(inputDirPath, outputDirPath, algo)
         }
@@ -30,7 +30,6 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
     private def generateCallGraphs(inputDirPath: String, outputDirPath: String, algorithm: String): Unit = {
         val outputDir = new File(s"$outputDirPath/$algorithm")
         outputDir.mkdirs()
-        println(inputDirPath)
         val testDirs = new File(inputDirPath).list()
 
         // check if pycg command is available
@@ -41,22 +40,20 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
         }
 
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, outputDir.getAbsolutePath, s"$inputDirPath/$testDir")
+            serializeCG(algorithm, s"$inputDirPath/$testDir", outputDir.getAbsolutePath)
             return
         })
     }
 
-    /**
-     * Generates a single call graph.
-     *
-     * @param algorithm     The algorithm to use for generating the call graph.
-     * @param outputDirPath The directory to write the call graph to.
-     * @param inputDirPath  The directory containing the input files to generate a call graph for.
-     * @return The time taken to generate the call graph in nanoseconds.
-     */
-    override def serializeCG(algorithm: String, outputDirPath: String, inputDirPath: String): Long = {
+    override def serializeCG(
+        algorithm:      String,
+        inputDirPath:   String,
+        outputDirPath:  String,
+        adapterOptions: AdapterOptions
+    ): Long = {
         val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
-        val files = new File(inputDirPath).listFiles()(0).listFiles().filter(_.getName.endsWith(".py")).map(_.getAbsolutePath)
+        val files =
+            new File(inputDirPath).listFiles()(0).listFiles().filter(_.getName.endsWith(".py")).map(_.getAbsolutePath)
         val mainFilePath = if (files.length == 1) files(0) else files.find(_.contains("main")).getOrElse(files(0))
         if (debug) println(mainFilePath)
         val args = Seq(mainFilePath, "-o", outputPath, "--fasten")
@@ -69,14 +66,15 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
         }
 
         val start = System.nanoTime()
-        val processSucceeded = try {
-            sys.process.Process(Seq(command) ++ args).!!
-            true
-        } catch {
-            case e: Exception =>
-                println(s"${Console.RED}[ERROR]: $command failed for $mainFilePath${Console.RESET}")
-                false
-        }
+        val processSucceeded =
+            try {
+                sys.process.Process(Seq(command) ++ args).!!
+                true
+            } catch {
+                case e: Exception =>
+                    println(s"${Console.RED}[ERROR]: $command failed for $mainFilePath${Console.RESET}")
+                    false
+            }
         val end = System.nanoTime()
         if (debug) println(s"Call graph for $inputDirPath generated in ${end - start} ns")
 
@@ -89,7 +87,8 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
                 bw.write(json)
                 bw.close()
             } catch {
-                case e: Exception => println(s"${Console.RED}[ERROR]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
+                case e: Exception =>
+                    println(s"${Console.RED}[ERROR]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
             }
         }
 
@@ -170,12 +169,21 @@ object PyCGCallGraphAdapter extends JSTestAdapter {
      * @return The node extracted from the key-value pair.
      */
     private def getNodeFromKV(kv: (String, ujson.Value), filePath: String): Node = {
-        val label = kv._2("namespace").strOpt.getOrElse("").split("/").last
+        var label = kv._2("namespace").strOpt.getOrElse("").split("/").last
         val row = kv._2("metadata").objOpt match {
             case Some(metadata) => metadata.get("first").flatMap(_.numOpt).getOrElse(0.0).toInt
-            case None => 0
+            case None           => 0
+        }
+
+        val mainPath = filePath.split("\\.py").head.replaceAll("/", ".")
+
+        label = label match {
+            case l if l == mainPath         => "global"
+            case l if l.contains("<lambda") => "anon"
+            case _                          => label.replaceAll("\\(\\)", "")
         }
 
         Node(kv._1, label, filePath, Position(row))
     }
+
 }

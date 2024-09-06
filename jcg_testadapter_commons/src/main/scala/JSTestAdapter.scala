@@ -1,3 +1,3 @@
 trait JSTestAdapter extends TestAdapter {
-    val language = "js"
+    override val language = "js"
 }
