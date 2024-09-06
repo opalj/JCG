@@ -35,7 +35,8 @@ case class JCGConfig(
 }
 
 object ConfigParser {
-    private val ALL_ADAPTERS: List[TestAdapter] = EvaluationHelper.ALL_JS_ADAPTERS ++ EvaluationHelper.ALL_JAVA_ADAPTERS
+    private val ALL_ADAPTERS: List[TestAdapter] =
+        EvaluationHelper.ALL_JS_ADAPTERS ++ EvaluationHelper.ALL_JAVA_ADAPTERS ++ EvaluationHelper.ALL_PY_ADAPTERS
 
     def parseConfig(args: Array[String]): Option[JCGConfig] = {
         import scopt.OParser
@@ -58,8 +59,8 @@ object ConfigParser {
                         else failure(s"Value ${dir.getAbsolutePath} must exist and must be a directory.")
                     }
                     .validate { dir =>
-                        if (FileOperations.hasFilesDeep(dir, ".conf", ".js")) success
-                        else failure(s"${dir.getAbsolutePath} does not contain *.conf or *.js files")
+                        if (FileOperations.hasFilesDeep(dir, ".conf", ".js", ".py")) success
+                        else failure(s"${dir.getAbsolutePath} does not contain *.conf, *.js or *.py files")
                     },
                 opt[File]('o', "outputDir")
                     .action { (dir, c) =>
@@ -191,6 +192,7 @@ object CommonEvaluationConfig {
 object EvaluationHelper {
     val ALL_JAVA_ADAPTERS: List[JavaTestAdapter] = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
     val ALL_JS_ADAPTERS: List[JSTestAdapter] = List(JSCallGraphAdapter, Code2flowCallGraphAdapter, TAJSJCGAdapter)
+    val ALL_PY_ADAPTERS: List[PyTestAdapter] = List(PyCGCallGraphAdapter)
 
     def getProjectsDir(inputPath: String): File = {
         val projectsDir = new File(inputPath)
