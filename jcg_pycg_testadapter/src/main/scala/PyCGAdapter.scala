@@ -5,7 +5,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import upickle.default._
 
-object PyCGCallGraphAdapter extends PyTestAdapter {
+object PyCGAdapter extends PyTestAdapter {
     val debug: Boolean = false
     val frameworkName: String = "PyCG"
     val possibleAlgorithms: Array[String] = Array("NONE")

@@ -192,7 +192,7 @@ object CommonEvaluationConfig {
 object EvaluationHelper {
     val ALL_JAVA_ADAPTERS: List[JavaTestAdapter] = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
     val ALL_JS_ADAPTERS: List[JSTestAdapter] = List(JSCallGraphAdapter, Code2flowCallGraphAdapter, TAJSJCGAdapter)
-    val ALL_PY_ADAPTERS: List[PyTestAdapter] = List(PyCGCallGraphAdapter)
+    val ALL_PY_ADAPTERS: List[PyTestAdapter] = List(PyCGAdapter)
 
     def getProjectsDir(inputPath: String): File = {
         val projectsDir = new File(inputPath)
