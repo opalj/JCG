@@ -1,3 +1,3 @@
 object JSFingerprintExtractor extends FingerprintExtractor {
-    val language = "python"
+    val language = "js"
 }
