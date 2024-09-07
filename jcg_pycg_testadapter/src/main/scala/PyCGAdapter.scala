@@ -1,6 +1,7 @@
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.io.Writer
 import scala.collection.mutable.ArrayBuffer
 
 import upickle.default._
@@ -40,7 +41,7 @@ object PyCGAdapter extends PyTestAdapter {
         }
 
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, s"$inputDirPath/$testDir", outputDir.getAbsolutePath)
+            serializeCG(algorithm, s"$inputDirPath/$testDir", new FileWriter(outputDir.getAbsolutePath), Array.empty)
             return
         })
     }
@@ -48,22 +49,16 @@ object PyCGAdapter extends PyTestAdapter {
     override def serializeCG(
         algorithm:      String,
         inputDirPath:   String,
-        outputDirPath:  String,
+        output:         Writer,
+        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
-        val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
         val files =
             new File(inputDirPath).listFiles()(0).listFiles().filter(_.getName.endsWith(".py")).map(_.getAbsolutePath)
         val mainFilePath = if (files.length == 1) files(0) else files.find(_.contains("main")).getOrElse(files(0))
         if (debug) println(mainFilePath)
         val args = Seq(mainFilePath, "-o", outputPath, "--fasten")
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
-
-        // clear output file if already exists
-        val outputFile = new File(outputPath)
-        if (outputFile.exists()) {
-            outputFile.delete()
-        }
 
         val start = System.nanoTime()
         val processSucceeded =
@@ -80,12 +75,9 @@ object PyCGAdapter extends PyTestAdapter {
 
         // process output and convert to common call graph format
         if (processSucceeded) {
-            val outputFile = new File(outputPath)
             try {
                 val json = toCommonFormat(outputFile)
-                val bw = new BufferedWriter(new FileWriter(outputFile))
-                bw.write(json)
-                bw.close()
+                output.write(json)
             } catch {
                 case e: Exception =>
                     println(s"${Console.RED}[ERROR]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")

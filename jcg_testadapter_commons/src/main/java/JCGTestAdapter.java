@@ -1,3 +1,5 @@
+import java.io.Writer;
+
 /**
  * A interface to adapt a static analysis framework to be used in the JCG context.
  *
@@ -20,7 +22,9 @@ public interface JCGTestAdapter {
             String[] classPath,
             String JDKPath,
             boolean analyzeJDK,
-            String outputFile) throws Exception;
+            Writer output,
+            String[] jvm_args,
+            String[] program_args) throws Exception;
 
     String[] possibleAlgorithms();
 

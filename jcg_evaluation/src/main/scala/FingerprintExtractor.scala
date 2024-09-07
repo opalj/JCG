@@ -37,19 +37,24 @@ trait FingerprintExtractor {
             val adapterDir = new File(s"$outputDir/${adapter.frameworkName}/$cgAlgorithm")
             adapterDir.mkdirs()
             for (testDir <- testDirs.filter(_.startsWith(config.projectFilter))) {
+                val output = new BufferedWriter(new FileWriter(adapterDir.getAbsolutePath))
+
                 val future = Future {
                     // execute adapter
                     try {
                         adapter.serializeCG(
                             cgAlgorithm,
                             s"${inputDir.getAbsolutePath}/$testDir",
-                            adapterDir.getAbsolutePath
+                            output,
+                            Array.empty
                         )
                     } catch {
                         case e: Throwable =>
                             if (config.debug) {
                                 println(e.getMessage)
                             }
+                    } finally {
+                        output.close()
                     }
 
                     // try reading and matching resulting call graph

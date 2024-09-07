@@ -1,6 +1,6 @@
 
 import java.io.File
-import java.io.PrintWriter
+import java.io.Writer
 import java.net.URL
 import java.nio.file.Files
 
@@ -40,7 +40,7 @@ object DoopAdapter extends JavaTestAdapter {
     val frameworkName: String = "Doop"
 
     private def createJsonRepresentation(
-        doopEdges: Source, doopReachable: Source, tgtJar: File, jreDir: File, outFile: File
+        doopEdges: Source, doopReachable: Source, tgtJar: File, jreDir: File, output: Writer
     ): Unit = {
         implicit val p: Project[URL] = Project(Array(tgtJar, jreDir), Array.empty[File])
 
@@ -50,9 +50,7 @@ object DoopAdapter extends JavaTestAdapter {
 
         val callSitesJson: JsValue = Json.toJson(reachableMe)
 
-        val pw = new PrintWriter(outFile)
-        pw.write(Json.prettyPrint(callSitesJson))
-        pw.close()
+        output.write(Json.prettyPrint(callSitesJson))
     }
 
     private def resolveBridgeMethod(
@@ -263,16 +261,18 @@ object DoopAdapter extends JavaTestAdapter {
     }
 
     override def serializeCG(
-                              algorithm: String,
-                              inputDirPath: String,
-                              outputDirPath: String,
-                              adapterOptions: AdapterOptions
+        algorithm:      String,
+        inputDirPath:   String,
+        output:         Writer,
+        programArgs:    Array[String],
+        adapterOptions: AdapterOptions
     ): Long = {
         val env = System.getenv
 
         val mainClass = adapterOptions.getString("mainClass")
         val classPath = adapterOptions.getStringArray("classPath")
         val JDKPath = adapterOptions.getString("JDKPath")
+        val analyzeJDK = adapterOptions.getBoolean("analyzeJDK")
 
         assert(env.containsKey("DOOP_HOME"))
         val doopHome = new File(env.get("DOOP_HOME"))
@@ -280,16 +280,20 @@ object DoopAdapter extends JavaTestAdapter {
         assert(doopHome.isDirectory)
 
         val doopPlatformDirs = Files.createTempDirectory(null).toFile
-        val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.7/lib/")
+        val doopJDKPath = new File(doopPlatformDirs, "JREs/jre1.8/lib/")
         doopJDKPath.mkdirs()
         FileUtils.copyDirectory(new File(JDKPath), doopJDKPath)
 
         val outDir = Files.createTempDirectory(null).toFile
 
         assert(algorithm == "context-insensitive")
-        var args = Array("./doop", "-a", "context-insensitive", "--platform", "java_7", "--dacapo", "-i", inputDirPath) ++ classPath
 
-        //args ++= Array("--reflection-classic")
+        var args = Array("./doop", "-a", "context-insensitive", "-t", "1440", "--platform", "java_8", "-i", inputDirPath) ++ classPath
+        if (analyzeJDK) {
+           args ++= JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
+        }
+
+        // args ++= Array("--reflection-classic")
 
         if (mainClass != null)
             args ++= Array("--main", mainClass)
@@ -317,7 +321,7 @@ object DoopAdapter extends JavaTestAdapter {
             Source.fromFile(rmCsv),
             new File(inputDirPath),
             new File(JDKPath),
-            new File(outputDirPath)
+            output
         )
 
         FileUtils.deleteDirectory(doopPlatformDirs)

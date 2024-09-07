@@ -49,10 +49,11 @@ object OpalJCGAdatper extends JavaTestAdapter {
     val frameworkName: String = "OPAL"
 
     def serializeCG(
-                     algorithm: String,
-                     inputDirPath: String,
-                     outputDirPath: String,
-                     adapterOptions: AdapterOptions
+        algorithm:      String,
+        inputDirPath:   String,
+        output:         Writer,
+        programArgs:    Array[String],
+        adapterOptions: AdapterOptions
     ): Long = {
         val mainClass = adapterOptions.getString("mainClass")
         val classPath = adapterOptions.getStringArray("classPath")
@@ -146,8 +147,7 @@ object OpalJCGAdatper extends JavaTestAdapter {
 
         val after = System.nanoTime()
 
-        val out = new BufferedWriter(new FileWriter(outputDirPath))
-        out.write(s"""{\n\t"reachableMethods":[""")
+        output.write(s"""{\n\t"reachableMethods":[""")
         var firstRM = true
         for {
             dm ← declaredMethods.declaredMethods if (!dm.hasSingleDefinedMethod && !dm.hasMultipleDefinedMethods) ||
@@ -158,22 +158,20 @@ object OpalJCGAdatper extends JavaTestAdapter {
             if (firstRM) {
                 firstRM = false
             } else {
-                out.write(",")
+                output.write(",")
             }
-            out.write("{\n\t\t\"method\":")
-            writeMethodObject(dm, out)
-            out.write(",\n\t\t\"callSites\":[")
+            output.write("{\n\t\t\"method\":")
+            writeMethodObject(dm, output)
+            output.write(",\n\t\t\"callSites\":[")
             calleeEOptP match {
                 case FinalEP(_, NoCallees) ⇒
                 case FinalEP(_, callees: Callees) ⇒
-                    writeCallSites(dm, callees, out)
+                    writeCallSites(dm, callees, output)
                 case _ ⇒ throw new RuntimeException()
             }
-            out.write("]\n\t}")
+            output.write("]\n\t}")
         }
-        out.write("]\n}")
-        out.flush()
-        out.close()
+        output.write("]\n}")
 
         ps.shutdown()
 

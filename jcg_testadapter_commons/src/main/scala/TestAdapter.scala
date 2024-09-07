@@ -1,3 +1,5 @@
+import java.io.Writer
+
 trait TestAdapter {
     val frameworkName: String
     val language: String
@@ -6,7 +8,8 @@ trait TestAdapter {
     def serializeCG(
         algorithm:      String,
         inputDirPath:   String,
-        outputDirPath:  String,
+        output:         Writer,
+        programArgs:    Array[String],
         adapterOptions: AdapterOptions = AdapterOptions.makeEmptyOptions()
     ): Long
 }

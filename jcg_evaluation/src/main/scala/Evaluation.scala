@@ -1,7 +1,13 @@
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.FileWriter
+import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import play.api.libs.json.Json
+import java.util.zip.GZIPOutputStream
+
 import scala.io.Source
 
 import org.opalj.br.MethodDescriptor
@@ -13,6 +19,7 @@ object Evaluation {
     private var excludeJDK = false
     private var runAnalyses = true
     private var allQueries = false
+    private var programArgs = Array.empty[String]
 
     private var FINGERPRINT_DIR = ""
 
@@ -20,7 +27,6 @@ object Evaluation {
 
         // val c = parseConfig(args)
 
-        CommonEvaluationConfig.processArguments(args)
         val config = CommonEvaluationConfig.processArguments(args)
         parseArguments(args)
 
@@ -43,7 +49,7 @@ object Evaluation {
             val resultsDir = new File(config.OUTPUT_DIR_PATH)
             resultsDir.mkdirs()
             val locations: Map[String, Map[String, Set[Method]]] = createLocationsMapping(resultsDir)
-            runAnalyses(projectsDir, resultsDir, jreLocations, locations, config)
+            runAnalyses(projectsDir, resultsDir, jreLocations, locations, config, programArgs)
         }
     }
 
@@ -59,6 +65,11 @@ object Evaluation {
                 assert(FINGERPRINT_DIR.isEmpty, "multiple fingerprint directories specified")
                 FINGERPRINT_DIR = dir
             case Array("--analyze", value: String) => runAnalyses = value.toBoolean
+        }
+        val argsIndex = args.indexOf("--program-args") + 1
+        if(argsIndex > 0) {
+            val argsEndIndex = args.indexWhere(_.startsWith("--"), argsIndex)
+            programArgs = args.slice(argsIndex, if(argsEndIndex>=0) argsEndIndex else args.length)
         }
 
         if (projectSpecificEvaluation) {
@@ -108,7 +119,8 @@ object Evaluation {
         resultsDir:   File,
         jreLocations: Map[Int, String],
         locationsMap: Map[String, Map[String, Set[Method]]],
-        config:       CommonEvaluationConfig
+        config:       CommonEvaluationConfig,
+        programArgs:  Array[String]
     ): Unit = {
         val projectSpecFiles = projectsDir.listFiles { (_, name) =>
             name.endsWith(".conf") && name.startsWith(config.PROJECT_PREFIX_FILTER)
@@ -116,7 +128,7 @@ object Evaluation {
 
         for {
             adapter <- config.EVALUATION_ADAPTERS
-            cgAlgo <- adapter.possibleAlgorithms.filter(_.startsWith(config.ALGORITHM_PREFIX_FILTER))
+            cgAlgo <- adapter.possibleAlgorithms.filter(_.toLowerCase().startsWith(config.ALGORITHM_PREFIX_FILTER.toLowerCase()))
             psf <- projectSpecFiles
         } {
 
@@ -131,12 +143,19 @@ object Evaluation {
             if (cgFile.exists())
                 cgFile.delete()
 
+            val output =
+                if (cgFile.getName.endsWith(".zip") || cgFile.getName.endsWith(".gz"))
+                    new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(cgFile)))
+                else
+                    new BufferedWriter(new FileWriter(cgFile))
+
             val elapsed =
                 try {
                     adapter.serializeCG(
                         cgAlgo,
                         projectSpec.target(projectsDir).getCanonicalPath,
-                        cgFile.getPath,
+                        new FileWriter(cgFile.getPath),
+                        programArgs,
                         AdapterOptions.makeJavaOptions(
                             projectSpec.main.orNull,
                             projectSpec.allClassPathEntryPaths(projectsDir),

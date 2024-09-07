@@ -1,4 +1,6 @@
 import java.io.File
+import java.io.FileWriter
+import java.io.Writer
 
 object JSCallGraphAdapter extends JSTestAdapter {
     val debug: Boolean = false
@@ -38,7 +40,7 @@ object JSCallGraphAdapter extends JSTestAdapter {
 
         // generate callgraph for every testcase
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, s"$inputDirPath/$testDir", outputDir.getAbsolutePath)
+            serializeCG(algorithm, s"$inputDirPath/$testDir", new FileWriter(outputDir.getAbsolutePath), Array.empty)
         })
 
         println("Call graphs generated!")
@@ -47,10 +49,10 @@ object JSCallGraphAdapter extends JSTestAdapter {
     def serializeCG(
         algorithm:      String,
         inputDirPath:   String,
-        outputDirPath:  String,
+        output:         Writer,
+        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
-        val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
         val args = Seq("--cg", inputDirPath, "--output", outputPath, "--strategy", algorithm)
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 

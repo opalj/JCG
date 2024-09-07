@@ -25,11 +25,12 @@ import play.api.libs.json.Writes
  * @author Florian Kuebler
  */
 case class ProjectSpecification(
-        name:               String,
-        java:               Int,
-        main:               Option[String],
-        private val target: String,
-        private val cp:     Option[Array[ClassPathEntry]]
+        name:                String,
+        java:                Int,
+        main:                Option[String],
+        private val target:  String,
+        private val cp:      Option[Array[ClassPathEntry]],
+        jvm_args: Option[Array[String]]
 ) {
     /**
      * For the specified [[ClassPathEntry]]s it computes all concrete class path entries.

@@ -1,6 +1,7 @@
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.io.Writer
 import scala.collection.mutable
 
 import upickle.default._
@@ -66,7 +67,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
         testDirs.foreach(testDir => {
             // Extract input files, TAJS only supports single file projects
 
-            serializeCG(algorithm, s"$inputDirPath/$testDir", outputDir.getAbsolutePath)
+            serializeCG(algorithm, s"$inputDirPath/$testDir", new FileWriter(outputDir.getAbsolutePath), Array.empty)
         })
     }
 
@@ -81,7 +82,8 @@ object TAJSJCGAdapter extends JSTestAdapter {
     def serializeCG(
         algorithm:      String,
         inputDirPath:   String,
-        outputDirPath:  String,
+        output:         Writer,
+        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
         if (command.isEmpty) throw new Exception(
@@ -92,7 +94,6 @@ object TAJSJCGAdapter extends JSTestAdapter {
             new File(inputDirPath).listFiles()(0).listFiles().map(_.getAbsolutePath).filter(_.endsWith(
                 ".js"
             )).head
-        val outputPath = s"$outputDirPath/${inputFilePath.split(File.separator).last.split("\\.").head}.json"
         val args = Seq("-callgraph", inputFilePath)
         if (debug) println(s"[DEBUG] executing ${args.mkString(" ")}")
         val start = System.nanoTime()
@@ -110,9 +111,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
         if (processSucceeded) {
             try {
                 val json = toCommonFormat(new File("out/callgraph.dot"))
-                val bw = new BufferedWriter(new FileWriter(outputPath))
-                bw.write(json)
-                bw.close()
+                output.write(json)
             } catch {
                 case e: Exception =>
                     println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputFilePath${Console.RESET}")

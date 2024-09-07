@@ -1,6 +1,7 @@
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.io.Writer
 import scala.collection.mutable
 
 import upickle.default._
@@ -44,7 +45,7 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
 
         // generate callgraph for every testcase
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, s"$inputDirPath/$testDir", outputDir.getAbsolutePath)
+            serializeCG(algorithm, s"$inputDirPath/$testDir", new FileWriter(outputDir.getAbsolutePath), Array.empty)
         })
 
         println("Call graphs generated!")
@@ -61,10 +62,10 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
     def serializeCG(
         algorithm:      String,
         inputDirPath:   String,
-        outputDirPath:  String,
+        output:         Writer,
+        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
-        val outputPath = s"$outputDirPath/${inputDirPath.split(File.separator).last}.json"
         val args = Seq(inputDirPath, "--output", outputPath, "-q", "--source-type=module", "--no-trimming")
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 
@@ -83,12 +84,9 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
 
         // Process output and convert to common call graph format
         if (processSucceeded) {
-            val outputFile = new File(outputPath)
             try {
                 val json = toCommonFormat(outputFile)
-                val bw = new BufferedWriter(new FileWriter(outputFile))
-                bw.write(json)
-                bw.close()
+                output.write(json)
             } catch {
                 case e: Exception =>
                     println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")

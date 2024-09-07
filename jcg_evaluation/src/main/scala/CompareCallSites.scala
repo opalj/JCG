@@ -1,4 +1,5 @@
 
+import java.io.File
 import java.io.FileInputStream
 
 import play.api.libs.json.Json
@@ -32,8 +33,8 @@ object CompareCallSites {
                 sizeGap = gap.toInt
         }
 
-        val cg1 = Json.parse(new FileInputStream(cg1Path)).validate[ReachableMethods].get.toMap
-        val cg2 = Json.parse(new FileInputStream(cg2Path)).validate[ReachableMethods].get.toMap
+        val cg1 = EvaluationHelper.readCG(new File(cg1Path)).toMap
+        val cg2 = EvaluationHelper.readCG(new File(cg2Path)).toMap
 
         val commonReachableMethods = cg1.filter(m ⇒ cg2.contains(m._1)).keySet
 

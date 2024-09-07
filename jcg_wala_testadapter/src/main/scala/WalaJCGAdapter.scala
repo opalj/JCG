@@ -1,3 +1,10 @@
+
+import java.io.File
+import java.io.PrintWriter
+import java.io.Writer
+import java.util
+import java.util.stream.Collectors
+
 import com.ibm.wala.classLoader.Language.JAVA
 import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
@@ -8,21 +15,17 @@ import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
 import play.api.libs.json.Json
-
-import java.io.File
-import java.io.FileWriter
-import java.io.PrintWriter
-import java.util
-import java.util.stream.Collectors
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object WalaJCGAdapter extends JavaTestAdapter {
+
     def serializeCG(
-                     algorithm: String,
-                     inputDirPath: String,
-                     outputDirPath: String,
-                     adapterOptions: AdapterOptions
+        algorithm: String,
+        inputDirPath: String,
+        output:         Writer,
+        programArgs:    Array[String],
+        adapterOptions: AdapterOptions
     ): Long = {
         val mainClass = adapterOptions.getString("mainClass")
         val classPath = adapterOptions.getStringArray("classPath")
@@ -145,11 +148,8 @@ object WalaJCGAdapter extends JavaTestAdapter {
                 ReachableMethod(createMethodObject(currentMethod), callSites.toSet.flatten)
         }
 
-        val file: FileWriter = new FileWriter(outputDirPath)
         val prettyPrint = Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods)))
-        file.write(prettyPrint)
-        file.flush()
-        file.close()
+        output.write(prettyPrint)
 
         after - before
     }
