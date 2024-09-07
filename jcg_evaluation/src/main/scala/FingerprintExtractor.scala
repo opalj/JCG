@@ -1,5 +1,6 @@
 import java.io._
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.TimeoutException
 import scala.concurrent.duration.Duration
@@ -10,7 +11,94 @@ trait FingerprintExtractor {
     val EVALUATION_RESULT_FILE_NAME = "evaluation-result.tsv"
     val language: String
 
-    def generateFingerprints(config: JCGConfig): Unit
+    def generateFingerprints(config: JCGConfig): Unit = {
+        if (config.debug) println("[DEBUG] " + config.language + " " + config.inputDir + " " + config.outputDir)
+        println(s"Extracting $language fingerprints")
+        if (config.debug) println("Adapters: " + config.adapters.map(_.frameworkName).mkString(", "))
+
+        val outputDir = config.outputDir
+        val inputDir = config.inputDir
+        outputDir.mkdirs()
+        val testDirs = new File(inputDir.getAbsolutePath).list().sorted
+
+        val ow = new BufferedWriter(getOutputTarget(outputDir))
+        printHeader(ow, testDirs.map(new File(_)))
+
+        for {
+            adapter <- config.adapters
+            cgAlgorithm <- adapter.possibleAlgorithms.filter(_.startsWith(config.algorithmFilter))
+        } {
+            ow.write(s"${adapter.frameworkName}-$cgAlgorithm")
+
+            println(s"creating fingerprint for ${adapter.frameworkName} $cgAlgorithm")
+            val fingerprintWriter: PrintWriter = makeFingerprintWriter(outputDir, adapter, cgAlgorithm)
+
+            // create output dir for every adapter-cgAlgorithm combination
+            val adapterDir = new File(s"$outputDir/${adapter.frameworkName}/$cgAlgorithm")
+            adapterDir.mkdirs()
+            for (testDir <- testDirs.filter(_.startsWith(config.projectFilter))) {
+                val future = Future {
+                    // execute adapter
+                    try {
+                        adapter.serializeCG(
+                            cgAlgorithm,
+                            s"${inputDir.getAbsolutePath}/$testDir",
+                            adapterDir.getAbsolutePath
+                        )
+                    } catch {
+                        case e: Throwable =>
+                            if (config.debug) {
+                                println(e.getMessage)
+                            }
+                    }
+
+                    // try reading and matching resulting call graph
+                    ow.synchronized {
+                        System.gc()
+
+                        val result: Assessment = assessCG(inputDir, adapterDir, testDir)
+
+                        ow.write(s"\t${result.shortNotation}")
+                        fingerprintWriter.write(s"$testDir -> $result\n")
+                        fingerprintWriter.flush()
+                    }
+                }
+                tryAwaitGenerateCG(config.timeout, ow, fingerprintWriter, testDir, future)
+
+            }
+            ow.newLine()
+            fingerprintWriter.close()
+        }
+        ow.close()
+    }
+
+    /**
+     * Compares the call graph of a test case with the expected call graph and returns assessment.
+     * @param inputDir The directory containing the expected call graphs.
+     * @param adapterDir The directory containing the generated call graphs.
+     * @param testName The name of the test case.
+     * @return The assessment of the call graph (Sound, Unsound, Error). Assessment is Error if no generated CG exists.
+     */
+    def assessCG(inputDir: File, adapterDir: File, testName: String): Assessment = {
+        // compare to expected call graph
+        val cgFile = new File(s"${adapterDir.getAbsolutePath}/$testName.json")
+        println(cgFile)
+        val callGraph: Option[AdapterCG] = if (cgFile.exists()) Some(new AdapterCG(cgFile)) else None
+        val expectedCGFile =
+            FileOperations.listFilesRecursively(
+                new File(s"${inputDir.getAbsolutePath}/$testName"),
+                ".json"
+            ).head
+
+        val expectedCG = new ExpectedCG(expectedCGFile)
+        val assessment: Assessment = callGraph match {
+            case Some(cg) =>
+                val isSound = cg.compareLinks(expectedCG).length == 0
+                if (isSound) Sound else Unsound
+            case None => Error
+        }
+        assessment
+    }
 
     /**
      * Returns a FileWriter for the evaluation result file.
@@ -108,9 +196,10 @@ object FingerprintExtractor {
         val config = c.get
 
         config.language match {
-            case "java" => JavaFingerprintExtractor.generateFingerprints(config)
-            case "js"   => JSFingerprintExtractor.generateFingerprints(config)
-            case _      => println("Language not supported")
+            case "java"   => JavaFingerprintExtractor.generateFingerprints(config)
+            case "js"     => JSFingerprintExtractor.generateFingerprints(config)
+            case "python" => PyFingerprintExtractor.generateFingerprints(config)
+            case _        => println("Language not supported")
         }
     }
 

@@ -60,8 +60,8 @@ Test the use of an anonymous function calling another anonymous function.
 ```json
 {
   "directLinks": [
-    ["AF4.foo", "AF4.<anonymous:8>"],
-    ["AF4.<anonymous:8>", "AF4.<anonymous:4>"]
+    ["AF3.foo", "AF3.<anonymous:8>"],
+    ["AF3.<anonymous:8>", "AF3.<anonymous:4>"]
   ],
   "indirectLinks": []
 }
