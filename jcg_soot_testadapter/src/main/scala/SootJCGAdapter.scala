@@ -1,8 +1,9 @@
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileWriter
 import java.io.PrintStream
 import java.io.Writer
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 import play.api.libs.json.Json
 
 import soot.G
@@ -11,8 +12,6 @@ import soot.Scene
 import soot.SootMethod
 import soot.options.Options
 import soot.util.backend.ASMBackendUtils
-import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 object SootJCGAdapter extends JavaTestAdapter {
 
@@ -28,7 +27,6 @@ object SootJCGAdapter extends JavaTestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
         val mainClass = adapterOptions.getString("mainClass")

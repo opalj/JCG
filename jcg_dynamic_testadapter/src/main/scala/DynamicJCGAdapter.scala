@@ -27,7 +27,6 @@ object DynamicJCGAdapter extends JavaTestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions = AdapterOptions.makeEmptyOptions()
     ): Long = {
 

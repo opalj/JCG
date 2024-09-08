@@ -24,7 +24,6 @@ object WalaJCGAdapter extends JavaTestAdapter {
         algorithm: String,
         inputDirPath: String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
         val mainClass = adapterOptions.getString("mainClass")

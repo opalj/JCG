@@ -45,8 +45,7 @@ trait FingerprintExtractor {
                         adapter.serializeCG(
                             cgAlgorithm,
                             s"${inputDir.getAbsolutePath}/$testDir",
-                            output,
-                            Array.empty
+                            output
                         )
                     } catch {
                         case e: Throwable =>

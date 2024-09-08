@@ -18,16 +18,22 @@ object AdapterOptions {
      * Creates a new AdapterOptions object for Java test adapters.
      */
     def makeJavaOptions(
-        mainClass:  String,
-        classPath:  Array[String],
-        JDKPath:    String,
-        analyzeJDK: Boolean
+        mainClass:   String,
+        classPath:   Array[String],
+        JDKPath:     String,
+        analyzeJDK:  Boolean,
+        target:      String        = "",
+        jvmArgs:     Array[String] = Array.empty,
+        programArgs: Array[String] = Array.empty
     ): AdapterOptions = {
         new AdapterOptions(Map(
             "mainClass" -> mainClass,
             "classPath" -> classPath,
             "JDKPath" -> JDKPath,
-            "analyzeJDK" -> analyzeJDK
+            "analyzeJDK" -> analyzeJDK,
+            "target" -> target,
+            "jvmArgs" -> jvmArgs,
+            "programArgs" -> programArgs
         ))
     }
 
