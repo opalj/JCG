@@ -49,6 +49,8 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                     cgFile.delete()
                 }
 
+                val output = new BufferedWriter(new FileWriter(cgFile))
+
                 println(s"performing test case: ${projectSpec.name}")
 
                 val future = Future {
@@ -56,7 +58,7 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                         adapter.serializeCG(
                             cgAlgorithm,
                             projectSpec.target(projectsDir).getCanonicalPath,
-                            cgFile.getAbsolutePath,
+                            output,
                             AdapterOptions.makeJavaOptions(
                                 projectSpec.main.orNull,
                                 projectSpec.allClassPathEntryPaths(projectsDir),
@@ -69,6 +71,8 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                             if (config.debug) {
                                 println(e.printStackTrace())
                             }
+                    } finally {
+                        output.close()
                     }
                     ow.synchronized {
                         System.gc()
