@@ -1,4 +1,3 @@
-import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer
@@ -41,8 +40,9 @@ object PyCGAdapter extends PyTestAdapter {
         }
 
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, s"$inputDirPath/$testDir", new FileWriter(outputDir.getAbsolutePath), Array.empty)
-            return
+            val output = new FileWriter(outputDir.getAbsolutePath + "/" + testDir + ".json")
+            serializeCG(algorithm, s"$inputDirPath/$testDir", output)
+            output.close()
         })
     }
 
@@ -50,14 +50,18 @@ object PyCGAdapter extends PyTestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
         val files =
             new File(inputDirPath).listFiles()(0).listFiles().filter(_.getName.endsWith(".py")).map(_.getAbsolutePath)
         val mainFilePath = if (files.length == 1) files(0) else files.find(_.contains("main")).getOrElse(files(0))
         if (debug) println(mainFilePath)
-        val args = Seq(mainFilePath, "-o", outputPath, "--fasten")
+
+        // delete and create temp folder
+        val tempFile = new File(s"temp/$frameworkName/$algorithm/out.json")
+        tempFile.getParentFile.mkdirs()
+
+        val args = Seq(mainFilePath, "-o", tempFile.getAbsolutePath, "--fasten")
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 
         val start = System.nanoTime()
@@ -76,7 +80,7 @@ object PyCGAdapter extends PyTestAdapter {
         // process output and convert to common call graph format
         if (processSucceeded) {
             try {
-                val json = toCommonFormat(outputFile)
+                val json = toCommonFormat(tempFile)
                 output.write(json)
             } catch {
                 case e: Exception =>
