@@ -1,4 +1,3 @@
-import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer
@@ -45,7 +44,9 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
 
         // generate callgraph for every testcase
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, s"$inputDirPath/$testDir", new FileWriter(outputDir.getAbsolutePath), Array.empty)
+            val output = new FileWriter(outputDir.getAbsolutePath + "/" + testDir + ".json")
+            serializeCG(algorithm, s"$inputDirPath/$testDir", output)
+            output.close()
         })
 
         println("Call graphs generated!")
@@ -63,10 +64,12 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
-        val args = Seq(inputDirPath, "--output", outputPath, "-q", "--source-type=module", "--no-trimming")
+        val tempFile = new File(s"temp/$frameworkName/$algorithm/out.json")
+        tempFile.getParentFile.mkdirs()
+
+        val args = Seq(inputDirPath, "--output", tempFile.getAbsolutePath, "-q", "--source-type=module", "--no-trimming")
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 
         // Generate call graph
@@ -85,7 +88,7 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
         // Process output and convert to common call graph format
         if (processSucceeded) {
             try {
-                val json = toCommonFormat(outputFile)
+                val json = toCommonFormat(tempFile)
                 output.write(json)
             } catch {
                 case e: Exception =>
