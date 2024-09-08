@@ -37,7 +37,7 @@ trait FingerprintExtractor {
             val adapterDir = new File(s"$outputDir/${adapter.frameworkName}/$cgAlgorithm")
             adapterDir.mkdirs()
             for (testDir <- testDirs.filter(_.startsWith(config.projectFilter))) {
-                val output = new BufferedWriter(new FileWriter(adapterDir.getAbsolutePath))
+                val output = new BufferedWriter(new FileWriter(adapterDir.getAbsolutePath + "/" + testDir + ".json"))
 
                 val future = Future {
                     // execute adapter
