@@ -1,4 +1,3 @@
-import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer
@@ -18,9 +17,12 @@ object TAJSJCGAdapter extends JSTestAdapter {
             println("[ERROR] tajs.properties not found")
             None
         } else {
-            val tajsLocation = scala.io.Source.fromFile(tajsProperties).getLines.find(
-                _.replaceAll(" ", "").startsWith("tajs=")
-            ).getOrElse("")
+            import scala.util.Using
+
+            val tajsLocation = Using(scala.io.Source.fromFile(tajsProperties)) { source =>
+                source.getLines.find(_.replaceAll(" ", "").startsWith("tajs=")).getOrElse("")
+            }.getOrElse("")
+
             val tajsJar = new File(s"${tajsLocation.split("=")(1)}dist/tajs-all.jar".trim())
             if (!tajsJar.exists()) {
                 println("[ERROR] tajs location not found in tajs.properties")
@@ -66,8 +68,9 @@ object TAJSJCGAdapter extends JSTestAdapter {
         // generate callgraph for every testcase
         testDirs.foreach(testDir => {
             // Extract input files, TAJS only supports single file projects
-
-            serializeCG(algorithm, s"$inputDirPath/$testDir", new FileWriter(outputDir.getAbsolutePath), Array.empty)
+            val output = new FileWriter(outputDir.getAbsolutePath + "/" + testDir + ".json")
+            serializeCG(algorithm, s"$inputDirPath/$testDir", output)
+            output.close()
         })
     }
 
@@ -83,7 +86,6 @@ object TAJSJCGAdapter extends JSTestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
         if (command.isEmpty) throw new Exception(

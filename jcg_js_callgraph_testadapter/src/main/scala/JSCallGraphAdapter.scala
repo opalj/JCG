@@ -1,11 +1,14 @@
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer
+import play.api.libs.json.Json
+import scala.io.Source
+import scala.util.Using
 
 object JSCallGraphAdapter extends JSTestAdapter {
     val debug: Boolean = false
 
-    val possibleAlgorithms: Array[String] = Array("NONE", "ONESHOT", "DEMAND", "FULL")
+    val possibleAlgorithms: Array[String] = Array("NONE", "ONESHOT", "DEMAND")
     val frameworkName: String = "js-callgraph"
     private val command = "js-callgraph"
 
@@ -40,7 +43,13 @@ object JSCallGraphAdapter extends JSTestAdapter {
 
         // generate callgraph for every testcase
         testDirs.foreach(testDir => {
-            serializeCG(algorithm, s"$inputDirPath/$testDir", new FileWriter(outputDir.getAbsolutePath), Array.empty)
+            val output = new FileWriter(outputDir.getAbsolutePath + "/" + testDir + ".json")
+            serializeCG(
+                algorithm,
+                s"$inputDirPath/$testDir",
+                output
+            )
+            output.close()
         })
 
         println("Call graphs generated!")
@@ -50,10 +59,20 @@ object JSCallGraphAdapter extends JSTestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
-        val args = Seq("--cg", inputDirPath, "--output", outputPath, "--strategy", algorithm)
+        // delete and create temp folder
+        val tempFile = new File(s"temp/$frameworkName/$algorithm/out.json")
+        tempFile.getParentFile.mkdirs()
+
+        val args = Seq(
+            "--cg",
+            inputDirPath,
+            "--output",
+            tempFile.getAbsolutePath,
+            "--strategy",
+            algorithm
+        )
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 
         val start = System.nanoTime()
@@ -63,6 +82,8 @@ object JSCallGraphAdapter extends JSTestAdapter {
             case e: Exception => println(s"[Error]: $command failed for $inputDirPath")
         }
         val end = System.nanoTime()
+        Using(Source.fromFile(tempFile)) { source => output.write(Json.prettyPrint(Json.parse(source.mkString))) }
+
         if (debug) println(s"Call graph for $inputDirPath generated in ${end - start} ns")
         end - start
     }

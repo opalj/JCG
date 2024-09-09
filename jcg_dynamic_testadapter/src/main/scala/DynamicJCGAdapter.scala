@@ -1,14 +1,11 @@
 import java.io.BufferedReader
-import java.io.BufferedWriter
 import java.io.File
-import java.io.FileWriter
-import java.io.Writer
 import java.io.InputStreamReader
+import java.io.Writer
 import java.net.ServerSocket
 import java.nio.file.Paths
 import java.util
 import java.util.stream.Collectors
-
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.util.Using
@@ -16,20 +13,25 @@ import scala.util.Using
 import org.opalj.br.MethodDescriptor
 
 object DynamicJCGAdapter extends JavaTestAdapter {
-    
-    override def possibleAlgorithms(): Array[String] = Array("Dynamic")
 
-    override def frameworkName(): String = "Dynamic"
-    
+    override val possibleAlgorithms: Array[String] = Array("Dynamic")
+
+    override val frameworkName: String = "Dynamic"
+
     val port = 1337
 
     override def serializeCG(
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions = AdapterOptions.makeEmptyOptions()
     ): Long = {
+        val mainClass = adapterOptions.getString("mainClass")
+        val classPath = adapterOptions.getStringArray("classPath")
+        val JDKPath = adapterOptions.getString("JDKPath")
+        val target = adapterOptions.getString("target")
+        val jvmArgs = adapterOptions.getStringArray("jvmArgs")
+        val programArgs = adapterOptions.getStringArray("programArgs")
 
         val javaPath = Paths.get(JDKPath).getParent.toAbsolutePath + "/bin/java"
         val agentPath = getClass.getClassLoader.getResource("DynamicCG.so").getPath
@@ -48,7 +50,7 @@ object DynamicJCGAdapter extends JavaTestAdapter {
         args ++= programArgs
 
         val before = System.nanoTime
-        
+
         val result = Using.Manager { use =>
             val serverSocket = use(new ServerSocket(port))
 
@@ -62,21 +64,21 @@ object DynamicJCGAdapter extends JavaTestAdapter {
             val endMessage = "End of Callgraph"
             var caller = in.readLine()
 
-            while(caller != endMessage){
+            while (caller != endMessage) {
 
-            	val parsedCaller = if(caller == "TopLevel"){
-			        None     	
-            	} else{
-            		Some(parseMethod(caller))
-            	}
+                val parsedCaller = if (caller == "TopLevel") {
+                    None
+                } else {
+                    Some(parseMethod(caller))
+                }
 
-            	val pc = in.readLine().toInt
-            	val lineNumber = in.readLine().toInt
-            	val callee = in.readLine()
-            	val pcLn = (pc, lineNumber)
-            	val parsedCallee = parseMethod(callee)
-            	
-           	    reachableMethods += parsedCallee
+                val pc = in.readLine().toInt
+                val lineNumber = in.readLine().toInt
+                val callee = in.readLine()
+                val pcLn = (pc, lineNumber)
+                val parsedCallee = parseMethod(callee)
+
+                reachableMethods += parsedCallee
 
                 if (parsedCaller.isDefined) {
                     if (!edges.contains(parsedCaller.get)) {
@@ -97,11 +99,11 @@ object DynamicJCGAdapter extends JavaTestAdapter {
 
             System.nanoTime()
         }
-        
-        if(result.isFailure){
-        	throw result.failed.get
+
+        if (result.isFailure) {
+            throw result.failed.get
         }
-        
+
         var edgeCount = 0
         println(reachableMethods.size)
         output.write(s"""{"reachableMethods":[""")
@@ -126,20 +128,24 @@ object DynamicJCGAdapter extends JavaTestAdapter {
         }
         println(edgeCount)
         output.write("]}")
-        
+
         val after = result.getOrElse(before)
 
         after - before
     }
-    
+
     def parseMethod(param: String): Method = {
-    	val calleeData = param.split(':')
-           val calleeNameDesc = calleeData(1).split("\\(")
-          val calleeDesc = MethodDescriptor("("+calleeNameDesc(1))
-          Method(calleeNameDesc(0), calleeData(0), calleeDesc.returnType.toJVMTypeName, calleeDesc.parameterTypes.map(_.toJVMTypeName).toList)
+        val calleeData = param.split(':')
+        val calleeNameDesc = calleeData(1).split("\\(")
+        val calleeDesc = MethodDescriptor("(" + calleeNameDesc(1))
+        Method(
+            calleeNameDesc(0),
+            calleeData(0),
+            calleeDesc.returnType.toJVMTypeName,
+            calleeDesc.parameterTypes.map(_.toJVMTypeName).toList
+        )
     }
-    
-   
+
     private def writeCallSites(
         callSites: mutable.Map[(Int, Int), mutable.Set[Method]],
         out:       Writer
@@ -156,7 +162,7 @@ object DynamicJCGAdapter extends JavaTestAdapter {
     }
 
     private def writeCallSite(
-        pcLn:      (Int, Int),
+        pcLn:    (Int, Int),
         targets: mutable.Set[Method],
         out:     Writer
     ): Unit = {
@@ -192,4 +198,3 @@ object DynamicJCGAdapter extends JavaTestAdapter {
         out.write("]}")
     }
 }
-

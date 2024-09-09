@@ -264,7 +264,6 @@ object DoopAdapter extends JavaTestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
         val env = System.getenv

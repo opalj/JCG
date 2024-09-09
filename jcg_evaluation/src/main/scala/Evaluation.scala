@@ -5,9 +5,8 @@ import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
-import play.api.libs.json.Json
 import java.util.zip.GZIPOutputStream
-
+import play.api.libs.json.Json
 import scala.io.Source
 
 import org.opalj.br.MethodDescriptor
@@ -67,9 +66,9 @@ object Evaluation {
             case Array("--analyze", value: String) => runAnalyses = value.toBoolean
         }
         val argsIndex = args.indexOf("--program-args") + 1
-        if(argsIndex > 0) {
+        if (argsIndex > 0) {
             val argsEndIndex = args.indexWhere(_.startsWith("--"), argsIndex)
-            programArgs = args.slice(argsIndex, if(argsEndIndex>=0) argsEndIndex else args.length)
+            programArgs = args.slice(argsIndex, if (argsEndIndex >= 0) argsEndIndex else args.length)
         }
 
         if (projectSpecificEvaluation) {
@@ -128,7 +127,8 @@ object Evaluation {
 
         for {
             adapter <- config.EVALUATION_ADAPTERS
-            cgAlgo <- adapter.possibleAlgorithms.filter(_.toLowerCase().startsWith(config.ALGORITHM_PREFIX_FILTER.toLowerCase()))
+            cgAlgo <-
+                adapter.possibleAlgorithms.filter(_.toLowerCase().startsWith(config.ALGORITHM_PREFIX_FILTER.toLowerCase()))
             psf <- projectSpecFiles
         } {
 
@@ -155,12 +155,12 @@ object Evaluation {
                         cgAlgo,
                         projectSpec.target(projectsDir).getCanonicalPath,
                         new FileWriter(cgFile.getPath),
-                        programArgs,
                         AdapterOptions.makeJavaOptions(
                             projectSpec.main.orNull,
                             projectSpec.allClassPathEntryPaths(projectsDir),
                             jreLocations(projectSpec.java),
-                            !excludeJDK
+                            !excludeJDK,
+                            programArgs = programArgs
                         )
                     )
 

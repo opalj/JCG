@@ -1,18 +1,14 @@
-import java.io.BufferedWriter
 import java.io.File
-import java.io.FileWriter
 import java.io.Writer
 import java.net.URL
-
 import scala.collection.JavaConverters._
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
 
-import org.opalj.fpcf.FinalEP
-import org.opalj.fpcf.PropertyStore
 import org.opalj.br.DeclaredMethod
+import org.opalj.br.ObjectType
 import org.opalj.br.analyses.DeclaredMethods
 import org.opalj.br.analyses.DeclaredMethodsKey
 import org.opalj.br.analyses.Project
@@ -22,7 +18,8 @@ import org.opalj.br.fpcf.properties.cg.Callees
 import org.opalj.br.fpcf.properties.cg.NoCallees
 import org.opalj.br.fpcf.properties.cg.NoCalleesDueToNotReachableMethod
 import org.opalj.br.instructions.MethodInvocationInstruction
-import org.opalj.br.ObjectType
+import org.opalj.fpcf.FinalEP
+import org.opalj.fpcf.PropertyStore
 import org.opalj.tac.cg.AllocationSiteBasedPointsToCallGraphKey
 import org.opalj.tac.cg.CFA_1_0_CallGraphKey
 import org.opalj.tac.cg.CFA_1_1_CallGraphKey
@@ -52,7 +49,6 @@ object OpalJCGAdatper extends JavaTestAdapter {
         algorithm:      String,
         inputDirPath:   String,
         output:         Writer,
-        programArgs:    Array[String],
         adapterOptions: AdapterOptions
     ): Long = {
         val mainClass = adapterOptions.getString("mainClass")
