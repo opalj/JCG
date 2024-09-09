@@ -121,7 +121,7 @@ Test method calling method of superclass.
 ```json
 {
   "directLinks": [
-    ["C5.Foo.bar", "C5.Foo.foo"]
+    ["C5.Bar.bar", "C5.Foo.foo"]
   ],
   "indirectLinks": []
 }
@@ -139,3 +139,6 @@ class Bar(Foo):
         pass
 
 b = Bar()
+b.bar()
+```
+[//]: # (END)
