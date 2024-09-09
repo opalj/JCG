@@ -54,12 +54,39 @@ f.bar()
 
 ## C3
 [//]: # (MAIN: global)
+Test inheritance
+
+```json
+{
+  "directLinks": [
+    ["<global>", "C3.Bar.foo"]
+  ],
+  "indirectLinks": []
+}
+```
+```python 
+# classes/C3.py
+
+class Foo:
+    def foo(self):
+        pass
+    
+class Bar(Foo):
+    pass
+
+b = Bar()
+b.foo()
+```
+[//]: # (END)
+
+## C4
+[//]: # (MAIN: global)
 Test if diamond problem is correctly resolved, i.e. the MRO is correctly followed.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "C3.Three.foo"]
+    ["<global>", "C4.Three.foo"]
   ],
   "indirectLinks": []
 }
@@ -86,3 +113,29 @@ f = Four()
 f.foo()
 ```
 [//]: # (END)
+
+## C5
+[//]: # (MAIN: global)
+Test method calling method of superclass.
+
+```json
+{
+  "directLinks": [
+    ["C5.Foo.bar", "C5.Foo.foo"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# classes/C5.py
+
+class Foo:
+    def foo(self):
+        pass
+
+class Bar(Foo):
+    def bar(self):
+        self.foo()
+        pass
+
+b = Bar()
