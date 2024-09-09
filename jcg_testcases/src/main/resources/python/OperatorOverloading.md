@@ -135,3 +135,57 @@ f1 = Foo(1)
 f2 = Foo(2)
 f1 == f2
 ```
+
+## OO6
+[//]: # (MAIN: global)
+Test overloading the `<` operator.
+
+```json
+{
+  "directLinks": [
+    ["<global>", "OO6.Foo.__lt__"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# classes/OO6.py
+
+class Foo:
+    def __init__(self, x):
+        self.x = x
+
+    def __lt__(self, other):
+        return self.x < other.x
+
+f1 = Foo(1)
+f2 = Foo(2)
+f1 < f2
+```
+
+## OO7
+[//]: # (MAIN: global)
+Test overloading the `>` operator.
+
+```json
+{
+  "directLinks": [
+    ["<global>", "OO7.Foo.__gt__"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# classes/OO7.py
+
+class Foo:
+    def __init__(self, x):
+        self.x = x
+
+    def __gt__(self, other):
+        return self.x > other.x
+
+f1 = Foo(1)
+f2 = Foo(2)
+f1 > f2
+```
