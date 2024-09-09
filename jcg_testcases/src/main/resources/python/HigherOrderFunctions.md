@@ -79,4 +79,32 @@ f(1)
 ```
 [//]: # (END)
 
+## HOF4
+[//]: # (MAIN: global)
+Test reassignment of a function to a variable
+
+```json
+{
+  "directLinks": [
+    ["<global>", "HOF4.bar"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# af/HOF4.py
+
+def foo():
+    return bar
+
+def bar(x):
+    return x
+
+f = foo
+f = bar
+f(1)
+```
+[//]: # (END)
+
+
 
