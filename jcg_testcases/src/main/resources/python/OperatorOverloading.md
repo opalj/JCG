@@ -14,7 +14,7 @@ Test overloading the `+` operator.
 }
 ```
 ```python
-# classes/OO1.py
+# oo/OO1.py
 
 class Foo:
     def __init__(self, x):
@@ -27,6 +27,7 @@ f1 = Foo(1)
 f2 = Foo(2)
 f1 + f2
 ```
+[//]: # (END)
 
 ## OO2
 [//]: # (MAIN: global)
@@ -41,7 +42,7 @@ Test overloading the `*` operator.
 }
 ```
 ```python
-# classes/OO2.py
+# oo/OO2.py
 
 class Foo:
     def __init__(self, x):
@@ -54,6 +55,7 @@ f1 = Foo(1)
 f2 = Foo(2)
 f1 * f2
 ```
+[//]: # (END)
 
 ## OO3
 [//]: # (MAIN: global)
@@ -68,7 +70,7 @@ Test overloading the `-` operator.
 }
 ```
 ```python
-# classes/OO3.py
+# oo/OO3.py
 
 class Foo:
     def __init__(self, x):
@@ -81,6 +83,7 @@ f1 = Foo(1)
 f2 = Foo(2)
 f1 - f2
 ```
+[//]: # (END)
 
 ## OO4
 [//]: # (MAIN: global)
@@ -95,7 +98,7 @@ Test overloading the `/` operator.
 }
 ```
 ```python
-# classes/OO4.py
+# oo/OO4.py
 
 class Foo:
     def __init__(self, x):
@@ -108,6 +111,7 @@ f1 = Foo(1)
 f2 = Foo(2)
 f1 / f2
 ```
+[//]: # (END)
 
 ## OO5
 [//]: # (MAIN: global)
@@ -122,7 +126,7 @@ Test overloading the `==` operator.
 }
 ```
 ```python
-# classes/OO5.py
+# oo/OO5.py
 
 class Foo:
     def __init__(self, x):
@@ -135,6 +139,7 @@ f1 = Foo(1)
 f2 = Foo(2)
 f1 == f2
 ```
+[//]: # (END)
 
 ## OO6
 [//]: # (MAIN: global)
@@ -149,7 +154,7 @@ Test overloading the `<` operator.
 }
 ```
 ```python
-# classes/OO6.py
+# oo/OO6.py
 
 class Foo:
     def __init__(self, x):
@@ -162,6 +167,7 @@ f1 = Foo(1)
 f2 = Foo(2)
 f1 < f2
 ```
+[//]: # (END)
 
 ## OO7
 [//]: # (MAIN: global)
@@ -176,7 +182,7 @@ Test overloading the `>` operator.
 }
 ```
 ```python
-# classes/OO7.py
+# oo/OO7.py
 
 class Foo:
     def __init__(self, x):
@@ -189,3 +195,4 @@ f1 = Foo(1)
 f2 = Foo(2)
 f1 > f2
 ```
+[//]: # (END)
