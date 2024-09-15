@@ -96,7 +96,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
             new File(inputDirPath).listFiles()(0).listFiles().map(_.getAbsolutePath).filter(_.endsWith(
                 ".js"
             )).head
-        val args = Seq("-callgraph", inputFilePath)
+        val args = Seq("-callgraph", inputFilePath, "-uneval")
         if (debug) println(s"[DEBUG] executing ${args.mkString(" ")}")
         val start = System.nanoTime()
         val processSucceeded =
