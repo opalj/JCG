@@ -54,7 +54,7 @@ f.bar()
 
 ## C3
 [//]: # (MAIN: global)
-Test inheritance
+Test inheritance.
 
 ```json
 {
@@ -64,7 +64,7 @@ Test inheritance
   "indirectLinks": []
 }
 ```
-```python 
+```python
 # classes/C3.py
 
 class Foo:
@@ -92,7 +92,7 @@ Test if diamond problem is correctly resolved, i.e. the MRO is correctly followe
 }
 ```
 ```python
-# classes/C3.py
+# classes/C4.py
 
 class One:
     def foo(self):
@@ -142,3 +142,33 @@ b = Bar()
 b.bar()
 ```
 [//]: # (END)
+
+## C6
+[//]: # (MAIN: global)
+Test the use of super() to access overridden method.
+
+```json
+{
+  "directLinks": [
+    ["C6.Foo.foo", "C6.Bar.foo"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# classes/C6.py
+
+class Foo:
+    def foo(self):
+        pass
+
+class Bar(Foo):
+    def foo(self):
+        super().foo()
+        pass
+
+b = Bar()
+b.foo()
+```
+[//]: # (END)
+
