@@ -176,7 +176,7 @@ function getPropertyName() {
 }
 
 var bar = {};
-bar[getPropertyName()] = foo();
+bar[getPropertyName()] = foo;
 
 bar["a"];
 ```
