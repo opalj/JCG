@@ -187,6 +187,7 @@ Test importing a Submodule from a package.
 from submodule.M7 import foo
 
 foo(1)
+```
 ```python
 # modules/submodule/M7.py
 
