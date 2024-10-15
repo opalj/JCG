@@ -100,7 +100,7 @@ Test a call to inherited method.
 ```json
 {
   "directLinks": [
-    ["<global>", "C4.foo:14"]
+    ["<global>", "C4.foo:7"]
   ],
   "indirectLinks": []
 }
@@ -115,6 +115,16 @@ class Foo {
 
     foo() {
         return 1;
+    }
+}
+
+class Baz {
+    constructor(x) {
+        this.x = x;
+    }
+    
+    foo() {
+        return 2;
     }
 }
 
