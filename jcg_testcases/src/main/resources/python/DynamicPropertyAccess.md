@@ -10,17 +10,20 @@ Test a simple function call using dynamic property access.
   "indirectLinks": ["DPA1.foo"]
 }
 ```
-```js
-// dcg/DPA1.js
+```python
+# dcg/DPA1.py
 
-function foo() {
-    return 2;
-}
+def foo():
+    return 2
 
-var bar = {};
-bar["a"] = foo;
+class Bar:
+    pass
 
-bar["a"]();
+bar = Bar()
+setattr(bar, "a", foo)
+
+# Call the function using getattr
+getattr(bar, "a")()
 ```
 [//]: # (END)
 
@@ -35,17 +38,20 @@ Here static expression needs to be evaluated first to compute the property name.
   "indirectLinks": ["DPA2.foo"]
 }
 ```
-```js
-// dcg/DPA2.js
+```python
+# dcg/DPA2.js
 
-function foo() {
-    return 2;
-}
+def foo():
+    return 2
 
-var bar = {};
-bar["aa"] = foo;
+class Bar:
+    pass
 
-bar["a" + "a"]();
+bar = Bar()
+setattr(bar, "aa", foo)
+
+property_name = "a" + "a"
+getattr(bar, property_name)()
 ```
 [//]: # (END)
 
@@ -59,21 +65,22 @@ Test property access depending on a function call.
   "indirectLinks": ["DPA3.foo"]
 }
 ```
-```js
-// dcg/DPA3.js
+```python
+# dcg/DPA3.js
 
-function foo() {
-    return 1;
-}
+def foo():
+    return 1
 
-function getPropertyName() {
-    return "a";
-}
+def get_property_name():
+    return "a"
 
-var bar = {};
-bar[getPropertyName()] = foo;
+class Bar:
+    pass
 
-bar["a"]();
+bar = Bar()
+setattr(bar, get_property_name(), foo)
+
+getattr(bar, "a")()
 ```
 [//]: # (END)
 
@@ -87,21 +94,23 @@ Test property access depending on conditional.
   "indirectLinks": ["DPA4.foo"]
 }
 ```
-```js
+```python
+# dcg/DPA4.js
 
-function foo() {
-    return 1;
-}
+def foo():
+    return 1
 
-var bar = {};
-var cond = false;
+class Bar:
+    pass
 
-if (cond) {
-    bar["a"] = foo;
-} else {
-    bar["b"] = foo;
-}
+bar = Bar()
+cond = False
 
-bar["b"]();
+if cond:
+    setattr(bar, "a", foo)
+else:
+    setattr(bar, "b", foo)
+
+getattr(bar, "b")()
 ```
 [//]: # (END)
