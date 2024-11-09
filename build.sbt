@@ -101,12 +101,33 @@ lazy val jcg_code2flow_testadapter = project.settings(
     commonSettings,
     name := "JCG Code2Flow Test Adapter",
     assembly / aggregate := false,
-    publishArtifact := false,
+    publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_pycg_testadapter = project.settings(
     commonSettings,
     name := "JCG PyCG Test Adapter",
+    assembly / aggregate := false,
+    publishArtifact := false
+).dependsOn(jcg_testadapter_commons)
+
+lazy val jcg_pyan_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Pyan Test Adapter",
+    assembly / aggregate := false,
+    publishArtifact := false
+).dependsOn(jcg_testadapter_commons)
+
+lazy val jcg_jelly_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Jelly Test Adapter",
+    assembly / aggregate := false,
+    publishArtifact := false
+).dependsOn(jcg_testadapter_commons)
+
+lazy val jcg_jarvis_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Jarvis Test Adapter",
     assembly / aggregate := false,
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
@@ -134,6 +155,7 @@ lazy val jcg_dynamic_testadapter = project.settings(
 ).dependsOn(jcg_testadapter_commons)
 
 lazy val buildJVMTIAgent = taskKey[Unit]("Build the JVMTI Agent")
+
 jcg_dynamic_testadapter / buildJVMTIAgent := {
     import sys.process._
     s"g++ -fPIC -shared -o jcg_dynamic_testadapter/src/main/resources/DynamicCG.so -I ${System.getProperty("java.home")}/../include -I ${System.getProperty("java.home")}/../include/linux jcg_dynamic_testadapter/src/main/resources/DynamicCG.cpp" !
@@ -143,7 +165,7 @@ lazy val jcg_testadapter_commons = project.settings(
     commonSettings,
     name := "JCG Test Adapter Commons",
     assembly / aggregate := false,
-    libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0",
+    libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.0"
 ).dependsOn(jcg_data_format)
 
 lazy val jcg_evaluation = project.settings(
