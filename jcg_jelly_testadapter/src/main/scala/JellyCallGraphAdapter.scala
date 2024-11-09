@@ -6,7 +6,7 @@ import scala.util.Using
 import upickle.default._
 
 object JellyCallGraphAdapter extends JSTestAdapter {
-    val debug: Boolean = true
+    val debug: Boolean = false
 
     val possibleAlgorithms: Array[String] = Array("NONE")
     val frameworkName: String = "jelly"
@@ -38,7 +38,6 @@ object JellyCallGraphAdapter extends JSTestAdapter {
             case e: Exception =>
                 println(s"${Console.RED}[Error]: $command command not found, make sure it is installed and in your PATH${Console.RESET}")
                 return
-
         }
 
         // generate callgraph for every testcase
