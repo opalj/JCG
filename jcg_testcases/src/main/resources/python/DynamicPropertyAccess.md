@@ -39,7 +39,7 @@ Here static expression needs to be evaluated first to compute the property name.
 }
 ```
 ```python
-# dcg/DPA2.js
+# dcg/DPA2.py
 
 def foo():
     return 2
@@ -66,7 +66,7 @@ Test property access depending on a function call.
 }
 ```
 ```python
-# dcg/DPA3.js
+# dcg/DPA3.py
 
 def foo():
     return 1
@@ -95,7 +95,7 @@ Test property access depending on conditional.
 }
 ```
 ```python
-# dcg/DPA4.js
+# dcg/DPA4.py
 
 def foo():
     return 1
