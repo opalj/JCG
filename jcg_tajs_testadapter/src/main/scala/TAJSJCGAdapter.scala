@@ -23,7 +23,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
                 source.getLines.find(_.replaceAll(" ", "").startsWith("tajs=")).getOrElse("")
             }.getOrElse("")
 
-            val tajsJar = new File(s"${tajsLocation.split("=")(1)}dist/tajs-all.jar".trim())
+            val tajsJar = new File(s"${tajsLocation.split("=")(1)}".trim())
             if (!tajsJar.exists()) {
                 println("[ERROR] tajs location not found in tajs.properties")
                 None
