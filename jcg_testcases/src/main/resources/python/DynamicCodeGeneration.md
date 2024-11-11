@@ -11,7 +11,7 @@ Test a simple function call using eval.
 }
 ```
 ```python
-# dcg/DCG1.js
+# dcg/DCG1.py
 
 def foo():
     return 2
@@ -32,7 +32,7 @@ Test a constructed function call using eval
 }
 ```
 ```python
-# dcg/DCG2.js
+# dcg/DCG2.py
 
 def foo():
     return 2
@@ -53,7 +53,7 @@ Test a function call using exec
 }
 ```
 ```python
-# dcg/DCG3.js
+# dcg/DCG3.py
 
 def foo():
     return 2
@@ -80,7 +80,7 @@ Test a more complex function call using exec.
 }
 ```
 ```python
-# dcg/DCG4.js
+# dcg/DCG4.py
 
 def foo():
     return 2
