@@ -193,6 +193,7 @@ Test a call to super constructor.
 }
 ```
 ```js
+// classes/C6.js
 
 class Foo {
     constructor(x) {
