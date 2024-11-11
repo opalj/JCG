@@ -11,7 +11,7 @@ Test a simple function call using dynamic property access.
 }
 ```
 ```js
-// dcg/DPA1.js
+// dpa/DPA1.js
 
 function foo() {
     return 2;
@@ -36,7 +36,7 @@ Here static expression needs to be evaluated first to compute the property name.
 }
 ```
 ```js
-// dcg/DPA2.js
+// dpa/DPA2.js
 
 function foo() {
     return 2;
@@ -60,7 +60,7 @@ Test property access depending on a function call.
 }
 ```
 ```js
-// dcg/DPA3.js
+// dpa/DPA3.js
 
 function foo() {
     return 1;
@@ -88,6 +88,7 @@ Test property access depending on conditional.
 }
 ```
 ```js
+// dpa/DPA4.js
 
 function foo() {
     return 1;

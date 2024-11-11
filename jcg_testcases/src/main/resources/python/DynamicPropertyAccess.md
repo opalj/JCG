@@ -11,7 +11,7 @@ Test a simple function call using dynamic property access.
 }
 ```
 ```python
-# dcg/DPA1.py
+# dpa/DPA1.py
 
 def foo():
     return 2
@@ -39,7 +39,7 @@ Here static expression needs to be evaluated first to compute the property name.
 }
 ```
 ```python
-# dcg/DPA2.py
+# dpa/DPA2.py
 
 def foo():
     return 2
@@ -66,7 +66,7 @@ Test property access depending on a function call.
 }
 ```
 ```python
-# dcg/DPA3.py
+# dpa/DPA3.py
 
 def foo():
     return 1
@@ -84,6 +84,7 @@ getattr(bar, "a")()
 ```
 [//]: # (END)
 
+
 ## DPA4
 [//]: # (MAIN: global)
 Test property access depending on conditional.
@@ -95,7 +96,7 @@ Test property access depending on conditional.
 }
 ```
 ```python
-# dcg/DPA4.py
+# dpa/DPA4.py
 
 def foo():
     return 1
