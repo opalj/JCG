@@ -5,7 +5,7 @@ import scala.collection.mutable
 
 import upickle.default._
 
-object Code2flowPyCallGraphAdapter extends JSTestAdapter {
+object Code2flowPyCallGraphAdapter extends PyTestAdapter {
     val debug: Boolean = false
 
     val possibleAlgorithms: Array[String] = Array("NONE")
