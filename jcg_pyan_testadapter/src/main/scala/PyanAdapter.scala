@@ -6,7 +6,7 @@ import scala.collection.mutable
 import upickle.default._
 
 object PyanAdapter extends PyTestAdapter {
-    val debug: Boolean = true
+    val debug: Boolean = false
     val frameworkName: String = "Pyan"
     val possibleAlgorithms: Array[String] = Array("NONE")
     private val command = "pyan3"
