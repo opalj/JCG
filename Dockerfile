@@ -44,7 +44,6 @@ RUN touch /app/package.json # Jelly needs a package.json file to detect base dir
 #    ln -s /usr/local/sbt/bin/sbt /usr/local/bin/sbt
 
 # Install Coursier
-# Install Coursier
 RUN curl -fLo cs-x86_64-pc-linux.gz https://github.com/coursier/coursier/releases/download/v2.1.16/cs-x86_64-pc-linux.gz && \
     gunzip cs-x86_64-pc-linux.gz && \
     chmod +x cs-x86_64-pc-linux && \
@@ -62,5 +61,8 @@ ENV PATH="${PATH}:/root/.local/share/coursier/bin"
 #RUN sbt clean compile
 RUN chmod +x /app/run_eval.sh
 
+RUN sbt clean compile
+
+ENV _JAVA_OPTIONS="-Xmx10g"
 
 CMD ["/app/run_eval.sh"]
