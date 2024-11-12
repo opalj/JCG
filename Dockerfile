@@ -9,6 +9,12 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Setup python link
+RUN ln -s /usr/bin/python3 /usr/local/bin/python3
+
+# setup more recent version of node needed for jelly
+RUN npm install -g n
+RUN n 22.11.0
 RUN pip install --upgrade setuptools==58.0.4 wheel
 
 # Install call graph generators
