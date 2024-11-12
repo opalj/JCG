@@ -23,23 +23,22 @@ RUN npm install -g @cs-au-dk/jelly@0.10.0
 RUN pip install PyCG==0.0.7
 RUN pip3 install code2flow==2.5.1
 RUN npm install -g acorn@8.14.0 # code2flow needs acorn for js parsing
-RUN pip3 install pyan3==1.2.0 # might need to be downgraded to 1.1.1
+RUN pip3 install pyan3==1.1.1 # version 1.2.0 crashes
 
 # Install TAJS
 RUN curl -sL https://www.brics.dk/TAJS/dist/tajs-all.jar -o /usr/local/bin/tajs-all.jar
 
 # Install Jarvis
-RUN git clone https://github.com/nico-kunz/pythonJaRvis.github.io.git
-RUN mv pythonJaRvis.github.io /usr/local/bin/jarvis
+RUN git clone https://github.com/nico-kunz/pythonJaRvis.github.io.git /usr/local/bin/jarvis
 
-# Create working directory
+# Create working directory and copy application files
 WORKDIR /app
-
-# Copy application into container
 COPY . /app
 
 RUN echo "tajs = /usr/local/bin/tajs-all.jar" >> /app/tajs.properties
-RUN echo "jarvis = /usr/local/bin/jarvis/tool/Jarvis/jarvis_cli.py" >> /app/adapters.properties
+RUN echo "jarvis = /usr/local/bin/jarvis/Jarvis/tool/Jarvis/jarvis_cli.py" >> /app/adapters.properties
+RUN touch /app/package.json # Jelly needs a package.json file to detect base directory
+
 # Set up Scala
 #RUN curl -sL https://github.com/sbt/sbt/releases/download/v1.8.0/sbt-1.8.0.tgz | tar xz -C /usr/local && \
 #    ln -s /usr/local/sbt/bin/sbt /usr/local/bin/sbt
