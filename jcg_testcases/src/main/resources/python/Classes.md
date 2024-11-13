@@ -7,7 +7,7 @@ Test the call to a class method.
 ```json
 {
   "directLinks": [
-    ["<global>", "C1.Foo.foo"]
+    ["<global>", "C1.foo"]
   ],
   "indirectLinks": []
 }
@@ -31,7 +31,7 @@ Test a class method calling another class method on self.
 ```json
 {
   "directLinks": [
-    ["C2.Foo.bar", "C2.Foo.foo"]
+    ["C2.bar", "C2.foo"]
   ],
   "indirectLinks": []
 }
@@ -59,7 +59,7 @@ Test inheritance.
 ```json
 {
   "directLinks": [
-    ["<global>", "C3.Bar.foo"]
+    ["<global>", "C3.foo"]
   ],
   "indirectLinks": []
 }
@@ -86,7 +86,7 @@ Test if diamond problem is correctly resolved, i.e. the MRO is correctly followe
 ```json
 {
   "directLinks": [
-    ["<global>", "C4.Three.foo"]
+    ["<global>", "C4.foo:11"]
   ],
   "indirectLinks": []
 }
@@ -121,7 +121,7 @@ Test method calling method of superclass.
 ```json
 {
   "directLinks": [
-    ["C5.Bar.bar", "C5.Foo.foo"]
+    ["C5.bar", "C5.foo"]
   ],
   "indirectLinks": []
 }
@@ -150,7 +150,8 @@ Test the use of super() to access overridden method.
 ```json
 {
   "directLinks": [
-    ["C6.Foo.foo", "C6.Bar.foo"]
+    ["<global>", "C6.foo:8"],
+    ["C6.foo:8", "C6.foo:3"]
   ],
   "indirectLinks": []
 }
@@ -172,3 +173,54 @@ b.foo()
 ```
 [//]: # (END)
 
+## C7
+[//]: # (MAIN: global)
+Test the use of a constructor.
+
+```json
+{
+  "directLinks": [
+    ["<global>", "C7.__init__"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# classes/C7.py
+
+class Foo:
+    def __init__(self):
+        pass
+
+f = Foo()
+```
+[//]: # (END)
+
+## C8
+[//]: # (MAIN: global)
+Test call to super constructor
+
+```json
+{
+  "directLinks": [
+    ["<global>", "C8.__init__:7"],
+    ["C8.__init__:8", "C8.__init__:3"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# classes/C8.py
+
+class Foo:
+    def __init__(self):
+        pass
+
+class Bar(Foo):
+    def __init__(self):
+        super().__init__()
+        pass
+
+b = Bar()
+```
+[//]: # (END)
