@@ -120,7 +120,7 @@ Test an anonymous function calling another anonymous function.
   "directLinks": [
     ["<global>", "AF5.foo"],
     ["AF5.foo", "AF5.<anonymous:11>"],
-    ["AF5.<anonymous:12>", "AF5.<anonymous:4>"]
+    ["AF5.<anonymous:11>", "AF5.<anonymous:4>"]
   ],
   "indirectLinks": []
 }
