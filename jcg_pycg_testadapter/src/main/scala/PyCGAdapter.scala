@@ -179,6 +179,10 @@ object PyCGAdapter extends PyTestAdapter {
             case _                          => label.replaceAll("\\(\\)", "")
         }
 
+        if (label.contains('.')) {
+            label = label.split('.').last
+        }
+
         Node(kv._1, label, filePath, Position(row))
     }
 
