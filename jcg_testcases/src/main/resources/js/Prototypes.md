@@ -57,7 +57,6 @@ dog.speak();
 ## P3
 [//]: # (MAIN: global)
 Test prototype chain inheritance with method override (see if tool can follow the prototype chain correctly).
-TODO: EXPECTED NOT RIGHT, TEST ALSO A BIT WEIRD
 
 ```json
 {
