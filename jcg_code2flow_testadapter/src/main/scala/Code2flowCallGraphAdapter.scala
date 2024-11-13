@@ -121,7 +121,15 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
 
     private def getNodeFromKV(kv: (String, ujson.Value), folder: String): (String, Node) = {
         val splitName = kv._2("name").str.split("::")
-        val label = if (splitName.last == "(global)") "global" else splitName.last
+        var label = if (splitName.last == "(global)") "global" else splitName.last
+        if (label.contains("constructor")) {
+            label = "constructor"
+        }
+
+        if (label.contains(".")) {
+            label = label.split("\\.").last
+        }
+
         val path = folder.split("/").last.split("\\.").head + "/" + splitName.head + ".js"
         val start = kv._2("label").str.split(":").head.toInt
 
