@@ -138,7 +138,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
             if (debug) println(s"$id: $label at line $start in $filePath")
 
             label = label match {
-                case s"function($rest" => if (filePath != "Native") s"<anonymous:$start>" else label
+                case s"function($rest" => if (filePath != "Native") s"anon" else label
                 case "<main>"          => "global"
                 case _                 => label.split("\\(")(0)
             }
