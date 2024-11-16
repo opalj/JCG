@@ -88,7 +88,7 @@ bar(1)
 
 ## M4
 [//]: # (MAIN: global)
-Test a module import import.
+Test a full module import.
 
 ```json
 {
