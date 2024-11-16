@@ -106,3 +106,36 @@ if (cond) {
 bar["b"]();
 ```
 [//]: # (END)
+
+## DPA5
+[//]: # (MAIN: global)
+Test a more complex dynamic property access scenario.
+
+```json
+{
+  "directLinks": [],
+  "indirectLinks": ["DPA5.foo"]
+}
+```
+```js
+// dpa/DPA5.js
+
+function foo() {
+    return 1;
+}
+
+function getName(num) {
+    if(num === 1) {
+        return "a";
+    } else {
+        return getName(num - 1);
+    }
+}
+
+var bar = {};
+
+bar[getName(100000)] = foo;
+bar["a"]();
+```
+[//]: # (END)
+
