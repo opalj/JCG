@@ -84,3 +84,32 @@ var x = foo()
 x(1);
 ```
 [//]: # (END)
+
+## HOF4
+[//]: # (MAIN: global)
+Test reassignment of a function to a variable
+
+```json
+{
+  "directLinks": [
+    ["<global>", "HOF4.bar"],
+  ],
+  "indirectLinks": []
+}
+```
+```js
+// af/HOF4.js
+
+function foo() {
+    return bar;
+}
+
+function bar(x) {
+    return x;
+}
+
+var f = foo;
+var f = bar;
+f(1);
+```
+[//]: # (END)
