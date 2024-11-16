@@ -150,7 +150,7 @@ Test the use of super() to access overridden method.
 ```json
 {
   "directLinks": [
-    ["<global>", "C6.foo:8"],
+    ["<global>", "C6.foo:7"],
     ["C6.foo:8", "C6.foo:3"]
   ],
   "indirectLinks": []
