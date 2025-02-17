@@ -58,13 +58,12 @@ RUN echo "jarvis = /usr/local/bin/jarvis/Jarvis/tool/Jarvis/jarvis_cli.py" >> /a
 
 # Add coursier binaries to PATH
 ENV PATH="${PATH}:/root/.local/share/coursier/bin"
+RUN echo "{ }" > package.json  # Jelly needs a package.json file to detect base directory
 
 #RUN sbt clean compile
 RUN chmod +x /app/run_eval.sh
 
 RUN sbt clean compile
-
-RUN echo "{ }" > package.json  # Jelly needs a package.json file to detect base directory
 
 ENV _JAVA_OPTIONS="-Xmx10g"
 
