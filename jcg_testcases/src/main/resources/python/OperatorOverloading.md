@@ -3,12 +3,12 @@ Python allows to define custom behavior for operators, this is known as operator
 
 ## OO1
 [//]: # (MAIN: global)
-Test overloading the `+` operator.
+Test overloading the `[]` operator.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "OO1.Foo.__add__"]
+    ["<global>", "OO1.Foo.__getitem__"]
   ],
   "indirectLinks": []
 }
@@ -18,25 +18,24 @@ Test overloading the `+` operator.
 
 class Foo:
     def __init__(self, x):
-        self.x = x
+        self.x = [x]
 
-    def __add__(self, other):
-        return self.x + other.x
+    def __getitem__(self, key):
+        return self.x[key]
 
 f1 = Foo(1)
-f2 = Foo(2)
-f1 + f2
+f1[0]
 ```
 [//]: # (END)
 
 ## OO2
 [//]: # (MAIN: global)
-Test overloading the `*` operator.
+Test overloading the `==` operator.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "OO2.Foo.__mul__"]
+    ["<global>", "OO2.Foo.__eq__"]
   ],
   "indirectLinks": []
 }
@@ -48,23 +47,23 @@ class Foo:
     def __init__(self, x):
         self.x = x
 
-    def __mul__(self, other):
-        return self.x * other.x
+    def __eq__(self, other):
+        return self.x == other.x
 
 f1 = Foo(1)
 f2 = Foo(2)
-f1 * f2
+f1 == f2
 ```
 [//]: # (END)
 
 ## OO3
 [//]: # (MAIN: global)
-Test overloading the `-` operator.
+Test overloading the `in` operator.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "OO3.Foo.__sub__"]
+    ["<global>", "OO3.Foo.__contains__"]
   ],
   "indirectLinks": []
 }
@@ -73,26 +72,25 @@ Test overloading the `-` operator.
 # oo/OO3.py
 
 class Foo:
-    def __init__(self, x):
-        self.x = x
+    def __init__(self, items):
+        self.items = items
 
-    def __sub__(self, other):
-        return self.x - other.x
+    def __contains__(self, item):
+        return item in self.items
 
-f1 = Foo(1)
-f2 = Foo(2)
-f1 - f2
+f1 = Foo([1, 2, 3])
+2 in f1
 ```
 [//]: # (END)
 
 ## OO4
 [//]: # (MAIN: global)
-Test overloading the `/` operator.
+Test overloading the `setitem` operator.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "OO4.Foo.__truediv__"]
+    ["<global>", "OO4.Foo.__setitem__"]
   ],
   "indirectLinks": []
 }
@@ -101,26 +99,25 @@ Test overloading the `/` operator.
 # oo/OO4.py
 
 class Foo:
-    def __init__(self, x):
-        self.x = x
+    def __init__(self):
+        self.data = {}
 
-    def __truediv__(self, other):
-        return self.x / other.x
+    def __setitem__(self, key, value):
+        self.data[key] = value
 
-f1 = Foo(1)
-f2 = Foo(2)
-f1 / f2
+f1 = Foo()
+f1['a'] = 1
 ```
 [//]: # (END)
 
 ## OO5
 [//]: # (MAIN: global)
-Test overloading the `==` operator.
+Test overloading the `!=` operator.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "OO5.Foo.__eq__"]
+    ["<global>", "OO5.Foo.__ne__"]
   ],
   "indirectLinks": []
 }
@@ -132,12 +129,12 @@ class Foo:
     def __init__(self, x):
         self.x = x
 
-    def __eq__(self, other):
-        return self.x == other.x
+    def __ne__(self, other):
+        return self.x != other.x
 
 f1 = Foo(1)
 f2 = Foo(2)
-f1 == f2
+f1 != f2
 ```
 [//]: # (END)
 
@@ -171,12 +168,12 @@ f1 < f2
 
 ## OO7
 [//]: # (MAIN: global)
-Test overloading the `>` operator.
+Test overloading the `+` operator.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "OO7.Foo.__gt__"]
+    ["<global>", "OO7.Foo.__add__"]
   ],
   "indirectLinks": []
 }
@@ -188,11 +185,11 @@ class Foo:
     def __init__(self, x):
         self.x = x
 
-    def __gt__(self, other):
-        return self.x > other.x
+    def __add__(self, other):
+        return self.x + other.x
 
 f1 = Foo(1)
 f2 = Foo(2)
-f1 > f2
+f1 + f2
 ```
 [//]: # (END)

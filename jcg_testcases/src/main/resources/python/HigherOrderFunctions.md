@@ -108,18 +108,44 @@ f(1)
 
 ## HOF5
 [//]: # (MAIN: global)
-Test if chained assignments are correctly tracked.
+Test call to returned function that was passed as argument.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "HOF5.bar"]
+    ["<global>", "HOF5.bar"],
+    ["<global>", "HOF5.foo"]
   ],
   "indirectLinks": []
 }
 ```
 ```python
 # hof/HOF5.py
+
+def bar(func):
+    return func
+
+def foo():
+    return 1
+
+bar(foo)()
+```
+[//]: # (END)
+
+## HOF6
+[//]: # (MAIN: global)
+Test if chained assignments are correctly tracked.
+
+```json
+{
+  "directLinks": [
+    ["<global>", "HOF6.bar"]
+  ],
+  "indirectLinks": []
+}
+```
+```python
+# hof/HOF6.py
 
 def bar():
     return 1
@@ -129,20 +155,20 @@ f()
 ```
 [//]: # (END)
 
-## HOF6
+## HOF7
 [//]: # (MAIN: global)
 Test if multi assignments are correctly tracked.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "HOF6.foo"]
+    ["<global>", "HOF7.foo"]
   ],
   "indirectLinks": []
 }
 ```
 ```python
-# hof/HOF6.py
+# hof/HOF7.py
 
 def bar():
     return 1
@@ -154,5 +180,3 @@ f, g = bar, foo
 g()
 ```
 [//]: # (END)
-
-

@@ -25,6 +25,7 @@ function foo() {
 }
 
 var f = [bar, foo];
+f[1]();
 ```
 [//]: # (END)
 

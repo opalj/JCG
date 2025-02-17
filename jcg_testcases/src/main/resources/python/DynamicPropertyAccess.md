@@ -84,7 +84,6 @@ getattr(bar, "a")()
 ```
 [//]: # (END)
 
-
 ## DPA4
 [//]: # (MAIN: global)
 Test property access depending on conditional.
@@ -113,5 +112,37 @@ else:
     setattr(bar, "b", foo)
 
 getattr(bar, "b")()
+```
+[//]: # (END)
+
+## DPA5
+[//]: # (MAIN: global)
+Test a more complex dynamic property access scenario.
+
+```json
+{
+  "directLinks": [],
+  "indirectLinks": ["DPA5.foo"]
+}
+```
+```python
+# dpa/DPA5.py
+
+def foo():
+    return 1
+
+def get_name(n):
+    if n == 1:
+        return "a"
+    else:
+        return get_name(n - 1)
+
+class Bar:
+    pass
+
+bar = Bar()
+setattr(bar, get_name(100000), foo)
+
+getattr(bar, "a")()
 ```
 [//]: # (END)

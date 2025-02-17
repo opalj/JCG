@@ -89,9 +89,8 @@ code = """
 x = "test"
 """
 
-code += """
-foo()
-"""
+code += "foo"
+code = code + "()"
 
 exec(code)
 ```

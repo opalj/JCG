@@ -63,7 +63,12 @@ function foo() {
     return 2;
 }
 
-Function("return foo()")();
+var code = "var z = 1;";
+code += "return";
+code += " foo";
+code += "()";
+
+new Function(code)();
 ```
 
 [//]: # (END)
@@ -108,6 +113,81 @@ function foo() {
 }
 
 setInterval("foo()", 1000);
+```
+
+[//]: # (END)
+
+## DCG6
+[//]: # (MAIN: global)
+Test a more complex function call using eval.
+
+```json
+{
+  "directLinks": [],
+  "indirectLinks": ["DCG6.foo"]
+}
+```
+```js
+// dcg/DCG6.js
+
+function foo() {
+    return 2;
+}
+
+var code = "var z = 1;";
+code += "foo()";
+
+eval(code);
+```
+
+[//]: # (END)
+
+## DCG7
+[//]: # (MAIN: global)
+Test a more complex function call using setTimeout.
+
+```json
+{
+  "directLinks": [],
+  "indirectLinks": ["DCG7.foo"]
+}
+```
+```js
+// dcg/DCG7.js
+
+function foo() {
+    return 2;
+}
+
+var code = "var z = 1;";
+code += "foo()";
+
+setTimeout(code, 1000);
+```
+
+[//]: # (END)
+
+## DCG8
+[//]: # (MAIN: global)
+Test a more complex function call using setInterval.
+
+```json
+{
+  "directLinks": [],
+  "indirectLinks": ["DCG8.foo"]
+}
+```
+```js
+// dcg/DCG8.js
+
+function foo() {
+    return 2;
+}
+
+var code = "var z = 1;";
+code += "foo()";
+
+setInterval(code, 1000);
 ```
 
 [//]: # (END)
