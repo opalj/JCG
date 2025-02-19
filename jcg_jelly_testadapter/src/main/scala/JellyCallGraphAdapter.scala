@@ -128,10 +128,6 @@ object JellyCallGraphAdapter extends JSTestAdapter {
 
             Edge(source, target)
         }).toArray
-        // val nodes = cg.filter(node => node("data").obj("kind").str == "function").map(node => getNodeFromKV((node("data").obj("id").num.toInt.toString, node("data").obj), cgFile.getAbsolutePath))
-        // val nodes: mutable.Map[String, Node] = cg("nodes").obj.map(node => getNodeFromKV(node, cgFile.getAbsolutePath))
-        // val edges: Array[Edge] =
-        //  cg("edges").arr.map(edge => Edge(nodes(edge("source").str), nodes(edge("target").str))).toArray
 
         if (debug) {
             println("[DEBUG] nodes:\n" + nodes.mkString("\n"))

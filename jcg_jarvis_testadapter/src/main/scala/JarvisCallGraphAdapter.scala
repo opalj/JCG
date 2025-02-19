@@ -156,14 +156,6 @@ object JarvisCallGraphAdapter extends PyTestAdapter {
             nodes ++= getNodesFromNamespace(namespaces, filePath)
         })
 
-        /*val externalModules = cg("modules").obj("external").obj
-        externalModules.foreach(module => {
-            val filePath = if (module._1 == ".builtin") "Native" else module._2("sourceFile").str
-            val namespaces = module._2("namespaces").obj
-
-            nodes ++= getNodesFromNamespace(namespaces, filePath)
-        })*/
-
         nodes.toArray
     }
 
