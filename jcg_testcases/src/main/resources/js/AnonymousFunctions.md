@@ -88,20 +88,45 @@ foo(
 
 ## AF4
 [//]: # (MAIN: global)
-Test an anonymous function calling another anonymous function.
+Test the use of arrow syntax with explicit body.
 
 ```json
 {
   "directLinks": [
-    ["<global>", "AF4.foo"],
-    ["AF4.foo", "AF4.<anonymous:11>"],
-    ["AF4.<anonymous:12>", "AF4.<anonymous:4>"]
+    ["AF4.foo", "AF4.<anonymous:7>"]
   ],
   "indirectLinks": []
 }
 ```
 ```js
 // af/AF4.js
+
+function foo(f) {
+    return f(1);
+}
+
+foo(
+    x => { return x + 1; }
+);
+```
+[//]: # (END)
+
+## AF5
+[//]: # (MAIN: global)
+Test an anonymous function calling another anonymous function.
+
+```json
+{
+  "directLinks": [
+    ["<global>", "AF5.foo"],
+    ["AF5.foo", "AF5.<anonymous:11>"],
+    ["AF5.<anonymous:11>", "AF5.<anonymous:4>"]
+  ],
+  "indirectLinks": []
+}
+```
+```js
+// af/AF5.js
 
 function foo(f) {
     f(

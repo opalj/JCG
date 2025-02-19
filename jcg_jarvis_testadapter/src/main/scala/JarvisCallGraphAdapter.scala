@@ -5,11 +5,34 @@ import scala.collection.mutable.ArrayBuffer
 
 import upickle.default._
 
-object PyCGAdapter extends PyTestAdapter {
+// IMPORTANT NOTE: MAKE SURE TO USE PYTHON 3.8 for this, newer Python versions won't work
+object JarvisCallGraphAdapter extends PyTestAdapter {
     val debug: Boolean = false
-    val frameworkName: String = "PyCG"
+    val frameworkName: String = "Jarvis"
     val possibleAlgorithms: Array[String] = Array("NONE")
-    private val command = "pycg"
+    private lazy val command: Option[Seq[String]] = {
+        // read jarvis location from jarvis variable in adapters.properties
+        val propertiesFile = new File("adapters.properties")
+        if (!propertiesFile.exists()) {
+            println("[ERROR] adapters.properties not found")
+            None
+        } else {
+            import scala.util.Using
+
+            val jarvisLocation = Using(scala.io.Source.fromFile(propertiesFile)) { source =>
+                source.getLines.find(_.replaceAll(" ", "").startsWith("jarvis=")).getOrElse("").split("=").last.trim()
+            }.getOrElse("")
+
+            println(s"[DEBUG] jarvis location: ${jarvisLocation.trim()}")
+
+            val jarvisPy = new File(jarvisLocation)
+            if (!jarvisPy.exists()) {
+                println("[ERROR] jarvis location not found in adpaters.properties")
+                None
+            }
+            Some(Seq("python3", jarvisPy.getAbsolutePath))
+        }
+    }
 
     def main(args: Array[String]): Unit = {
         serializeAllCGs("testcasesOutput/python", s"results/python/$frameworkName")
@@ -34,7 +57,7 @@ object PyCGAdapter extends PyTestAdapter {
 
         // check if pycg command is available
         try {
-            sys.process.Process(Seq(command, "-h")).!!
+            sys.process.Process(command.get ++ Seq("-h")).!!
         } catch {
             case e: Exception => println(s"${Console.RED}[ERROR]: $command not found${Console.RESET}")
         }
@@ -52,6 +75,7 @@ object PyCGAdapter extends PyTestAdapter {
         output:         Writer,
         adapterOptions: AdapterOptions
     ): Long = {
+        print(s"Generating call graph for $inputDirPath... ")
         val files =
             new File(inputDirPath).listFiles()(0).listFiles().filter(_.getName.endsWith(".py")).map(_.getAbsolutePath)
         val mainFilePath = if (files.length == 1) files(0) else files.find(_.contains("main")).getOrElse(files(0))
@@ -61,13 +85,13 @@ object PyCGAdapter extends PyTestAdapter {
         val tempFile = new File(s"temp/$frameworkName/$algorithm/out.json")
         tempFile.getParentFile.mkdirs()
 
-        val args = Seq(mainFilePath, "-o", tempFile.getAbsolutePath, "--fasten")
+        val args = Seq("--decy", "--precision", mainFilePath, "-o", tempFile.getAbsolutePath)
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 
         val start = System.nanoTime()
         val processSucceeded =
             try {
-                sys.process.Process(Seq(command) ++ args).!!
+                sys.process.Process(command.get ++ args).!!
                 true
             } catch {
                 case e: Exception =>
@@ -85,6 +109,8 @@ object PyCGAdapter extends PyTestAdapter {
             } catch {
                 case e: Exception =>
                     println(s"${Console.RED}[ERROR]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
+                    println(e)
+                    println(e.getStackTrace.mkString("\n"))
             }
         }
 
@@ -96,7 +122,7 @@ object PyCGAdapter extends PyTestAdapter {
         val cg = file("graph")
 
         // merge "internalCalls", "resolvedCalls" and externalCalls array
-        val edges = cg("internalCalls").arr ++ cg("resolvedCalls").arr ++ cg("externalCalls").arr
+        val edges = cg("internalCalls").arr ++ cg("externalCalls").arr
         val nodes = parseNodes(file)
         if (debug) {
             println("[DEBUG] nodes:\n" + nodes.mkString("\n"))
@@ -105,8 +131,8 @@ object PyCGAdapter extends PyTestAdapter {
 
         val resultEdges: Array[Edge] = edges.map(edgeArr => {
             // array contains three elements, last one is always empty object
-            val source = edgeArr(0).str
-            val target = edgeArr(1).str
+            val source = edgeArr(0).num.toInt.toString
+            val target = edgeArr(1).num.toInt.toString
             Edge(nodes.find(_.id == source).get, nodes.find(_.id == target).get)
         }).toArray
         val jsonCG = write(resultEdges)
@@ -122,18 +148,10 @@ object PyCGAdapter extends PyTestAdapter {
     private def parseNodes(cg: ujson.Obj): Array[Node] = {
         val nodes: ArrayBuffer[Node] = ArrayBuffer()
 
-        val internalModules = cg("modules").obj("internal").obj.values
+        val internalModules = cg("modules").obj.values
         internalModules.foreach(module => {
             val filePath = module("sourceFile").str
             val namespaces = module("namespaces").obj
-
-            nodes ++= getNodesFromNamespace(namespaces, filePath)
-        })
-
-        val externalModules = cg("modules").obj("external").obj
-        externalModules.foreach(module => {
-            val filePath = if (module._1 == ".builtin") "Native" else module._2("sourceFile").str
-            val namespaces = module._2("namespaces").obj
 
             nodes ++= getNodesFromNamespace(namespaces, filePath)
         })
@@ -179,9 +197,8 @@ object PyCGAdapter extends PyTestAdapter {
             case _                          => label.replaceAll("\\(\\)", "")
         }
 
-        if (label.contains('.')) {
+        if (label.contains('.'))
             label = label.split('.').last
-        }
 
         Node(kv._1, label, filePath, Position(row))
     }

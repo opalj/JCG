@@ -21,7 +21,7 @@ export function foo(x) {
 }
 ```
 ```js
-//modules/Main.js
+// modules/Main.js
 import { foo } from './M1.js';
 
 foo(1);
@@ -47,7 +47,7 @@ export function foo(x) {
 }
 ```
 ```js
-//modules/Main.js
+// modules/Main.js
 
 import { foo as myFoo } from './M2.js';
 
@@ -74,7 +74,7 @@ export default function foo(x) {
 }
 ```
 ```js
-//modules/Main.js
+// modules/Main.js
 
 import foo from './M3.js';
 
@@ -106,7 +106,7 @@ export function bar(x) {
 }
 ```
 ```js
-//modules/Main.js
+// modules/Main.js
 
 import foo, { bar } from './M4.js';
 
@@ -134,7 +134,7 @@ export default function foo(x) {
 }
 ```
 ```js
-//modules/Main.js
+// modules/Main.js
 
 import myFoo from './M5.js';
 
@@ -161,7 +161,7 @@ export function foo(x) {
 }
 ```
 ```js
-//modules/Main.js
+// modules/Main.js
 
 import * as myModule from './M6.js';
 
@@ -188,9 +188,63 @@ module.exports = function foo(x) {
 }
 ```
 ```js
-//modules/Main.js
+// modules/Main.js
 
 const foo = require('./M7.js');
+
+foo(1);
+```
+[//]: # (END)
+
+## M8
+[//]: # (MAIN: global)
+Test the use of an import without file ending.
+```json
+{
+  "directLinks": [
+    ["<global>", "M8.foo"]
+  ],
+  "indirectLinks": []
+}
+```
+```js
+// modules/M8.js
+
+export function foo(x) {
+    return x + 1;
+}
+```
+```js
+// modules/Main.js
+
+import { foo } from './M8';
+
+foo(1);
+```
+[//]: # (END)
+
+## M9
+[//]: # (MAIN: global)
+Test the use of a commonJS import without file ending.
+```json
+{
+  "directLinks": [
+    ["<global>", "M9.foo"]
+  ],
+  "indirectLinks": []
+}
+```
+```js
+// modules/M9.js
+
+module.exports = function foo(x) {
+    return x + 1;
+}
+```
+```js
+// modules/Main.js
+
+const foo = require('./M9');
 
 foo(1);
 ```

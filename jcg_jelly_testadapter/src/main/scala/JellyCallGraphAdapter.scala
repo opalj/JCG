@@ -1,16 +1,16 @@
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer
-import scala.collection.mutable
+import scala.util.Using
 
 import upickle.default._
 
-object Code2flowCallGraphAdapter extends JSTestAdapter {
+object JellyCallGraphAdapter extends JSTestAdapter {
     val debug: Boolean = false
 
     val possibleAlgorithms: Array[String] = Array("NONE")
-    val frameworkName: String = "code2flow"
-    private val command = "code2flow"
+    val frameworkName: String = "jelly"
+    private val command = "jelly"
 
     def main(args: Array[String]): Unit = serializeAllCGs("testcasesOutput/js", s"results/js/$frameworkName")
 
@@ -32,14 +32,12 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
         val testDirs = new File(inputDirPath).list()
 
         // check if js-callgraph command is available
-        val command = "code2flow"
         try {
             sys.process.Process(Seq(command, "--help")).!!
         } catch {
             case e: Exception =>
                 println(s"${Console.RED}[Error]: $command command not found, make sure it is installed and in your PATH${Console.RESET}")
                 return
-
         }
 
         // generate callgraph for every testcase
@@ -66,10 +64,10 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
         output:         Writer,
         adapterOptions: AdapterOptions
     ): Long = {
-        val tempFile = new File(s"temp/$frameworkName/$algorithm/out.json")
+        val tempFile = new File(s"temp/$frameworkName/$algorithm/out.html")
         tempFile.getParentFile.mkdirs()
 
-        val args = Seq(inputDirPath, "--output", tempFile.getAbsolutePath, "-q", "--source-type=module", "--no-trimming")
+        val args = Seq("--approx", inputDirPath, "-m", tempFile.getAbsolutePath)
         if (debug) println(s"[DEBUG] executing ${(Seq(command) ++ args).mkString(" ")}")
 
         // Generate call graph
@@ -93,6 +91,8 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
             } catch {
                 case e: Exception =>
                     println(s"${Console.RED}[Error]: Failed to process and write the call graph for $inputDirPath${Console.RESET}")
+                    println(e)
+                    println(e.getStackTrace.mkString("\n"))
             }
         }
 
@@ -106,33 +106,72 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
      * @return The call graph in the common format.
      */
     private def toCommonFormat(cgFile: File): String = {
-        val cg = ujson.read(cgFile).obj("graph")
-        val nodes: mutable.Map[String, Node] = cg("nodes").obj.map(node => getNodeFromKV(node, cgFile.getAbsolutePath))
-        val edges: Array[Edge] =
-            cg("edges").arr.map(edge => Edge(nodes(edge("source").str), nodes(edge("target").str))).toArray
+        val jsonData = getJSONData(cgFile.getAbsolutePath)
+        val graphData = jsonData("graphs").arr
+        val cg = graphData.head("elements").arr
+
+        val filterFuncs = (node: ujson.Value) => {
+            val kind = node("data").obj("kind").str
+
+            // the bool is stored as a string for some reason..
+            val isEntry = node("data").obj.contains("isEntry") && node("data").obj("isEntry").str == "true"
+            kind == "function" || (kind == "module" && isEntry)
+        }
+        val nodes = cg.filter(filterFuncs).map(node =>
+            getNodeFromObj(node("data").obj, cgFile.getAbsolutePath)
+        ).toMap
+
+        val calls = cg.filter(node => node("data").obj("kind").str == "call").map(call => {
+            val data = call("data").obj
+            val source = nodes(data("source").num.toInt.toString)
+            val target = nodes(data("target").num.toInt.toString)
+
+            Edge(source, target)
+        }).toArray
 
         if (debug) {
             println("[DEBUG] nodes:\n" + nodes.mkString("\n"))
-            println("[DEBUG] edges:\n" + edges.mkString("\n"))
+            println("[DEBUG] edges:\n" + calls.mkString("\n"))
         }
-        val jsonCG = write(edges)
+        val jsonCG = write(calls)
         jsonCG
     }
 
-    private def getNodeFromKV(kv: (String, ujson.Value), folder: String): (String, Node) = {
-        val splitName = kv._2("name").str.split("::")
-        var label = if (splitName.last == "(global)") "global" else splitName.last
-        if (label.contains("constructor")) {
-            label = "constructor"
+    private def getJSONData(filePath: String): ujson.Value = {
+        val htmlContent = Using.resource(scala.io.Source.fromFile(filePath))(_.mkString)
+        val dataRegex = """(?s)const data = (\{.*?});""".r
+        val dataMatch = dataRegex.findFirstMatchIn(htmlContent)
+
+        dataMatch match {
+            case Some(m) =>
+                if (debug) println("[DEBUG] DATA", m.group(1))
+                ujson.read(m.group(1)) // get the JSON content inside the `{...}`
+            case None =>
+                throw new RuntimeException("No JSON data found in the file.")
+        }
+    }
+
+    private def getNodeFromObj(node: ujson.Obj, folder: String): (String, Node) = {
+        // find global scope
+        val filePath = node("fullName").str.split("/").takeRight(3).mkString("/").split(":").head
+
+        if (node("kind").str == "module") {
+            val fileName = node("name").str.split("/").last
+            return node("id").num.toInt.toString -> Node(node("id").num.toInt.toString, "global", filePath, Position(0))
         }
 
-        if (label.contains(".")) {
-            label = label.split("\\.").last
+        val name = node("name").str
+        val id = node("id").num.toInt.toString
+        val splitName = name.split(" ")
+        val label = {
+            if (splitName.head == "global") "global"
+            else if (splitName.head == "<anon>") "anon"
+            else splitName.head
         }
 
-        val path = folder.split("/").last.split("\\.").head + "/" + splitName.head + ".js"
-        val start = kv._2("label").str.split(":").head.toInt
+        // foo 2:1:4:2
+        val start = splitName.last.split(":").head.toInt
 
-        kv._1 -> Node(kv._1, label, path, Position(start))
+        id -> Node(id, label, filePath, Position(start))
     }
 }

@@ -23,7 +23,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
                 source.getLines.find(_.replaceAll(" ", "").startsWith("tajs=")).getOrElse("")
             }.getOrElse("")
 
-            val tajsJar = new File(s"${tajsLocation.split("=")(1)}dist/tajs-all.jar".trim())
+            val tajsJar = new File(s"${tajsLocation.split("=")(1)}".trim())
             if (!tajsJar.exists()) {
                 println("[ERROR] tajs location not found in tajs.properties")
                 None
@@ -96,7 +96,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
             new File(inputDirPath).listFiles()(0).listFiles().map(_.getAbsolutePath).filter(_.endsWith(
                 ".js"
             )).head
-        val args = Seq("-callgraph", inputFilePath)
+        val args = Seq("-callgraph", inputFilePath, "-uneval")
         if (debug) println(s"[DEBUG] executing ${args.mkString(" ")}")
         val start = System.nanoTime()
         val processSucceeded =
@@ -138,7 +138,7 @@ object TAJSJCGAdapter extends JSTestAdapter {
             if (debug) println(s"$id: $label at line $start in $filePath")
 
             label = label match {
-                case s"function($rest" => if (filePath != "Native") s"<anonymous:$start>" else label
+                case s"function($rest" => if (filePath != "Native") s"anon" else label
                 case "<main>"          => "global"
                 case _                 => label.split("\\(")(0)
             }

@@ -71,6 +71,7 @@ trait FingerprintExtractor {
 
             }
             ow.newLine()
+            ow.flush()
             fingerprintWriter.close()
         }
         ow.close()
@@ -86,13 +87,16 @@ trait FingerprintExtractor {
     def assessCG(inputDir: File, adapterDir: File, testName: String): Assessment = {
         // compare to expected call graph
         val cgFile = new File(s"${adapterDir.getAbsolutePath}/$testName.json")
-        println(cgFile)
         val callGraph: Option[AdapterCG] = if (cgFile.exists()) Some(new AdapterCG(cgFile)) else None
         val expectedCGFile =
             FileOperations.listFilesRecursively(
                 new File(s"${inputDir.getAbsolutePath}/$testName"),
                 ".json"
             ).head
+
+        if (cgFile.length() == 0) {
+            return Error
+        }
 
         val expectedCG = new ExpectedCG(expectedCGFile)
         val assessment: Assessment = callGraph match {

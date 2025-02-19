@@ -5,14 +5,14 @@ import scala.collection.mutable
 
 import upickle.default._
 
-object Code2flowCallGraphAdapter extends JSTestAdapter {
+object Code2flowPyCallGraphAdapter extends PyTestAdapter {
     val debug: Boolean = false
 
     val possibleAlgorithms: Array[String] = Array("NONE")
-    val frameworkName: String = "code2flow"
+    val frameworkName: String = "code2flowPy"
     private val command = "code2flow"
 
-    def main(args: Array[String]): Unit = serializeAllCGs("testcasesOutput/js", s"results/js/$frameworkName")
+    def main(args: Array[String]): Unit = serializeAllCGs("testcasesOutput/python", s"results/python/$frameworkName")
 
     /**
      * Generates all call graphs with the given algorithm.
@@ -130,7 +130,7 @@ object Code2flowCallGraphAdapter extends JSTestAdapter {
             label = label.split("\\.").last
         }
 
-        val path = folder.split("/").last.split("\\.").head + "/" + splitName.head + ".js"
+        val path = folder.split("/").last.split("\\.").head + "/" + splitName.head + ".py"
         val start = kv._2("label").str.split(":").head.toInt
 
         kv._1 -> Node(kv._1, label, path, Position(start))

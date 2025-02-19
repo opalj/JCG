@@ -63,14 +63,42 @@ Test the use of a function as return value but stored in variable
 ```json
 {
   "directLinks": [
-    ["<global>", "HOF2.foo"],
-    ["<global>", "HOF2.bar"]
+    ["<global>", "HOF3.foo"],
+    ["<global>", "HOF3.bar"]
   ],
   "indirectLinks": []
 }
 ```
 ```js
 // af/HOF3.js
+
+function bar(x) {
+    return x;
+}
+
+function foo() {
+    return bar;
+}
+
+var x = foo()
+x(1);
+```
+[//]: # (END)
+
+## HOF4
+[//]: # (MAIN: global)
+Test reassignment of a function to a variable
+
+```json
+{
+  "directLinks": [
+    ["<global>", "HOF4.bar"],
+  ],
+  "indirectLinks": []
+}
+```
+```js
+// af/HOF4.js
 
 function foo() {
     return bar;
@@ -80,7 +108,8 @@ function bar(x) {
     return x;
 }
 
-var x = foo()
-x(1);
+var f = foo;
+var f = bar;
+f(1);
 ```
 [//]: # (END)

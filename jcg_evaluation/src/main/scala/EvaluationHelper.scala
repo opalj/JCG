@@ -1,7 +1,6 @@
 import java.io.File
 import java.io.FileInputStream
 import java.util.zip.GZIPInputStream
-
 import play.api.libs.json.Json
 
 // todo make a factory
@@ -15,7 +14,7 @@ class CommonEvaluationConfig(
     val ZIP:                     Boolean
 ) {
     val JRE_LOCATIONS_FILE = "jre.conf"
-    val SERIALIZATION_FILE_NAME = if(ZIP) "cg.zip" else "cg.json"
+    val SERIALIZATION_FILE_NAME = if (ZIP) "cg.zip" else "cg.json"
 }
 
 case class JCGConfig(
@@ -199,8 +198,10 @@ object CommonEvaluationConfig {
 
 object EvaluationHelper {
     val ALL_JAVA_ADAPTERS: List[JavaTestAdapter] = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
-    val ALL_JS_ADAPTERS: List[JSTestAdapter] = List(JSCallGraphAdapter, Code2flowCallGraphAdapter, TAJSJCGAdapter)
-    val ALL_PY_ADAPTERS: List[PyTestAdapter] = List(PyCGAdapter)
+    val ALL_JS_ADAPTERS: List[JSTestAdapter] =
+        List(JSCallGraphAdapter, Code2flowCallGraphAdapter, TAJSJCGAdapter, JellyCallGraphAdapter)
+    val ALL_PY_ADAPTERS: List[PyTestAdapter] =
+        List(PyCGAdapter, PyanAdapter, Code2flowPyCallGraphAdapter, JarvisCallGraphAdapter)
 
     def getProjectsDir(inputPath: String): File = {
         val projectsDir = new File(inputPath)
@@ -227,7 +228,7 @@ object EvaluationHelper {
         projectSpec: ProjectSpecification,
         resultsDir:  File
     ): File = {
-        val dirName = s"${ projectSpec.name }${ File.separator }${ adapter.frameworkName }${ File.separator }$algorithm"
+        val dirName = s"${projectSpec.name}${File.separator}${adapter.frameworkName}${File.separator}$algorithm"
         new File(resultsDir, dirName)
     }
 
