@@ -83,9 +83,29 @@ lazy val jcg_opal_testadapter = project.settings(
     jcg_testadapter_commons
 )
 
+lazy val jcg_doop_testadapter = project.settings(
+    commonSettings,
+    name := "JCG DOOP Test Adapter",
+    libraryDependencies += "de.opal-project" %% "bytecode-representation" % "5.0.1-SNAPSHOT",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
+    libraryDependencies += "commons-io" % "commons-io" % "2.6",
+    assembly / aggregate := false,
+    publishArtifact := false
+).dependsOn(
+    jcg_annotation_matcher, // TODO
+    jcg_testadapter_commons
+)
+
 lazy val jcg_js_callgraph_testadapter = project.settings(
     commonSettings,
     name := "JCG js-callgraph Test Adapter",
+    assembly / aggregate := false,
+    publishArtifact := false
+).dependsOn(jcg_testadapter_commons)
+
+lazy val jcg_jelly_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Jelly Test Adapter",
     assembly / aggregate := false,
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
@@ -97,12 +117,19 @@ lazy val jcg_tajs_testadapter = project.settings(
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
 
-lazy val jcg_code2flow_testadapter = project.settings(
+lazy val jcg_code2flow_js_testadapter = project.settings(
     commonSettings,
-    name := "JCG Code2Flow Test Adapter",
+    name := "JCG Code2Flow JS Test Adapter",
     assembly / aggregate := false,
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
+
+lazy val jcg_code2flow_py_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Code2Flow Python Test Adapter",
+    assembly / aggregate := false,
+    publishArtifact := false
+    ).dependsOn(jcg_testadapter_commons)
 
 lazy val jcg_pycg_testadapter = project.settings(
     commonSettings,
@@ -118,32 +145,12 @@ lazy val jcg_pyan_testadapter = project.settings(
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
 
-lazy val jcg_jelly_testadapter = project.settings(
-    commonSettings,
-    name := "JCG Jelly Test Adapter",
-    assembly / aggregate := false,
-    publishArtifact := false
-).dependsOn(jcg_testadapter_commons)
-
 lazy val jcg_jarvis_testadapter = project.settings(
     commonSettings,
     name := "JCG Jarvis Test Adapter",
     assembly / aggregate := false,
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
-
-lazy val jcg_doop_testadapter = project.settings(
-    commonSettings,
-    name := "JCG DOOP Test Adapter",
-    libraryDependencies += "de.opal-project" %% "bytecode-representation" % "5.0.1-SNAPSHOT",
-    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
-    libraryDependencies += "commons-io" % "commons-io" % "2.6",
-    assembly / aggregate := false,
-    publishArtifact := false
-).dependsOn(
-    jcg_annotation_matcher, // TODO
-    jcg_testadapter_commons
-)
 
 lazy val jcg_dynamic_testadapter = project.settings(
     commonSettings,
@@ -186,8 +193,12 @@ lazy val jcg_evaluation = project.settings(
     jcg_opal_testadapter,
     jcg_doop_testadapter,
     jcg_js_callgraph_testadapter,
-    jcg_code2flow_testadapter,
+    jcg_jelly_testadapter,
     jcg_tajs_testadapter,
+    jcg_code2flow_js_testadapter,
+    jcg_code2flow_py_testadapter,
     jcg_pycg_testadapter,
+    jcg_pyan_testadapter,
+    jcg_jarvis_testadapter,
     jcg_dynamic_testadapter
 )
