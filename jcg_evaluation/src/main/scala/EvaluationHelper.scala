@@ -197,7 +197,7 @@ object CommonEvaluationConfig {
 }
 
 object EvaluationHelper {
-    val ALL_JAVA_ADAPTERS: List[JavaTestAdapter] = List(SootJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
+    val ALL_JAVA_ADAPTERS: List[JavaTestAdapter] = List(SootJCGAdapter, SootUpJCGAdapter, WalaJCGAdapter, OpalJCGAdatper, DoopAdapter)
     val ALL_JS_ADAPTERS: List[JSTestAdapter] =
         List(JSCallGraphAdapter, Code2flowCallGraphAdapter, TAJSJCGAdapter, JellyCallGraphAdapter)
     val ALL_PY_ADAPTERS: List[PyTestAdapter] =

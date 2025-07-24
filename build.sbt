@@ -73,6 +73,18 @@ lazy val jcg_soot_testadapter = project.settings(
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
 
+lazy val jcg_sootup_testadapter = project.settings(
+    commonSettings,
+    name := "JCG SootUp Test Adapter",
+    libraryDependencies += "org.soot-oss" % "sootup.callgraph" % "2.0.0",
+    libraryDependencies += "org.soot-oss" % "sootup.java.core" % "2.0.0",
+    libraryDependencies += "org.soot-oss" % "sootup.java.bytecode.frontend" % "2.0.0",
+    libraryDependencies += "org.soot-oss" % "sootup.qilin" % "2.0.0",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
+    aggregate in assembly := false,
+    publishArtifact := false
+    ).dependsOn(jcg_testadapter_commons)
+
 lazy val jcg_opal_testadapter = project.settings(
     commonSettings,
     name := "JCG OPAL Test Adapter",
@@ -192,6 +204,7 @@ lazy val jcg_evaluation = project.settings(
     jcg_testadapter_commons,
     jcg_wala_testadapter,
     jcg_soot_testadapter,
+    jcg_sootup_testadapter,
     jcg_opal_testadapter,
     jcg_doop_testadapter,
     jcg_js_callgraph_testadapter,
