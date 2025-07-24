@@ -22,7 +22,44 @@ import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
 
-object WalaJCGAdapter extends JavaTestAdapter {
+import com.ibm.wala.ipa.callgraph.AnalysisCache
+import com.ibm.wala.ipa.callgraph.AnalysisScope
+import com.ibm.wala.ipa.callgraph.CallGraph
+import com.ibm.wala.ipa.callgraph.Entrypoint
+import com.ibm.wala.ipa.cha.ClassHierarchy
+
+object WalaJCGAdapter extends WalaBasedJCGAdapter {
+
+    val frameworkName: String = "WALA"
+
+    val possibleAlgorithms: Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA")
+
+
+    def computeCG(algorithm: String, scope: AnalysisScope, classHierarchy: ClassHierarchy, cache: AnalysisCache, options: AnalysisOptions, entrypoints: java.lang.Iterable[Entrypoint]): CallGraph = {
+        if (algorithm.contains("0-CFA")) {
+            val ncfaBuilder = Util.makeZeroCFABuilder(JAVA, options, cache, classHierarchy, scope)
+            ncfaBuilder.makeCallGraph(options)
+        } else if (algorithm.contains("0-1-CFA")) {
+            val cfaBuilder = Util.makeZeroOneCFABuilder(JAVA, options, cache, classHierarchy, scope)
+            cfaBuilder.makeCallGraph(options)
+        } else if (algorithm.contains("1-CFA")) {
+            val cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope)
+            cfaBuilder.makeCallGraph(options)
+        } else if (algorithm.contains("RTA")) {
+            val rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope)
+            rtaBuilder.makeCallGraph(options, new NullProgressMonitor)
+        } else if (algorithm.contains("CHA")) {
+            import com.ibm.wala.ipa.callgraph.cha.CHACallGraph
+            val CG = new CHACallGraph(classHierarchy)
+            CG.init(entrypoints)
+            CG
+        } else throw new IllegalArgumentException
+    }
+}
+
+abstract class WalaBasedJCGAdapter extends JavaTestAdapter {
+
+    def computeCG(algorithm: String, scope: AnalysisScope, classHierarchy: ClassHierarchy, cache: AnalysisCache, options: AnalysisOptions, entrypoints: java.lang.Iterable[Entrypoint]): CallGraph
 
     def serializeCG(
         algorithm: String,
@@ -41,6 +78,13 @@ object WalaJCGAdapter extends JavaTestAdapter {
         var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
         cp = inputDirPath + File.pathSeparator + cp
 
+        val ex = if (analyzeJDK) {
+            new File(cl.getResource("no-exclusions.txt").getFile)
+        } else {
+            // TODO exclude more of the jdk
+            new File(cl.getResource("Java60RegressionExclusions.txt").getFile)
+        }
+
         // write wala.properties with the specified JDK and store it in the classpath
         val tmp = new File("tmp")
         tmp.mkdirs()
@@ -54,13 +98,6 @@ object WalaJCGAdapter extends JavaTestAdapter {
         val m = sysclass.getDeclaredMethod("addURL", classOf[URL])
         m.setAccessible(true)
         m.invoke(sysloader, tmp.toURI.toURL)*/
-
-        val ex = if (analyzeJDK) {
-            new File(cl.getResource("no-exclusions.txt").getFile)
-        } else {
-            // TODO exclude more of the jdk
-            new File(cl.getResource("Java60RegressionExclusions.txt").getFile)
-        }
 
         val scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(cp, ex)
 
@@ -83,25 +120,7 @@ object WalaJCGAdapter extends JavaTestAdapter {
 
         val cache = new AnalysisCacheImpl
 
-        val cg =
-            if (algorithm.contains("0-CFA")) {
-                val ncfaBuilder = Util.makeZeroCFABuilder(JAVA, options, cache, classHierarchy, scope)
-                ncfaBuilder.makeCallGraph(options)
-            } else if (algorithm.contains("0-1-CFA")) {
-                val cfaBuilder = Util.makeZeroOneCFABuilder(JAVA, options, cache, classHierarchy, scope)
-                cfaBuilder.makeCallGraph(options)
-            } else if (algorithm.contains("1-CFA")) {
-                val cfaBuilder = Util.makeNCFABuilder(1, options, cache, classHierarchy, scope)
-                cfaBuilder.makeCallGraph(options)
-            } else if (algorithm.contains("RTA")) {
-                val rtaBuilder = Util.makeRTABuilder(options, cache, classHierarchy, scope)
-                rtaBuilder.makeCallGraph(options, new NullProgressMonitor)
-            } else if (algorithm.contains("CHA")) {
-                import com.ibm.wala.ipa.callgraph.cha.CHACallGraph
-                val CG = new CHACallGraph(classHierarchy)
-                CG.init(entrypoints)
-                CG
-            } else throw new IllegalArgumentException
+        val cg = computeCG(algorithm, scope, classHierarchy, cache, options, entrypoints)
         val after = System.nanoTime
 
         val initialEntryPoints = cg.getFakeRootNode.iterateCallSites().asScala.map(_.getDeclaredTarget)
@@ -168,10 +187,6 @@ object WalaJCGAdapter extends JavaTestAdapter {
 
         after - before
     }
-
-    val possibleAlgorithms: Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
-
-    val frameworkName: String = "WALA"
 
     private def createMethodObject(method: MethodReference): Method = {
         val name = method.getName.toString

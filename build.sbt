@@ -62,6 +62,16 @@ lazy val jcg_wala_testadapter = project.settings(
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
 
+lazy val jcg_seneca_testadapter = project.settings(
+    commonSettings,
+    name := "JCG Seneca Test Adapter",
+    resolvers += Resolver.mavenLocal,
+    libraryDependencies += "edu.rit.se.design" % "seneca" % "1.0",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
+    assembly / aggregate := false,
+    publishArtifact := false
+    ).dependsOn(jcg_testadapter_commons, jcg_wala_testadapter)
+
 lazy val jcg_soot_testadapter = project.settings(
     commonSettings,
     name := "JCG Soot Test Adapter",
@@ -203,6 +213,7 @@ lazy val jcg_evaluation = project.settings(
     jcg_annotation_matcher,
     jcg_testadapter_commons,
     jcg_wala_testadapter,
+    jcg_seneca_testadapter,
     jcg_soot_testadapter,
     jcg_sootup_testadapter,
     jcg_opal_testadapter,
