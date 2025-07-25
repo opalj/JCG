@@ -1,9 +1,6 @@
 /bin/
 target/
-.project
-.classpath
-.cache-main
-.idea
+.*
 *.iws
 *.ipr
 *.iml
@@ -22,6 +19,6 @@ result/
 /evaluation
 jre.conf
 local.sbt
-*/build.properties
+**/build.properties
 /fingerprints
 .*
