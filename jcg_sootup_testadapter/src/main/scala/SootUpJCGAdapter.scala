@@ -49,13 +49,15 @@ object SootUpJCGAdapter extends JavaTestAdapter {
         val JDKPath = adapterOptions.getString("JDKPath")
         val analyzeJDK = adapterOptions.getBoolean("analyzeJDK")
 
-        val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
+        val classPathString = if(classPath.isEmpty) "" else classPath.mkString(File.pathSeparator, File.pathSeparator, "")
 
         val cp =
-            if(analyzeJDK || Seq(CHA, RTA).contains(algorithm)){
-                inputDirPath + classPath.mkString(File.pathSeparator, File.pathSeparator, "") + jreJars.mkString(File.pathSeparator, File.pathSeparator, "")
+            if(analyzeJDK || !Seq(CHA, RTA).contains(algorithm)){
+                val jreJars = JRELocation.getAllJREJars(JDKPath).map(_.getCanonicalPath)
+                val jreJarString = if(jreJars.isEmpty) "" else jreJars.mkString(File.pathSeparator, File.pathSeparator, "")
+                inputDirPath + classPathString + jreJarString
             } else {
-                inputDirPath + classPath.mkString(File.pathSeparator, File.pathSeparator, "")
+                inputDirPath + classPathString
             }
 
         val inputLocations: List[AnalysisInputLocation] = List(new JavaClassPathAnalysisInputLocation(cp))
@@ -66,8 +68,9 @@ object SootUpJCGAdapter extends JavaTestAdapter {
 
         val before = System.nanoTime
 
-        def computeCG(cgAlgorithm: CallGraphAlgorithm): CallGraph = {
-            if (mainClass == null) {
+        def computeCG(cgAlgorithm: CallGraphAlgorithm): (CallGraph, Iterable[MethodSignature]) = {
+            val cg =
+                if (mainClass == null) {
                 cgAlgorithm.initialize()
             } else {
                 val idFactory = view.getIdentifierFactory
@@ -76,9 +79,10 @@ object SootUpJCGAdapter extends JavaTestAdapter {
                 val mainMethod = idFactory.getMethodSignature(mainClassType, "main", VoidType.getInstance(), List(stringArrayType).asJava)
                 cgAlgorithm.initialize(List(mainMethod).asJava)
             }
+            (cg, cg.getEntryMethods.asScala)
         }
 
-        val cg: CallGraph =
+        val (cg: CallGraph, entrypoints: Iterable[MethodSignature]) =
             if (algorithm.contains(CHA)) {
                 computeCG(new ClassHierarchyAnalysisAlgorithm(view))
         } else if (algorithm.contains(RTA)) {
@@ -94,12 +98,12 @@ object SootUpJCGAdapter extends JavaTestAdapter {
             PTAConfig.v()
             val pta = PTAFactory.createPTA(ptaPattern, view, mainClass)
             pta.run()
-            pta.getCallGraph()
+            (pta.getCallGraph(), pta.getNakedReachableMethods.asScala.map(_.getSignature))
         }
 
         val after = System.nanoTime
 
-        val worklist = mutable.Queue(cg.getEntryMethods.asScala.toSeq: _*)
+        val worklist = mutable.Queue(entrypoints.toSeq: _*)
         val processed = mutable.Set(worklist.toSeq: _*)
 
         var reachableMethods = Set.empty[ReachableMethod]
