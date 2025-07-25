@@ -52,9 +52,9 @@ lazy val jcg_wala_testadapter = project.settings(
     commonSettings,
     name := "JCG WALA Test Adapter",
     resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.core" % "1.5.7",
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.5.7",
-    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.5.7",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.core" % "1.5.5",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.5.5",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.5.5",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
     assembly / aggregate := false,
     publishArtifact := false
