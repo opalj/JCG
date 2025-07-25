@@ -122,14 +122,14 @@ object TestCaseExtractor {
 
         // parse arguments
         val mdFilter = getArgumentValue(args, "--md").getOrElse("")
-        val language = getArgumentValue(args, "--lang").getOrElse("all")
+        val language = getArgumentValue(args, "--lang").getOrElse("all").toLowerCase
         val resourceDir = new File(getArgumentValue(args, "--rsrcDir").getOrElse(userDir))
         val outputDir = new File(getArgumentValue(args, "--outDir").getOrElse("testcasesOutput"))
         if (args.contains("--debug")) {
             debug = true
         }
 
-        val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor, PyTestExtractor).filter(extractor => language == "all" || language.contains(extractor.language))
+        val extractors = List[TestCaseExtractor](JavaTestExtractor, JSTestExtractor, PyTestExtractor).filter(extractor => language == "all" || language.contains(extractor.language.toLowerCase))
 
         for (extractor <- extractors) {
             extractor.extract(resourceDir, outputDir, mdFilter)

@@ -119,7 +119,7 @@ object FileOperations {
      * @param filter    a filter to apply to the file names
      */
     def listFiles(dir: File, extension: String, filter: String): Array[File] =
-        dir.listFiles(_.getPath.endsWith(extension)).filter(_.getName.startsWith(filter))
+        dir.listFiles(_.getPath.endsWith(extension)).filter(_.getName.toLowerCase.startsWith(filter.toLowerCase))
 
 
     /**
