@@ -40,7 +40,7 @@ object CGMatcher {
             Array.empty[File]
         )
 
-        if(!serializedCallGraph.exists()){
+        if(!serializedCallGraph.exists() || serializedCallGraph.length() == 0){
             return Error;
         }
 
