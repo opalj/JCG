@@ -30,7 +30,7 @@ trait TestCaseExtractor {
      */
     def extract(inputDir: File, outputDir: File, prefixFilter: String = ""): Unit = {
         val resources: Array[File] = FileOperations.getResources(new File(inputDir, language), prefixFilter)
-        val resultsDir = new File(outputDir, language)
+        val resultsDir = if (language == "all") new File(outputDir, language) else outputDir
         val temp = new File("tmp")
         // Clear result directory if it already exists
         FileOperations.cleanUpDirectory(resultsDir)
