@@ -2,27 +2,24 @@
 import java.io.File
 import java.io.PrintWriter
 import java.io.Writer
-import java.util
-import java.util.stream.Collectors
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+import play.api.libs.json.Json
 
 import com.ibm.wala.classLoader.Language.JAVA
+import com.ibm.wala.ipa.callgraph.AnalysisCache
 import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
+import com.ibm.wala.ipa.callgraph.AnalysisScope
+import com.ibm.wala.ipa.callgraph.CallGraph
+import com.ibm.wala.ipa.callgraph.Entrypoint
 import com.ibm.wala.ipa.callgraph.impl.Util
+import com.ibm.wala.ipa.cha.ClassHierarchy
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory
 import com.ibm.wala.types.MethodReference
 import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
-import play.api.libs.json.Json
-import scala.collection.JavaConverters._
-import scala.collection.mutable
-
-import com.ibm.wala.ipa.callgraph.AnalysisCache
-import com.ibm.wala.ipa.callgraph.AnalysisScope
-import com.ibm.wala.ipa.callgraph.CallGraph
-import com.ibm.wala.ipa.callgraph.Entrypoint
-import com.ibm.wala.ipa.cha.ClassHierarchy
 
 object WalaJCGAdapter extends WalaBasedJCGAdapter {
 
@@ -71,8 +68,8 @@ abstract class WalaBasedJCGAdapter extends JavaTestAdapter {
         val before = System.nanoTime
         val cl = Thread.currentThread.getContextClassLoader
 
-        var cp = util.Arrays.stream(classPath).collect(Collectors.joining(File.pathSeparator))
-        cp = inputDirPath + File.pathSeparator + cp
+        val classPathString = if(classPath.isEmpty) "" else classPath.mkString(File.pathSeparator, File.pathSeparator, "")
+        val cp = inputDirPath + classPathString
 
         val ex = if (analyzeJDK) {
             new File(cl.getResource("no-exclusions.txt").getFile)
