@@ -40,8 +40,7 @@ trait FingerprintExtractor {
                 val output = new BufferedWriter(new FileWriter(adapterDir.getAbsolutePath + "/" + testDir + ".json"))
 
                 val future = Future {
-                    // execute adapter
-                    try {
+                    val elapsed = try {
                         adapter.serializeCG(
                             cgAlgorithm,
                             s"${inputDir.getAbsolutePath}/$testDir",
@@ -52,11 +51,19 @@ trait FingerprintExtractor {
                             if (config.debug) {
                                 println(e.getMessage)
                             }
+                            -1
                     } finally {
                         output.close()
                     }
 
-                    // try reading and matching resulting call graph
+                    // write the timing information (just like in Evaluation.runAnalyses())
+                    val seconds = elapsed / 1000000000d
+                    val timingFile = new File(adapterDir, s"$testDir.timing.txt")
+                    val pw = new PrintWriter(timingFile)
+                    pw.write(s"$seconds sec.")
+                    pw.close()
+                    println(s"analysis for $testDir took $seconds sec.")
+
                     ow.synchronized {
                         System.gc()
 

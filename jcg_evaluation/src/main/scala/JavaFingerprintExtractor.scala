@@ -54,7 +54,7 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                 println(s"performing test case: ${projectSpec.name}")
 
                 val future = Future {
-                    try {
+                    val elapsed = try {
                         adapter.serializeCG(
                             cgAlgorithm,
                             projectSpec.target(projectsDir).getCanonicalPath,
@@ -71,9 +71,19 @@ object JavaFingerprintExtractor extends FingerprintExtractor {
                             if (config.debug) {
                                 println(e.printStackTrace())
                             }
+                            -1
                     } finally {
                         output.close()
                     }
+                    
+                    // write the timing information (just like in Evaluation.runAnalyses())
+                    val seconds = elapsed / 1000000000d
+                    val timingFile = new File(outDir, "timings.txt")
+                    val pw = new PrintWriter(timingFile)
+                    pw.write(s"$seconds sec.")
+                    pw.close()
+                    println(s"analysis for ${projectSpec.name} took $seconds sec.")
+
                     ow.synchronized {
                         System.gc()
 
