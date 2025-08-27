@@ -118,7 +118,7 @@ object ConfigParser {
                     .required(),
                 checkConfig(c =>
                     // check if adapters match language
-                    if (c.adapters.map(_.language).forall(_ == c.language)) success
+                    if (c.adapters.map(_.language.toLowerCase).forall(_ == c.language.toLowerCase)) success
                     else failure("The given adapters do not match the language of the projects.")
                 )
             )
@@ -128,7 +128,7 @@ object ConfigParser {
             case Some(config) =>
                 // If no adapter is specified, all adapters of specified language are used
                 if (config.adapters.isEmpty) {
-                    val adapters = ALL_ADAPTERS.filter(_.language == config.language)
+                    val adapters = ALL_ADAPTERS.filter(_.language.toLowerCase == config.language.toLowerCase)
                     Some(config.copy(adapters = adapters))
                 } else {
                     Some(config)

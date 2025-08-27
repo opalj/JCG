@@ -203,7 +203,7 @@ object FingerprintExtractor {
 
         val config = c.get
 
-        config.language match {
+        config.language.toLowerCase match {
             case "java"   => JavaFingerprintExtractor.generateFingerprints(config)
             case "js"     => JSFingerprintExtractor.generateFingerprints(config)
             case "python" => PyFingerprintExtractor.generateFingerprints(config)
