@@ -30,7 +30,8 @@ lazy val jcg_data_format = project.settings(
     assembly / aggregate := false,
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
     libraryDependencies += "io.get-coursier" %% "coursier" % "2.1.8",
-    libraryDependencies += "io.get-coursier" %% "coursier-cache" % "2.1.8"
+    libraryDependencies += "io.get-coursier" %% "coursier-cache" % "2.1.8",
+    libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.3"
 )
 
 lazy val jcg_testcases = project.settings(
@@ -56,6 +57,7 @@ lazy val jcg_wala_testadapter = project.settings(
     libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.5.7",
     libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.5.7",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
+    libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.3",
     assembly / aggregate := false,
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)

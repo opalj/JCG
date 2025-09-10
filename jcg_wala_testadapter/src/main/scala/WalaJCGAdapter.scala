@@ -5,6 +5,13 @@ import java.io.Writer
 import java.util
 import java.util.stream.Collectors
 
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.core.{JsonFactory, JsonGenerator}
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+
 import com.ibm.wala.classLoader.Language.JAVA
 import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
@@ -14,9 +21,6 @@ import com.ibm.wala.types.MethodReference
 import com.ibm.wala.types.TypeReference
 import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
-import play.api.libs.json.Json
-import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 object WalaJCGAdapter extends JavaTestAdapter {
 
@@ -147,8 +151,20 @@ object WalaJCGAdapter extends JavaTestAdapter {
                 ReachableMethod(createMethodObject(currentMethod), callSites.toSet.flatten)
         }
 
-        val prettyPrint = Json.prettyPrint(Json.toJson(ReachableMethods(reachableMethods)))
-        output.write(prettyPrint)
+        // Write to JSON using a stream to fix issues with CGs too large for memory
+        val data = ReachableMethods(reachableMethods)
+        
+        // using Jackson directly instead of play-json
+        val factory = new JsonFactory()
+        val generator = factory.createGenerator(output)
+        generator.setPrettyPrinter(new DefaultPrettyPrinter())
+        
+        new ObjectMapper()
+            .registerModule(DefaultScalaModule)
+            .writerWithDefaultPrettyPrinter()
+            .writeValue(generator, data)
+        
+        generator.close()
 
         after - before
     }
