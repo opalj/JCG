@@ -29,6 +29,7 @@ object SootJCGAdapter extends JavaTestAdapter {
         output:         Writer,
         adapterOptions: AdapterOptions
     ): Long = {
+        G.reset()
         val mainClass = adapterOptions.getString("mainClass")
         val classPath = adapterOptions.getStringArray("classPath")
         val JDKPath = adapterOptions.getString("JDKPath")
