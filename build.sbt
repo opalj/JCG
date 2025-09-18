@@ -98,6 +98,16 @@ lazy val jcg_doop_testadapter = project.settings(
     jcg_testadapter_commons
 )
 
+lazy val jcg_tai_e_testadapter = project.settings(
+    commonSettings,
+    name := "JCG ValueCG Test Adapter",
+    resolvers += "soot snapshot" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-snapshot/",
+    resolvers += "soot release" at "https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-release/",
+    libraryDependencies += "com.google.code.gson" % "gson" % "2.13.1",
+    assembly / aggregate := false,
+    publishArtifact := false
+).dependsOn(jcg_testadapter_commons)
+
 lazy val jcg_js_callgraph_testadapter = project.settings(
     commonSettings,
     name := "JCG js-callgraph Test Adapter",
@@ -194,6 +204,7 @@ lazy val jcg_evaluation = project.settings(
     jcg_soot_testadapter,
     jcg_opal_testadapter,
     jcg_doop_testadapter,
+    jcg_tai_e_testadapter,
     jcg_js_callgraph_testadapter,
     jcg_jelly_testadapter,
     jcg_tajs_testadapter,
