@@ -1,6 +1,6 @@
 # TestCaseDescriptions
 Documents all test cases that contained within the ```infrastructure_incompatible_testcases``` project
-that comprises all test cases that cannot be build with the automated test pipeline.
+that comprises all test cases that cannot be built with the automated test pipeline.
 
 # ClassLoading
 Please see the descriptions from the ```classloading.md``` file which can be found in the ```testcases```
