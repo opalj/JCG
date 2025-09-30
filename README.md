@@ -1,8 +1,8 @@
 # Java Call Graph (JCG)
 This repository accommodates the Java Call Graph (JCG) project, a collection of annotated test cases
-that are relevant for call-graph construction in Java. The test cases specifically target the call
-graph's soundness and, therefore, tests the correct support of Java language features, core APIs, and
-runtime (JVM) callbacks. Not supporting those features/APIs will render the call graph unsound.
+that are relevant for call-graph construction in Java, JavaScript, and Python. The test cases specifically
+target the call graph's soundness and, therefore, tests the correct support of language features, core
+APIs, and runtime callbacks. Not supporting those features/APIs will render the call graph unsound.
 
 The project's structure and usage are explained in the following.
 
@@ -19,39 +19,71 @@ the test cases extractor which is used to parse the test cases and to compile th
 a test case's expectations. 
 
 - **jcg_annotation_matcher** provides a matcher that matches a given call graph against the expected
-annotations of a particular test case. 
-
-- **jcg_test_adapter_commons** provides an interface that must be implemented when a custom adapter
-is implemented. Adapters that implement this interface are fully compatible with all JCG features and,
-hence, can be used everywhere.
-
-- **jcg_soot_adapter** accommodates an adapter that allows to test Soot's call-graph algorithms
-against the test suite. Currently, the adapter supports Soot's CHA, RTA, VTA, and SPARK algorithms.
-Besides testing Soot's algorithms, the adapter also allows to generate call graph's for an arbitrary
-project. The adapter can also serialize the generated call graph in a unified format
-(see Section Call-graph Serialization).
-
-- **jcg_wala_adapter** accommodates an adapter that allows to test WALA's call-graph algorithms
-against the test suite. Currently, the adapter supports WALA's RTA, 0-CFA, N-CFA, and 0-1-CFA algorithms.
-Besides testing WALA's algorithms, the adapter also allows to generate call graph's for an arbitrary
-project. The adapter can also serialize the generated call graph in a unified format
-(see Section Call-graph Serialization).
-
-- **jcg_opal_adapter** accommodates an adapter that allows to test OPAL's call-graph algorithm
-against the test suite. Currently, the adapter supports OPAL's RTA.
-Besides testing OPAL's algorithms, the adapter also allows to generate call graph's for an arbitrary
-project. The adapter can also serialize the generated call graph in a unified format
-(see Section Call-graph Serialization).
-
-- **jcg_doop_adapter** accommodates an adapter that allows to test Doop's context-insensitive call graph
-against the test suite. Besides testing DOOP, the adapter also allows to generate call graph's for an arbitrary
-project. The adapter can also serialize the generated call graph in a unified format
-(see Section Call-graph Serialization).
+annotations of a particular test case.
 
 - **jcg_data_format** holds the data structure which are used to represent the call graphs internally.
 And data classes for project specifications.
 
-- **jcg_evaluation** provides a several call-graph evaluation an understanding tools. The usage
+- **jcg_evaluation** provides a several call-graph evaluation and exploration tools.
+
+- **jcg_testadapter_commons** provides an interface that must be implemented when a custom adapter
+is implemented. Adapters that implement this interface are fully compatible with all JCG features and,
+hence, can be used everywhere. The adapters allow to generate call graph's for an arbitrary project and
+can also serialize the generated call graph in a unified format (see Section Call-graph Serialization).
+
+### Java Test Adapters
+
+- **jcg_soot_testadapter** accommodates an adapter that allows to test Soot's call-graph algorithms
+against the test suite. Currently, the adapter supports Soot's CHA, RTA, VTA, and SPARK algorithms.
+ 
+- **jcg_sootup_testadapter** accommodates an adapter that allows to test SootUp's call-graph algorithms
+against the test suite. Currently, the adapter supports Soot's CHA, RTA, 0-CFA (via qilin), and 1-CFA
+(via qilin) algorithms.
+
+- **jcg_wala_testadapter** accommodates an adapter that allows to test WALA's call-graph algorithms
+against the test suite. Currently, the adapter supports WALA's RTA, 0-CFA, N-CFA, and 0-1-CFA algorithms.
+
+- **jcg_opal_testadapter** accommodates an adapter that allows to test OPAL's call-graph algorithm
+against the test suite. Currently, the adapter supports OPAL's RTA.
+
+- **jcg_doop_testadapter** accommodates an adapter that allows to test Doop's context-insensitive call graph
+against the test suite.
+
+- **jcg_seneca_testadapter** accommodates an adapter that allows to test SootUp's call-graph algorithms
+against the test suite. Currently, the adapter supports Soot's CHA, RTA, 0-CFA (via qilin), and 1-CFA 
+(via qilin) algorithms.
+
+- **jcg_dynamic_testadapter** accommodates an adapter that allows to generate dynamic call graphs using a
+JVM agent to dynamicall record calls.
+
+### JavaScript Test Adapters
+
+- **jcg_jelly_testadapter** accommodates an adapter that allows to test Jelly's call graph algorithm
+against the test suite.
+
+- **jcg_js_callgraph** accommodates an adapter that allows to test js-callgraph's call-graph algorithms
+against the test suite. Currently, the adapter supports js-callgraph's basic pessimistic (NONE), refined
+pessimistic (ONESHOT) and optimistic (DEMAND) algorithms.
+
+- **jcg_tajs_testadapter** accommodates an adapter that allows to test TAJS's call-graph algorithm
+against the test suite.
+
+- **jcg_code2flow_js_testadapter** accommodates an adapter that allows to test code2flow's JavaScript
+call graph algorithm against the test suite.
+
+### Python Test Adapters
+
+- **jcg_jarvis_testadapter** accommodates an adapter that allows to test Jarvis' call graph algorithm
+against the test suite.
+
+- **jcg_pyan_testadapter** accommodates an adapter that allows to test Pyan's call-graph algorithm
+  against the test suite.
+
+- **jcg_pycg_testadapter** accommodates an adapter that allows to test PyCG's call-graph algorithm
+  against the test suite.
+
+- **jcg_code2flow_py_testadapter** accommodates an adapter that allows to test code2flow's Python
+call graph algorithm against the test suite.
 
 ## Annotating Test Expectations
 
