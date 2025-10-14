@@ -62,6 +62,22 @@ lazy val jcg_wala_testadapter = project.settings(
     publishArtifact := false
 ).dependsOn(jcg_testadapter_commons)
 
+lazy val jcg_wala_js_testadapter = project.settings(
+    commonSettings,
+    name := "JCG WALA JS Test Adapter",
+    resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.core" % "1.5.7",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.util" % "1.5.7",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.shrike" % "1.5.7",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.cast" % "1.5.7",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.cast.js" % "1.5.7",
+    libraryDependencies += "com.ibm.wala" % "com.ibm.wala.cast.js.rhino" % "1.5.7",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
+    libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.3",
+    assembly / aggregate := false,
+    publishArtifact := false
+    ).dependsOn(jcg_testadapter_commons)
+
 lazy val jcg_soot_testadapter = project.settings(
     commonSettings,
     name := "JCG Soot Test Adapter",
@@ -197,6 +213,7 @@ lazy val jcg_evaluation = project.settings(
     jcg_js_callgraph_testadapter,
     jcg_jelly_testadapter,
     jcg_tajs_testadapter,
+    jcg_wala_js_testadapter,
     jcg_code2flow_js_testadapter,
     jcg_code2flow_py_testadapter,
     jcg_pycg_testadapter,

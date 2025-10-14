@@ -4,14 +4,13 @@ import java.io.PrintWriter
 import java.io.Writer
 import java.util
 import java.util.stream.Collectors
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.core.{JsonFactory, JsonGenerator}
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
+import com.fasterxml.jackson.core.JsonFactory
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.ibm.wala.classLoader.Language.JAVA
 import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl
 import com.ibm.wala.ipa.callgraph.AnalysisOptions
@@ -23,6 +22,10 @@ import com.ibm.wala.util.NullProgressMonitor
 import com.ibm.wala.util.config.AnalysisScopeReader
 
 object WalaJCGAdapter extends JavaTestAdapter {
+
+    val possibleAlgorithms: Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
+
+    val frameworkName: String = "WALA"
 
     def serializeCG(
         algorithm: String,
@@ -168,10 +171,6 @@ object WalaJCGAdapter extends JavaTestAdapter {
 
         after - before
     }
-
-    val possibleAlgorithms: Array[String] = Array("0-1-CFA", "RTA", "0-CFA", "1-CFA", "CHA") //Array("0-1-CFA") //"RTA = "0-CFA = "1-CFA = "0-1-CFA")
-
-    val frameworkName: String = "WALA"
 
     private def createMethodObject(method: MethodReference): Method = {
         val name = method.getName.toString
