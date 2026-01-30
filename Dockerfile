@@ -29,7 +29,7 @@ RUN pip3 install pyan3==1.1.1 # version 1.2.0 crashes
 RUN curl -sL https://www.brics.dk/TAJS/dist/tajs-all.jar -o /usr/local/bin/tajs-all.jar
 
 # Install Jarvis
-RUN git clone https://github.com/nico-kunz/pythonJaRvis.github.io.git /usr/local/bin/jarvis
+RUN git clone https://github.com/opalj/pythonJaRvis.github.io.git /usr/local/bin/jarvis
 
 # Install Coursier
 RUN ARCH="$(uname -m)" && \
@@ -54,7 +54,7 @@ RUN coursier install sbt && \
 WORKDIR /app
 #COPY . /app
 RUN git clone https://github.com/opalj/JCG.git /app
-RUN cd /app && git checkout feature/WALA-JS-nico
+RUN cd /app && git checkout feature/WALA-JS-new
 
 RUN rm -f /app/tajs.properties
 RUN rm -f /app/adapters.properties
