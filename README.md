@@ -71,6 +71,9 @@ against the test suite.
 - **jcg_code2flow_js_testadapter** accommodates an adapter that allows to test code2flow's JavaScript
 call graph algorithm against the test suite.
 
+- **jcg_wala_js_testadapter** accommodates an adapter that allows to test WALA's JavaScript call graph
+algorithm against the test suite.
+
 ### Python Test Adapters
 
 - **jcg_jarvis_testadapter** accommodates an adapter that allows to test Jarvis' call graph algorithm
