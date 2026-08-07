@@ -178,12 +178,12 @@ the ```target``` method.
 package tr;
 
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
     private Target field;
 
-    @IndirectCall(
+    @DirectCall(
         name = "target", line = 18, resolvedTargets = "Ltr/CallTarget;"
     )
     public static void main(String[] args) throws Exception {
@@ -225,12 +225,12 @@ the ```target``` method.
 package tr;
 
 import java.lang.reflect.Field;
-import lib.annotations.callgraph.IndirectCall;
+import lib.annotations.callgraph.DirectCall;
 
 public class Demo {
     public Target field;
 
-    @IndirectCall(
+    @DirectCall(
         name = "target", line = 18, resolvedTargets = "Ltr/CallTarget;"
     )
     public static void main(String[] args) throws Exception {
