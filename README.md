@@ -1,4 +1,5 @@
-# Judging Call Graphs (JCG)
+# Judging Call Graphs (JCG) ![JCGLogo](JCGIcon.png)
+
 This repository accommodates the JCG project for judging call graphs, a collection of annotated test cases
 that are relevant for call-graph construction in Java, JavaScript, and Python. The test cases specifically
 target the call graph's soundness and, therefore, tests the correct support of language features, core
