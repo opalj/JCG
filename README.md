@@ -200,12 +200,12 @@ to setup DOOP and OPAL.
 ### DOOP
 To use the DOOP adapter, you need to setup DOOP. To do so, please have a look at DOOP's install instructions:
 
-https://bitbucket.org/yanniss/doop/src/master/
+[https://bitbucket.org/yanniss/doop/src/master/](https://github.com/plast-lab/doop)
 
 ### OPAL
 The current OPAL adapter builds on an development build of OPAL, to set it up do the following:
 
-First make sure to fulfill OPALs dependencies: (see [here](https://github.com/opalj/opal/src/master/))
+First make sure to fulfill OPALs dependencies: (see [here](https://github.com/opalj/opal/tree/master))
 
 Afterwards, clone the opal project, checkout the `develop` branch and publish the project to the local
 Ivy repository:
